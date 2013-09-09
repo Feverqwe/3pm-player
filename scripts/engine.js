@@ -84,6 +84,9 @@ var engine = function() {
 		};
 		return {
 			open: function(id) {
+				if (playlist[id] === undefined) {
+					return;
+				}
 				current_id = id;
 				audio.type = getType(playlist[id].file.name);
 				audio.src = window.URL.createObjectURL(playlist[id].file);
