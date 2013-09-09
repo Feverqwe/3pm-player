@@ -161,18 +161,20 @@ var view = function() {
 			$('.click_for_open input').on('change', function() {
 				engine.open(this.files);
 			});
-			chrome.contextMenus.create({
-				id: "1",
-				title: "Open files",
-				contexts: ["all"]
-			});
-			chrome.contextMenus.onClicked.addListener(function(info) {
-				if (info.menuItemId === "1") {
-					$('.click_for_open input').trigger('click');
-				}
-			});
 			dom_cache.mute.on('click', function() {
 				engine.mute();
+			});
+			chrome.contextMenus.removeAll(function() {
+				chrome.contextMenus.create({
+					id: "1",
+					title: "Open files",
+					contexts: ["all"]
+				});
+				chrome.contextMenus.onClicked.addListener(function(info) {
+					if (info.menuItemId === "1") {
+						$('.click_for_open input').trigger('click');
+					}
+				});
 			});
 		},
 		setTags: function(tags) {

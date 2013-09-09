@@ -19,6 +19,4 @@ chrome.app.runtime.onLaunched.addListener(function() {
 			resizable: false
 		});
 	};
-
-
 });
