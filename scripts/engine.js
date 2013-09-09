@@ -149,10 +149,10 @@ var engine = function() {
 				}
 			},
 			next: function() {
+				var id = current_id + 1;
 				if (shuffle) {
 					id = getRandomInt(0, playlist.length - 1);
 				} else {
-					var id = current_id + 1;
 					if (playlist.length <= id) {
 						id = 0;
 					}
@@ -160,10 +160,10 @@ var engine = function() {
 				player.open(id);
 			},
 			preview: function() {
+				var id = current_id - 1;
 				if (shuffle) {
 					id = getRandomInt(0, playlist.length - 1);
 				} else {
-					var id = current_id - 1;
 					if (id < 0) {
 						id = playlist.length - 1;
 					}
