@@ -205,7 +205,7 @@ var view = function() {
 					}
 				});
 			});
-			dom_cache.shuffle.on('click',function() {
+			dom_cache.shuffle.on('click', function() {
 				engine.shuffle();
 			});
 			chrome.storage.local.get('shuffle', function(storage) {
@@ -213,6 +213,38 @@ var view = function() {
 					engine.shuffle();
 				}
 			});
+			dom_cache.volume.parent().get(0).onmousewheel = function(e) {
+				var val = dom_cache.volume.slider("value");
+				if (e.wheelDelta > 0) {
+					val = val + 10;
+					if (val > 100) {
+						val = 100;
+					}
+					engine.volume(val);
+				} else {
+					val = val - 10;
+					if (val < 0) {
+						val = 0;
+					}
+					engine.volume(val);
+				}
+			};
+			dom_cache.progress.get(0).onmousewheel = function(e) {
+				var val = dom_cache.progress.slider("value");
+				if (e.wheelDelta > 0) {
+					val = (val + 25) / 10;
+					if (val > 100) {
+						val = 100;
+					}
+					engine.position(val);
+				} else {
+					val = (val - 25) / 10;
+					if (val < 0) {
+						val = 0;
+					}
+					engine.position(val);
+				}
+			};
 		},
 		setTags: function(tags) {
 			if (tags === null) {
@@ -289,7 +321,7 @@ var view = function() {
 				dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_medium.png)');
 			}
 		},
-		setShuffle : function(status) {
+		setShuffle: function(status) {
 			chrome.storage.local.set({'shuffle': status});
 			if (status) {
 				dom_cache.shuffle.css('background-image', 'url(images/shuffle_on.png)');
