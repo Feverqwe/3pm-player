@@ -10,10 +10,45 @@ var engine = function() {
 			function loadUrl(url, callback, reader) {
 				ID3.loadTags(url, function() {
 					var tags = ID3.getAllTags(url);
+
+					if ("picture" in tags) {
+						var image = tags.picture;
+						var binary = image.data.reduce(function(str, charIndex) {
+							return str += String.fromCharCode(charIndex);
+						}, '');
+						tags.picture = null;
+						var index = binary.indexOf('JFIF');
+						var type = "jpeg"
+						var pos = 6;
+						if (index === -1) {
+							index = binary.indexOf('PNG');
+							type = "png"
+							pos = 1;
+						}
+						if (index === -1) {
+							var bin = String.fromCharCode.apply(null, [255, 216, 255, 225]);
+							index = binary.indexOf(bin);
+							type = "jpeg"
+							pos = 0;
+						}
+						if (index !== -1) {
+							binary = binary.substr(index - pos);
+							tags.picture = {data: binary, type: type};
+						} else {
+							console.log('Can\'t show image!');
+							delete tags.picture
+						}
+					}
+					$.each(tags, function(key) {
+						if ($.inArray(key, ["artist", "title", "album", "picture"]) === -1) {
+							delete tags[key]
+						}
+					});
+
 					m_cb(tags);
 					view.setTags(tags);
 				},
-				{tags: ["artist", "title", "album", "picture"], dataReader: reader});
+						{tags: ["artist", "title", "album", "picture"], dataReader: reader});
 			}
 			var url = file.urn || file.name;
 			var t = FileAPIReader(file);
@@ -34,44 +69,8 @@ var engine = function() {
 			}
 		};
 		return {
-			open: function(files) {
-				if (files.length === 0)
-					return;
-				playlist = [];
-				for (var i = 0; i < files.length; i++) {
-					if ( $.inArray( files[i].name.split('.').slice(-1)[0].toLowerCase() , ['mp3', 'm4a', 'mp4', 'ogg']) === -1 ) {
-						continue;
-					}
-					playlist.push({id: playlist.length, file: files[i], tags: null, duration: null});
-				}
-				if (playlist.length > 0) {
-					player.play_file(0);
-				} else {
-					audio.pause();
-					view.state("emptied");
-				}
-			},
-			play_file: function(id) {
+			open: function(id) {
 				current_id = id;
-				$('audio').children('source').remove();
-				if (playlist[id].tags === null) {
-					read_tags(playlist[id].file, function(tags) {
-						var obj = {};
-						if ("title" in tags) {
-							obj['title'] = tags.title;
-						}
-						if ("artist" in tags) {
-							obj['artist'] = tags.artist;
-						}
-						if ("album" in tags) {
-							obj['album'] = tags.album;
-						}
-						if ("picture" in tags) {
-							obj['picture'] = tags.picture;
-						}
-						playlist[id].tags = obj;
-					});
-				}
 				audio.type = getType(playlist[id].file.name);
 				audio.src = window.URL.createObjectURL(playlist[id].file);
 			},
@@ -85,20 +84,18 @@ var engine = function() {
 				audio.pause();
 			},
 			next: function() {
-				if (playlist.length <= current_id + 1) {
-					var id = 0;
-				} else {
-					var id = current_id + 1;
+				var id = current_id + 1;
+				if (playlist.length <= id) {
+					id = 0;
 				}
-				player.play_file(id);
+				player.open(id);
 			},
 			preview: function() {
-				if (current_id - 1 <= 0) {
-					var id = 0;
-				} else {
-					var id = current_id - 1;
+				var id = current_id - 1;
+				if (id < 0) {
+					id = playlist.length - 1;
 				}
-				player.play_file(id);
+				player.open(id);
 			},
 			status: function() {
 				var status = {};
@@ -113,112 +110,115 @@ var engine = function() {
 				console.log(status);
 				return status;
 			},
-			volume: function() {
-
+			volume: function(persent) {
+				if (persent === undefined) {
+					view.setVolume(audio.volume);
+					return;
+				}
+				audio.volume = 1.0 / 100 * persent;
 			},
 			position: function(persent) {
-				audio.currentTime = audio.duration/100*persent;
+				if (isNaN(audio.duration)) return;
+				audio.currentTime = audio.duration / 100 * persent;
 			},
 			loop: function() {
-
+				
 			},
 			init: function(audio_el) {
 				$('.engine').append('<audio/>');
 				audio = $('.engine > audio').get(0);
 				$(audio).on('loadstart', function(e) {
-					console.log("loadstart");
+					view.setTags({});
 					view.state("loadstart");
 				});
 				$(audio).on('progress', function(e) {
-					console.log("progress");
 					view.state("progress");
 				});
 				$(audio).on('suspend', function(e) {
-					console.log("suspend");
 					view.state("suspend");
 				});
 				$(audio).on('abort', function(e) {
-					console.log("abort");
 					view.state("abort");
 				});
 				$(audio).on('error', function(e) {
-					console.log("error");
 					view.state("error");
 				});
 				$(audio).on('emptied', function(e) {
-					console.log("emptied");
 					view.state("emptied");
 				});
 				$(audio).on('stalled', function(e) {
-					console.log("stalled");
 					view.state("stalled");
 				});
 				$(audio).on('play', function(e) {
-					console.log("play");
 					view.state("play");
 				});
 				$(audio).on('pause', function(e) {
-					console.log("pause");
 					view.state("pause");
 				});
 				$(audio).on('loadedmetadata', function(e) {
 					playlist[current_id].duration = this.duration;
-					console.log("loadedmetadata");
 					view.state("loadedmetadata");
 				});
 				$(audio).on('loadeddata', function(e) {
-					view.setTags(playlist[current_id].tags);
-					console.log("loadeddata");
+					if (playlist[current_id].tags === null) {
+						read_tags(playlist[current_id].file, function(tags) {
+							var obj = {};
+							if ("title" in tags) {
+								obj['title'] = tags.title;
+							}
+							if ("artist" in tags) {
+								obj['artist'] = tags.artist;
+							}
+							if ("album" in tags) {
+								obj['album'] = tags.album;
+							}
+							if ("picture" in tags) {
+								obj['picture'] = tags.picture;
+							}
+							playlist[current_id].tags = obj;
+						});
+					} else {
+						view.setTags(playlist[current_id].tags);
+					}
 					view.state("loadeddata");
 				});
 				$(audio).on('waiting', function(e) {
-					console.log("waiting");
 					view.state("waiting");
 				});
 				$(audio).on('playing', function(e) {
-					console.log("playing");
 					view.state("playing");
 				});
 				$(audio).on('canplay', function(e) {
-					console.log("canplay");
 					view.state("canplay");
+					view.setVolume(audio.volume);
 				});
 				$(audio).on('canplaythrough', function(e) {
-					console.log("canplaythrough");
 					view.state("canplaythrough");
 				});
 				$(audio).on('seeking', function(e) {
-					console.log("seeking");
 					view.state("seeking");
 				});
 				$(audio).on('seeked', function(e) {
-					console.log("seeked");
 					view.state("seeked");
 				});
 				$(audio).on('timeupdate', function(e) {
 					view.setProgress(this.duration, this.currentTime);
-					//console.log("timeupdate")
-					//console.log(this.currentTime)
-					//console.log(this.duration)
 				});
 				$(audio).on('ended', function(e) {
-					if ( current_id !== playlist.length -1 ) {
+					if (current_id !== playlist.length - 1) {
 						player.next();
 					}
-					console.log("ended");
 					view.state("ended");
 				});
 				$(audio).on('ratechange', function(e) {
-					console.log("ratechange");
 					view.state("ratechange");
 				});
 				$(audio).on('durationchange', function(e) {
-					console.log("durationchange");
 					view.state("durationchange");
 				});
 				$(audio).on('volumechange', function(e) {
-					console.log("volumechange");
 					view.state("volumechange");
+					view.setVolume(audio.volume);
 				});
 			}
 		}
@@ -229,16 +229,31 @@ var engine = function() {
 			$('body').append('<div class="engine"/>');
 			player.init();
 		},
-		status: function() {
-
-		},
 		get_filename: player.get_filename,
-		open: player.open,
+		open: function(files) {
+			if (files.length === 0) {
+				return;
+			}
+			playlist = [];
+			for (var i = 0; i < files.length; i++) {
+				if ($.inArray(files[i].name.split('.').slice(-1)[0].toLowerCase(), ['mp3', 'm4a', 'mp4', 'ogg']) === -1) {
+					continue;
+				}
+				playlist.push({id: playlist.length, file: files[i], tags: null, duration: null});
+			}
+			if (playlist.length > 0) {
+				player.open(0);
+			} else {
+				player.pause();
+				view.state("emptied");
+			}
+		},
 		play: player.play,
 		pause: player.pause,
 		next: player.next,
 		preview: player.preview,
-		position: player.position
+		position: player.position,
+		volume: player.volume
 	}
 }();
 $(function() {

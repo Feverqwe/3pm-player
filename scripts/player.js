@@ -1,7 +1,7 @@
-String.prototype.toHHMMSS = function() {
-	var sec_num = parseInt(this, 10); // don't forget the second parm
+toHHMMSS = function(val) {
+	var sec_num = parseInt(val, 10); // don't forget the second parm
 	if (isNaN(sec_num))
-		return '00:00'
+		return '00:00';
 	var hours = Math.floor(sec_num / 3600);
 	var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
 	var seconds = sec_num - (hours * 3600) - (minutes * 60);
@@ -21,12 +21,24 @@ String.prototype.toHHMMSS = function() {
 		var time = minutes + ':' + seconds;
 	}
 	return time;
-}
+};
 
 var view = function() {
 	var dom_cache = {};
 	var var_cache = {};
 	var time_tipe = 0;
+	var isPlaying = function() {
+		dom_cache.btnPlayPause.removeClass('play').addClass('pause');
+	};
+	var isPause = function() {
+		dom_cache.btnPlayPause.removeClass('pause').addClass('play');
+	};
+	var showImage = function(src) {
+		dom_cache.picture.get(0).src = src;
+	};
+	var hideImage = function() {
+		dom_cache.picture.get(0).src = "images/no-cover.png";
+	};
 	return {
 		show: function() {
 			dom_cache = {
@@ -40,13 +52,48 @@ var view = function() {
 				btnPrev: $('.controls .prev.btn'),
 				btnNext: $('.controls .next.btn'),
 				progress: $('.progress'),
-				progress_bar: $('.progress > .progress_bar'),
-				picture: $('.image > img')
-			}
+				picture: $('.image > img'),
+				volume: $('.volume')
+			};
+			dom_cache.progress.slider({
+				range: "min",
+				min: 0,
+				max: 1000,
+				step: 10,
+				change: function(event, ui) {
+					if ('which' in event === false) {
+						return;
+					}
+					engine.position(ui.value / 10);
+				},
+				slide: function(event, ui) {
+					if ('which' in event === false) {
+						return;
+					}
+					engine.position(ui.value / 10);
+				}
+			});
+			dom_cache.volume.slider({
+				range: "min",
+				min: 0,
+				max: 100,
+				change: function(event, ui) {
+					if ('which' in event === false) {
+						return;
+					}
+					engine.volume(ui.value);
+				},
+				slide: function(event, ui) {
+					if ('which' in event === false) {
+						return;
+					}
+					engine.volume(ui.value);
+				}
+			});
 			view.state('emptied');
 			dom_cache.body.on('drop', function(event) {
 				event.preventDefault();
-				engine.open(event.originalEvent.dataTransfer.files)
+				engine.open(event.originalEvent.dataTransfer.files);
 			});
 			var drag_timeout = null;
 			dom_cache.body.on('dragover', function(event) {
@@ -72,8 +119,8 @@ var view = function() {
 				engine.preview();
 			});
 			dom_cache.picture.get(0).onerror = function() {
-				view.hideImage();
-			}
+				hideImage();
+			};
 			$('.close').on('click', function() {
 				chrome.storage.local.set({'pos_left': window.screenLeft, 'pos_top': window.screenTop}, function() {
 					window.close();
@@ -81,9 +128,6 @@ var view = function() {
 			});
 			$('.mini').on('click', function() {
 				chrome.app.window.current().minimize();
-			});
-			dom_cache.progress.on('click', function(e) {
-				engine.position(e.offsetX / e.currentTarget.clientWidth * 100)
 			});
 			dom_cache.time.on('click', function() {
 				time_tipe = (time_tipe) ? 0 : 1;
@@ -94,121 +138,126 @@ var view = function() {
 					time_tipe = storage.time_tipe;
 				}
 			});
-		},
-		isPlaying: function() {
-			dom_cache.btnPlayPause.removeClass('play').addClass('pause');
-		},
-		isPause: function() {
-			dom_cache.btnPlayPause.removeClass('pause').addClass('play');
-		},
-		showImage: function(src) {
-			dom_cache.picture.get(0).src = src;
-		},
-		hideImage: function() {
-			dom_cache.picture.get(0).src = "images/no-cover.png";
+			chrome.storage.local.get('volume', function(storage) {
+				if ('volume' in storage) {
+					engine.volume(storage.volume);
+				}
+				if ('volume' in storage === false || storage.volume === 100) {
+					engine.volume();
+				}
+			});
+			$(window).keypress(function(event) {
+				if ( 'keyCode' in event == false ) {
+					return;
+				}
+				if (event.keyCode == 32) {
+					event.preventDefault();
+					dom_cache.btnPlayPause.trigger('click');
+				}
+			});
 		},
 		setTags: function(tags) {
 			if (tags === null) {
-				tags = {}
+				tags = {};
 			}
 			if ("title" in tags) {
-				dom_cache.trackname.text(tags.title)
+				dom_cache.trackname.text(tags.title);
 			} else {
-				dom_cache.trackname.text(engine.get_filename())
+				dom_cache.trackname.text(engine.get_filename());
 			}
 			if ("album" in tags && "artist" in tags) {
-				dom_cache.trackalbum.text(tags.artist + ' - ' + tags.album)
+				dom_cache.trackalbum.text(tags.artist + ' - ' + tags.album);
 			} else
 			if ("artist" in tags) {
-				dom_cache.trackalbum.text(tags.artist)
+				dom_cache.trackalbum.text(tags.artist);
 			} else
 			if ("album" in tags) {
-				dom_cache.trackalbum.text(tags.album)
+				dom_cache.trackalbum.text(tags.album);
 			}
 			if ("picture" in tags) {
-				var image = tags.picture;
-				var binary = image.data.reduce(function(str, charIndex) {
-					return str += String.fromCharCode(charIndex);
-				}, '');
-				var index = binary.indexOf('JFIF');
-				var type = "jpeg"
-				var pos = 6;
-				if (index === -1) {
-					index = binary.indexOf('PNG');
-					type = "png"
-					pos = 1;
-				}
-				if (index === -1) {
-					var bin = String.fromCharCode.apply(null, [255, 216, 255, 225]);
-					index = binary.indexOf(bin);
-					type = "jpeg"
-					pos = 0;
-				}
-				if (index !== -1) {
-					binary = binary.substr(index - pos)
-					view.showImage("data:image/" + type + ";base64," + btoa(binary));
-				} else {
-					console.log('Can\'t show image!');
-					//console.log(binary);
-					view.hideImage();
-				}
+				showImage("data:image/" + tags.picture.type + ";base64," + btoa(tags.picture.data));
 			} else {
-				view.hideImage();
+				hideImage();
 			}
 			//console.log(tags)
 		},
 		setProgress: function(max, pos) {
-			var width = pos / max * 100;
-			width = Math.round(var_cache.progress_w / 100 * width * 10) / 10;
-			if (var_cache['progress_bar_w'] == width)
-				return;
-			var_cache['progress_bar_w'] = width;
-			dom_cache.progress_bar.css('width', width + 'px');
+			var width_persent = pos / max * 100;
+			dom_cache.progress.slider("value", width_persent * 10);
 			if (time_tipe) {
-				var time = "-" + String(max - pos).toHHMMSS();
+				var time = "-" + toHHMMSS(max - pos);
 			} else {
-				var time = String(pos).toHHMMSS();
+				var time = toHHMMSS(pos);
 			}
-			dom_cache.time.html(time)
+			dom_cache.time.html(time);
+		},
+		setVolume: function(pos) {
+			var max = 1.0;
+			var width_persent = pos / max * 100;
+			dom_cache.volume.slider("value", width_persent);
+			chrome.storage.local.set({'volume': width_persent});
+			if (width_persent > 50) {
+				if (var_cache['volume_image'] === 1) {
+					return;
+				}
+				var_cache['volume_image'] = 1;
+				dom_cache.volume.parent().css('background-image', 'url(images/sound_high.png)');
+			} else
+			if (pos === 0) {
+				if (var_cache['volume_image'] === 2) {
+					return;
+				}
+				var_cache['volume_image'] = 2;
+				dom_cache.volume.parent().css('background-image', 'url(images/sound_mute.png)');
+			} else
+			if (width_persent < 50) {
+				if (var_cache['volume_image'] === 3) {
+					return;
+				}
+				var_cache['volume_image'] = 3;
+				dom_cache.volume.parent().css('background-image', 'url(images/sound_low.png)');
+			}
 		},
 		state: function(type) {
-			if (type == "loadstart") {
+			console.log(type);
+			if (type === "loadstart") {
 				dom_cache.loading.show();
 			}
-			if (type == "loadeddata") {
+			if (type === "loadeddata") {
 				dom_cache.loading.hide();
 			}
-			if (type == "emptied") {
+			if (type === "emptied") {
 				dom_cache.loading.hide();
 				dom_cache.trackname.empty();
 				dom_cache.trackalbum.empty();
 				dom_cache.time.empty();
-				view.hideImage();
+				hideImage();
 				var_cache = {};
 				var_cache['progress_w'] = dom_cache.progress.width();
-				view.isPause();
+				var_cache['volume_w'] = dom_cache.volume.width();
+				isPause();
 				view.setProgress(0.1, 0);
 			}
-			if (type == "error") {
+			if (type === "error") {
 				dom_cache.loading.hide();
-				view.isPause()
+				isPause()
 			}
-			if (type == "waiting") {
+			if (type === "waiting") {
 				dom_cache.loading.show();
 			}
-			if (type == "play") {
+			if (type === "play") {
 				dom_cache.loading.show();
-				view.isPlaying()
+				isPlaying()
 			}
-			if (type == "playing") {
+			if (type === "playing") {
 				dom_cache.loading.hide();
-				view.isPlaying()
+				isPlaying()
 			}
-			if (type == "pause") {
+			if (type === "pause") {
 				dom_cache.loading.hide();
-				view.isPause()
+				isPause()
 			}
-			if (type == "canplay") {
+			if (type === "canplay") {
 				engine.play();
 			}
 		}

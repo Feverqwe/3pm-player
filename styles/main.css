@@ -9,15 +9,18 @@ body {
 	display: inline-block;
 }
 .player .image {
-	width: 64px;
-	height: 64px;
+	width: 80px;
+	height: 80px;
 	float: left;
 	margin-right: 4px;
+	overflow: hidden;
+}
+div.image img {
+	width: 100%;
+	height: 100%;
 }
 .player .box {
 	overflow: hidden;
-}
-.player .box > div {
 }
 .player .info {
 	position: relative;
@@ -31,7 +34,6 @@ body {
 .player > div.controls ul {
 	padding: 0;
 	margin: 0;
-	-webkit-app-region: no-drag;
 }
 .player > div.controls li {
 	display: inline-block;
@@ -41,10 +43,35 @@ body {
 	vertical-align: top;
 	background-repeat: no-repeat;
 	background-position: center;
+	-webkit-app-region: no-drag;
 }
-.player > div.controls li.volume {
+.player > div.controls li.volume_controll {
 	background-color: initial;
-	width: 100px;
+	width: 80px;
+	background-image: url(../images/sound_high.png);
+	background-position: left 4px
+}
+.player > div.controls li.volume_controll > .volume {
+	height: 4px;
+	background-color: #ccc;
+	margin-top: 10px;
+	margin-left: 20px;
+	-webkit-app-region: no-drag;
+	cursor: pointer;
+	position: relative;
+}
+.player > div.controls li.volume_controll > .volume > div {
+	background-color: rgb(253, 182, 0);
+	position: absolute;
+	z-index: 1;
+	height: 4px;
+}
+.player > div.controls li.volume_controll > .volume > a {
+	background-color: red;
+	position: absolute;
+	z-index: 2;
+	height: 4px;
+	width: 2px;
 }
 .player > div.controls li.btn {
 	cursor: pointer;
@@ -70,22 +97,23 @@ body {
 div.progress {
 	background-color: #ddd;
 	height: 4px;
-	margin-top: 2px;
 	margin-bottom: 2px;
 	cursor: pointer;
 	-webkit-app-region: no-drag;
-	margin-left: 5px;
-	margin-right: 5px;
+	position: relative;
 }
-div.image img {
-	width: 100%;
-	height: 100%;
-}
-div.progress .progress_bar {
+div.progress > div {
 	background-color: rgb(253, 182, 0);
 	height: 4px;
-	width: 100%;
-	-webkit-transition: all 0.3s;
+	z-index: 1;
+}
+div.progress > a {
+	background-color: red;
+	height: 4px;
+	width: 2px;
+	z-index: 2;
+	position: absolute;
+	top: 0;
 }
 div.drop {
 	position: absolute;
@@ -99,7 +127,7 @@ div.drop {
 }
 div.drop > span {
 	display: block;
-	margin-top: 28px;
+	margin-top: 36px;
 	border: 2px dashed #fff;
 	width: 210px;
 	margin-left: 15%;
@@ -127,6 +155,9 @@ div.loading {
 	position: absolute;
 	top: 0px;
 }
+.t_btn:hover {
+	opacity: 1;
+}
 .mini {
 	background: url('../images/_.png') center no-repeat;
 	right: 20px;
@@ -134,8 +165,4 @@ div.loading {
 .close {
 	background: url('../images/x.png') center no-repeat;
 	right: 0px;
-}
-
-.t_btn:hover {
-	opacity: 1;
 }

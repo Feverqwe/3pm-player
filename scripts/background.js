@@ -11,12 +11,12 @@ chrome.app.runtime.onLaunched.addListener(function() {
 		chrome.app.window.create('index.html', {
 			bounds: {
 				width: 335,
-				height: 97,
+				height: 111,
 				left: p_l,
-				top: p_t,
+				top: p_t
 			},
 			frame: "none",
 			resizable: false
 		});
-	}
+	};
 });
