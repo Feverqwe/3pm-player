@@ -2,6 +2,7 @@ var _debug = false;
 var engine = function() {
 	var playlist = [];
 	var covers = []
+	var shuffle = false;
 	var add_cover = function(len, bin, type) {
 		covers.forEach(function(item) {
 			if (item.len === len && item.type === type) {
@@ -58,7 +59,8 @@ var engine = function() {
 	var player = function() {
 		var audio = null;
 		var current_id = null;
-		var read_tags = function(file, m_cb) {
+		var read_tags = function(id, m_cb) {
+			var file = playlist[id].file;
 			if (file.size > 31457280) {
 				return;
 			}
@@ -102,7 +104,7 @@ var engine = function() {
 						}
 					});
 
-					m_cb(tags);
+					m_cb(tags, id);
 					view.setTags(tags);
 				},
 						{tags: ["artist", "title", "album", "picture"], dataReader: reader});
@@ -111,6 +113,9 @@ var engine = function() {
 			var t = FileAPIReader(file);
 			loadUrl(url, null, t);
 		};
+		function getRandomInt(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
 		return {
 			open: function(id) {
 				if (playlist[id] === undefined) {
@@ -144,16 +149,24 @@ var engine = function() {
 				}
 			},
 			next: function() {
-				var id = current_id + 1;
-				if (playlist.length <= id) {
-					id = 0;
+				if (shuffle) {
+					id = getRandomInt(0, playlist.length - 1);
+				} else {
+					var id = current_id + 1;
+					if (playlist.length <= id) {
+						id = 0;
+					}
 				}
 				player.open(id);
 			},
 			preview: function() {
-				var id = current_id - 1;
-				if (id < 0) {
-					id = playlist.length - 1;
+				if (shuffle) {
+					id = getRandomInt(0, playlist.length - 1);
+				} else {
+					var id = current_id - 1;
+					if (id < 0) {
+						id = playlist.length - 1;
+					}
 				}
 				player.open(id);
 			},
@@ -233,7 +246,7 @@ var engine = function() {
 				});
 				$(audio).on('loadeddata', function(e) {
 					if (playlist[current_id].tags === null) {
-						read_tags(playlist[current_id].file, function(tags) {
+						read_tags(current_id, function(tags, id) {
 							var obj = {};
 							if ("title" in tags) {
 								obj['title'] = tags.title;
@@ -247,7 +260,7 @@ var engine = function() {
 							if ("picture" in tags) {
 								obj['picture'] = tags.picture;
 							}
-							playlist[current_id].tags = obj;
+							playlist[id].tags = obj;
 						});
 					} else {
 						view.setTags(playlist[current_id].tags);
@@ -343,6 +356,10 @@ var engine = function() {
 		getMute: player.getMute,
 		getCover: function(id) {
 			return covers[id];
+		},
+		shuffle: function() {
+			shuffle = !shuffle;
+			view.setShuffle(shuffle);
 		}
 	}
 }();

@@ -135,6 +135,10 @@ div.progress > a {
 .player > div.controls li.next {
 	background-image: url(../images/playback_next.png);
 }
+.player > div.controls li.shuffle {
+	background-image: url(../images/shuffle.png);
+	background-position-y: 4px;
+}
 div.drop {
 	position: absolute;
 	width: 100%;
