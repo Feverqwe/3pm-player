@@ -290,7 +290,7 @@ var engine = function() {
 					view.setProgress(this.duration, this.currentTime);
 				});
 				$(audio).on('ended', function(e) {
-					if (current_id !== playlist.length - 1) {
+					if ( shuffle || current_id !== playlist.length - 1) {
 						player.next();
 					}
 					view.state("ended");
