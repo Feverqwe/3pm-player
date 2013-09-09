@@ -128,7 +128,7 @@ var engine = function() {
 				$('.engine').append('<audio/>');
 				audio = $('.engine > audio').get(0);
 				$(audio).on('loadstart', function(e) {
-					view.setTags({});
+					view.setTags(playlist[current_id].tags || {});
 					view.state("loadstart");
 				});
 				$(audio).on('progress', function(e) {

@@ -1,28 +1,3 @@
-toHHMMSS = function(val) {
-	var sec_num = parseInt(val, 10); // don't forget the second parm
-	if (isNaN(sec_num))
-		return '00:00';
-	var hours = Math.floor(sec_num / 3600);
-	var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-	var seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-	if (hours < 10) {
-		hours = "0" + hours;
-	}
-	if (minutes < 10) {
-		minutes = "0" + minutes;
-	}
-	if (seconds < 10) {
-		seconds = "0" + seconds;
-	}
-	if (parseInt(hours) > 0) {
-		var time = hours + ':' + minutes + ':' + seconds;
-	} else {
-		var time = minutes + ':' + seconds;
-	}
-	return time;
-};
-
 var view = function() {
 	var dom_cache = {};
 	var var_cache = {};
@@ -38,6 +13,29 @@ var view = function() {
 	};
 	var hideImage = function() {
 		dom_cache.picture.get(0).src = "images/no-cover.png";
+	};
+	var toHHMMSS = function(val) {
+		var sec_num = parseInt(val, 10); // don't forget the second parm
+		if (isNaN(sec_num))
+			return '00:00';
+		var hours = Math.floor(sec_num / 3600);
+		var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+		var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+		if (hours < 10) {
+			hours = "0" + hours;
+		}
+		if (minutes < 10) {
+			minutes = "0" + minutes;
+		}
+		if (seconds < 10) {
+			seconds = "0" + seconds;
+		}
+		var time = minutes + ':' + seconds;
+		if (parseInt(hours) > 0) {
+			time = hours + ':' + time;
+		}
+		return time;
 	};
 	return {
 		show: function() {
@@ -147,10 +145,10 @@ var view = function() {
 				}
 			});
 			$(window).keypress(function(event) {
-				if ( 'keyCode' in event == false ) {
+				if ('keyCode' in event === false) {
 					return;
 				}
-				if (event.keyCode == 32) {
+				if (event.keyCode === 32) {
 					event.preventDefault();
 					dom_cache.btnPlayPause.trigger('click');
 				}
@@ -240,28 +238,28 @@ var view = function() {
 			}
 			if (type === "error") {
 				dom_cache.loading.hide();
-				isPause()
+				isPause();
 			}
 			if (type === "waiting") {
 				dom_cache.loading.show();
 			}
 			if (type === "play") {
 				dom_cache.loading.show();
-				isPlaying()
+				isPlaying();
 			}
 			if (type === "playing") {
 				dom_cache.loading.hide();
-				isPlaying()
+				isPlaying();
 			}
 			if (type === "pause") {
 				dom_cache.loading.hide();
-				isPause()
+				isPause();
 			}
 			if (type === "canplay") {
 				engine.play();
 			}
 		}
-	}
+	};
 }();
 $(function() {
 	view.show();
