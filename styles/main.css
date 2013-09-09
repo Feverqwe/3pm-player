@@ -8,6 +8,12 @@ body {
 .player .image, .player > .track {
 	display: inline-block;
 }
+.player .track {
+	margin-left: 84px;
+}
+.player .track > div {
+	word-wrap: break-word;
+}
 .player .image {
 	width: 80px;
 	height: 80px;
@@ -197,4 +203,30 @@ div.loading {
 	border-radius: 5px;
 	cursor: pointer;
 	-webkit-app-region: no-drag;
+}
+.url_dialog {
+	position: absolute;
+	left: 90px;
+	top: 29px;
+	z-index: 10;
+	display: none;
+}
+.url_dialog input[name=url] {
+	display: inline-block;
+	width: 153px;
+}
+.url_dialog input[name=open_btn] {
+	width: 47px;
+}
+.url_dialog span {
+	font-size: 18px;
+	font-weight: bolder;
+	color: #ccc;
+	border: 2px dashed #ccc;
+	padding: 6px;
+	padding-bottom: 11px;
+	border-radius: 5px;
+	cursor: pointer;
+	-webkit-app-region: no-drag;
+	background-color: #fff;
 }

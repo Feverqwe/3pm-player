@@ -53,7 +53,8 @@ var view = function() {
 				picture: $('.image > img'),
 				volume: $('.volume'),
 				mute: $('.volume_controll .pic'),
-				click_for_open: $('.click_for_open')
+				click_for_open: $('.click_for_open'),
+				url_dialog: $('.url_dialog')
 			};
 			dom_cache.progress.slider({
 				range: "min",
@@ -161,6 +162,22 @@ var view = function() {
 			$('.click_for_open input').on('change', function() {
 				engine.open(this.files);
 			});
+			$('.url_dialog input[name=url]').keyup(function(event) {
+				if (event.keyCode === 13) {
+					engine.open_url(this.value);
+					this.value = '';
+					dom_cache.url_dialog.hide();
+				}
+				if (event.keyCode === 27) {
+					dom_cache.url_dialog.hide();
+				}
+			});
+			$('.url_dialog input[name=open_btn]').on('click', function(event) {
+				var text = $(this).parent().children('input[name=url]').get(0);
+				engine.open_url(text.value);
+				text.value = '';
+				dom_cache.url_dialog.hide();
+			});
 			dom_cache.mute.on('click', function() {
 				engine.mute();
 			});
@@ -170,9 +187,20 @@ var view = function() {
 					title: "Open files",
 					contexts: ["all"]
 				});
+				chrome.contextMenus.create({
+					id: "2",
+					title: "Open URL",
+					contexts: ["all"]
+				});
 				chrome.contextMenus.onClicked.addListener(function(info) {
 					if (info.menuItemId === "1") {
 						$('.click_for_open input').trigger('click');
+					}
+				});
+				chrome.contextMenus.onClicked.addListener(function(info) {
+					if (info.menuItemId === "2") {
+						dom_cache.url_dialog.toggle();
+						dom_cache.url_dialog.find('input[name=url]').get(0).focus();
 					}
 				});
 			});

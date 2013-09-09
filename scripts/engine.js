@@ -4,7 +4,7 @@ var engine = function() {
 	var covers = []
 	var add_cover = function(len, bin, type) {
 		covers.forEach(function(item) {
-			if ( item.len === len && item.type === type ) {
+			if (item.len === len && item.type === type) {
 				return item.id;
 			}
 		});
@@ -12,6 +12,49 @@ var engine = function() {
 		covers.push({id: id, len: len, data: bin, type: type});
 		return id;
 	}
+	var getType = function(filename) {
+		var types = [
+				'audio/mpeg',//0
+				'audio/mp4',//1
+				'audio/ogg', //2
+				'audio/webm',//3
+				'audio/wav',//4
+				'audio/x-flv',//5
+				'audio/rtmp',//6
+				'video/ogg',//7
+				'video/3gpp'//8
+			];
+		var ext = filename.split('.').slice(-1)[0].toLowerCase();
+		var type = undefined;
+		if (ext === "mp3") {
+			type = types[0];
+		} else
+		if (ext === "m4a" || ext === "m4v" || ext === "mp4") {
+			type = types[1];
+		} else
+		if (ext === "ogg" || ext === "oga" || ext === "spx") {
+			type = types[2];
+		} else
+		if (ext === "webm" || ext === "webma") {
+			type = types[3];
+		} else
+		if (ext === "wav") {
+			type = types[4];
+		} else
+		if (ext === "fla") {
+			type = types[5];
+		} else
+		if (ext === "rtmpa") {
+			type = types[6];
+		} else
+		if (ext === "ogv") {
+			type = types[7];
+		} else
+		if (ext === "3gp") {
+			type = types[8];
+		}
+		return type;
+	};
 	var player = function() {
 		var audio = null;
 		var current_id = null;
@@ -68,28 +111,19 @@ var engine = function() {
 			var t = FileAPIReader(file);
 			loadUrl(url, null, t);
 		};
-		var getType = function(filename) {
-			var types = ["audio/mp3", "audio/mp4", "audio/ogg"];
-			var ext = filename.split('.').slice(-1)[0].toLowerCase();
-			var type = types[0];
-			if (ext === "mp4") {
-				type = types[1];
-			} else
-			if (ext === "m4a") {
-				type = types[1];
-			} else
-			if (ext === "ogg") {
-				type = types[2];
-			}
-		};
 		return {
 			open: function(id) {
 				if (playlist[id] === undefined) {
 					return;
 				}
 				current_id = id;
-				audio.type = getType(playlist[id].file.name);
-				audio.src = window.URL.createObjectURL(playlist[id].file);
+				if ('url' in playlist[id].file) {
+					$(audio).removeAttr('codecs');
+					audio.src = playlist[id].file.url;
+				} else {
+					$(audio).attr('codecs',getType(playlist[id].file.name));
+					audio.src = window.URL.createObjectURL(playlist[id].file);
+				}
 			},
 			get_filename: function() {
 				return playlist[current_id].file.name;
@@ -266,7 +300,7 @@ var engine = function() {
 			playlist = [];
 			covers = [];
 			for (var i = 0; i < files.length; i++) {
-				if ($.inArray(files[i].name.split('.').slice(-1)[0].toLowerCase(), ['mp3', 'm4a', 'mp4', 'ogg']) === -1) {
+				if (getType(files[i].name) === undefined) {
 					continue;
 				}
 				playlist.push({id: playlist.length, file: files[i], tags: null, duration: null});
@@ -279,6 +313,16 @@ var engine = function() {
 				view.state("emptied");
 				view.state("playlist_is_empty");
 			}
+		},
+		open_url: function(url) {
+			if (url.length === 0) {
+				return;
+			}
+			playlist = [];
+			covers = [];
+			playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: null});
+			view.state("playlist_not_empty");
+			player.open(0);
 		},
 		play: player.play,
 		pause: player.pause,
