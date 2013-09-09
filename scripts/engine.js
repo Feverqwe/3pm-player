@@ -1,5 +1,17 @@
+var _debug = false;
 var engine = function() {
 	var playlist = [];
+	var covers = []
+	var add_cover = function(len, bin, type) {
+		covers.forEach(function(item) {
+			if ( item.len === len && item.type === type ) {
+				return item.id;
+			}
+		});
+		var id = covers.length;
+		covers.push({id: id, len: len, data: bin, type: type});
+		return id;
+	}
 	var player = function() {
 		var audio = null;
 		var current_id = null;
@@ -33,9 +45,11 @@ var engine = function() {
 						}
 						if (index !== -1) {
 							binary = binary.substr(index - pos);
-							tags.picture = {data: binary, type: type};
+							tags.picture = add_cover(binary.length, binary, type);
 						} else {
-							console.log('Can\'t show image!');
+							if (_debug) {
+								console.log('Can\'t show image!');
+							}
 							delete tags.picture
 						}
 					}
@@ -107,7 +121,9 @@ var engine = function() {
 				status['ended '] = audio.ended;
 				status['seeking '] = audio.seeking;
 				status['seekable '] = audio.seekable;
-				console.log(status);
+				if (_debug) {
+					console.log(status);
+				}
 				return status;
 			},
 			volume: function(persent) {
@@ -115,14 +131,24 @@ var engine = function() {
 					view.setVolume(audio.volume);
 					return;
 				}
+				if (audio.muted) {
+					audio.muted = false;
+				}
 				audio.volume = 1.0 / 100 * persent;
 			},
 			position: function(persent) {
-				if (isNaN(audio.duration)) return;
+				if (isNaN(audio.duration))
+					return;
 				audio.currentTime = audio.duration / 100 * persent;
 			},
 			loop: function() {
-				
+
+			},
+			mute: function() {
+				audio.muted = !audio.muted;
+			},
+			getMute: function() {
+				return audio.muted;
 			},
 			init: function(audio_el) {
 				$('.engine').append('<audio/>');
@@ -235,6 +261,7 @@ var engine = function() {
 				return;
 			}
 			playlist = [];
+			covers = [];
 			for (var i = 0; i < files.length; i++) {
 				if ($.inArray(files[i].name.split('.').slice(-1)[0].toLowerCase(), ['mp3', 'm4a', 'mp4', 'ogg']) === -1) {
 					continue;
@@ -242,10 +269,12 @@ var engine = function() {
 				playlist.push({id: playlist.length, file: files[i], tags: null, duration: null});
 			}
 			if (playlist.length > 0) {
+				view.state("playlist_not_empty");
 				player.open(0);
 			} else {
 				player.pause();
 				view.state("emptied");
+				view.state("playlist_is_empty");
 			}
 		},
 		play: player.play,
@@ -253,7 +282,12 @@ var engine = function() {
 		next: player.next,
 		preview: player.preview,
 		position: player.position,
-		volume: player.volume
+		volume: player.volume,
+		mute: player.mute,
+		getMute: player.getMute,
+		getCover: function(id) {
+			return covers[id];
+		}
 	}
 }();
 $(function() {

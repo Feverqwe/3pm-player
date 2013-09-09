@@ -31,6 +31,10 @@ div.image img {
 	right: 3px;
 	-webkit-app-region: no-drag;
 }
+.player > div.controls {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
 .player > div.controls ul {
 	padding: 0;
 	margin: 0;
@@ -45,14 +49,35 @@ div.image img {
 	background-position: center;
 	-webkit-app-region: no-drag;
 }
+div.progress {
+	background-color: #ddd;
+	height: 5px;
+	cursor: pointer;
+	-webkit-app-region: no-drag;
+	position: relative;
+}
+div.progress > div {
+	background-color: rgb(253, 182, 0);
+	height: 5px;
+	z-index: 1;
+}
+div.progress > a {
+	background-color: red;
+	height: 5px;
+	width: 2px;
+	z-index: 2;
+	position: absolute;
+	top: 0;
+}
 .player > div.controls li.volume_controll {
 	background-color: initial;
 	width: 80px;
-	background-image: url(../images/sound_high.png);
-	background-position: left 4px
+	position: relative;
+	float: right;
+	margin-right: 5px;
 }
 .player > div.controls li.volume_controll > .volume {
-	height: 4px;
+	height: 5px;
 	background-color: #ccc;
 	margin-top: 10px;
 	margin-left: 20px;
@@ -64,14 +89,24 @@ div.image img {
 	background-color: rgb(253, 182, 0);
 	position: absolute;
 	z-index: 1;
-	height: 4px;
+	height: 5px;
 }
 .player > div.controls li.volume_controll > .volume > a {
 	background-color: red;
 	position: absolute;
 	z-index: 2;
-	height: 4px;
+	height: 5px;
 	width: 2px;
+}
+.player > .controls .volume_controll .pic {
+	position: absolute;
+	left: 0;
+	height: 25px;
+	width: 16px;
+	background-image: url(../images/sound_high.png);
+	background-position: left 4px;
+	background-repeat: no-repeat;
+	cursor: pointer;
 }
 .player > div.controls li.btn {
 	cursor: pointer;
@@ -93,27 +128,6 @@ div.image img {
 }
 .player > div.controls li.next {
 	background-image: url(../images/playback_next.png);
-}
-div.progress {
-	background-color: #ddd;
-	height: 4px;
-	margin-bottom: 2px;
-	cursor: pointer;
-	-webkit-app-region: no-drag;
-	position: relative;
-}
-div.progress > div {
-	background-color: rgb(253, 182, 0);
-	height: 4px;
-	z-index: 1;
-}
-div.progress > a {
-	background-color: red;
-	height: 4px;
-	width: 2px;
-	z-index: 2;
-	position: absolute;
-	top: 0;
 }
 div.drop {
 	position: absolute;
@@ -165,4 +179,22 @@ div.loading {
 .close {
 	background: url('../images/x.png') center no-repeat;
 	right: 0px;
+}
+.click_for_open {
+	position: absolute;
+	left: 90px;
+	top: 29px;
+}
+.click_for_open input {
+	display: none;
+}
+.click_for_open span {
+	font-size: 18px;
+	font-weight: bolder;
+	color: #ccc;
+	border: 2px dashed #ccc;
+	padding: 6px;
+	border-radius: 5px;
+	cursor: pointer;
+	-webkit-app-region: no-drag;
 }

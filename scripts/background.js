@@ -11,7 +11,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
 		chrome.app.window.create('index.html', {
 			bounds: {
 				width: 335,
-				height: 111,
+				height: 114,
 				left: p_l,
 				top: p_t
 			},
@@ -19,4 +19,6 @@ chrome.app.runtime.onLaunched.addListener(function() {
 			resizable: false
 		});
 	};
+
+
 });

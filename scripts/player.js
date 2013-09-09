@@ -51,13 +51,14 @@ var view = function() {
 				btnNext: $('.controls .next.btn'),
 				progress: $('.progress'),
 				picture: $('.image > img'),
-				volume: $('.volume')
+				volume: $('.volume'),
+				mute: $('.volume_controll .pic'),
+				click_for_open: $('.click_for_open')
 			};
 			dom_cache.progress.slider({
 				range: "min",
 				min: 0,
 				max: 1000,
-				step: 10,
 				change: function(event, ui) {
 					if ('which' in event === false) {
 						return;
@@ -89,6 +90,7 @@ var view = function() {
 				}
 			});
 			view.state('emptied');
+			view.state("playlist_is_empty");
 			dom_cache.body.on('drop', function(event) {
 				event.preventDefault();
 				engine.open(event.originalEvent.dataTransfer.files);
@@ -153,6 +155,25 @@ var view = function() {
 					dom_cache.btnPlayPause.trigger('click');
 				}
 			});
+			$('.click_for_open span').on('click', function() {
+				$('.click_for_open input').trigger('click');
+			});
+			$('.click_for_open input').on('change', function() {
+				engine.open(this.files);
+			});
+			chrome.contextMenus.create({
+				id: "1",
+				title: "Open files",
+				contexts: ["all"]
+			});
+			chrome.contextMenus.onClicked.addListener(function(info) {
+				if (info.menuItemId === "1") {
+					$('.click_for_open input').trigger('click');
+				}
+			});
+			dom_cache.mute.on('click', function() {
+				engine.mute();
+			});
 		},
 		setTags: function(tags) {
 			if (tags === null) {
@@ -173,7 +194,8 @@ var view = function() {
 				dom_cache.trackalbum.text(tags.album);
 			}
 			if ("picture" in tags) {
-				showImage("data:image/" + tags.picture.type + ";base64," + btoa(tags.picture.data));
+				var cover = engine.getCover(tags.picture);
+				showImage("data:image/" + cover.type + ";base64," + btoa(cover.data));
 			} else {
 				hideImage();
 			}
@@ -190,34 +212,54 @@ var view = function() {
 			dom_cache.time.html(time);
 		},
 		setVolume: function(pos) {
+			if (engine.getMute()) {
+				dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_mute.png)');
+				var_cache['volume_image'] = -1;
+				return;
+			}
 			var max = 1.0;
 			var width_persent = pos / max * 100;
 			dom_cache.volume.slider("value", width_persent);
 			chrome.storage.local.set({'volume': width_persent});
-			if (width_persent > 50) {
+			if (width_persent > 70) {
 				if (var_cache['volume_image'] === 1) {
 					return;
 				}
 				var_cache['volume_image'] = 1;
-				dom_cache.volume.parent().css('background-image', 'url(images/sound_high.png)');
+				dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_high.png)');
 			} else
 			if (pos === 0) {
 				if (var_cache['volume_image'] === 2) {
 					return;
 				}
 				var_cache['volume_image'] = 2;
-				dom_cache.volume.parent().css('background-image', 'url(images/sound_mute.png)');
+				dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_zero.png)');
 			} else
-			if (width_persent < 50) {
+			if (width_persent < 40) {
 				if (var_cache['volume_image'] === 3) {
 					return;
 				}
 				var_cache['volume_image'] = 3;
-				dom_cache.volume.parent().css('background-image', 'url(images/sound_low.png)');
+				dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_low.png)');
+			} else
+			if (width_persent < 70) {
+				if (var_cache['volume_image'] === 4) {
+					return;
+				}
+				var_cache['volume_image'] = 4;
+				dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_medium.png)');
 			}
 		},
 		state: function(type) {
-			console.log(type);
+			if (_debug) {
+				console.log(type);
+			}
+			if (type === "playlist_is_empty") {
+				dom_cache.click_for_open.show();
+			}
+			if (type === "playlist_not_empty") {
+				dom_cache.click_for_open.hide();
+			}
 			if (type === "loadstart") {
 				dom_cache.loading.show();
 			}
