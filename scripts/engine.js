@@ -14,16 +14,16 @@ var engine = function() {
 	}
 	var getType = function(filename) {
 		var types = [
-				'audio/mpeg',//0
-				'audio/mp4',//1
-				'audio/ogg', //2
-				'audio/webm',//3
-				'audio/wav',//4
-				'audio/x-flv',//5
-				'audio/rtmp',//6
-				'video/ogg',//7
-				'video/3gpp'//8
-			];
+			'audio/mpeg', //0
+			'audio/mp4', //1
+			'audio/ogg', //2
+			'audio/webm', //3
+			'audio/wav', //4
+			'audio/x-flv', //5
+			'audio/rtmp', //6
+			'video/ogg', //7
+			'video/3gpp'//8
+		];
 		var ext = filename.split('.').slice(-1)[0].toLowerCase();
 		var type = undefined;
 		if (ext === "mp3") {
@@ -121,7 +121,7 @@ var engine = function() {
 					$(audio).removeAttr('codecs');
 					audio.src = playlist[id].file.url;
 				} else {
-					$(audio).attr('codecs',getType(playlist[id].file.name));
+					$(audio).attr('codecs', getType(playlist[id].file.name));
 					audio.src = window.URL.createObjectURL(playlist[id].file);
 				}
 			},
@@ -129,10 +129,19 @@ var engine = function() {
 				return playlist[current_id].file.name;
 			},
 			play: function() {
-				audio.play();
+				if ('url' in playlist[current_id].file && audio.src.split(':')[0] === "chrome-extension") {
+					audio.src = playlist[current_id].file.url;
+				} else {
+					audio.play();
+				}
 			},
 			pause: function() {
-				audio.pause();
+				if ('url' in playlist[current_id].file) {
+					audio.pause();
+					audio.src = "";
+				} else {
+					audio.pause();
+				}
 			},
 			next: function() {
 				var id = current_id + 1;
