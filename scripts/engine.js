@@ -1,10 +1,23 @@
 var _debug = false;
+var _playlist = null;
 var engine = function() {
 	var playlist = [];
 	var covers = [];
 	var playedlist = [];
 	var shuffle = false;
 	var current_played_pos = -1;
+	function sendPlaylist(callback) {
+		if (_playlist === null || _playlist.window === null) {
+			chrome.runtime.getBackgroundPage(function(bg) {
+				_playlist = bg.wm.getPlaylist(wm_id);
+				if (_playlist !== null) {
+					callback();
+				}
+			});
+		} else {
+			callback();
+		}
+	}
 	var reset_playlist = function() {
 		playlist = [];
 		covers = [];
@@ -77,6 +90,9 @@ var engine = function() {
 		}
 		return type;
 	};
+	function getRandomInt(min, max) {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
 	var player = function() {
 		var audio = null;
 		var current_id = null;
@@ -134,15 +150,15 @@ var engine = function() {
 			var t = FileAPIReader(file);
 			loadUrl(url, null, t);
 		};
-		function getRandomInt(min, max) {
-			return Math.floor(Math.random() * (max - min + 1)) + min;
-		}
 		return {
 			open: function(id) {
 				if (playlist[id] === undefined) {
 					return;
 				}
 				current_id = id;
+				sendPlaylist(function() {
+					_playlist.playlist.selected(current_id);
+				});
 				if ('url' in playlist[id].file) {
 					$(audio).removeAttr('codecs');
 					audio.src = playlist[id].file.url;
@@ -303,6 +319,9 @@ var engine = function() {
 								obj['picture'] = tags.picture;
 							}
 							playlist[id].tags = obj;
+							sendPlaylist(function() {
+								_playlist.playlist.updPlaylistItem(id, playlist[id]);
+							});
 						});
 					} else {
 						view.setTags(playlist[current_id].tags);
@@ -375,8 +394,15 @@ var engine = function() {
 				playlist.push({id: playlist.length, file: files[i], tags: null, duration: null});
 			}
 			if (playlist.length > 0) {
+				sendPlaylist(function() {
+					_playlist.playlist.setPlaylist(playlist);
+				});
 				view.state("playlist_not_empty");
-				player.open(0);
+				var id = 0;
+				if (shuffle) {
+					id = getRandomInt(0, playlist.length - 1);
+				}
+				player.open(id);
 			} else {
 				player.pause();
 				view.state("emptied");
@@ -393,6 +419,7 @@ var engine = function() {
 			player.open(0);
 		},
 		play: player.play,
+		open_id: player.open,
 		pause: player.pause,
 		next: player.next,
 		preview: player.preview,
@@ -403,11 +430,17 @@ var engine = function() {
 		getCover: function(id) {
 			return covers[id];
 		},
-		shuffle: function() {
-			shuffle = !shuffle;
-			view.setShuffle(shuffle);
-		}
-	};
+		shuffle: function(c) {
+			if (c === undefined) {
+				shuffle = !shuffle;
+			}
+			sendPlaylist(function() {
+				_playlist.playlist.setShuffle(shuffle);
+			});
+		},
+		getPlaylist: function() {
+			return playlist;
+		}};
 }();
 $(function() {
 	engine.run();

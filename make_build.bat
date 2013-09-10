@@ -17,8 +17,14 @@ java -jar compiler.jar --js .\scripts\engine.js --js_output_file .\build\scripts
 java -jar compiler.jar --js .\scripts\id3-minimized.js --js_output_file .\build\scripts\id3-minimized.js
 :: make player.js
 java -jar compiler.jar --js .\scripts\player.js --js_output_file .\build\scripts\player.js
+:: make player.js
+java -jar compiler.jar --js .\scripts\playlist.js --js_output_file .\build\scripts\playlist.js
 :: make main.css
 java -jar yuicompressor-2.4.7.jar .\styles\main.css -o .\build\styles\main.css
+:: make playlist.css
+java -jar yuicompressor-2.4.7.jar .\styles\playlist.css -o .\build\styles\playlist.css
+
+java -jar htmlcompressor-1.5.3.jar -t html .\playlist.html -o .\build\playlist.html
 java -jar htmlcompressor-1.5.3.jar -t html .\index.html -o .\build\index.html
 
 7za a -tzip .\build.zip .\build\*

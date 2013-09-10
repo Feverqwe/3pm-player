@@ -34,15 +34,14 @@ var wm = function() {
 			return;
 		}
 		var create_window = function(p_l, p_t) {
-			chrome.app.window.create('index.html', {
+			chrome.app.window.create('playlist.html', {
 				bounds: {
 					width: 335,
 					height: 400,
 					left: p_l,
 					top: p_t
 				},
-				frame: "none",
-				resizable: false
+				frame: "none"
 			}, function(win) {
 				win.contentWindow.window.wm_id = wm_id;
 				app_windows[wm_id].playlist = win;
@@ -88,7 +87,7 @@ var wm = function() {
 		for (var i = 0; i < app_windows.length; i++) {
 			var item = app_windows[i];
 			if (item.player !== null) {
-				if (wm_id !== undefined && wm_id === item.player.contentWindow.window.wm_id) {
+				if (wm_id !== undefined && i !== wm_id && wm_id === item.player.contentWindow.window.wm_id) {
 					wm_id = i;
 				}
 				item.player.contentWindow.window.wm_id = i;
@@ -116,7 +115,31 @@ var wm = function() {
 			}
 		},
 		create_player: create_player_window,
-		create_playlist: create_playlist_window
+		create_playlist: create_playlist_window,
+		toggle_playlist: function(wm_id) {
+			wm_id = check(wm_id);
+			if (app_windows[wm_id] !== undefined && app_windows[wm_id].playlist !== null) {
+				app_windows[wm_id].playlist.contentWindow.close();
+			} else {
+				create_playlist_window(wm_id);
+			}
+		},
+		getPlayer: function(wm_id) {
+			if (app_windows[wm_id] === undefined ||
+					app_windows[wm_id].player === null ||
+					app_windows[wm_id].player.contentWindow.window === null) {
+				return null;
+			}
+			return app_windows[wm_id].player.contentWindow.window;
+		},
+		getPlaylist: function(wm_id) {
+			if (app_windows[wm_id] === undefined ||
+					app_windows[wm_id].playlist === null ||
+					app_windows[wm_id].playlist.contentWindow.window === null) {
+				return null;
+			}
+			return app_windows[wm_id].playlist.contentWindow.window;
+		}
 	};
 }();
 chrome.app.runtime.onLaunched.addListener(function() {
