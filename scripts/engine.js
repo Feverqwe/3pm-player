@@ -1,8 +1,29 @@
 var _debug = false;
 var engine = function() {
 	var playlist = [];
-	var covers = []
+	var covers = [];
+	var playedlist = [];
 	var shuffle = false;
+	var current_played_pos = -1;
+	var reset_playlist = function() {
+		playlist = [];
+		covers = [];
+		playedlist = [];
+		current_played_pos = -1;
+	};
+	var add_played = function(id) {
+		var ex_id = null;
+		for (var i = 0; i < playedlist.length; i++) {
+			if (playedlist[i] === id) {
+				ex_id = i;
+				break;
+			}
+		}
+		if (ex_id !== null) {
+			playedlist.splice(ex_id, 1);
+		}
+		playedlist.push(id);
+	};
 	var add_cover = function(len, bin, type) {
 		covers.forEach(function(item) {
 			if (item.len === len && item.type === type) {
@@ -12,7 +33,7 @@ var engine = function() {
 		var id = covers.length;
 		covers.push({id: id, len: len, data: bin, type: type});
 		return id;
-	}
+	};
 	var getType = function(filename) {
 		var types = [
 			'audio/mpeg', //0
@@ -75,17 +96,17 @@ var engine = function() {
 						}, '');
 						tags.picture = null;
 						var index = binary.indexOf('JFIF');
-						var type = "jpeg"
+						var type = "jpeg";
 						var pos = 6;
 						if (index === -1) {
 							index = binary.indexOf('PNG');
-							type = "png"
+							type = "png";
 							pos = 1;
 						}
 						if (index === -1) {
 							var bin = String.fromCharCode.apply(null, [255, 216, 255, 225]);
 							index = binary.indexOf(bin);
-							type = "jpeg"
+							type = "jpeg";
 							pos = 0;
 						}
 						if (index !== -1) {
@@ -95,12 +116,12 @@ var engine = function() {
 							if (_debug) {
 								console.log('Can\'t show image!');
 							}
-							delete tags.picture
+							delete tags.picture;
 						}
 					}
 					$.each(tags, function(key) {
 						if ($.inArray(key, ["artist", "title", "album", "picture"]) === -1) {
-							delete tags[key]
+							delete tags[key];
 						}
 					});
 
@@ -149,9 +170,18 @@ var engine = function() {
 				}
 			},
 			next: function() {
+				current_played_pos = -1;
 				var id = current_id + 1;
 				if (shuffle) {
+					if (playedlist.length === playlist.length) {
+						playedlist = [];
+					}
 					id = getRandomInt(0, playlist.length - 1);
+					var n = 2000;
+					while ($.inArray(id, playedlist) !== -1 && n > 0) {
+						id = getRandomInt(0, playlist.length - 1);
+						n--;
+					}
 				} else {
 					if (playlist.length <= id) {
 						id = 0;
@@ -162,7 +192,17 @@ var engine = function() {
 			preview: function() {
 				var id = current_id - 1;
 				if (shuffle) {
-					id = getRandomInt(0, playlist.length - 1);
+					var pos = null;
+					if (current_played_pos === -1) {
+						pos = $.inArray(current_id, playedlist);
+					} else {
+						pos = current_played_pos;
+					}
+					if (pos <= 0) {
+						pos = playedlist.length;
+					}
+					current_played_pos = pos - 1;
+					id = playedlist[current_played_pos];
 				} else {
 					if (id < 0) {
 						id = playlist.length - 1;
@@ -241,7 +281,9 @@ var engine = function() {
 					view.state("pause");
 				});
 				$(audio).on('loadedmetadata', function(e) {
-					playlist[current_id].duration = this.duration;
+					if (playlist[current_id].duration === null) {
+						playlist[current_id].duration = this.duration;
+					}
 					view.state("loadedmetadata");
 				});
 				$(audio).on('loadeddata', function(e) {
@@ -271,6 +313,7 @@ var engine = function() {
 					view.state("waiting");
 				});
 				$(audio).on('playing', function(e) {
+					add_played(current_id);
 					view.state("playing");
 				});
 				$(audio).on('canplay', function(e) {
@@ -290,7 +333,12 @@ var engine = function() {
 					view.setProgress(this.duration, this.currentTime);
 				});
 				$(audio).on('ended', function(e) {
-					if ( shuffle || current_id !== playlist.length - 1) {
+					if (shuffle) {
+						if (playedlist.length !== playlist.length) {
+							player.next();
+						}
+					} else
+					if (current_id !== playlist.length - 1) {
 						player.next();
 					}
 					view.state("ended");
@@ -306,7 +354,7 @@ var engine = function() {
 					view.setVolume(audio.volume);
 				});
 			}
-		}
+		};
 	}();
 	return {
 		run: function() {
@@ -319,8 +367,7 @@ var engine = function() {
 			if (files.length === 0) {
 				return;
 			}
-			playlist = [];
-			covers = [];
+			reset_playlist();
 			for (var i = 0; i < files.length; i++) {
 				if (getType(files[i].name) === undefined) {
 					continue;
@@ -340,9 +387,8 @@ var engine = function() {
 			if (url.length === 0) {
 				return;
 			}
-			playlist = [];
-			covers = [];
-			playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: null});
+			reset_playlist();
+			playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: 0});
 			view.state("playlist_not_empty");
 			player.open(0);
 		},
@@ -361,7 +407,7 @@ var engine = function() {
 			shuffle = !shuffle;
 			view.setShuffle(shuffle);
 		}
-	}
+	};
 }();
 $(function() {
 	engine.run();

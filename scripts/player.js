@@ -124,9 +124,7 @@ var view = function() {
 				hideImage();
 			};
 			$('.close').on('click', function() {
-				chrome.storage.local.set({'pos_left': window.screenLeft, 'pos_top': window.screenTop}, function() {
-					window.close();
-				});
+				window.close();
 			});
 			$('.mini').on('click', function() {
 				chrome.app.window.current().minimize();
@@ -245,6 +243,16 @@ var view = function() {
 					engine.position(val);
 				}
 			};
+			var save_pos = function() {
+				var wl = window.screenLeft;
+				var wr = window.screenTop;
+				if (var_cache['wl'] !== wl || var_cache['wr'] !== wr) {
+					var_cache['wl'] = wl;
+					var_cache['wr'] = wr;
+					chrome.storage.local.set({'pos_left': wl, 'pos_top': wr});
+				}
+			};
+			setInterval(save_pos, 1000);
 		},
 		setTags: function(tags) {
 			if (tags === null) {
