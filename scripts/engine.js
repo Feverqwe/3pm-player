@@ -421,6 +421,9 @@ var engine = function() {
 			}
 			reset_playlist();
 			playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: 0});
+			sendPlaylist(function() {
+				_playlist.playlist.setPlaylist(playlist);
+			});
 			view.state("playlist_not_empty");
 			player.open(0);
 		},
