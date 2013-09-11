@@ -92,7 +92,7 @@ div.navigation > ul {
 div.navigation li.btn {
 	cursor: pointer;
 }
-div.navigation li.btn:hover {
+div.navigation li.btn:active {
 	background-color: #ccc;
 }
 div.navigation > ul > li {
@@ -108,4 +108,8 @@ div.navigation > ul > li {
 div.navigation li.shuffle {
 	background-image: url(../images/shuffle.png);
 	background-position-y: 4px;
+}
+div.navigation li.loop {
+	background-image: url(../images/loop.png);
+	background-position-y: 7px;
 }

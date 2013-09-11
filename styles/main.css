@@ -118,7 +118,7 @@ div.progress > a {
 .player > div.controls li.btn {
 	cursor: pointer;
 }
-.player > div.controls li.btn:hover {
+.player > div.controls li.btn:active {
 	background-color: #ccc;
 }
 .player > div.controls li.prev {

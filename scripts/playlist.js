@@ -82,7 +82,8 @@ var playlist = function() {
 			dom_cache = {
 				playlist: $('div.playlist'),
 				playlist_ul: $('div.playlist ul'),
-				shuffle: $('.shuffle.btn')
+				shuffle: $('.shuffle.btn'),
+				loop: $('.loop.btn')
 			};
 			$('.close').on('click', function() {
 				window.close();
@@ -109,8 +110,21 @@ var playlist = function() {
 			sendPlayer(function() {
 				_player.engine.shuffle(null);
 			});
+			dom_cache.loop.on('click', function() {
+				sendPlayer(function() {
+					_player.engine.loop();
+				});
+			});
+			sendPlayer(function() {
+				_player.engine.loop(null);
+			});
+			var_cache['resize_timer'] = null;
 			window.onresize = function() {
 				dom_cache.playlist.css('height', (window.innerHeight - 48) + "px");
+				clearTimeout(var_cache.resize_timer);
+				var_cache.resize_timer = setTimeout(function() {
+					chrome.storage.local.set({pl_w: window.innerWidth, pl_h: window.innerHeight});
+				}, 500);
 			};
 			$(window).trigger('resize');
 			var save_pos = function() {
@@ -140,6 +154,14 @@ var playlist = function() {
 				dom_cache.shuffle.css('background-image', 'url(images/shuffle_on.png)');
 			} else {
 				dom_cache.shuffle.css('background-image', 'url(images/shuffle.png)');
+			}
+		},
+		setLoop: function(status) {
+			chrome.storage.local.set({'loop': status});
+			if (status) {
+				dom_cache.loop.css('background-image', 'url(images/loop_on.png)');
+			} else {
+				dom_cache.loop.css('background-image', 'url(images/loop.png)');
 			}
 		},
 		empty: function() {

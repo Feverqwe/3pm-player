@@ -211,6 +211,11 @@ var view = function() {
 					engine.shuffle();
 				}
 			});
+			chrome.storage.local.get('loop', function(storage) {
+				if ('loop' in storage && storage.loop) {
+					engine.loop();
+				}
+			});
 			dom_cache.volume.parent().get(0).onmousewheel = function(e) {
 				var val = dom_cache.volume.slider("value");
 				if (e.wheelDelta > 0) {

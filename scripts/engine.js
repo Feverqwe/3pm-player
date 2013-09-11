@@ -5,6 +5,7 @@ var engine = function() {
 	var covers = [];
 	var playedlist = [];
 	var shuffle = false;
+	var loop = false;
 	var current_played_pos = -1;
 	function sendPlaylist(callback) {
 		if (_playlist === null || _playlist.window === null) {
@@ -259,9 +260,6 @@ var engine = function() {
 					return;
 				audio.currentTime = audio.duration / 100 * persent;
 			},
-			loop: function() {
-
-			},
 			mute: function() {
 				audio.muted = !audio.muted;
 			},
@@ -361,11 +359,11 @@ var engine = function() {
 				});
 				$(audio).on('ended', function(e) {
 					if (shuffle) {
-						if (playedlist.length !== playlist.length) {
+						if (playedlist.length !== playlist.length || loop) {
 							player.next();
 						}
 					} else
-					if (current_id !== playlist.length - 1) {
+					if (current_id !== playlist.length - 1 || loop) {
 						player.next();
 					}
 					view.state("ended");
@@ -444,6 +442,14 @@ var engine = function() {
 			}
 			sendPlaylist(function() {
 				_playlist.playlist.setShuffle(shuffle);
+			});
+		},
+		loop: function(c) {
+			if (c === undefined) {
+				loop = !loop;
+			}
+			sendPlaylist(function() {
+				_playlist.playlist.setLoop(loop);
 			});
 		},
 		getPlaylist: function() {

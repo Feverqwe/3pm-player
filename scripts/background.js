@@ -33,11 +33,11 @@ var wm = function() {
 			app_windows[wm_id].playlist.focus();
 			return;
 		}
-		var create_window = function(p_l, p_t) {
+		var create_window = function(p_l, p_t, pl_w, pl_h) {
 			chrome.app.window.create('playlist.html', {
 				bounds: {
-					width: 335,
-					height: 400,
+					width: pl_w || 335,
+					height: pl_h || 400,
 					left: p_l,
 					top: p_t
 				},
@@ -49,9 +49,11 @@ var wm = function() {
 		};
 		chrome.storage.local.get(function(storage) {
 			if ('pl_pos_left' in storage && 'pl_pos_top' in storage) {
-				create_window(storage.pl_pos_left, storage.pl_pos_top);
+				var pl_w = ('pl_w' in storage)?storage.pl_w:null;
+				var pl_h = ('pl_h' in storage)?storage.pl_h:null;
+				create_window(storage.pl_pos_left, storage.pl_pos_top, pl_w, pl_h);
 			} else {
-				create_window(30, 30);
+				create_window(30, 30, null, null);
 			}
 		});
 	};
