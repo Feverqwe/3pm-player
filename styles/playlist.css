@@ -1,6 +1,7 @@
 body {
 	margin: 0;
 	-webkit-app-region: drag;
+	border: 1px solid #CACACA;
 }
 .t_btn {
 	background-size: 20px 20px;
@@ -31,8 +32,9 @@ ul.track_list {
 	-webkit-app-region: no-drag;
 }
 div.playlist {
-	margin: 2px;
 	margin-top: 20px;
+	margin-left: 0px;
+	margin-right: 0px;
 	overflow: auto;	
 	-webkit-app-region: no-drag;
 }
@@ -81,9 +83,7 @@ div.playlist > ul > li .name {
 div.playlist > ul > li .info {
 }
 div.navigation {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
+	border-top: 1px solid #CACACA;
 }
 div.navigation > ul {
 	margin: 0;

@@ -1,6 +1,7 @@
 body {
 	margin: 0;
 	-webkit-app-region: drag;
+	border: 1px solid #CACACA;
 }
 .player {
 	margin-bottom: -2px;

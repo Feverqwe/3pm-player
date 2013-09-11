@@ -110,7 +110,7 @@ var playlist = function() {
 				_player.engine.shuffle(null);
 			});
 			window.onresize = function() {
-				dom_cache.playlist.css('height', (window.innerHeight - 45) + "px");
+				dom_cache.playlist.css('height', (window.innerHeight - 48) + "px");
 			};
 			$(window).trigger('resize');
 			var save_pos = function() {
