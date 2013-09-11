@@ -46,7 +46,8 @@ div.playlist > ul > li:nth-child(even) {
 div.playlist > ul > li {
 	list-style-type: none;
 	height: 32px;
-	padding: 3px;
+	margin-top: 3px;
+	margin-bottom: 3px;
 	position: relative;
 	cursor: pointer;
 }
@@ -68,13 +69,16 @@ div.playlist > ul > li .cover.pic_none {
 	background-repeat: no-repeat;
 	-webkit-filter: grayscale(1);
 }
-div.playlist > ul > li .name {
-	margin-left: 37px;
+div.playlist > ul > li > span {
+	margin-left: 35px;
 	display: block;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+div.playlist > ul > li .name {
 }
 div.playlist > ul > li .info {
-	margin-left: 37px;
-	display: block;
 }
 div.navigation {
 	position: absolute;

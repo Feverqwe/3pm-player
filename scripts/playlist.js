@@ -47,10 +47,13 @@ var playlist = function() {
 		if (id === "none") {
 			return;
 		}
+		if ($('style.pic_' + id).length > 0) {
+			return;
+		}
 		sendPlayer(function() {
 			var cover = _player.engine.getCover(id);
 			var img = "data:image/" + cover.type + ";base64," + btoa(cover.data);
-			$('body').remove('style.pic_' + id).append('<style class="pic_' + id + '">.pic_' + id + '{background-image:url(' + img + ');}</style>');
+			$('body').remove('style.pic_' + id).append('<style class="cover pic_' + id + '">.pic_' + id + '{background-image:url(' + img + ');}</style>');
 		});
 	};
 	var write_playlist = function(items) {
@@ -59,8 +62,11 @@ var playlist = function() {
 		items.forEach(function(item) {
 			item = item_read(item);
 			add_image(item.pic);
-			dom_cache.playlist_ul.append('<li data-id="' + n + '"><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name">' + item.title + '</span><span class="info">' + item.info + '</span></li>');
+			dom_cache.playlist_ul.append('<li data-id="' + n + '"><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name" title="' + item.title + '">' + item.title + '</span><span class="info" title="' + item.info + '">' + item.info + '</span></li>');
 			n++;
+		});
+		sendPlayer(function() {
+			_player.engine.getCurrent();
 		});
 	};
 	var update_playlist_item = function(id, item) {
@@ -135,6 +141,13 @@ var playlist = function() {
 			} else {
 				dom_cache.shuffle.css('background-image', 'url(images/shuffle.png)');
 			}
+		},
+		empty: function() {
+			$('style.cover').remove();
+			dom_cache.playlist_ul.empty();
+		},
+		minimize: function() {
+			$('.mini').trigger('click');
 		}
 	};
 }();

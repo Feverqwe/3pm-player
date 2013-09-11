@@ -23,6 +23,9 @@ var engine = function() {
 		covers = [];
 		playedlist = [];
 		current_played_pos = -1;
+		sendPlaylist(function() {
+			_playlist.playlist.empty();
+		});
 	};
 	var add_played = function(id) {
 		var ex_id = null;
@@ -155,7 +158,7 @@ var engine = function() {
 				if (playlist[id] === undefined) {
 					return;
 				}
-				current_id = id;
+				current_id = parseInt(id);
 				sendPlaylist(function() {
 					_playlist.playlist.selected(current_id);
 				});
@@ -265,7 +268,12 @@ var engine = function() {
 			getMute: function() {
 				return audio.muted;
 			},
-			init: function(audio_el) {
+			getCurrent: function() {
+				sendPlaylist(function() {
+					_playlist.playlist.selected(current_id);
+				});
+			},
+			init: function() {
 				$('.engine').append('<audio/>');
 				audio = $('.engine > audio').get(0);
 				$(audio).on('loadstart', function(e) {
@@ -440,7 +448,9 @@ var engine = function() {
 		},
 		getPlaylist: function() {
 			return playlist;
-		}};
+		},
+		getCurrent: player.getCurrent
+	};
 }();
 $(function() {
 	engine.run();

@@ -127,6 +127,9 @@ var view = function() {
 				window.close();
 			});
 			$('.mini').on('click', function() {
+				chrome.runtime.getBackgroundPage(function(bg) {
+					bg.wm.getPlaylist(wm_id).playlist.minimize();
+				});
 				chrome.app.window.current().minimize();
 			});
 			dom_cache.time.on('click', function() {
