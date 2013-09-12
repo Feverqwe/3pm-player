@@ -44,7 +44,7 @@ var engine = function() {
 	var add_cover = function(len, bin, type) {
 		for (var i = 0; i < covers.length; i++) {
 			var item = covers[i];
-			if (item.len === len && item.type === type) {
+			if (item.len === len && item.type === type && item.data === bin) {
 				return item.id;
 			}
 		}
