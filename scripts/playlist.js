@@ -126,7 +126,7 @@ var playlist = function() {
 			});
 			var_cache['resize_timer'] = null;
 			window.onresize = function() {
-				dom_cache.playlist.css('height', (window.innerHeight - 48) + "px");
+				dom_cache.playlist.css('height', (window.innerHeight - 49) + "px");
 				clearTimeout(var_cache.resize_timer);
 				var_cache.resize_timer = setTimeout(function() {
 					chrome.storage.local.set({pl_w: window.innerWidth, pl_h: window.innerHeight});

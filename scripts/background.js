@@ -5,7 +5,7 @@ var wm = function() {
 			chrome.app.window.create('index.html', {
 				bounds: {
 					width: 335,
-					height: 114,
+					height: 113,
 					left: p_l,
 					top: p_t
 				},

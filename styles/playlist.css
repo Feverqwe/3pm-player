@@ -37,6 +37,8 @@ div.playlist {
 	margin-right: 0px;
 	overflow: auto;	
 	-webkit-app-region: no-drag;
+	border-top: 1px solid #E7E7E7;
+	border-bottom: 1px solid #E7E7E7;
 }
 div.playlist > ul {
 	margin: 0;
@@ -83,7 +85,6 @@ div.playlist > ul > li .name {
 div.playlist > ul > li .info {
 }
 div.navigation {
-	border-top: 1px solid #CACACA;
 }
 div.navigation > ul {
 	margin: 0;

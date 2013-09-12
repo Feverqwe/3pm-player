@@ -10,16 +10,24 @@ body {
 	display: inline-block;
 }
 .player .track {
-	margin-left: 84px;
+	margin-left: 83px;
 }
 .player .track > div {
 	word-wrap: break-word;
 }
+.player .image_box {
+	width: 79px;
+	height: 79px;
+	float: left;
+	margin-right: 4px;
+}
 .player .image {
 	width: 80px;
 	height: 80px;
-	float: left;
-	margin-right: 4px;
+	left: 0;
+	top: 0;
+	position: absolute;
+	z-index: 10;
 	overflow: hidden;
 }
 div.image img {
