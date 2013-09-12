@@ -77,6 +77,12 @@ var playlist = function() {
 		itm.children('.name').text(item.title);
 		itm.children('.info').text(item.info);
 	};
+	var scrool_to = function(el) {
+		if (el.offset() === undefined) {
+			return;
+		}
+		dom_cache.playlist.scrollTop(el.offset().top + dom_cache.playlist.scrollTop() - 24);
+	};
 	return {
 		show: function() {
 			dom_cache = {
@@ -146,7 +152,8 @@ var playlist = function() {
 		},
 		selected: function(id) {
 			$('li.selected').removeClass('selected');
-			$('li[data-id=' + id + ']').addClass('selected');
+			var el = $('li[data-id=' + id + ']').addClass('selected');
+			scrool_to(el);
 		},
 		setShuffle: function(status) {
 			chrome.storage.local.set({'shuffle': status});

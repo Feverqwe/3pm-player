@@ -124,6 +124,9 @@ var view = function() {
 				hideImage();
 			};
 			$('.close').on('click', function() {
+				chrome.runtime.getBackgroundPage(function(bg) {
+					bg.wm.getPlaylist(wm_id).close();
+				});
 				window.close();
 			});
 			$('.mini').on('click', function() {
