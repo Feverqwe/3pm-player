@@ -175,6 +175,9 @@ var engine = function() {
 				return playlist[current_id].file.name;
 			},
 			play: function() {
+				if (playedlist.length === playlist.length) {
+					playedlist = [];
+				}
 				if ('url' in playlist[current_id].file && audio.src.split(':')[0] === "chrome-extension") {
 					audio.src = playlist[current_id].file.url;
 				} else {
