@@ -42,11 +42,12 @@ var engine = function() {
 		playedlist.push(id);
 	};
 	var add_cover = function(len, bin, type) {
-		covers.forEach(function(item) {
+		for (var i = 0; i < covers.length; i++) {
+			var item = covers[i];
 			if (item.len === len && item.type === type) {
 				return item.id;
 			}
-		});
+		}
 		var id = covers.length;
 		covers.push({id: id, len: len, data: bin, type: type});
 		return id;
