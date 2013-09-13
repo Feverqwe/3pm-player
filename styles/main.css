@@ -1,245 +1,245 @@
 body {
-	margin: 0;
-	-webkit-app-region: drag;
-	border: 1px solid #CACACA;
+    margin: 0;
+    -webkit-app-region: drag;
+    border: 1px solid #CACACA;
 }
 .player {
-	margin-bottom: -2px;
+    margin-bottom: -2px;
 }
 .player .image, .player > .track {
-	display: inline-block;
+    display: inline-block;
 }
 .player .track {
-	margin-left: 83px;
+    margin-left: 83px;
 }
 .player .track > div {
-	word-wrap: break-word;
+    word-wrap: break-word;
 }
 .player .image_box {
-	width: 79px;
-	height: 79px;
-	float: left;
-	margin-right: 4px;
+    width: 79px;
+    height: 79px;
+    float: left;
+    margin-right: 4px;
 }
 .player .image {
-	width: 80px;
-	height: 80px;
-	left: 0;
-	top: 0;
-	position: absolute;
-	z-index: 10;
-	overflow: hidden;
+    width: 80px;
+    height: 80px;
+    left: 0;
+    top: 0;
+    position: absolute;
+    z-index: 10;
+    overflow: hidden;
 }
 div.image img {
-	width: 100%;
-	height: 100%;
+    width: 100%;
+    height: 100%;
 }
 .player .box {
-	overflow: hidden;
+    overflow: hidden;
 }
 .player .info {
-	position: relative;
+    position: relative;
 }
 .player .info > span.time {
-	position: absolute;
-	top: -15px;
-	right: 3px;
-	-webkit-app-region: no-drag;
+    position: absolute;
+    top: -15px;
+    right: 3px;
+    -webkit-app-region: no-drag;
 }
 .player > div.controls {
-	padding-top: 2px;
-	padding-bottom: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 .player > div.controls ul {
-	padding: 0;
-	margin: 0;
+    padding: 0;
+    margin: 0;
 }
 .player > div.controls li {
-	display: inline-block;
-	height: 25px;
-	overflow: hidden;
-	width: 55px;
-	vertical-align: top;
-	background-repeat: no-repeat;
-	background-position: center;
-	-webkit-app-region: no-drag;
+    display: inline-block;
+    height: 25px;
+    overflow: hidden;
+    width: 55px;
+    vertical-align: top;
+    background-repeat: no-repeat;
+    background-position: center;
+    -webkit-app-region: no-drag;
 }
 div.progress {
-	background-color: #ddd;
-	height: 5px;
-	cursor: pointer;
-	-webkit-app-region: no-drag;
-	position: relative;
+    background-color: #ddd;
+    height: 5px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: relative;
 }
 div.progress > div {
-	background-color: rgb(253, 182, 0);
-	height: 5px;
-	z-index: 1;
+    background-color: rgb(253, 182, 0);
+    height: 5px;
+    z-index: 1;
 }
 div.progress > a {
-	background-color: red;
-	height: 5px;
-	width: 2px;
-	z-index: 2;
-	position: absolute;
-	top: 0;
+    background-color: red;
+    height: 5px;
+    width: 2px;
+    z-index: 2;
+    position: absolute;
+    top: 0;
 }
 .player > div.controls li.volume_controll {
-	background-color: initial;
-	width: 80px;
-	position: relative;
-	float: right;
-	margin-right: 5px;
+    background-color: initial;
+    width: 80px;
+    position: relative;
+    float: right;
+    margin-right: 5px;
 }
 .player > div.controls li.volume_controll > .volume {
-	height: 5px;
-	background-color: #ccc;
-	margin-top: 10px;
-	margin-left: 20px;
-	-webkit-app-region: no-drag;
-	cursor: pointer;
-	position: relative;
+    height: 5px;
+    background-color: #ccc;
+    margin-top: 10px;
+    margin-left: 20px;
+    -webkit-app-region: no-drag;
+    cursor: pointer;
+    position: relative;
 }
 .player > div.controls li.volume_controll > .volume > div {
-	background-color: rgb(253, 182, 0);
-	position: absolute;
-	z-index: 1;
-	height: 5px;
+    background-color: rgb(253, 182, 0);
+    position: absolute;
+    z-index: 1;
+    height: 5px;
 }
 .player > div.controls li.volume_controll > .volume > a {
-	background-color: red;
-	position: absolute;
-	z-index: 2;
-	height: 5px;
-	width: 2px;
+    background-color: red;
+    position: absolute;
+    z-index: 2;
+    height: 5px;
+    width: 2px;
 }
 .player > .controls .volume_controll .pic {
-	position: absolute;
-	left: 0;
-	height: 25px;
-	width: 16px;
-	background-image: url(../images/sound_high.png);
-	background-position: left 4px;
-	background-repeat: no-repeat;
-	cursor: pointer;
+    position: absolute;
+    left: 0;
+    height: 25px;
+    width: 16px;
+    background-image: url(../images/sound_high.png);
+    background-position: left 4px;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
 .player > div.controls li.btn {
-	cursor: pointer;
+    cursor: pointer;
 }
 .player > div.controls li.btn:active {
-	background-color: #ccc;
+    background-color: #ccc;
 }
 .player > div.controls li.prev {
-	background-image: url(../images/playback_prev.png);
+    background-image: url(../images/playback_prev.png);
 }
 .player > div.controls li.play {
-	background-image: url(../images/playback_play.png);
+    background-image: url(../images/playback_play.png);
 }
 .player > div.controls li.pause {
-	background-image: url(../images/playback_pause.png);
+    background-image: url(../images/playback_pause.png);
 }
 .player > div.controls li.stop {
-	background-image: url(../images/playback_stop.png);
+    background-image: url(../images/playback_stop.png);
 }
 .player > div.controls li.next {
-	background-image: url(../images/playback_next.png);
+    background-image: url(../images/playback_next.png);
 }
 .player > div.controls li.playlist {
-	background-image: url(../images/playlist.png);
-	background-position-y: 4px;
+    background-image: url(../images/playlist.png);
+    background-position-y: 4px;
 }
 div.drop {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	background-color: #000;
-	opacity: 0.7;
-	color: #fff;
-	text-align: center;
-	display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0.7;
+    color: #fff;
+    text-align: center;
+    display: none;
 }
 div.drop > span {
-	display: block;
-	margin-top: 36px;
-	border: 2px dashed #fff;
-	width: 210px;
-	margin-left: 15%;
-	padding: 10px;
-	border-radius: 5px;
+    display: block;
+    margin-top: 36px;
+    border: 2px dashed #fff;
+    width: 210px;
+    margin-left: 15%;
+    padding: 10px;
+    border-radius: 5px;
 }
 div.engine {
-	display: none;
+    display: none;
 }
 div.loading {
-	background: url(../images/loading.gif) center center no-repeat;
-	height: 24px;
-	width: 20px;
-	display: none;
+    background: url(../images/loading.gif) center center no-repeat;
+    height: 24px;
+    width: 20px;
+    display: none;
 }
 .t_btn {
-	background-size: 20px 20px;
-	height: 20px;
-	width: 20px;
-	float: right;
-	opacity: 0.7;
-	z-index: 50;
-	cursor: pointer;
-	-webkit-app-region: no-drag;
-	position: absolute;
-	top: 0px;
+    background-size: 20px 20px;
+    height: 20px;
+    width: 20px;
+    float: right;
+    opacity: 0.7;
+    z-index: 50;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 0px;
 }
 .t_btn:hover {
-	opacity: 1;
+    opacity: 1;
 }
 .mini {
-	background: url('../images/_.png') center no-repeat;
-	right: 20px;
+    background: url('../images/_.png') center no-repeat;
+    right: 20px;
 }
 .close {
-	background: url('../images/x.png') center no-repeat;
-	right: 0px;
+    background: url('../images/x.png') center no-repeat;
+    right: 0px;
 }
 .click_for_open {
-	position: absolute;
-	left: 90px;
-	top: 29px;
+    position: absolute;
+    left: 90px;
+    top: 29px;
 }
 .click_for_open input {
-	display: none;
+    display: none;
 }
 .click_for_open span {
-	font-size: 18px;
-	font-weight: bolder;
-	color: #ccc;
-	border: 2px dashed #ccc;
-	padding: 6px;
-	border-radius: 5px;
-	cursor: pointer;
-	-webkit-app-region: no-drag;
+    font-size: 18px;
+    font-weight: bolder;
+    color: #ccc;
+    border: 2px dashed #ccc;
+    padding: 6px;
+    border-radius: 5px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
 }
 .url_dialog {
-	position: absolute;
-	left: 90px;
-	top: 29px;
-	z-index: 10;
-	display: none;
+    position: absolute;
+    left: 90px;
+    top: 29px;
+    z-index: 10;
+    display: none;
 }
 .url_dialog input[name=url] {
-	display: inline-block;
-	width: 153px;
+    display: inline-block;
+    width: 153px;
 }
 .url_dialog input[name=open_btn] {
-	width: 47px;
+    width: 47px;
 }
 .url_dialog span {
-	font-size: 18px;
-	font-weight: bolder;
-	color: #ccc;
-	border: 2px dashed #ccc;
-	padding: 6px;
-	padding-bottom: 11px;
-	border-radius: 5px;
-	cursor: pointer;
-	-webkit-app-region: no-drag;
-	background-color: #fff;
+    font-size: 18px;
+    font-weight: bolder;
+    color: #ccc;
+    border: 2px dashed #ccc;
+    padding: 6px;
+    padding-bottom: 11px;
+    border-radius: 5px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    background-color: #fff;
 }

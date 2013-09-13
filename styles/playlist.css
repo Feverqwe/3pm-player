@@ -1,84 +1,86 @@
 body {
-	margin: 0;
-	-webkit-app-region: drag;
-	border: 1px solid #CACACA;
+    margin: 0;
+    -webkit-app-region: drag;
+    border: 1px solid #CACACA;
 }
 .t_btn {
-	background-size: 20px 20px;
-	height: 20px;
-	width: 20px;
-	float: right;
-	opacity: 0.7;
-	z-index: 50;
-	cursor: pointer;
-	-webkit-app-region: no-drag;
-	position: absolute;
-	top: 0px;
+    background-size: 20px 20px;
+    height: 20px;
+    width: 20px;
+    float: right;
+    opacity: 0.7;
+    z-index: 50;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 0px;
 }
 .t_btn:hover {
-	opacity: 1;
+    opacity: 1;
 }
 .mini {
-	background: url('../images/_.png') center no-repeat;
-	right: 20px;
+    background: url('../images/_.png') center no-repeat;
+    right: 20px;
 }
 .close {
-	background: url('../images/x.png') center no-repeat;
-	right: 0px;
+    background: url('../images/x.png') center no-repeat;
+    right: 0px;
 }
 div.playlist {
 }
 ul.track_list {
-	-webkit-app-region: no-drag;
+}
+div.top {
+    height: 20px;
+    -webkit-app-region: drag;
 }
 div.playlist {
-	margin-top: 20px;
-	margin-left: 0px;
-	margin-right: 0px;
-	overflow: auto;	
-	-webkit-app-region: no-drag;
-	border-top: 1px solid #E7E7E7;
-	border-bottom: 1px solid #E7E7E7;
+    margin-left: 0px;
+    margin-right: 0px;
+    overflow: auto;	
+    -webkit-app-region: no-drag;
+    border-top: 1px solid #E7E7E7;
+    border-bottom: 1px solid #E7E7E7;
 }
 div.playlist > ul {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 div.playlist > ul > li:nth-child(even) {
-	background-color: #E7E7E7;
+    background-color: #E7E7E7;
 }
 div.playlist > ul > li {
-	list-style-type: none;
-	height: 32px;
-	margin-top: 3px;
-	margin-bottom: 3px;
-	position: relative;
-	cursor: pointer;
+    list-style-type: none;
+    height: 32px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    position: relative;
+    cursor: pointer;
 }
 div.playlist > ul > li:hover {
-	background-color: rgb(253, 182, 0);
+    background-color: rgb(253, 182, 0);
 }
 div.playlist > ul > li.selected {
-	background-color: rgb(253, 182, 0);
+    background-color: rgb(253, 182, 0);
 }
 div.playlist > ul > li .cover {
-	height: 32px;
-	width: 32px;
-	display: block;
-	position: absolute;
-	background-size: 32px 32px;
+    height: 32px;
+    width: 32px;
+    display: block;
+    position: absolute;
+    background-size: 32px 32px;
 }
 div.playlist > ul > li .cover.pic_none {
-	background-image: url(../images/no-cover.png);
-	background-repeat: no-repeat;
-	-webkit-filter: grayscale(1);
+    background-image: url(../images/no-cover.png);
+    background-repeat: no-repeat;
+    -webkit-filter: grayscale(1);
 }
 div.playlist > ul > li > span {
-	margin-left: 35px;
-	display: block;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
+    margin-left: 35px;
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 div.playlist > ul > li .name {
 }
@@ -87,30 +89,30 @@ div.playlist > ul > li .info {
 div.navigation {
 }
 div.navigation > ul {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 div.navigation li.btn {
-	cursor: pointer;
+    cursor: pointer;
 }
 div.navigation li.btn:active {
-	background-color: #ccc;
+    background-color: #ccc;
 }
 div.navigation > ul > li {
-	display: inline-block;
-	height: 25px;
-	overflow: hidden;
-	width: 55px;
-	vertical-align: top;
-	background-repeat: no-repeat;
-	background-position: center;
-	-webkit-app-region: no-drag;
+    display: inline-block;
+    height: 25px;
+    overflow: hidden;
+    width: 55px;
+    vertical-align: top;
+    background-repeat: no-repeat;
+    background-position: center;
+    -webkit-app-region: no-drag;
 }
 div.navigation li.shuffle {
-	background-image: url(../images/shuffle.png);
-	background-position-y: 4px;
+    background-image: url(../images/shuffle.png);
+    background-position-y: 4px;
 }
 div.navigation li.loop {
-	background-image: url(../images/loop.png);
-	background-position-y: 7px;
+    background-image: url(../images/loop.png);
+    background-position-y: 7px;
 }
