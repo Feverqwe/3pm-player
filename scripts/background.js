@@ -154,23 +154,44 @@ var wm = function() {
             }
             if (headerMap.url === '/') {
                 headerMap.url = '/index.html';
+            } else
+            if (headerMap.url === '/favicon.ico') {
+                headerMap.url = '/../icon_16.png';
+            } else
+            if (headerMap.url === '/js/jquery-2.0.3.min.js') {
+                headerMap.url = '/../scripts/jquery-2.0.3.min.js';
             }
+            if (headerMap.url.substr(0, 8) === '/images/') {
+                headerMap.url = '/..' + headerMap.url;
+            }
+
             var is_xhr = false;
+            if (headerMap.url.substr(0, 4) === '/pl/') {
+                var id = headerMap.url.substr(4);
+                player.engine.open_id(id);
+                return response_(socketId, headerMap, "200 OK\nLocation: /\nCache-Control: no-cache\nContent-Type: application/json", WebsocketFrameString(player.engine.APIstatus()));
+            } else
+            if (headerMap.url === '/playlist') {
+                return response_(socketId, headerMap, "200 OK\nLocation: /\nCache-Control: no-cache\nContent-Type: text/html", WebsocketFrameString(player.engine.APIplaylist()));
+            } else
+            if (headerMap.url === '/status') {
+                return response_(socketId, headerMap, "200 OK\nLocation: /\nCache-Control: no-cache\nContent-Type: application/json", WebsocketFrameString(player.engine.APIstatus()));
+            } else
             if (headerMap.url === '/play') {
                 player.engine.play();
-                return response_(socketId, headerMap, "302\nLocation: /\nCache-Control: no-cache", WebsocketFrameString('back'));
+                return response_(socketId, headerMap, "200 OK\nLocation: /\nCache-Control: no-cache\nContent-Type: application/json", WebsocketFrameString(player.engine.APIstatus()));
             } else
             if (headerMap.url === '/pause') {
                 player.engine.pause();
-                return response_(socketId, headerMap, "302\nLocation: /\nCache-Control: no-cache", WebsocketFrameString('back'));
+                return response_(socketId, headerMap, "200 OK\nLocation: /\nCache-Control: no-cache\nContent-Type: application/json", WebsocketFrameString(player.engine.APIstatus()));
             } else
             if (headerMap.url === '/next') {
                 player.engine.next();
-                return response_(socketId, headerMap, "302\nLocation: /\nCache-Control: no-cache", WebsocketFrameString('back'));
+                return response_(socketId, headerMap, "200 OK\nLocation: /\nCache-Control: no-cache\nContent-Type: application/json", WebsocketFrameString(player.engine.APIstatus()));
             } else
             if (headerMap.url === '/preview') {
                 player.engine.preview();
-                return response_(socketId, headerMap, "302\nLocation: /\nCache-Control: no-cache", WebsocketFrameString('back'));
+                return response_(socketId, headerMap, "200 OK\nLocation: /\nCache-Control: no-cache\nContent-Type: application/json", WebsocketFrameString(player.engine.APIstatus()));
             } else {
                 is_xhr = true;
                 var xhr = new XMLHttpRequest();
@@ -187,7 +208,7 @@ var wm = function() {
                         response_(socketId, headerMap, "500", WebsocketFrameString('Nothing'));
                     }
                 };
-                xhr.timeout = 500;
+                xhr.timeout = 100;
                 xhr.send(null);
             }
             if (is_xhr === false) {
@@ -267,7 +288,7 @@ var wm = function() {
             chrome.socket.getInfo(server_socketId, function(e) {
                 console.log(e);
             });
-        }
+        };
         return {
             start: start,
             write: write,

@@ -1,13 +1,28 @@
 <html>
     <head>
+        <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <title>3pm-player</title>
+        <link rel="stylesheet"  href="/css/jquery.mobile-1.3.2.min.css">
+        <link href="/css/style.css" rel="stylesheet">
+        <script src="/js/jquery-2.0.3.min.js"></script>
+        <script src="/js/main.js"></script>
+        <script src="/js/jquery.mobile-1.3.2.min.js"></script>
     </head>
     <body>
-        <a href='/preview'>Preview</a>
-        <a href='/play'>Play</a>
-        <a href='/pause'>Pause</a>
-        <a href='/next'>Next</a>
+        <div  data-role="page">
+            <div data-role="header">
+                <h1 class="title">3pm-player</h1>
+                <div class="navigation">
+                    <a href="#" data-theme="d" class="btn prev" data-iconpos="notext" data-role="button" data-inline="true" data-corners="false"></a>
+                    <a href="#" data-theme="d" class="btn playpause play" data-iconpos="notext" data-role="button" data-inline="true" data-corners="false"></a>
+                    <a href="#" data-theme="d" class="btn next" data-iconpos="notext" data-role="button" data-inline="true" data-corners="false"></a>
+                </div>
+            </div>
+
+            <div data-role="content" class="playlist">
+                <ul data-role="listview" class="playlist_ul"></ul>
+            </div>
+        </div>
     </body>
 </html>

@@ -1,0 +1,28 @@
+.btn {
+    min-height: 25px;
+    min-width: 55px;
+    background-repeat: no-repeat;
+    background-position: center;    
+}
+.btn.prev {
+    background-image: url(/images/playback_prev.png);
+}
+.btn.play {
+    background-image: url(/images/playback_play.png);
+}
+.btn.pause {
+    background-image: url(/images/playback_pause.png);
+}
+.btn.stop {
+    background-image: url(/images/playback_stop.png);
+}
+.btn.next {
+    background-image: url(/images/playback_next.png);
+}
+.btn.playlist {
+    background-image: url(/images/playlist.png);
+    background-position-y: 4px;
+}
+h1 {
+    margin: .6em 0 .8em !important;
+}

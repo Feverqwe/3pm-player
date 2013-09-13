@@ -5,6 +5,7 @@ mkdir .\build
 xcopy .\scripts .\build\scripts\ /E
 xcopy .\images .\build\images\ /E
 xcopy .\styles .\build\styles\ /E
+xcopy .\www .\build\www\ /E
 copy .\*.html .\build\.
 copy .\*.json .\build\.
 copy .\*.png .\build\.

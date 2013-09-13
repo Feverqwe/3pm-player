@@ -247,9 +247,10 @@ var engine = function() {
                 status['volume'] = audio.volume;
                 status['duration'] = audio.duration;
                 status['currentTime'] = audio.currentTime;
-                status['ended '] = audio.ended;
-                status['seeking '] = audio.seeking;
-                status['seekable '] = audio.seekable;
+                status['ended'] = audio.ended;
+                status['seeking'] = audio.seeking;
+                status['seekable'] = audio.seekable;
+                status['title'] = window.btoa(unescape(encodeURIComponent(playlist[current_id].file.name)));
                 if (_debug) {
                     console.log(status);
                 }
@@ -468,7 +469,19 @@ var engine = function() {
         getPlaylist: function() {
             return playlist;
         },
-        getCurrent: player.getCurrent
+        getCurrent: player.getCurrent,
+        APIstatus: function() {
+            return JSON.stringify(player.status())
+        },
+        APIplaylist: function() {
+            var list = [];
+            for (var i = 0; i < playlist.length; i++) {
+                var item = playlist[i];
+                list.push({id: item.id, title: item.file.name});
+            }
+            var data = window.btoa(unescape(encodeURIComponent(JSON.stringify({'playlist': list}))))
+            return data;
+        }
     };
 }();
 $(function() {
