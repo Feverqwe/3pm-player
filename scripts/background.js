@@ -184,9 +184,9 @@ var wm = function() {
                     'png': 'image/png',
                     'js': 'text/javascript',
                     'css': 'text/css',
-                    'html': 'text/html; charset=UTF-8',
-                }
-                var ext = (ext in ext_content_type) ? 'Content-Type: ' + ext_content_type[ext] : ''
+                    'html': 'text/html; charset=UTF-8'
+                };
+                var ext = (ext in ext_content_type) ? 'Content-Type: ' + ext_content_type[ext] : '';
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', '/www' + headerMap.url, true);
                 xhr.responseType = 'arraybuffer';
