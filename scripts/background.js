@@ -100,6 +100,184 @@ var wm = function() {
         }
         return wm_id;
     };
+    var web_socket = function() {
+        var server_socketId = null;
+        var WebsocketFrameString = function(str) {
+            var length = str.length;
+            var buffer = new ArrayBuffer(length);
+            var bv = new Uint8Array(buffer);
+            for (var i = 0; i < str.length; i++) {
+                bv[i] = str.charCodeAt(i);
+            }
+            return buffer;
+        };
+        var arrayBufferToString = function(buffer) {
+            var array = new Uint8Array(buffer);
+            var str = '';
+            for (var i = 0; i < array.length; ++i) {
+                str += String.fromCharCode(array[i]);
+            }
+            return str;
+        };
+
+        var response_ = function(socketId, headerMap, code, content) {
+            var header = WebsocketFrameString("HTTP/1.1 " + code + "\n" + "Content-Length: " + content.byteLength + "\n" + "\n");
+
+            chrome.socket.write(socketId, header, function(e) {
+                //console.log(e);
+            });
+
+            chrome.socket.write(socketId, content, function(e) {
+                //console.log(e);
+            });
+
+            var keepAlive = ('Connection' in headerMap && headerMap['Connection'] === 'keep-alive');
+            if (keepAlive) {
+                chrome.socket.setKeepAlive(socketId, true, 60, function(e) {
+                    //console.log(e);
+                });
+                readRequestFromSocket_(socketId);
+            }
+            else {
+                chrome.socket.disconnect(socketId);
+                chrome.socket.destroy(socketId);
+            }
+        };
+
+        var readUrl = function(headerMap, socketId) {
+            if (!'url' in headerMap) {
+                return response_(socketId, headerMap, "200", WebsocketFrameString("Don't have url!"));
+            }
+            var player = wm.getPlayer(0);
+            if (player === null) {
+                return response_(socketId, headerMap, "200", WebsocketFrameString("Player don't run!"));
+            }
+            if (headerMap.url === '/') {
+                headerMap.url = '/index.html';
+            }
+            var is_xhr = false;
+            if (headerMap.url === '/play') {
+                player.engine.play();
+                return response_(socketId, headerMap, "302\nLocation: /\nCache-Control: no-cache", WebsocketFrameString('back'));
+            } else
+            if (headerMap.url === '/pause') {
+                player.engine.pause();
+                return response_(socketId, headerMap, "302\nLocation: /\nCache-Control: no-cache", WebsocketFrameString('back'));
+            } else
+            if (headerMap.url === '/next') {
+                player.engine.next();
+                return response_(socketId, headerMap, "302\nLocation: /\nCache-Control: no-cache", WebsocketFrameString('back'));
+            } else
+            if (headerMap.url === '/preview') {
+                player.engine.preview();
+                return response_(socketId, headerMap, "302\nLocation: /\nCache-Control: no-cache", WebsocketFrameString('back'));
+            } else {
+                is_xhr = true;
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/www' + headerMap.url, true);
+                xhr.responseType = 'arraybuffer';
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var resp = this.response;
+                        response_(socketId, headerMap, xhr.status + " " + xhr.statusText, resp);
+                    }
+                };
+                xhr.onerror = function() {
+                    if (xhr.readyState === 4 && xhr.status !== 200) {
+                        response_(socketId, headerMap, "500", WebsocketFrameString('Nothing'));
+                    }
+                };
+                xhr.timeout = 500;
+                xhr.send(null);
+            }
+            if (is_xhr === false) {
+                response_(socketId, headerMap, "200", WebsocketFrameString('Do it more!'));
+            }
+        };
+        var readRequestFromSocket_ = function(socketId) {
+            var requestData = '';
+            var endIndex = 0;
+            var onDataRead = function(readInfo) {
+                if (readInfo.resultCode <= 0) {
+                    chrome.socket.disconnect(socketId);
+                    chrome.socket.destroy(socketId);
+                    console.log('break');
+                    return;
+                }
+                requestData += arrayBufferToString(readInfo.data).replace(/\r\n/g, '\n');
+                endIndex = requestData.indexOf('\n\n', endIndex);
+                if (endIndex === -1) {
+                    endIndex = requestData.length - 1;
+                    chrome.socket.read(socketId, onDataRead);
+                    return;
+                }
+
+                var headers = requestData.substring(0, endIndex).split('\n');
+                var headerMap = {};
+                // headers[0] should be the Request-Line
+                var requestLine = headers[0].split(' ');
+                headerMap['method'] = requestLine[0];
+                headerMap['url'] = requestLine[1];
+                headerMap['Http-Version'] = requestLine[2];
+                for (var i = 1; i < headers.length; i++) {
+                    requestLine = headers[i].split(':', 2);
+                    if (requestLine.length === 2)
+                        headerMap[requestLine[0]] = requestLine[1].trim();
+                }
+
+                //console.log(headerMap)
+
+                readUrl(headerMap, socketId);
+
+
+            };
+            chrome.socket.read(socketId, onDataRead);
+        };
+        var onConnection_ = function(acceptInfo) {
+            readRequestFromSocket_(acceptInfo.socketId);
+        };
+        var acceptConnection_ = function(socketId) {
+            chrome.socket.accept(socketId, function(acceptInfo) {
+                onConnection_(acceptInfo);
+                acceptConnection_(socketId);
+            });
+        };
+        var start = function() {
+            chrome.socket.create("tcp", {}, function(createInfo) {
+                server_socketId = createInfo.socketId;
+                chrome.socket.listen(server_socketId, '0.0.0.0', 9898, 50, function(e) {
+                    acceptConnection_(server_socketId);
+                });
+            });
+        };
+        var write = function(data) {
+            data += '\n\n';
+            var client_socketId = null;
+            var binary = WebsocketFrameString(data);
+            chrome.socket.create("tcp", {}, function(createInfo) {
+                client_socketId = createInfo.socketId;
+                chrome.socket.connect(client_socketId, '127.0.0.1', 9898, function(e) {
+                    chrome.socket.write(client_socketId, binary, function(e) {
+                        //console.log(e);
+                    });
+                });
+            });
+        };
+        var getInfo = function() {
+            chrome.socket.getInfo(server_socketId, function(e) {
+                console.log(e);
+            });
+        }
+        return {
+            start: start,
+            write: write,
+            info: getInfo,
+            stop: function() {
+                chrome.socket.disconnect(server_socketId);
+                chrome.socket.destroy(server_socketId);
+            }
+        };
+    }();
     return {
         get_player: function() {
             check();
@@ -141,7 +319,8 @@ var wm = function() {
                 return null;
             }
             return app_windows[wm_id].playlist.contentWindow.window;
-        }
+        },
+        ws: web_socket
     };
 }();
 chrome.app.runtime.onLaunched.addListener(function() {

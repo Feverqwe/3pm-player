@@ -176,6 +176,9 @@ var engine = function() {
                 return playlist[current_id].file.name;
             },
             play: function() {
+                if (current_id === null) {
+                    return;
+                }
                 if (playedlist.length === playlist.length) {
                     playedlist = [];
                 }
@@ -186,6 +189,9 @@ var engine = function() {
                 }
             },
             pause: function() {
+                if (current_id === null) {
+                    return;
+                }
                 if ('url' in playlist[current_id].file) {
                     audio.pause();
                     audio.src = "";

@@ -198,15 +198,30 @@ var view = function() {
                     title: "Open URL",
                     contexts: ["all"]
                 });
+                chrome.contextMenus.create({
+                    type: "checkbox",
+                    id: "ws",
+                    title: "Enable web server (0.0.0.0:9898)",
+                    contexts: ["all"]
+                });
                 chrome.contextMenus.onClicked.addListener(function(info) {
                     if (info.menuItemId === "1") {
                         $('.click_for_open input').trigger('click');
-                    }
-                });
-                chrome.contextMenus.onClicked.addListener(function(info) {
+                    } else
                     if (info.menuItemId === "2") {
                         dom_cache.url_dialog.toggle();
                         dom_cache.url_dialog.find('input[name=url]').get(0).focus();
+                    } else
+                    if (info.menuItemId === "ws") {
+                        if (info.checked) {
+                            chrome.runtime.getBackgroundPage(function(bg) {
+                                bg.wm.ws.start();
+                            });
+                        } else {
+                            chrome.runtime.getBackgroundPage(function(bg) {
+                                bg.wm.ws.stop();
+                            });
+                        }
                     }
                 });
             });

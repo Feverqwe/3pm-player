@@ -1,17 +1,17 @@
 {
-	"manifest_version": 2,
-	"name": "3pm-player",
-	"version": "0.4.10",
-	"minimum_chrome_version": "23",
-	"icons": {
-		"16": "icon_16.png",
-		"128": "icon_128.png"
-	},
-	"app": {
-		"background": {
-			"scripts": ["scripts/background.js"]
-		}
-	},
-	"offline_enabled": true,
-	"permissions" : ["storage","contextMenus"]
+    "manifest_version": 2,
+    "name": "3pm-player",
+    "version": "0.5.0",
+    "minimum_chrome_version": "23",
+    "icons": {
+        "16": "icon_16.png",
+        "128": "icon_128.png"
+    },
+    "app": {
+        "background": {
+            "scripts": ["scripts/background.js"]
+        }
+    },
+    "offline_enabled": true,
+    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*", "tcp-connect:*:*"]}]
 }
