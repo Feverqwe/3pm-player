@@ -241,6 +241,9 @@ var engine = function() {
                 player.open(id);
             },
             status: function() {
+                var encode_name = function(title) {
+                    return window.btoa(unescape(encodeURIComponent(title)));
+                };
                 var status = {};
                 status['paused'] = audio.paused;
                 status['muted'] = audio.muted;
@@ -250,7 +253,16 @@ var engine = function() {
                 status['ended'] = audio.ended;
                 status['seeking'] = audio.seeking;
                 status['seekable'] = audio.seekable;
-                status['title'] = window.btoa(unescape(encodeURIComponent(playlist[current_id].file.name)));
+                status['current_id'] = current_id;
+                if (playlist.length === 0) {
+                    status['title'] = encode_name("3pm-player");
+                } else {
+                    if (playlist[current_id].tags !== null && 'title' in playlist[current_id].tags) {
+                        status['title'] = encode_name(playlist[current_id].tags.title);
+                    } else {
+                        status['title'] = encode_name(playlist[current_id].file.name);
+                    }
+                }
                 if (_debug) {
                     console.log(status);
                 }

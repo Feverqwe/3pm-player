@@ -29,6 +29,10 @@ var view = function() {
                 if ('title' in data) {
                     dom_cache.title.text(decodeURIComponent(escape(window.atob(data.title))));
                 }
+                if ('current_id' in data) {
+                    $('a.selected').removeClass('selected');
+                    $('a[data-id=' + data.current_id + ']').addClass('selected');
+                }
                 //console.log(data);
             };
             dom_cache.playlist.on('click', 'a', function() {
