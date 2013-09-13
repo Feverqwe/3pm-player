@@ -63,12 +63,12 @@ var view = function() {
                     read_status(data);
                 });
             });
-            $.get('/status', function(data) {
-                read_status(data);
-            });
             $.get('/playlist', function(data) {
                 data = JSON.parse(decodeURIComponent(escape(window.atob(data))));
                 read_status(data);
+                $.get('/status', function(data) {
+                    read_status(data);
+                });
             });
         }
     };

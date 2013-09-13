@@ -104,6 +104,14 @@ var wm = function() {
         var not_found = [];
         var cache = {};
         var server_socketId = null;
+        var timeout = null;
+        var empty_timer = function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                wm.ws.stop();
+                wm.ws.start();
+            }, 5000);
+        }
         var stringToArrayBuffer = function(string) {
             var buffer = new ArrayBuffer(string.length);
             var bufferView = new Uint8Array(buffer);
@@ -144,11 +152,11 @@ var wm = function() {
 
             var is_xhr = false;
             if (not_found.indexOf(headerMap.url) >= 0) {
-                return response_(socketId, headerMap, stringToArrayBuffer('Not found!'), ['404 Not Found']);
+                return response_(socketId, headerMap, stringToArrayBuffer(''), ['404 Not Found']);
             } else
-            if ( headerMap.url in cache ) {
+            if (headerMap.url in cache) {
                 var data = cache[headerMap.url].data;
-                var head = cache[headerMap.url].head;
+                var head = JSON.parse(JSON.stringify(cache[headerMap.url].head));
                 return response_(socketId, headerMap, data, head);
             } else
             if (headerMap.url.substr(0, 4) === '/pl/') {
@@ -197,14 +205,14 @@ var wm = function() {
                         if (ext.length > 0) {
                             header.push(ext);
                         }
-                        cache[headerMap.url] = {data: resp, head: header};
+                        cache[headerMap.url] = {data: resp, head: JSON.parse(JSON.stringify(header))};
                         response_(socketId, headerMap, resp, header);
                     }
                 };
                 xhr.onerror = function() {
                     if (xhr.readyState === 4 && xhr.status !== 200) {
                         not_found.push(headerMap.url);
-                        response_(socketId, headerMap, stringToArrayBuffer('Not found!'), ['404 Not Found']);
+                        response_(socketId, headerMap, stringToArrayBuffer(''), ['404 Not Found']);
                     }
                 };
                 xhr.timeout = 100;
@@ -225,6 +233,7 @@ var wm = function() {
                         if (writeInfo.bytesWritten === header.byteLength) {
                             var keepAlive = headerMap['Connection'] === 'keep-alive';
                             if (keepAlive) {
+                                empty_timer();
                                 readRequestFromSocket_(socketId);
                             }
                         }
@@ -236,15 +245,10 @@ var wm = function() {
             var requestData = '';
             var endIndex = 0;
             var onDataRead = function(readInfo) {
+                empty_timer();
                 if (readInfo.resultCode <= 0) {
                     chrome.socket.disconnect(socketId);
                     chrome.socket.destroy(socketId);
-                    console.log('break', readInfo.resultCode);
-                    setTimeout(function() {
-                        console.log('Killing');
-                        wm.ws.stop();
-                        wm.ws.start();
-                    }, 3000);
                     return;
                 }
                 requestData += arrayBufferToString(readInfo.data).replace(/\r\n/g, '\n');
@@ -288,7 +292,7 @@ var wm = function() {
         var start = function() {
             chrome.socket.create("tcp", {}, function(createInfo) {
                 server_socketId = createInfo.socketId;
-                chrome.socket.listen(server_socketId, '0.0.0.0', 9898, 50, function(e) {
+                chrome.socket.listen(server_socketId, '0.0.0.0', 9898, 1, function(e) {
                     acceptConnection_(server_socketId);
                 });
             });
