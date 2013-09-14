@@ -111,7 +111,7 @@ var wm = function() {
                 wm.ws.stop();
                 wm.ws.start();
             }, 5000);
-        }
+        };
         var stringToArrayBuffer = function(string) {
             var buffer = new ArrayBuffer(string.length);
             var bufferView = new Uint8Array(buffer);

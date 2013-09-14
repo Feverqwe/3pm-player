@@ -156,7 +156,6 @@ var playlist = function() {
             scrool_to(el);
         },
         setShuffle: function(status) {
-            chrome.storage.local.set({'shuffle': status});
             if (status) {
                 dom_cache.shuffle.css('background-image', 'url(images/shuffle_on.png)');
             } else {
@@ -164,7 +163,6 @@ var playlist = function() {
             }
         },
         setLoop: function(status) {
-            chrome.storage.local.set({'loop': status});
             if (status) {
                 dom_cache.loop.css('background-image', 'url(images/loop_on.png)');
             } else {

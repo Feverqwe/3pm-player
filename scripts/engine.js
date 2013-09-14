@@ -293,6 +293,10 @@ var engine = function() {
                 return status;
             },
             volume: function(persent) {
+                var save_volume = function(pos) {
+                    var width_persent = pos / 1.0 * 100;
+                    chrome.storage.local.set({'volume': width_persent});
+                };
                 if (persent === undefined) {
                     view.setVolume(audio.volume);
                     return;
@@ -314,12 +318,14 @@ var engine = function() {
                         new_val = 0;
                     }
                     audio.volume = new_val;
+                    save_volume(audio.volume);
                     return;
                 }
                 if (audio.muted) {
                     audio.muted = false;
                 }
                 audio.volume = 1.0 / 100 * persent;
+                save_volume(audio.volume);
             },
             position: function(persent) {
                 if (isNaN(audio.duration))
@@ -509,6 +515,7 @@ var engine = function() {
             if (c === undefined) {
                 shuffle = !shuffle;
             }
+            chrome.storage.local.set({'shuffle': shuffle});
             sendPlaylist(function() {
                 _playlist.playlist.setShuffle(shuffle);
             });
@@ -517,6 +524,7 @@ var engine = function() {
             if (c === undefined) {
                 loop = !loop;
             }
+            chrome.storage.local.set({'loop': loop});
             sendPlaylist(function() {
                 _playlist.playlist.setLoop(loop);
             });
@@ -526,7 +534,7 @@ var engine = function() {
         },
         getCurrent: player.getCurrent,
         APIstatus: function() {
-            return JSON.stringify(player.status())
+            return JSON.stringify(player.status());
         },
         APIplaylist: function() {
             var list = [];
@@ -534,7 +542,7 @@ var engine = function() {
                 var item = playlist[i];
                 list.push({id: item.id, title: item.file.name});
             }
-            var data = window.btoa(unescape(encodeURIComponent(JSON.stringify({'playlist': list}))))
+            var data = window.btoa(unescape(encodeURIComponent(JSON.stringify({'playlist': list}))));
             return data;
         }
     };

@@ -328,7 +328,6 @@ var view = function() {
             var max = 1.0;
             var width_persent = pos / max * 100;
             dom_cache.volume.slider("value", width_persent);
-            chrome.storage.local.set({'volume': width_persent});
             if (width_persent > 70) {
                 if (var_cache['volume_image'] === 1) {
                     return;
