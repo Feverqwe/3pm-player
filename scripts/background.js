@@ -110,7 +110,7 @@ var wm = function() {
             timeout = setTimeout(function() {
                 wm.ws.stop();
                 wm.ws.start();
-            }, 5000);
+            }, 60000);
         };
         var stringToArrayBuffer = function(string) {
             var buffer = new ArrayBuffer(string.length);
