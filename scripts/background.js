@@ -149,7 +149,6 @@ var wm = function() {
             if (headerMap.url.substr(0, 8) === '/images/') {
                 headerMap.url = '/..' + headerMap.url;
             }
-
             var is_xhr = false;
             if (not_found.indexOf(headerMap.url) >= 0) {
                 return response_(socketId, headerMap, stringToArrayBuffer(''), ['404 Not Found']);
@@ -184,6 +183,22 @@ var wm = function() {
             } else
             if (headerMap.url === '/preview') {
                 player.engine.preview();
+                return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            } else
+            if (headerMap.url.substr(0, 11) === '/volume_up/') {
+                player.engine.volume(headerMap.url.substr(11));
+                return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            } else
+            if (headerMap.url.substr(0, 13) === '/volume_down/') {
+                player.engine.volume(headerMap.url.substr(13));
+                return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            } else
+            if (headerMap.url === '/shuffle') {
+                player.engine.shuffle();
+                return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            } else
+            if (headerMap.url === '/loop') {
+                player.engine.loop();
                 return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
             } else {
                 is_xhr = true;

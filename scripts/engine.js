@@ -253,15 +253,33 @@ var engine = function() {
                 status['ended'] = audio.ended;
                 status['seeking'] = audio.seeking;
                 status['seekable'] = audio.seekable;
+                status['loop'] = loop;
+                status['shuffle'] = shuffle;
                 status['current_id'] = current_id;
                 if (playlist.length === 0) {
                     status['title'] = encode_name("3pm-player");
                 } else {
-                    if (playlist[current_id].tags !== null && 'title' in playlist[current_id].tags) {
-                        status['title'] = encode_name(playlist[current_id].tags.title);
+
+                    var tags = playlist[current_id].tags;
+
+                    var title = '';
+                    var album = ''
+
+                    if ("title" in tags) {
+                        title = tags.title;
                     } else {
-                        status['title'] = encode_name(playlist[current_id].file.name);
+                        title = playlist[current_id].file.name;
                     }
+                    if ("album" in tags && "artist" in tags) {
+                        album = tags.artist + ' - ' + tags.album;
+                    } else
+                    if ("artist" in tags) {
+                        album = tags.artist;
+                    } else
+                    if ("album" in tags) {
+                        album = tags.album;
+                    }
+                    status['title'] = encode_name(title + ' – ' + album);
                 }
                 if (_debug) {
                     console.log(status);
@@ -271,6 +289,25 @@ var engine = function() {
             volume: function(persent) {
                 if (persent === undefined) {
                     view.setVolume(audio.volume);
+                    return;
+                }
+                if (typeof(persent) === "string") {
+                    if (persent.substr(0, 1) === "+") {
+                        persent = parseFloat(persent.substr(1));
+                    } else {
+                        persent = -1 * parseFloat(persent.substr(1));
+                    }
+                    if (isNaN(persent)) {
+                        return;
+                    }
+                    var new_val = audio.volume + persent / 100;
+                    if (new_val > 1) {
+                        new_val = 1;
+                    } else
+                    if (new_val < 0) {
+                        new_val = 0;
+                    }
+                    audio.volume = new_val;
                     return;
                 }
                 if (audio.muted) {

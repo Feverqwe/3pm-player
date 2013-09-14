@@ -3,25 +3,26 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <title>3pm-player</title>
-        <link rel="stylesheet"  href="/css/jquery.mobile-1.3.2.min.css">
-        <link href="/css/style.css" rel="stylesheet">
+        <link rel="stylesheet"  href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/style.css">
         <script src="/js/jquery-2.0.3.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
         <script src="/js/main.js"></script>
-        <script src="/js/jquery.mobile-1.3.2.min.js"></script>
     </head>
     <body>
-        <div  data-role="page">
-            <div data-role="header">
-                <h1 class="title">3pm-player</h1>
-                <div class="navigation">
-                    <a href="#" data-theme="d" class="btn prev" data-iconpos="notext" data-role="button" data-inline="true" data-corners="false"></a>
-                    <a href="#" data-theme="d" class="btn playpause play" data-iconpos="notext" data-role="button" data-inline="true" data-corners="false"></a>
-                    <a href="#" data-theme="d" class="btn next" data-iconpos="notext" data-role="button" data-inline="true" data-corners="false"></a>
-                </div>
-            </div>
-
-            <div data-role="content" class="playlist">
-                <ul data-role="listview" class="playlist_ul"></ul>
+        <h3 class="title">Panel title</h3>
+        <div class="btn-group btn-group-justified">
+            <a href="#" class="btn prev btn-default">&nbsp;</a>
+            <a href="#" class="btn playpause play btn-default">&nbsp;</a>
+            <a href="#" class="btn next btn-default">&nbsp;</a>
+        </div>
+        <div class="playlist list-group"></div>
+        <div class="bottom-panel">
+            <div class="btn-group btn-group-justified">
+                <a href="#" class="btn shuffle btn-default">&nbsp;</a>
+                <a href="#" class="btn loop btn-default">&nbsp;</a>
+                <a href="#" class="btn volume down btn-default">–</a>
+                <a href="#" class="btn volume up btn-default">+</a>
             </div>
         </div>
     </body>

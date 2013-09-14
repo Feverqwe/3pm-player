@@ -1,6 +1,4 @@
 .btn {
-    min-height: 25px;
-    min-width: 55px;
     background-repeat: no-repeat;
     background-position: center;    
 }
@@ -23,9 +21,32 @@
     background-image: url(/images/playlist.png);
     background-position-y: 4px;
 }
-h1 {
-    margin: .6em 0 .8em !important;
+.playlist {
+    margin-top: 10px;
+    margin-bottom: 44px;
 }
 li a.selected {
     background-color: rgb(255, 204, 0);
+}
+.bottom-panel {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #fff;
+    overflow: hidden;
+}
+.btn.shuffle {
+    background-image: url(../images/shuffle.png);
+}
+.btn.loop {
+    background-image: url(../images/loop.png);
+}
+.btn.shuffle.on {
+    background-image: url(../images/shuffle_on.png);
+}
+.btn.loop.on {
+    background-image: url(../images/loop_on.png);
+}
+.btn.volume {
+    font-weight: bolder;
 }
