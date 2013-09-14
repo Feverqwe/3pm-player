@@ -21,18 +21,6 @@ var view = function() {
             }
         });
     };
-    var getPage = function(url, cb) {
-        $.get(url, cb);
-//        $.ajax({
-//            type: 'GET',
-//            dataType: 'json',
-//            url: url,
-//            timeout: 10,
-//            success: function(data) {
-//                cb(data);
-//            }
-//        });
-    };
     var read_status = function(data) {
         if ('paused' in data) {
             if (data.paused) {
