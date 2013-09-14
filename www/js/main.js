@@ -1,6 +1,7 @@
 var view = function() {
     var dom_cache = {};
     var var_cache = {};
+    var lastStatus = {};
     var getStatus = function() {
         if ('status_timer' in var_cache === false) {
             var_cache['status_timer'] = null;
@@ -8,6 +9,7 @@ var view = function() {
         clearTimeout(var_cache.status_timer);
         var_cache.status_timer = setTimeout(function() {
             $.get('/status', function(data) {
+                lastStatus = data;
                 read_status(data);
             });
         }, 50);
@@ -63,7 +65,9 @@ var view = function() {
                 var_cache['playlist_count'] = data.playlist_count;
             } else
             if (data.playlist_count !== var_cache.playlist_count) {
-                getPlaylist();
+                getPlaylist(function() {
+                    read_status(lastStatus);
+                });
                 var_cache.playlist_count = data.playlist_count;
             }
         }
@@ -82,6 +86,10 @@ var view = function() {
                 btnShuffle: $('.shuffle.btn'),
                 btnLoop: $('.loop.btn')
             };
+            dom_cache.title.on('click', function(e) {
+                e.preventDefault();
+                getStatus();
+            });
             dom_cache.playlist.on('click', 'a', function(e) {
                 e.preventDefault();
                 var id = $(this).attr('data-id');
