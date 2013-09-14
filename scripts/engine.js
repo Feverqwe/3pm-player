@@ -246,16 +246,17 @@ var engine = function() {
                 };
                 var status = {};
                 status['paused'] = audio.paused;
-                status['muted'] = audio.muted;
-                status['volume'] = audio.volume;
-                status['duration'] = audio.duration;
-                status['currentTime'] = audio.currentTime;
-                status['ended'] = audio.ended;
-                status['seeking'] = audio.seeking;
-                status['seekable'] = audio.seekable;
+                //status['muted'] = audio.muted;
+                //status['volume'] = audio.volume;
+                //status['duration'] = audio.duration;
+                //status['currentTime'] = audio.currentTime;
+                //status['ended'] = audio.ended;
+                //status['seeking'] = audio.seeking;
+                //status['seekable'] = audio.seekable;
                 status['loop'] = loop;
                 status['shuffle'] = shuffle;
                 status['current_id'] = current_id;
+                status['playlist_count'] = playlist.length;
                 if (playlist.length === 0) {
                     status['title'] = encode_name("3pm-player");
                 } else {
