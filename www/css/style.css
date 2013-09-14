@@ -53,8 +53,8 @@ li a.selected {
 }
 .title {
     text-align: center;
-    height: 40px;
-    max-height: 40px;
+    height: 38px;
+    max-height: 38px;
     text-overflow: ellipsis;
     overflow: hidden
 }
