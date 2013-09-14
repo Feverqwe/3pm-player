@@ -7,13 +7,13 @@ var view = function() {
         }
         clearTimeout(var_cache.status_timer);
         var_cache.status_timer = setTimeout(function() {
-            getPage('/status', function(data) {
+            $.get('/status', function(data) {
                 read_status(data);
             });
         }, 50);
     };
     var getPlaylist = function(cb) {
-        getPage('/playlist', function(data) {
+        $.get('/playlist', function(data) {
             data = JSON.parse(decodeURIComponent(escape(window.atob(data))));
             read_status(data);
             if (cb) {
@@ -97,7 +97,7 @@ var view = function() {
             dom_cache.playlist.on('click', 'a', function(e) {
                 e.preventDefault();
                 var id = $(this).attr('data-id');
-                getPage('/pl/' + id, function(data) {
+                $.get('/pl/' + id, function(data) {
                     data.paused = false;
                     read_status(data);
                 });
@@ -105,48 +105,48 @@ var view = function() {
             dom_cache.btnPlayPause.on('click', function(e) {
                 e.preventDefault();
                 if ($(this).hasClass('pause')) {
-                    getPage('/pause', function(data) {
+                    $.get('/pause', function(data) {
                         read_status(data);
                     });
                 } else {
-                    getPage('/play', function(data) {
+                    $.get('/play', function(data) {
                         read_status(data);
                     });
                 }
             });
             dom_cache.btnPrev.on('click', function(e) {
                 e.preventDefault();
-                getPage('/preview', function(data) {
+                $.get('/preview', function(data) {
                     read_status(data);
                 });
             });
             dom_cache.btnNext.on('click', function(e) {
                 e.preventDefault();
-                getPage('/next', function(data) {
+                $.get('/next', function(data) {
                     read_status(data);
                 });
             });
             dom_cache.btnShuffle.on('click', function(e) {
                 e.preventDefault();
-                getPage('/shuffle', function(data) {
+                $.get('/shuffle', function(data) {
                     read_status(data);
                 });
             });
             dom_cache.btnLoop.on('click', function(e) {
                 e.preventDefault();
-                getPage('/loop', function(data) {
+                $.get('/loop', function(data) {
                     read_status(data);
                 });
             });
             dom_cache.btnVolume_up.on('click', function(e) {
                 e.preventDefault();
-                getPage('/volume_up/+10', function(data) {
+                $.get('/volume_up/+10', function(data) {
                     read_status(data);
                 });
             });
             dom_cache.btnVolume_down.on('click', function(e) {
                 e.preventDefault();
-                getPage('/volume_down/-10', function(data) {
+                $.get('/volume_down/-10', function(data) {
                     read_status(data);
                 });
             });

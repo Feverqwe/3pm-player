@@ -260,25 +260,32 @@ var engine = function() {
                 if (playlist.length === 0) {
                     status['title'] = encode_name("3pm-player");
                 } else {
-
                     var tags = playlist[current_id].tags;
                     var title = '';
                     var album = '';
-                    if ("title" in tags) {
-                        title = tags.title;
+                    if (tags !== null) {
+                        if ("title" in tags) {
+                            title = tags.title;
+                        } else {
+                            title = playlist[current_id].file.name;
+                        }
+                        if ("album" in tags && "artist" in tags) {
+                            album = tags.artist + ' - ' + tags.album;
+                        } else
+                        if ("artist" in tags) {
+                            album = tags.artist;
+                        } else
+                        if ("album" in tags) {
+                            album = tags.album;
+                        }
+                        if (album.length > 0) {
+                            status['title'] = encode_name(title + ' – ' + album);
+                        } else {
+                            status['title'] = encode_name(title);
+                        }
                     } else {
-                        title = playlist[current_id].file.name;
+                        status['title'] = encode_name(playlist[current_id].file.name);
                     }
-                    if ("album" in tags && "artist" in tags) {
-                        album = tags.artist + ' - ' + tags.album;
-                    } else
-                    if ("artist" in tags) {
-                        album = tags.artist;
-                    } else
-                    if ("album" in tags) {
-                        album = tags.album;
-                    }
-                    status['title'] = encode_name(title + ' – ' + album);
                 }
                 if (_debug) {
                     console.log(status);
