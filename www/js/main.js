@@ -22,14 +22,16 @@ var view = function() {
         });
     };
     var getPage = function(url, cb) {
-        $.ajax({
-            type: 'json',
-            url: url,
-            timeout: 10,
-            success: function(data) {
-                cb(data);
-            }
-        });
+        $.get(url, cb);
+//        $.ajax({
+//            type: 'GET',
+//            dataType: 'json',
+//            url: url,
+//            timeout: 10,
+//            success: function(data) {
+//                cb(data);
+//            }
+//        });
     };
     var read_status = function(data) {
         if ('paused' in data) {

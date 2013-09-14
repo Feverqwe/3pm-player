@@ -262,10 +262,8 @@ var engine = function() {
                 } else {
 
                     var tags = playlist[current_id].tags;
-
                     var title = '';
-                    var album = ''
-
+                    var album = '';
                     if ("title" in tags) {
                         title = tags.title;
                     } else {
