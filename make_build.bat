@@ -35,4 +35,4 @@ java -jar htmlcompressor-1.5.3.jar -t html .\index.html -o .\build\index.html
 
 7za a -tzip .\build.zip .\build\*
 
-puse
+pause
