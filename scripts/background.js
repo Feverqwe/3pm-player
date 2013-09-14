@@ -205,7 +205,7 @@ var wm = function() {
                 var ext = headerMap.url.substr(headerMap.url.lastIndexOf('.') + 1).toLowerCase();
                 ext_content_type = {
                     'png': 'image/png',
-                    'js': 'text/javascript',
+                    'js': 'application/javascript',
                     'css': 'text/css',
                     'html': 'text/html; charset=UTF-8'
                 };
