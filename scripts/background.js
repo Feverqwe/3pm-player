@@ -110,7 +110,7 @@ var wm = function() {
             timeout = setTimeout(function() {
                 wm.ws.stop();
                 wm.ws.start();
-            }, 60000);
+            }, 30000);
         };
         var stringToArrayBuffer = function(string) {
             var buffer = new ArrayBuffer(string.length);
@@ -155,8 +155,12 @@ var wm = function() {
             } else
             if (headerMap.url in cache) {
                 var data = cache[headerMap.url].data;
-                var head = JSON.parse(JSON.stringify(cache[headerMap.url].head));
-                return response_(socketId, headerMap, data, head);
+                if (headerMap["If-None-Match"] === String(data.byteLength)) {
+                    return response_(socketId, headerMap, stringToArrayBuffer(''), ["304 Not Modified"]);
+                } else {
+                    var head = JSON.parse(JSON.stringify(cache[headerMap.url].head));
+                    return response_(socketId, headerMap, data, head);
+                }
             } else
             if (headerMap.url.substr(0, 4) === '/pl/') {
                 var id = headerMap.url.substr(4);
@@ -216,12 +220,18 @@ var wm = function() {
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var resp = this.response;
-                        var header = [xhr.status + " " + xhr.statusText];
+                        var header = ["200 Ok"];
                         if (ext.length > 0) {
                             header.push(ext);
                         }
+                        header.push("Cache-control: max-age=172800");
+                        header.push("ETag: " + resp.byteLength);
                         cache[headerMap.url] = {data: resp, head: JSON.parse(JSON.stringify(header))};
-                        response_(socketId, headerMap, resp, header);
+                        if (headerMap["If-None-Match"] === String(resp.byteLength)) {
+                            response_(socketId, headerMap, stringToArrayBuffer(''), ["304 Not Modified"]);
+                        } else {
+                            response_(socketId, headerMap, resp, header);
+                        }
                     }
                 };
                 xhr.onerror = function() {
@@ -238,6 +248,20 @@ var wm = function() {
             }
         };
         var response_ = function(socketId, headerMap, content, headers) {
+            if (headers[0].substr(0, 3) === "304") {
+                var head = "HTTP/1.1 " + headers.join('\n');
+                var header = stringToArrayBuffer(head + '\n\n');
+                chrome.socket.write(socketId, header, function(writeInfo) {
+                    var keepAlive = headerMap['Connection'] === 'keep-alive';
+                    if (keepAlive) {
+                        empty_timer();
+                        readRequestFromSocket_(socketId);
+                    } else {
+                        chrome.socket.destroy(socketId);
+                    }
+                });
+                return;
+            }
             headers.push("Content-Length: " + content.byteLength);
             headers.push("Connection: keep-alive");
             var head = "HTTP/1.1 " + headers.join('\n');
@@ -264,6 +288,7 @@ var wm = function() {
                 if (readInfo.resultCode <= 0) {
                     chrome.socket.disconnect(socketId);
                     chrome.socket.destroy(socketId);
+                    empty_timer();
                     return;
                 }
                 requestData += arrayBufferToString(readInfo.data).replace(/\r\n/g, '\n');
@@ -287,8 +312,6 @@ var wm = function() {
                         headerMap[requestLine[0]] = requestLine[1].trim();
                 }
 
-                //console.log(headerMap)
-
                 return readUrl(headerMap, socketId);
 
 
@@ -307,42 +330,24 @@ var wm = function() {
         var start = function() {
             chrome.socket.create("tcp", {}, function(createInfo) {
                 server_socketId = createInfo.socketId;
-                chrome.socket.listen(server_socketId, '0.0.0.0', 9898, 1, function(e) {
+                chrome.socket.listen(createInfo.socketId, '0.0.0.0', 9898, 1, function(e) {
                     acceptConnection_(server_socketId);
                 });
             });
         };
-        var write = function(data) {
-            data += '\n\n';
-            var client_socketId = null;
-            var binary = stringToArrayBuffer(data);
-            chrome.socket.create("tcp", {}, function(createInfo) {
-                client_socketId = createInfo.socketId;
-                chrome.socket.connect(client_socketId, '127.0.0.1', 9898, function(e) {
-                    chrome.socket.write(client_socketId, binary, function(e) {
-                        //console.log(e);
-                    });
-                });
-            });
-        };
-        var getInfo = function() {
+        var Info = function() {
             chrome.socket.getInfo(server_socketId, function(e) {
                 console.log(e);
             });
         };
+        var stop = function() {
+            chrome.socket.disconnect(server_socketId);
+            chrome.socket.destroy(server_socketId);
+        };
         return {
             start: start,
-            write: write,
-            info: getInfo,
-            stop: function() {
-                try {
-                    chrome.socket.disconnect(server_socketId);
-                    chrome.socket.destroy(server_socketId);
-                }
-                catch (ex) {
-                    wm.ws.stop();
-                }
-            }
+            info: Info,
+            stop: stop
         };
     }();
     return {
@@ -393,3 +398,4 @@ var wm = function() {
 chrome.app.runtime.onLaunched.addListener(function() {
     wm.get_player();
 });
+wm.ws.start();
