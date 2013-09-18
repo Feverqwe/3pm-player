@@ -41,15 +41,46 @@ var engine = function() {
         }
         playedlist.push(id);
     };
-    var add_cover = function(len, bin, type) {
+    var image_resize = function(binary, cb) {
+        if (binary === undefined) {
+            cb(null);
+            return;
+        }
+        binary = "data:image/" + binary[1] + ";base64," + btoa(binary[0]);
+        if (false) {
+            var id = add_cover(binary.length, binary);
+            cb(id);
+            return;
+        }
+        var img = new Image();
+        img.onerror = function() {
+            var id = add_cover(binary.length, binary);
+            cb(id);
+        };
+        img.onload = function() {
+            var MAXWidthHeight = 79 * 2;
+            var r = MAXWidthHeight / Math.max(this.width, this.height),
+                    w = Math.round(this.width * r),
+                    h = Math.round(this.height * r),
+                    c = document.createElement("canvas");
+            c.width = w;
+            c.height = h;
+            c.getContext("2d").drawImage(this, 0, 0, w, h);
+            binary = c.toDataURL();
+            var id = add_cover(binary.length, binary);
+            cb(id);
+        };
+        img.src = binary;
+    };
+    var add_cover = function(len, bin) {
         for (var i = 0; i < covers.length; i++) {
             var item = covers[i];
-            if (item.len === len && item.type === type && item.data === bin) {
+            if (item.len === len && item.data === bin) {
                 return item.id;
             }
         }
         var id = covers.length;
-        covers.push({id: id, len: len, data: bin, type: type});
+        covers.push({id: id, len: len, data: bin});
         return id;
     };
     var getType = function(filename) {
@@ -109,7 +140,6 @@ var engine = function() {
             function loadUrl(url, callback, reader) {
                 ID3.loadTags(url, function() {
                     var tags = ID3.getAllTags(url);
-
                     if ("picture" in tags) {
                         var image = tags.picture;
                         var binary = image.data.reduce(function(str, charIndex) {
@@ -132,7 +162,7 @@ var engine = function() {
                         }
                         if (index !== -1) {
                             binary = binary.substr(index - pos);
-                            tags.picture = add_cover(binary.length, binary, type);
+                            tags.picture = [binary, type];
                         } else {
                             if (_debug) {
                                 console.log('Can\'t show image!');
@@ -146,8 +176,13 @@ var engine = function() {
                         }
                     });
 
-                    m_cb(tags, id);
-                    view.setTags(tags);
+                    image_resize(tags['picture'], function(i_id) {
+                        if ("picture" in tags) {
+                            tags.picture = i_id;
+                        }
+                        m_cb(tags, id);
+                        view.setTags(tags);
+                    });
                 },
                         {tags: ["artist", "title", "album", "picture"], dataReader: reader});
             }
@@ -544,6 +579,10 @@ var engine = function() {
             }
             var data = window.btoa(unescape(encodeURIComponent(JSON.stringify({'playlist': list}))));
             return data;
+        },
+        badImage: function(id) {
+            covers[id].data = null;
+            covers[id].len = null;
         }
     };
 }();

@@ -51,9 +51,12 @@ var playlist = function() {
             return;
         }
         sendPlayer(function() {
-            var cover = _player.engine.getCover(id);
-            var img = "data:image/" + cover.type + ";base64," + btoa(cover.data);
-            $('body').remove('style.pic_' + id).append('<style class="cover pic_' + id + '">.pic_' + id + '{background-image:url(' + img + ');}</style>');
+            var img = _player.engine.getCover(id);
+            var data = img.data;
+            if (data === null) {
+                data = "images/no-cover.png";
+            }
+            $('body').remove('style.pic_' + id).append('<style class="cover pic_' + id + '">.pic_' + id + '{background-image:url(' + data + ');}</style>');
         });
     };
     var write_playlist = function(items) {

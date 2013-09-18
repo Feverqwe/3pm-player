@@ -8,8 +8,13 @@ var view = function() {
     var isPause = function() {
         dom_cache.btnPlayPause.removeClass('pause').addClass('play');
     };
-    var showImage = function(src) {
-        dom_cache.picture.get(0).src = src;
+    var showImage = function(id) {
+        var img = engine.getCover(id);
+        if (img.data === null) {
+            hideImage();
+            return;
+        }
+        dom_cache.picture.attr('data-id', id).get(0).src = img.data;
     };
     var hideImage = function() {
         dom_cache.picture.get(0).src = "images/no-cover.png";
@@ -121,6 +126,7 @@ var view = function() {
                 engine.preview();
             });
             dom_cache.picture.get(0).onerror = function() {
+                engine.badImage($(this).attr('data-id'));
                 hideImage();
             };
             $('.close').on('click', function() {
@@ -302,8 +308,7 @@ var view = function() {
                 dom_cache.trackalbum.text(tags.album);
             }
             if ("picture" in tags) {
-                var cover = engine.getCover(tags.picture);
-                showImage("data:image/" + cover.type + ";base64," + btoa(cover.data));
+                showImage(tags.picture);
             } else {
                 hideImage();
             }
