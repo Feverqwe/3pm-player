@@ -23,11 +23,11 @@ java -jar compiler.jar --js .\scripts\player.js --js_output_file .\build\scripts
 :: make player.js
 java -jar compiler.jar --js .\scripts\playlist.js --js_output_file .\build\scripts\playlist.js
 :: make www/style.css
-java -jar yuicompressor-2.4.7.jar .\www\css\style.css -o .\build\www\css\style.css
+java -jar yuicompressor-2.4.8.jar .\www\css\style.css -o .\build\www\css\style.css
 :: make main.css
-java -jar yuicompressor-2.4.7.jar .\styles\main.css -o .\build\styles\main.css
+java -jar yuicompressor-2.4.8.jar .\styles\main.css -o .\build\styles\main.css
 :: make playlist.css
-java -jar yuicompressor-2.4.7.jar .\styles\playlist.css -o .\build\styles\playlist.css
+java -jar yuicompressor-2.4.8.jar .\styles\playlist.css -o .\build\styles\playlist.css
 
 java -jar htmlcompressor-1.5.3.jar -t html .\www\index.html -o .\build\www\index.html
 java -jar htmlcompressor-1.5.3.jar -t html .\playlist.html -o .\build\playlist.html
