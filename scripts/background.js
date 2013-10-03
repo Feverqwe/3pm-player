@@ -18,6 +18,12 @@ var wm = function() {
         };
         chrome.storage.local.get(function(storage) {
             if ('pos_left' in storage && 'pos_top' in storage) {
+                if (storage.pos_left > window.screen.width || storage.pos_left < 0) {
+                    storage.pos_left = 30;
+                }
+                if (storage.pos_top > window.screen.height - 30 || storage.pos_top < 0) {
+                    storage.pos_top = 30;
+                }
                 create_window(storage.pos_left, storage.pos_top);
             } else {
                 create_window(30, 30);
@@ -51,6 +57,18 @@ var wm = function() {
             if ('pl_pos_left' in storage && 'pl_pos_top' in storage) {
                 var pl_w = ('pl_w' in storage) ? storage.pl_w : null;
                 var pl_h = ('pl_h' in storage) ? storage.pl_h : null;
+                if (storage.pl_pos_left > window.screen.width || storage.pl_pos_left < 0) {
+                    storage.pl_pos_left = 30;
+                }
+                if (storage.pl_pos_top > window.screen.height - 30 || storage.pl_pos_top < 0) {
+                    storage.pl_pos_top = 30;
+                }
+                if (pl_w !== null && (pl_w < 50 || pl_w > window.screen.width)) {
+                    pl_w = null;
+                }
+                if (pl_h !== null && (pl_h < 50 || pl_h > window.screen.height)) {
+                    pl_h = null;
+                }
                 create_window(storage.pl_pos_left, storage.pl_pos_top, pl_w, pl_h);
             } else {
                 create_window(30, 30, null, null);
