@@ -6,7 +6,7 @@ var playlist = function() {
     var sendPlayer = function(callback) {
         if (_player === null || _player.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
-                _player = bg.wm.getPlayer(wm_id);
+                _player = bg.wm.getPlayer();
                 if (_player !== null) {
                     callback();
                 }

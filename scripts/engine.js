@@ -10,7 +10,7 @@ var engine = function() {
     function sendPlaylist(callback) {
         if (_playlist === null || _playlist.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
-                _playlist = bg.wm.getPlaylist(wm_id);
+                _playlist = bg.wm.getPlaylist();
                 if (_playlist !== null) {
                     callback();
                 }
@@ -336,7 +336,7 @@ var engine = function() {
                     view.setVolume(audio.volume);
                     return;
                 }
-                if (typeof(persent) === "string") {
+                if (typeof (persent) === "string") {
                     if (persent.substr(0, 1) === "+") {
                         persent = parseFloat(persent.substr(1));
                     } else {

@@ -131,13 +131,13 @@ var view = function() {
             };
             $('.close').on('click', function() {
                 chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.getPlaylist(wm_id).close();
+                    bg.wm.getPlaylist().close();
                 });
                 window.close();
             });
             $('.mini').on('click', function() {
                 chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.getPlaylist(wm_id).playlist.minimize();
+                    bg.wm.getPlaylist().playlist.minimize();
                 });
                 chrome.app.window.current().minimize();
             });
@@ -178,9 +178,6 @@ var view = function() {
                     var files = [];
                     for (var i = 0; i < theEntry.length; i++) {
                         var item = theEntry[i];
-                        chrome.fileSystem.getDisplayPath(item, function(a, b, c) {
-                            console.log(a, b, c);
-                        });
                         item.file(function(file) {
                             files.push(file);
                             if (i === theEntry.length) {
@@ -299,7 +296,7 @@ var view = function() {
             };
             dom_cache.btnPlaylist.on('click', function() {
                 chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.toggle_playlist(wm_id);
+                    bg.wm.toggle_playlist();
                 });
             });
             var save_pos = function() {
@@ -442,3 +439,4 @@ var view = function() {
 $(function() {
     view.show();
 });
+var tt = null;
