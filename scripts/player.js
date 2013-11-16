@@ -167,12 +167,36 @@ var view = function() {
                     dom_cache.btnPlayPause.trigger('click');
                 }
             });
-            $('.click_for_open span').on('click', function() {
-                $('.click_for_open input').trigger('click');
-            });
-            $('.click_for_open input').on('change', function() {
-                engine.open(this.files);
-                this.value = '';
+            $('.click_for_open').on('click', function() {
+                var accepts = [{
+                        mimeTypes: ['audio/*']
+                    }];
+                chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function(theEntry) {
+                    if (!theEntry) {
+                        return;
+                    }
+                    var files = [];
+                    for (var i = 0; i < theEntry.length; i++) {
+                        var item = theEntry[i];
+                        chrome.fileSystem.getDisplayPath(item, function(a, b, c) {
+                            console.log(a, b, c);
+                        });
+                        item.file(function(file) {
+                            files.push(file);
+                            if (i === theEntry.length) {
+                                engine.open(files);
+                            }
+                        });
+                    }
+                });
+                /*
+                 chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(theEntry) {
+                 if (!theEntry) {
+                 return;
+                 }
+                 theEntry = theEntry.createReader();
+                 console.log(theEntry);
+                 });*/
             });
             $('.url_dialog input[name=url]').keyup(function(event) {
                 if (event.keyCode === 13) {
@@ -212,7 +236,7 @@ var view = function() {
                 });
                 chrome.contextMenus.onClicked.addListener(function(info) {
                     if (info.menuItemId === "1") {
-                        $('.click_for_open input').trigger('click');
+                        $('.click_for_open').trigger('click');
                     } else
                     if (info.menuItemId === "2") {
                         dom_cache.url_dialog.toggle();

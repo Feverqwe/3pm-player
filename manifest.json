@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "3pm-player",
-    "version": "0.5.14",
+    "version": "0.5.15",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "icon_16.png",
@@ -13,5 +13,5 @@
         }
     },
     "offline_enabled": true,
-    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}]
+    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}, {"fileSystem": ["retainEntries", "directory"]}]
 }

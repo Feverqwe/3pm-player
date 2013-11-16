@@ -225,7 +225,7 @@ var wm = function() {
             } else {
                 is_xhr = true;
                 var ext = headerMap.url.substr(headerMap.url.lastIndexOf('.') + 1).toLowerCase();
-                ext_content_type = {
+                var ext_content_type = {
                     'png': 'image/png',
                     'js': 'application/javascript',
                     'css': 'text/css',
@@ -416,4 +416,3 @@ var wm = function() {
 chrome.app.runtime.onLaunched.addListener(function() {
     wm.get_player();
 });
-wm.ws.start();
