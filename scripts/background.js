@@ -1,10 +1,14 @@
 var web_socket = function() {
+    var active = false;
     var not_found = [];
     var cache = {};
     var server_socketId = null;
     var timeout = null;
     var empty_timer = function() {
         clearTimeout(timeout);
+        if (!active) {
+            return;
+        }
         timeout = setTimeout(function() {
             wm.ws.stop();
             wm.ws.start();
@@ -226,6 +230,7 @@ var web_socket = function() {
         });
     };
     var start = function() {
+        active = true;
         chrome.socket.create("tcp", {}, function(createInfo) {
             server_socketId = createInfo.socketId;
             chrome.socket.listen(createInfo.socketId, '0.0.0.0', 9898, 1, function(e) {
@@ -239,13 +244,17 @@ var web_socket = function() {
         });
     };
     var stop = function() {
+        active = false;
         chrome.socket.disconnect(server_socketId);
         chrome.socket.destroy(server_socketId);
     };
     return {
         start: start,
         info: Info,
-        stop: stop
+        stop: stop,
+        active: function() {
+            return active;
+        }
     };
 }();
 var wm = function() {
