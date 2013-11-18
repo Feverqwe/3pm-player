@@ -44,7 +44,9 @@ var view = function() {
     };
     var getEntryFromDir = function(entry, cb) {
         var dir = entry.createReader();
-        dir.readEntries(cb);
+        dir.readEntries(function(a) {
+            cb(a);
+        });
     };
     var entry2files = function(entry, cb) {
         var files = [];
@@ -59,6 +61,41 @@ var view = function() {
                 }
             });
         }
+    };
+    var readPlaylist = function(entry, file, cb) {
+        var readM3U = function(content) {
+            var file_tree = {};
+            var lines = content.split("\n");
+            var len = lines.length;
+            for (var i = 0; i < len; i++) {
+                var line = lines[i].trim();
+                if (line.length < 1 || line.substr(0, 1) === "#") {
+                    continue;
+                }
+                var path_arr = line.split('/');
+                var path_len = path_arr.length;
+                var path = '/';
+                for (var n = 0; n < path_len; n++) {
+                    if (path in file_tree === false) {
+                        file_tree[path] = {files: [path_arr[n]]};
+                    } else
+                    if (file_tree[path].files.indexOf(path_arr[n]) === -1) {
+                        file_tree[path].files.push(path_arr[n]);
+                    }
+                    path += ((path.length === 1) ? "" : "/") + path_arr[n];
+                }
+            }
+            var rootEntry = entry.filesystem.root;
+            tmp = rootEntry;
+            getEntryFromDir(rootEntry, function(sub_entry) {
+                console.log(sub_entry);
+            });
+        };
+        var r = new FileReader();
+        r.onload = function(e) {
+            readM3U("" + r.result);
+        };
+        r.readAsText(file);
     };
     return {
         show: function() {
@@ -119,9 +156,9 @@ var view = function() {
             dom_cache.body.on('drop', function(event) {
                 event.preventDefault();
                 var files = event.originalEvent.dataTransfer.files;
-                var entry = event.originalEvent.dataTransfer.items;
+                var entrys = event.originalEvent.dataTransfer.items;
                 if (files.length === 1) {
-                    var entry = entry[0].webkitGetAsEntry();
+                    var entry = entrys[0].webkitGetAsEntry();
                     if (entry.isDirectory) {
                         getEntryFromDir(entry, function(sub_entry) {
                             entry2files(sub_entry, function(files) {
@@ -130,6 +167,14 @@ var view = function() {
                         });
                         return;
                     }
+                    /*
+                     if (files[0].name.split('.').slice(-1)[0].toLowerCase() === "m3u") {
+                     readPlaylist(entry, files[0], function(files) {
+                     engine.open(files);
+                     });
+                     return;
+                     }
+                     */
                 }
                 engine.open(files);
             });
@@ -252,7 +297,7 @@ var view = function() {
                 chrome.contextMenus.create({
                     type: "checkbox",
                     id: "ws",
-                    title: "Enable web server (0.0.0.0:9898)",
+                    title: "Enable webUI (0.0.0.0:9898)",
                     contexts: ["all"]
                 });
                 chrome.runtime.getBackgroundPage(function(bg) {
@@ -466,3 +511,4 @@ var view = function() {
 $(function() {
     view.show();
 });
+var tmp = {};
