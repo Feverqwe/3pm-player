@@ -332,22 +332,24 @@ var wm = function() {
                 windows.dialog.contentWindow.close();
             }
         }
+        var w = options.w || 400;
+        var h = options.h || 120;
         var create_window = function(p_l, p_t) {
             chrome.app.window.create('dialog.html', {
                 bounds: {
-                    width: 400,
-                    height: 120,
+                    width: w,
+                    height: h,
                     left: p_l,
                     top: p_t
                 },
                 resizable: false
             }, function(win) {
-                win.options = options;
+                win.contentWindow.options = options;
                 windows.dialog = win;
             });
         };
         chrome.storage.local.get(function(storage) {
-            var lt = win_top_left_pos(screen[0] / 2 - 200, screen[1] / 2 - 60);
+            var lt = win_top_left_pos(screen[0] / 2 - parseInt(w / 2), screen[1] / 2 - parseInt(h / 2));
             create_window(lt[0], lt[1]);
         });
     };

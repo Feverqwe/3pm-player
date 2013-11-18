@@ -114,7 +114,6 @@ var view = function() {
                 volume: $('.volume'),
                 mute: $('.volume_controll .pic'),
                 click_for_open: $('.click_for_open'),
-                url_dialog: $('.url_dialog'),
                 btnPlaylist: $('.playlist.btn')
             };
             dom_cache.progress.slider({
@@ -264,22 +263,6 @@ var view = function() {
                  console.log(theEntry);
                  });*/
             });
-            $('.url_dialog input[name=url]').keyup(function(event) {
-                if (event.keyCode === 13) {
-                    engine.open_url(this.value);
-                    this.value = '';
-                    dom_cache.url_dialog.hide();
-                }
-                if (event.keyCode === 27) {
-                    dom_cache.url_dialog.hide();
-                }
-            });
-            $('.url_dialog input[name=open_btn]').on('click', function(event) {
-                var text = $(this).parent().children('input[name=url]').get(0);
-                engine.open_url(text.value);
-                text.value = '';
-                dom_cache.url_dialog.hide();
-            });
             dom_cache.mute.on('click', function() {
                 engine.mute();
             });
@@ -308,8 +291,9 @@ var view = function() {
                         $('.click_for_open').trigger('click');
                     } else
                     if (info.menuItemId === "2") {
-                        dom_cache.url_dialog.toggle();
-                        dom_cache.url_dialog.find('input[name=url]').get(0).focus();
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.showDialog({type: "url", h: 66});
+                        });
                     } else
                     if (info.menuItemId === "ws") {
                         if (info.checked) {
