@@ -42,6 +42,24 @@ var view = function() {
         }
         return time;
     };
+    var getEntryFromDir = function(entry, cb) {
+        var dir = entry.createReader();
+        dir.readEntries(cb);
+    };
+    var entry2files = function(entry, cb) {
+        var files = [];
+        var len = entry.length;
+        var n = 0;
+        for (var i = 0; i < len; i++) {
+            entry[i].file(function(file) {
+                files.push(file);
+                n++;
+                if (n === len && cb) {
+                    cb(files);
+                }
+            });
+        }
+    };
     return {
         show: function() {
             dom_cache = {
@@ -100,7 +118,20 @@ var view = function() {
             view.state("playlist_is_empty");
             dom_cache.body.on('drop', function(event) {
                 event.preventDefault();
-                engine.open(event.originalEvent.dataTransfer.files);
+                var files = event.originalEvent.dataTransfer.files;
+                var entry = event.originalEvent.dataTransfer.items;
+                if (files.length === 1) {
+                    var entry = entry[0].webkitGetAsEntry();
+                    if (entry.isDirectory) {
+                        getEntryFromDir(entry, function(sub_entry) {
+                            entry2files(sub_entry, function(files) {
+                                engine.open(files);
+                            });
+                        });
+                        return;
+                    }
+                }
+                engine.open(files);
             });
             var drag_timeout = null;
             dom_cache.body.on('dragover', function(event) {
@@ -171,20 +202,13 @@ var view = function() {
                 var accepts = [{
                         mimeTypes: ['audio/*']
                     }];
-                chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function(theEntry) {
-                    if (!theEntry) {
+                chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function(entry) {
+                    if (!entry) {
                         return;
                     }
-                    var files = [];
-                    for (var i = 0; i < theEntry.length; i++) {
-                        var item = theEntry[i];
-                        item.file(function(file) {
-                            files.push(file);
-                            if (i === theEntry.length) {
-                                engine.open(files);
-                            }
-                        });
-                    }
+                    entry2files(entry, function(files) {
+                        engine.open(files);
+                    });
                 });
                 /*
                  chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(theEntry) {
@@ -442,4 +466,3 @@ var view = function() {
 $(function() {
     view.show();
 });
-var tt = null;
