@@ -43,29 +43,35 @@ div.playlist > ul {
     margin: 0;
     padding: 0;
 }
-div.playlist > ul > li:nth-child(even) {
-    background-color: #E7E7E7;
-}
 div.playlist > ul > li {
     list-style-type: none;
-    height: 32px;
+    height: 39px;
     margin-top: 3px;
     margin-bottom: 3px;
     position: relative;
     cursor: pointer;
+    padding: 3px;
+    border-radius: 3px;
 }
-div.playlist > ul > li:hover {
-    background-color: rgb(253, 182, 0);
+div.playlist > ul > li > .gr_line {
+    background: -webkit-linear-gradient(left, rgba(255,255,255,1) 0%, rgba(214, 214, 214, 1) 50%, rgba(255,255,255,1) 100%);
+    height: 1px;
+    margin-top: -5px;
+    margin-bottom: 4px;
 }
 div.playlist > ul > li.selected {
-    background-color: rgb(253, 182, 0);
+    background-color: #8BA7C9;
+    background-image: url(../images/playing.png);
+    background-repeat: no-repeat;
+    background-position: center right;
+    color: #fff;
 }
 div.playlist > ul > li .cover {
-    height: 32px;
-    width: 32px;
+    height: 39px;
+    width: 39px;
     display: block;
     position: absolute;
-    background-size: 32px 32px;
+    background-size: 39px 39px;
 }
 div.playlist > ul > li .cover.pic_none {
     background-image: url(../images/no-cover.png);
@@ -73,13 +79,15 @@ div.playlist > ul > li .cover.pic_none {
     -webkit-filter: grayscale(1);
 }
 div.playlist > ul > li > span {
-    margin-left: 35px;
+    margin-left: 42px;
     display: block;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    margin-right: 14px;
 }
 div.playlist > ul > li .name {
+    margin-top: 8px;
 }
 div.playlist > ul > li .info {
 }

@@ -65,7 +65,7 @@ var playlist = function() {
         items.forEach(function(item) {
             item = item_read(item);
             add_image(item.pic);
-            dom_cache.playlist_ul.append('<li data-id="' + n + '"><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name" title="' + item.title + '">' + item.title + '</span><span class="info" title="' + item.info + '">' + item.info + '</span></li>');
+            dom_cache.playlist_ul.append('<li data-id="' + n + '"><div class="gr_line"></div><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name" title="' + item.title + '">' + item.title + '</span><span class="info" title="' + item.info + '">' + item.info + '</span></li>');
             n++;
         });
         sendPlayer(function() {

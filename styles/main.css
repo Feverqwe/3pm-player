@@ -158,6 +158,8 @@ div.drop {
     text-align: center;
     display: none;
     z-index: 11;
+    left: 0;
+    top: 0;
 }
 div.drop > span {
     display: block;
