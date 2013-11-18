@@ -35,7 +35,7 @@ var web_socket = function() {
         if (!'url' in headerMap) {
             return response_(socketId, headerMap, stringToArrayBuffer("Don't have url!"), ['404 Not Found']);
         }
-        var player = wm.getPlayer(0);
+        var player = wm.getPlayer();
         if (player === null) {
             return response_(socketId, headerMap, stringToArrayBuffer("Player don't run!"), ['200 OK']);
         }
@@ -324,6 +324,33 @@ var wm = function() {
             create_window(lt[0], lt[1], wh[0], wh[1]);
         });
     };
+    var create_dialog_window = function(options) {
+        if ("dialog" in windows) {
+            if (windows.dialog.contentWindow.window === null) {
+                delete windows.dialog;
+            } else {
+                windows.dialog.contentWindow.close();
+            }
+        }
+        var create_window = function(p_l, p_t) {
+            chrome.app.window.create('dialog.html', {
+                bounds: {
+                    width: 400,
+                    height: 120,
+                    left: p_l,
+                    top: p_t
+                },
+                resizable: false
+            }, function(win) {
+                win.options = options;
+                windows.dialog = win;
+            });
+        };
+        chrome.storage.local.get(function(storage) {
+            var lt = win_top_left_pos(screen[0] / 2 - 200, screen[1] / 2 - 60);
+            create_window(lt[0], lt[1]);
+        });
+    };
     var check = function() {
         var player_off = true;
         if ("player" in windows) {
@@ -366,6 +393,9 @@ var wm = function() {
         },
         getPlaylist: function() {
             return (check() && "playlist" in windows) ? windows.playlist.contentWindow.window : null;
+        },
+        showDialog: function(options) {
+            create_dialog_window(options);
         },
         ws: web_socket
     };
