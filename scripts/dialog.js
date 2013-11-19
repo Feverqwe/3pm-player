@@ -32,8 +32,10 @@ var createURLform = function() {
 var playlistChiser = function() {
     $('.playlist_chiser').show();
     var pl = $('.playlists');
-    window.options.playlists.forEach(function(item) {
-        var name = item.substr(0,item.length - 4);
+    var arr = JSON.parse(JSON.stringify(window.options.playlists));
+    arr.sort();
+    arr.forEach(function(item) {
+        var name = item.substr(0, item.length - 4);
         pl.append('<li class="pl_file" data-name="' + item + '"><div class="gr_line"></div><span>' + name + '</span></li>');
     });
     $('body').on('click', 'li.pl_file', function() {
