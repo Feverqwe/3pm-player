@@ -86,7 +86,6 @@ div.playlist > ul > li .cover {
 div.playlist > ul > li .cover.pic_none {
     background-image: url(../images/no-cover.png);
     background-repeat: no-repeat;
-    -webkit-filter: grayscale(1);
 }
 div.playlist > ul > li > span {
     margin-left: 42px;

@@ -7,6 +7,7 @@ var engine = function() {
     var shuffle = false;
     var loop = false;
     var current_played_pos = -1;
+    var filePlaylists = undefined;
     function sendPlaylist(callback) {
         if (_playlist === null || _playlist.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
@@ -24,6 +25,7 @@ var engine = function() {
         covers = [];
         playedlist = [];
         current_played_pos = -1;
+        filePlaylists = undefined;
         sendPlaylist(function() {
             _playlist.playlist.empty();
         });
@@ -211,7 +213,7 @@ var engine = function() {
                 return playlist[current_id].file.name;
             },
             play: function() {
-                if (current_id === null) {
+                if (current_id === null || playlist[current_id] === undefined) {
                     return;
                 }
                 if (playedlist.length === playlist.length) {
@@ -224,7 +226,7 @@ var engine = function() {
                 }
             },
             pause: function() {
-                if (current_id === null) {
+                if (current_id === null || playlist[current_id] === undefined) {
                     return;
                 }
                 if ('url' in playlist[current_id].file) {
@@ -499,14 +501,16 @@ var engine = function() {
             if (files.length === 0) {
                 return;
             }
-            reset_playlist();
+            var my_playlist = [];
             for (var i = 0; i < files.length; i++) {
                 if (getType(files[i].name) === undefined) {
                     continue;
                 }
-                playlist.push({id: playlist.length, file: files[i], tags: null, duration: null});
+                my_playlist.push({id: my_playlist.length, file: files[i], tags: null, duration: null});
             }
-            if (playlist.length > 0) {
+            if (my_playlist.length > 0) {
+                reset_playlist();
+                playlist = my_playlist;
                 sendPlaylist(function() {
                     _playlist.playlist.setPlaylist(playlist);
                 });
@@ -516,11 +520,12 @@ var engine = function() {
                     id = getRandomInt(0, playlist.length - 1);
                 }
                 player.open(id);
-            } else {
-                player.pause();
-                view.state("emptied");
-                view.state("playlist_is_empty");
-            }
+            }/*
+             else {
+             player.pause();
+             view.state("emptied");
+             view.state("playlist_is_empty");
+             }*/
         },
         open_url: function(url) {
             if (url.length === 0) {
@@ -583,6 +588,12 @@ var engine = function() {
         badImage: function(id) {
             covers[id].data = null;
             covers[id].len = null;
+        },
+        setPlaylists: function(m3u) {
+            filePlaylists = m3u;
+        },
+        getPlaylists: function() {
+            return filePlaylists;
         }
     };
 }();

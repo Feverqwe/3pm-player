@@ -29,12 +29,24 @@ var createURLform = function() {
         }
     }).get(0).focus();
 };
+var playlistChiser = function() {
+    $('.playlist_chiser').show();
+    var pl = $('.playlists');
+    window.options.playlists.forEach(function(item) {
+        var name = item.substr(0,item.length - 4);
+        pl.append('<li class="pl_file" data-name="' + item + '"><div class="gr_line"></div><span>' + name + '</span></li>');
+    });
+    $('body').on('click', 'li.pl_file', function() {
+        var name = $(this).data("name");
+        sendPlayer(function() {
+            _player.view.select_playlist(name);
+        });
+        window.close();
+    });
+};
 $(function() {
     $('body').height(window.options.h);
     $('.close').on('click', function() {
-        chrome.runtime.getBackgroundPage(function(bg) {
-            bg.wm.getPlaylist().close();
-        });
         window.close();
     });
     if (window.options === undefined) {
@@ -42,5 +54,8 @@ $(function() {
     }
     if (window.options.type === "url") {
         createURLform();
+    }
+    if (window.options.type === "m3u") {
+        playlistChiser();
     }
 });

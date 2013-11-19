@@ -21,6 +21,71 @@ input {
 .url_dialog {
     padding-left: 18px;
 }
+.playlist_chiser {
+    padding-left: 18px;
+    padding-right: 15px;
+}
+.playlist_chiser ul {
+    -webkit-app-region: no-drag;
+    list-style-type: none;
+    height: 160px;
+    max-height: 160px;
+    overflow: auto;
+    padding: 0;
+    margin: 0;
+}
+.playlist_chiser ul > li {
+    height: 43px;
+    background-size: 39px 39px;
+    background-position: center left;
+    background-repeat: no-repeat;
+    background-image: url(../images/no-cover.png);
+    position: relative;
+    padding: 3px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-radius: 3px;
+}
+.playlist_chiser ul > li:hover {
+    background-color: #39516F;
+    color: #fff;
+    cursor: pointer;
+}
+.playlist_chiser ul > li > .gr_line {
+    background: -webkit-linear-gradient(left, transparent 0%, rgba(109, 109, 109, 1) 50%, transparent 100%);
+    height: 1px;
+    margin-top: -5px;
+    margin-bottom: 4px;
+}
+.playlist_chiser ul > li:first-child > .gr_line {
+    display: none;
+}
+.playlist_chiser ul > li > span {
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-left: 42px;
+    margin-top: 8px;
+    margin-top: 12px;
+    font-size: 120%;
+}
+.playlist_chiser ul {
+    margin-right: 3px;
+}
+.playlist_chiser ul::-webkit-scrollbar {
+    width: 6px;
+}
+.playlist_chiser ul::-webkit-scrollbar-thumb:vertical {
+    margin: 5px;
+    background-color: #565A61;
+    -webkit-border-radius: 5px;
+}
+.playlist_chiser ul::-webkit-scrollbar-button:start:decrement,
+.playlist_chiser ul::-webkit-scrollbar-button:end:increment {
+    height: 0px;
+    display: block;
+}
 .t_btn {
     background-size: 14px 14px;
     height: 14px;

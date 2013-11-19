@@ -51,18 +51,71 @@ var view = function() {
     var entry2files = function(entry, cb) {
         var files = [];
         var len = entry.length;
+        var wlen = entry.length;
         var n = 0;
         for (var i = 0; i < len; i++) {
+            if (entry[i].isDirectory) {
+                wlen--;
+                continue;
+            }
             entry[i].file(function(file) {
                 files.push(file);
                 n++;
-                if (n === len && cb) {
+                if (n === wlen && cb) {
                     cb(files);
                 }
             });
         }
     };
     var readPlaylist = function(entry, file, cb) {
+        var stream_count = 0;
+        var stream_got = 0;
+        var file_list = [];
+        var ordered_name_list = [];
+        var file_getter = function(files) {
+            stream_got++;
+            file_list = file_list.concat(files);
+            if (stream_count !== stream_got) {
+                return;
+            }
+            var arr = [];
+            var oa = ordered_name_list.length;
+            var fl = file_list.length;
+            for (var n = 0; n < oa; n++) {
+                for (var i = 0; i < fl; i++) {
+                    if (file_list[i].name === ordered_name_list[n]) {
+                        arr.push(file_list[i]);
+                    }
+                }
+            }
+            entry2files(arr, function(files) {
+                cb(files);
+            });
+        };
+        var readEntry = function(entry, file_tree, file_arr) {
+            if (file_arr === undefined) {
+                file_arr = [];
+            }
+            stream_count++;
+            getEntryFromDir(entry, function(sub_entry) {
+                var len = sub_entry.length;
+                var files = [];
+                for (var n = 0; n < len; n++) {
+                    if (sub_entry[n].isDirectory) {
+                        $.each(file_tree, function(item) {
+                            if (sub_entry[n].fullPath === item) {
+                                readEntry(sub_entry[n], file_tree, file_tree[item].files);
+                            }
+                        });
+                    } else {
+                        if (file_arr.indexOf(sub_entry[n].name) !== -1) {
+                            files.push(sub_entry[n]);
+                        }
+                    }
+                }
+                file_getter(files);
+            });
+        };
         var readM3U = function(content) {
             var file_tree = {};
             var lines = content.split("\n");
@@ -74,7 +127,8 @@ var view = function() {
                 }
                 var path_arr = line.split('/');
                 var path_len = path_arr.length;
-                var path = '/';
+                ordered_name_list.push(path_arr[path_len - 1]);
+                var path = entry.fullPath;
                 for (var n = 0; n < path_len; n++) {
                     if (path in file_tree === false) {
                         file_tree[path] = {files: [path_arr[n]]};
@@ -82,14 +136,10 @@ var view = function() {
                     if (file_tree[path].files.indexOf(path_arr[n]) === -1) {
                         file_tree[path].files.push(path_arr[n]);
                     }
-                    path += ((path.length === 1) ? "" : "/") + path_arr[n];
+                    path += "/" + path_arr[n];
                 }
             }
-            var rootEntry = entry.filesystem.root;
-            tmp = rootEntry;
-            getEntryFromDir(rootEntry, function(sub_entry) {
-                console.log(sub_entry);
-            });
+            readEntry(entry, file_tree);
         };
         var r = new FileReader();
         r.onload = function(e) {
@@ -161,19 +211,31 @@ var view = function() {
                     if (entry.isDirectory) {
                         getEntryFromDir(entry, function(sub_entry) {
                             entry2files(sub_entry, function(files) {
+                                var m3u = undefined;
+                                var fl = files.length;
+                                for (var n = 0; n < fl; n++) {
+                                    var ext = files[n].name.split('.').slice(-1)[0].toLowerCase();
+                                    if (ext !== "m3u") {
+                                        continue;
+                                    }
+                                    if (m3u === undefined) {
+                                        m3u = {entry: entry, files: [files[n].name], data: [files[n]]};
+                                    } else {
+                                        m3u.files.push(files[n].name);
+                                        m3u.data.push(files[n]);
+                                    }
+                                }
                                 engine.open(files);
+                                if (m3u !== undefined) {
+                                    engine.setPlaylists(m3u);
+                                    chrome.runtime.getBackgroundPage(function(bg) {
+                                        bg.wm.showDialog({type: "m3u", h: 200, w: 350, playlists: m3u.files});
+                                    });
+                                }
                             });
                         });
                         return;
                     }
-                    /*
-                     if (files[0].name.split('.').slice(-1)[0].toLowerCase() === "m3u") {
-                     readPlaylist(entry, files[0], function(files) {
-                     engine.open(files);
-                     });
-                     return;
-                     }
-                     */
                 }
                 engine.open(files);
             });
@@ -254,14 +316,6 @@ var view = function() {
                         engine.open(files);
                     });
                 });
-                /*
-                 chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(theEntry) {
-                 if (!theEntry) {
-                 return;
-                 }
-                 theEntry = theEntry.createReader();
-                 console.log(theEntry);
-                 });*/
             });
             dom_cache.mute.on('click', function() {
                 engine.mute();
@@ -489,6 +543,19 @@ var view = function() {
             if (type === "canplay") {
                 engine.play();
             }
+        },
+        select_playlist: function(name) {
+            var filePlaylists = engine.getPlaylists();
+            if (filePlaylists === undefined) {
+                return;
+            }
+            var ind = filePlaylists.files.indexOf(name);
+            if (ind === -1) {
+                return;
+            }
+            readPlaylist(filePlaylists.entry, filePlaylists.data[ind], function(files) {
+                engine.open(files);
+            });
         }
     };
 }();
