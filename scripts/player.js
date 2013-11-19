@@ -403,7 +403,7 @@ var view = function() {
         },
         setVolume: function(pos) {
             if (engine.getMute()) {
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_mute.png)');
+                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_mute_w.png)');
                 var_cache['volume_image'] = -1;
                 return;
             }
@@ -415,28 +415,28 @@ var view = function() {
                     return;
                 }
                 var_cache['volume_image'] = 1;
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_high.png)');
+                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_high_w.png)');
             } else
             if (pos === 0) {
                 if (var_cache['volume_image'] === 2) {
                     return;
                 }
                 var_cache['volume_image'] = 2;
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_zero.png)');
+                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_zero_w.png)');
             } else
             if (width_persent < 40) {
                 if (var_cache['volume_image'] === 3) {
                     return;
                 }
                 var_cache['volume_image'] = 3;
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_low.png)');
+                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_low_w.png)');
             } else
             if (width_persent < 70) {
                 if (var_cache['volume_image'] === 4) {
                     return;
                 }
                 var_cache['volume_image'] = 4;
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_medium.png)');
+                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_medium_w.png)');
             }
         },
         state: function(type) {

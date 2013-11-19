@@ -125,37 +125,35 @@ div.progress > a {
     left: 0;
     height: 25px;
     width: 16px;
-    background-image: url(../images/sound_high.png);
+    background-image: url(../images/sound_high_w.png);
     background-position: left 4px;
     background-repeat: no-repeat;
     cursor: pointer;
-    -webkit-filter: invert(0.8);
 }
 .player > div.controls li.btn {
     cursor: pointer;
-    -webkit-filter: invert(0.8);
-    border-right: 1px solid #E5D8D8;
+    border-right: 1px solid #000000;
 }
 .player > div.controls li.btn:active {
     background-color: #ccc;
 }
 .player > div.controls li.prev {
-    background-image: url(../images/playback_prev.png);
+    background-image: url(../images/playback_prev_w.png);
 }
 .player > div.controls li.play {
-    background-image: url(../images/playback_play.png);
+    background-image: url(../images/playback_play_w.png);
 }
 .player > div.controls li.pause {
-    background-image: url(../images/playback_pause.png);
+    background-image: url(../images/playback_pause_w.png);
 }
 .player > div.controls li.stop {
-    background-image: url(../images/playback_stop.png);
+    background-image: url(../images/playback_stop_w.png);
 }
 .player > div.controls li.next {
-    background-image: url(../images/playback_next.png);
+    background-image: url(../images/playback_next_w.png);
 }
 .player > div.controls li.playlist {
-    background-image: url(../images/playlist.png);
+    background-image: url(../images/playlist_w.png);
     background-position-y: 4px;
 }
 div.drop {
@@ -188,6 +186,7 @@ div.loading {
     height: 24px;
     width: 20px;
     display: none;
+    -webkit-filter: invert(0.84);
 }
 .t_btn {
     background-size: 14px 14px;
