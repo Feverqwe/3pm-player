@@ -59,11 +59,11 @@ div.playlist > ul > li > .gr_line {
     margin-top: -5px;
     margin-bottom: 4px;
 }
+div.playlist > ul > li:first-child > .gr_line {
+    display: none;
+}
 div.playlist > ul > li.selected {
     background-color: #8BA7C9;
-    background-image: url(../images/playing.png);
-    background-repeat: no-repeat;
-    background-position: center right;
     color: #fff;
 }
 div.playlist > ul > li .cover {
@@ -84,7 +84,6 @@ div.playlist > ul > li > span {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    margin-right: 14px;
 }
 div.playlist > ul > li .name {
     margin-top: 8px;

@@ -289,7 +289,7 @@ var wm = function() {
             chrome.app.window.create('index.html', {
                 bounds: {
                     width: 335,
-                    height: 113,
+                    height: 116,
                     left: p_l,
                     top: p_t
                 },
