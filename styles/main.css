@@ -2,7 +2,7 @@ body {
     margin: 0;
     -webkit-app-region: drag;
     background: -webkit-linear-gradient(top, #565A61 0%,#212125 100%);
-    color: #fff;
+    color: #C9C9C9;
 }
 .player {
     margin-bottom: -2px;
@@ -15,6 +15,11 @@ body {
 }
 .player .track > div {
     word-wrap: break-word;
+    text-overflow: ellipsis;
+}
+.player .track > div.name {
+    color: #fff;
+    font-size: 130%;
 }
 .player .image_box {
     width: 81px;
@@ -39,6 +44,7 @@ div.image img {
 }
 .player .box {
     overflow: hidden;
+    height: 80px;
 }
 .player .info {
     position: relative;
@@ -135,7 +141,7 @@ div.progress > a {
     border-right: 1px solid #000000;
 }
 .player > div.controls li.btn:active {
-    background-color: #ccc;
+    background-color: #161616;
 }
 .player > div.controls li.prev {
     background-image: url(../images/playback_prev_w.png);
@@ -204,7 +210,8 @@ div.loading {
     background-color: rgba(0, 0, 0, 0.51);
     border: 1px solid #525252;
     border-radius: 4px;
-    background-position: center no-repeat;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 .t_btn:hover {
     opacity: 1;

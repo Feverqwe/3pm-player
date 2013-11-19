@@ -162,14 +162,14 @@ var playlist = function() {
             if (status) {
                 dom_cache.shuffle.css('background-image', 'url(images/shuffle_on.png)');
             } else {
-                dom_cache.shuffle.css('background-image', 'url(images/shuffle.png)');
+                dom_cache.shuffle.css('background-image', 'url(images/shuffle_w.png)');
             }
         },
         setLoop: function(status) {
             if (status) {
                 dom_cache.loop.css('background-image', 'url(images/loop_on.png)');
             } else {
-                dom_cache.loop.css('background-image', 'url(images/loop.png)');
+                dom_cache.loop.css('background-image', 'url(images/loop_w.png)');
             }
         },
         empty: function() {

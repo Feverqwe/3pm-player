@@ -1,30 +1,40 @@
 body {
     margin: 0;
     -webkit-app-region: drag;
-    border: 1px solid #CACACA;
+    background: -webkit-linear-gradient(top, #565A61 0%,#212125 120px,#212125 100%);
+    color: #C9C9C9;
 }
 .t_btn {
-    background-size: 20px 20px;
-    height: 20px;
-    width: 20px;
+    background-size: 14px 14px;
+    height: 14px;
+    width: 14px;
     float: right;
-    opacity: 0.7;
+    opacity: 0.9;
     z-index: 50;
     cursor: pointer;
     -webkit-app-region: no-drag;
     position: absolute;
-    top: 0px;
+    top: 2px;
+    -webkit-filter: invert(0.8);
+    -webkit-filter: brightness(1.1);
+    background-color: rgba(0, 0, 0, 0.51);
+    border: 1px solid #525252;
+    border-radius: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 .t_btn:hover {
     opacity: 1;
+    -webkit-filter: brightness(1.8);
+    border: 1px solid #383838;
 }
 .mini {
-    background: url('../images/_.png') center no-repeat;
-    right: 20px;
+    background-image: url('../images/_.png');
+    right: 18px;
 }
 .close {
-    background: url('../images/x.png') center no-repeat;
-    right: 0px;
+    background-image: url('../images/x.png');
+    right: 2px;
 }
 div.playlist {
 }
@@ -36,8 +46,8 @@ div.playlist {
     margin-top: 20px;
     overflow: auto;	
     -webkit-app-region: no-drag;
-    border-top: 1px solid #E7E7E7;
-    border-bottom: 1px solid #E7E7E7;
+    border-top: 1px solid #363636;
+    border-bottom: 1px solid #000000;
 }
 div.playlist > ul {
     margin: 0;
@@ -54,7 +64,7 @@ div.playlist > ul > li {
     border-radius: 3px;
 }
 div.playlist > ul > li > .gr_line {
-    background: -webkit-linear-gradient(left, rgba(255,255,255,1) 0%, rgba(214, 214, 214, 1) 50%, rgba(255,255,255,1) 100%);
+    background: -webkit-linear-gradient(left, transparent 0%, rgba(109, 109, 109, 1) 50%, transparent 100%);
     height: 1px;
     margin-top: -5px;
     margin-bottom: 4px;
@@ -63,7 +73,7 @@ div.playlist > ul > li:first-child > .gr_line {
     display: none;
 }
 div.playlist > ul > li.selected {
-    background-color: #8BA7C9;
+    background-color: #39516F;
     color: #fff;
 }
 div.playlist > ul > li .cover {
@@ -98,25 +108,49 @@ div.navigation > ul {
 }
 div.navigation li.btn {
     cursor: pointer;
+    border-right: 1px solid #000000;
 }
 div.navigation li.btn:active {
-    background-color: #ccc;
+    background-color: #161616;
 }
 div.navigation > ul > li {
     display: inline-block;
-    height: 25px;
+    height: 27px;
     overflow: hidden;
     width: 55px;
     vertical-align: top;
     background-repeat: no-repeat;
     background-position: center;
     -webkit-app-region: no-drag;
+
 }
 div.navigation li.shuffle {
-    background-image: url(../images/shuffle.png);
+    background-image: url(../images/shuffle_w.png);
     background-position-y: 4px;
 }
 div.navigation li.loop {
-    background-image: url(../images/loop.png);
+    background-image: url(../images/loop_w.png);
     background-position-y: 7px;
+}
+div.playlist {
+    margin-right: 3px;
+}
+div.playlist::-webkit-scrollbar {
+    width: 6px;
+}
+div.playlist::-webkit-scrollbar-thumb:vertical {
+    margin: 5px;
+    background-color: #565A61;
+    -webkit-border-radius: 5px;
+}
+div.playlist::-webkit-scrollbar-button:start:decrement,
+div.playlist::-webkit-scrollbar-button:end:increment {
+    height: 0px;
+    display: block;
+}
+div.title {
+    text-align: center;
+    float: left;
+    width: 100%;
+    font-size: 110%;
 }
