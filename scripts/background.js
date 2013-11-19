@@ -332,8 +332,10 @@ var wm = function() {
                 windows.dialog.contentWindow.close();
             }
         }
-        var w = options.w || 400;
-        var h = options.h || 120;
+        options.w = options.w || 400;
+        options.h = options.h || 120;
+        var w = options.w;
+        var h = options.h;
         var create_window = function(p_l, p_t) {
             chrome.app.window.create('dialog.html', {
                 bounds: {
@@ -342,6 +344,7 @@ var wm = function() {
                     left: p_l,
                     top: p_t
                 },
+                frame: "none",
                 resizable: false
             }, function(win) {
                 win.contentWindow.options = options;

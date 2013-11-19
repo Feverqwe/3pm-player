@@ -30,6 +30,13 @@ var createURLform = function() {
     }).get(0).focus();
 };
 $(function() {
+    $('body').height(window.options.h);
+    $('.close').on('click', function() {
+        chrome.runtime.getBackgroundPage(function(bg) {
+            bg.wm.getPlaylist().close();
+        });
+        window.close();
+    });
     if (window.options === undefined) {
         return;
     }

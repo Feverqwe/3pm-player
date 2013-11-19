@@ -292,7 +292,7 @@ var view = function() {
                     } else
                     if (info.menuItemId === "2") {
                         chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "url", h: 66});
+                            bg.wm.showDialog({type: "url", h: 76});
                         });
                     } else
                     if (info.menuItemId === "ws") {

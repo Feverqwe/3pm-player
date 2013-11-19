@@ -1,9 +1,15 @@
 body {
     margin: 0;
     -webkit-app-region: drag;
+    background: -webkit-linear-gradient(top, #565A61 0%,#212125 100%);
+    color: #C9C9C9;
 }
 body > .dialog {
     display: none;
+    margin-top: 15px;
+}
+input {
+    -webkit-app-region: no-drag;
 }
 .url_dialog input[name=url] {
     display: inline-block;
@@ -14,4 +20,32 @@ body > .dialog {
 }
 .url_dialog {
     padding-left: 18px;
+}
+.t_btn {
+    background-size: 14px 14px;
+    height: 14px;
+    width: 14px;
+    float: right;
+    opacity: 0.9;
+    z-index: 50;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 2px;
+    -webkit-filter: invert(0.8);
+    -webkit-filter: brightness(1.1);
+    background-color: rgba(0, 0, 0, 0.51);
+    border: 1px solid #525252;
+    border-radius: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.t_btn:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.8);
+    border: 1px solid #383838;
+}
+.close {
+    background-image: url('../images/x.png');
+    right: 2px;
 }
