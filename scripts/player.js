@@ -147,6 +147,33 @@ var view = function() {
         };
         r.readAsText(file);
     };
+    var readDirectory = function(entry) {
+        getEntryFromDir(entry, function(sub_entry) {
+            entry2files(sub_entry, function(files) {
+                var m3u = undefined;
+                var fl = files.length;
+                for (var n = 0; n < fl; n++) {
+                    var ext = files[n].name.split('.').slice(-1)[0].toLowerCase();
+                    if (ext !== "m3u") {
+                        continue;
+                    }
+                    if (m3u === undefined) {
+                        m3u = {entry: entry, files: [files[n].name], data: [files[n]]};
+                    } else {
+                        m3u.files.push(files[n].name);
+                        m3u.data.push(files[n]);
+                    }
+                }
+                engine.open(files);
+                if (m3u !== undefined) {
+                    engine.setPlaylists(m3u);
+                    chrome.runtime.getBackgroundPage(function(bg) {
+                        bg.wm.showDialog({type: "m3u", h: 200, w: 350, playlists: m3u.files});
+                    });
+                }
+            });
+        });
+    };
     return {
         show: function() {
             dom_cache = {
@@ -209,31 +236,7 @@ var view = function() {
                 if (files.length === 1) {
                     var entry = entrys[0].webkitGetAsEntry();
                     if (entry.isDirectory) {
-                        getEntryFromDir(entry, function(sub_entry) {
-                            entry2files(sub_entry, function(files) {
-                                var m3u = undefined;
-                                var fl = files.length;
-                                for (var n = 0; n < fl; n++) {
-                                    var ext = files[n].name.split('.').slice(-1)[0].toLowerCase();
-                                    if (ext !== "m3u") {
-                                        continue;
-                                    }
-                                    if (m3u === undefined) {
-                                        m3u = {entry: entry, files: [files[n].name], data: [files[n]]};
-                                    } else {
-                                        m3u.files.push(files[n].name);
-                                        m3u.data.push(files[n]);
-                                    }
-                                }
-                                engine.open(files);
-                                if (m3u !== undefined) {
-                                    engine.setPlaylists(m3u);
-                                    chrome.runtime.getBackgroundPage(function(bg) {
-                                        bg.wm.showDialog({type: "m3u", h: 200, w: 350, playlists: m3u.files});
-                                    });
-                                }
-                            });
-                        });
+                        readDirectory(entry);
                         return;
                     }
                 }
@@ -327,6 +330,11 @@ var view = function() {
                     contexts: ["all"]
                 });
                 chrome.contextMenus.create({
+                    id: "3",
+                    title: "Open folder",
+                    contexts: ["all"]
+                });
+                chrome.contextMenus.create({
                     id: "2",
                     title: "Open URL",
                     contexts: ["all"]
@@ -347,6 +355,14 @@ var view = function() {
                     if (info.menuItemId === "2") {
                         chrome.runtime.getBackgroundPage(function(bg) {
                             bg.wm.showDialog({type: "url", h: 76});
+                        });
+                    } else
+                    if (info.menuItemId === "3") {
+                        chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
+                            if (!entry) {
+                                return;
+                            }
+                            readDirectory(entry);
                         });
                     } else
                     if (info.menuItemId === "ws") {
