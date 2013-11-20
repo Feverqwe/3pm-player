@@ -1,4 +1,5 @@
-_player = null;
+var dialog = true;
+var _player = null;
 var sendPlayer = function(callback) {
     if (_player === null || _player.window === null) {
         chrome.runtime.getBackgroundPage(function(bg) {
@@ -36,7 +37,7 @@ var playlistChiser = function() {
     arr.sort();
     arr.forEach(function(item) {
         var name = item.substr(0, item.length - 4);
-        pl.append('<li class="pl_file" data-name="' + item + '"><div class="gr_line"></div><span title="'+name+'">' + name + '</span></li>');
+        pl.append('<li class="pl_file" data-name="' + item + '"><div class="gr_line"></div><span title="' + name + '">' + name + '</span></li>');
     });
     $('body').on('click', 'li.pl_file', function() {
         var name = $(this).data("name");

@@ -122,6 +122,7 @@ var playlist = function() {
                 loop: $('.loop.btn')
             };
             $('.close').on('click', function() {
+                save_pos();
                 window.close();
             });
             $('.mini').on('click', function() {
@@ -188,6 +189,9 @@ var playlist = function() {
             });
             setInterval(function() {
                 save_pos();
+                chrome.runtime.getBackgroundPage(function(bg) {
+                    bg.wm.hi("player", chrome.app.window.current());
+                });
             }, 5000);
         },
         setPlaylist: function(items) {

@@ -402,7 +402,12 @@ var wm = function() {
         showDialog: function(options) {
             create_dialog_window(options);
         },
-        ws: web_socket
+        ws: web_socket,
+        hi: function(type, win) {
+            if (type in windows === false) {
+                windows[type] = win;
+            }
+        }
     };
 }();
 chrome.app.runtime.onLaunched.addListener(function() {

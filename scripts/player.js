@@ -270,14 +270,21 @@ var view = function() {
                 hideImage();
             };
             $('.close').on('click', function() {
+                save_pos();
                 chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.getPlaylist().close();
+                    var pl = bg.wm.getPlaylist();
+                    if (pl !== null) {
+                        pl.close();
+                    }
                 });
                 window.close();
             });
             $('.mini').on('click', function() {
                 chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.getPlaylist().playlist.minimize();
+                    var pl = bg.wm.getPlaylist();
+                    if (pl !== null) {
+                        pl.playlist.minimize();
+                    }
                 });
                 chrome.app.window.current().minimize();
             });
@@ -436,6 +443,9 @@ var view = function() {
             };
             setInterval(function() {
                 save_pos();
+                chrome.runtime.getBackgroundPage(function(bg) {
+                    bg.wm.hi("player", chrome.app.window.current());
+                });
             }, 5000);
         },
         setTags: function(tags) {
