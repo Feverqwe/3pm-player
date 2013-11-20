@@ -58,7 +58,7 @@ input {
     margin-bottom: 4px;
 }
 .playlist_chiser ul > li:first-child > .gr_line {
-    display: none;
+    background: none;
 }
 .playlist_chiser ul > li > span {
     display: block;

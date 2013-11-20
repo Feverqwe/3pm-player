@@ -75,7 +75,7 @@ div.playlist > ul > li > .gr_line {
     margin-bottom: 4px;
 }
 div.playlist > ul > li:first-child > .gr_line {
-    display: none;
+    background: none;
 }
 div.playlist > ul > li.selected {
     background-color: #39516F;
@@ -100,7 +100,8 @@ div.playlist > ul > li > span {
     overflow: hidden;
 }
 div.playlist > ul > li .name {
-    margin-top: 8px;
+    margin-top: 6px;
+    font-size: 110%;
 }
 div.playlist > ul > li .info {
 }
