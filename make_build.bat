@@ -22,16 +22,22 @@ java -jar compiler.jar --js .\scripts\id3-minimized.js --js_output_file .\build\
 java -jar compiler.jar --js .\scripts\player.js --js_output_file .\build\scripts\player.js
 :: make player.js
 java -jar compiler.jar --js .\scripts\playlist.js --js_output_file .\build\scripts\playlist.js
+:: make dialog.js
+java -jar compiler.jar --js .\scripts\dialog.js --js_output_file .\build\scripts\dialog.js
+
 :: make www/style.css
 java -jar yuicompressor-2.4.8.jar .\www\css\style.css -o .\build\www\css\style.css
 :: make main.css
 java -jar yuicompressor-2.4.8.jar .\styles\main.css -o .\build\styles\main.css
 :: make playlist.css
 java -jar yuicompressor-2.4.8.jar .\styles\playlist.css -o .\build\styles\playlist.css
+:: make dialog.css
+java -jar yuicompressor-2.4.8.jar .\styles\dialog.css -o .\build\styles\dialog.css
 
 java -jar htmlcompressor-1.5.3.jar -t html .\www\index.html -o .\build\www\index.html
 java -jar htmlcompressor-1.5.3.jar -t html .\playlist.html -o .\build\playlist.html
 java -jar htmlcompressor-1.5.3.jar -t html .\index.html -o .\build\index.html
+java -jar htmlcompressor-1.5.3.jar -t html .\dialog.html -o .\build\dialog.html
 
 7za a -tzip .\build.zip .\build\*
 
