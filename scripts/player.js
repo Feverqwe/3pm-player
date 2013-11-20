@@ -418,7 +418,9 @@ var view = function() {
                     chrome.storage.local.set({'pos_left': wl, 'pos_top': wr});
                 }
             };
-            setInterval(save_pos, 1000);
+            setInterval(function() {
+                save_pos();
+            }, 5000);
         },
         setTags: function(tags) {
             if (tags === null) {
@@ -554,7 +556,7 @@ var view = function() {
                 return;
             }
             readPlaylist(filePlaylists.entry, filePlaylists.data[ind], function(files) {
-                engine.open(files);
+                engine.open(files, name);
             });
         }
     };

@@ -86,6 +86,33 @@ var playlist = function() {
         }
         dom_cache.playlist.scrollTop(el.offset().top + dom_cache.playlist.scrollTop() - 24);
     };
+    var makeSelectList = function(arr) {
+        var arr = JSON.parse(JSON.stringify(arr));
+        arr.sort();
+        var content = '<ul class="list_select">';
+        arr.forEach(function(item) {
+            var name = item.substr(0, item.length - 4);
+            content += '<li title="' + name + '" data-name="' + item + '">' + name + '</li>';
+        });
+        content += '</ul>';
+        $('body').append(content);
+    };
+    var selectPL = function(playlist) {
+        if (playlist !== undefined) {
+            makeSelectList(playlist.files);
+            $('.playlist_select').show();
+        } else {
+            $('.playlist_select').hide();
+        }
+    };
+    var setTitle = function(name) {
+        if (name === undefined) {
+            name = "Playlist";
+        } else {
+            name = name.substr(0, name.length - 4);
+        }
+        $('div.title').text(name);
+    };
     return {
         show: function() {
             dom_cache = {
@@ -145,11 +172,28 @@ var playlist = function() {
                     chrome.storage.local.set({'pl_pos_left': wl, 'pl_pos_top': wr});
                 }
             };
-            setInterval(save_pos, 1000);
+            $('div.playlist_select').on('click', function() {
+                $('ul.list_select').toggle();
+            });
+            $('body').on('click', 'ul.list_select li', function() {
+                var name = $(this).data('name');
+                sendPlayer(function() {
+                    _player.view.select_playlist(name);
+                });
+                $(this).parent().hide();
+            });
+            sendPlayer(function() {
+                selectPL(_player.engine.getPlaylists());
+                setTitle(_player.engine.getPlaylistName());
+            });
+            setInterval(function() {
+                save_pos();
+            }, 5000);
         },
         setPlaylist: function(items) {
             write_playlist(items);
         },
+        setPlaylistName: setTitle,
         updPlaylistItem: function(id, item) {
             update_playlist_item(id, item);
         },
@@ -175,10 +219,12 @@ var playlist = function() {
         empty: function() {
             $('style.cover').remove();
             dom_cache.playlist_ul.empty();
+            setTitle();
         },
         minimize: function() {
             $('.mini').trigger('click');
-        }
+        },
+        setSelectList: selectPL
     };
 }();
 $(function() {

@@ -2,6 +2,7 @@ var _debug = false;
 var _playlist = null;
 var engine = function() {
     var playlist = [];
+    var playlist_name = undefined;
     var covers = [];
     var playedlist = [];
     var shuffle = false;
@@ -22,10 +23,10 @@ var engine = function() {
     }
     var reset_playlist = function() {
         playlist = [];
+        playlist_name = undefined;
         covers = [];
         playedlist = [];
         current_played_pos = -1;
-        filePlaylists = undefined;
         sendPlaylist(function() {
             _playlist.playlist.empty();
         });
@@ -497,7 +498,7 @@ var engine = function() {
             player.init();
         },
         get_filename: player.get_filename,
-        open: function(files) {
+        open: function(files, name) {
             if (files.length === 0) {
                 return;
             }
@@ -511,8 +512,10 @@ var engine = function() {
             if (my_playlist.length > 0) {
                 reset_playlist();
                 playlist = my_playlist;
+                playlist_name = name;
                 sendPlaylist(function() {
                     _playlist.playlist.setPlaylist(playlist);
+                    _playlist.playlist.setPlaylistName(playlist_name);
                 });
                 view.state("playlist_not_empty");
                 var id = 0;
@@ -535,6 +538,7 @@ var engine = function() {
             playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: 0});
             sendPlaylist(function() {
                 _playlist.playlist.setPlaylist(playlist);
+                _playlist.playlist.setPlaylistName(playlist_name);
             });
             view.state("playlist_not_empty");
             player.open(0);
@@ -572,6 +576,9 @@ var engine = function() {
         getPlaylist: function() {
             return playlist;
         },
+        getPlaylistName: function() {
+            return playlist_name;
+        },
         getCurrent: player.getCurrent,
         APIstatus: function() {
             return JSON.stringify(player.status());
@@ -591,6 +598,9 @@ var engine = function() {
         },
         setPlaylists: function(m3u) {
             filePlaylists = m3u;
+            sendPlaylist(function() {
+                _playlist.playlist.setSelectList(filePlaylists);
+            });
         },
         getPlaylists: function() {
             return filePlaylists;

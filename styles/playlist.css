@@ -36,6 +36,11 @@ body {
     background-image: url('../images/x.png');
     right: 2px;
 }
+.playlist_select {
+    background-image: url(../images/select.png);
+    right: 34px;
+    display: none;
+}
 div.playlist {
 }
 ul.track_list {
@@ -152,4 +157,49 @@ div.title {
     float: left;
     width: 100%;
     font-size: 110%;
+    max-height: 20px;
+    overflow: hidden;
+}
+ul.list_select {
+    position: absolute;
+    top: 20px;
+    right: 5px;
+    background-color: #252525;
+    border: 1px solid #000;
+    border-radius: 3px;
+    opacity: 0.9;
+    margin: 0;
+    min-width: 70px;
+    padding: 2px;
+    list-style-type: none;
+    display: none;
+    overflow: auto;
+    max-width: 200px;
+    max-height: calc(100% - 53px);
+    color: #fff;
+}
+ul.list_select li {
+    position: relative;
+    padding: 3px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    border-radius: 3px;
+}
+ul.list_select li:hover {
+    background-color: #39516F;
+    color: #fff;
+    cursor: pointer;
+}
+ul.list_select::-webkit-scrollbar {
+    width: 6px;
+}
+ul.list_select::-webkit-scrollbar-thumb:vertical {
+    margin: 5px;
+    background-color: #565A61;
+    -webkit-border-radius: 5px;
+}
+ul.list_select::-webkit-scrollbar-button:start:decrement,
+ul.list_select::-webkit-scrollbar-button:end:increment {
+    height: 0px;
+    display: block;
 }
