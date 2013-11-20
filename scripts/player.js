@@ -404,7 +404,7 @@ var view = function() {
                     engine.position(val);
                 }
             };
-            dom_cache.btnPlaylist.on('click', function() {
+            dom_cache.btnPlaylist.unbind().on('click', function() {
                 chrome.runtime.getBackgroundPage(function(bg) {
                     bg.wm.toggle_playlist();
                 });

@@ -100,8 +100,8 @@ div.playlist > ul > li > span {
     overflow: hidden;
 }
 div.playlist > ul > li .name {
-    margin-top: 6px;
-    font-size: 110%;
+    margin-top: 5px;
+    font-size: 120%;
 }
 div.playlist > ul > li .info {
 }

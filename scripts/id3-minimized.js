@@ -143,7 +143,7 @@ var BufferedBinaryAjax = function(strUrl, fncCallback, fncError) {
                 bAsync = true;
 
             if (fncCallback) {
-                if (typeof(oHTTP.onload) != "undefined") {
+                if (typeof (oHTTP.onload) != "undefined") {
                     oHTTP.onload = function() {
 
                         if (oHTTP.status == "200" || oHTTP.status == "206") {
@@ -201,7 +201,7 @@ var BufferedBinaryAjax = function(strUrl, fncCallback, fncError) {
         var oHTTP = createRequest();
         if (oHTTP) {
             if (fncCallback) {
-                if (typeof(oHTTP.onload) != "undefined") {
+                if (typeof (oHTTP.onload) != "undefined") {
                     oHTTP.onload = function() {
                         if (oHTTP.status == "200") {
                             fncCallback(this);
@@ -545,48 +545,6 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         }
     };
 })(this);
-// Modified version of http://www.webtoolkit.info/javascript-base64.html
-(function(ns) {
-    ns.Base64 = {
-        // private property
-        _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-        // public method for encoding
-        encodeBytes: function(input) {
-            var output = "";
-            var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-            var i = 0;
-
-            while (i < input.length) {
-
-                chr1 = input[i++];
-                chr2 = input[i++];
-                chr3 = input[i++];
-
-                enc1 = chr1 >> 2;
-                enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-                enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-                enc4 = chr3 & 63;
-
-                if (isNaN(chr2)) {
-                    enc3 = enc4 = 64;
-                } else if (isNaN(chr3)) {
-                    enc4 = 64;
-                }
-
-                output = output +
-                        Base64._keyStr.charAt(enc1) + Base64._keyStr.charAt(enc2) +
-                        Base64._keyStr.charAt(enc3) + Base64._keyStr.charAt(enc4);
-
-            }
-
-            return output;
-        }
-    };
-
-    // Export functions for closure compiler
-    ns["Base64"] = ns.Base64;
-    ns.Base64["encodeBytes"] = ns.Base64.encodeBytes;
-})(this);
 /*
  * JavaScript ID3 Tag Reader 0.1.2
  * Copyright (c) 2008 Jacob Seidelin, cupboy@gmail.com, http://blog.nihilogic.dk/
@@ -640,7 +598,6 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
     ID3.loadTags = function(url, cb, options) {
         options = options || {};
         var dataReader = options["dataReader"] || BufferedBinaryAjax;
-
         dataReader(url, function(data) {
             // preload the format identifier
             data.loadRange(_formatIDRange, function() {
@@ -651,8 +608,6 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                         cb();
                 });
             });
-        }, function(e) {
-            console.log(e);
         });
     };
 
@@ -1251,8 +1206,6 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
 
         //offset += 1 + desc.bytesReadCount + 1;
 
-        //console.log(data.getBytesAt(247, 5))
-
         return {
             "format": format.toString(),
             "type": type,
@@ -1365,7 +1318,10 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         '©grp': ['grouping'],
         'keyw': ['keyword'],
         '©lyr': ['lyrics'],
-        '©gen': ['genre']
+        '©cmt': ['comment'],
+        'tmpo': ['tempo'],
+        'cpil': ['compilation'],
+        'disk': ['disc']
     };
 
     ID4.loadData = function(data, callback) {
@@ -1448,22 +1404,31 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                     // 4: NULL (usually locale indicator)
                     var dataStart = seek + 16 + 4 + 4;
                     var dataEnd = atomSize - 16 - 4 - 4;
+                    var atomData;
                     switch (type) {
                         case 'text':
-                            tag[atom[0]] = data.getStringWithCharsetAt(dataStart, dataEnd, "UTF-8");
+                            atomData = data.getStringWithCharsetAt(dataStart, dataEnd, "UTF-8");
                             break;
 
                         case 'uint8':
-                            tag[atom[0]] = data.getShortAt(dataStart);
+                            atomData = data.getShortAt(dataStart);
                             break;
 
                         case 'jpeg':
                         case 'png':
-                            tag[atom[0]] = {
+                            atomData = {
                                 format: "image/" + type,
                                 data: data.getBytesAt(dataStart, dataEnd)
                             };
                             break;
+                    }
+
+                    if (atom[0] === "comment") {
+                        tag[atom[0]] = {
+                            "text": atomData
+                        };
+                    } else {
+                        tag[atom[0]] = atomData;
                     }
                 }
             }

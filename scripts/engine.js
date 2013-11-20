@@ -140,58 +140,52 @@ var engine = function() {
             if (file.size > 31457280) {
                 return;
             }
-            function loadUrl(url, callback, reader) {
-                ID3.loadTags(url, function() {
-                    var tags = ID3.getAllTags(url);
-                    if ("picture" in tags) {
-                        var image = tags.picture;
-                        var binary = image.data.reduce(function(str, charIndex) {
-                            return str += String.fromCharCode(charIndex);
-                        }, '');
-                        tags.picture = null;
-                        var index = binary.indexOf('JFIF');
-                        var type = "jpeg";
-                        var pos = 6;
-                        if (index === -1) {
-                            index = binary.indexOf('PNG');
-                            type = "png";
-                            pos = 1;
-                        }
-                        if (index === -1) {
-                            var bin = String.fromCharCode.apply(null, [255, 216, 255, 225]);
-                            index = binary.indexOf(bin);
-                            type = "jpeg";
-                            pos = 0;
-                        }
-                        if (index !== -1) {
-                            binary = binary.substr(index - pos);
-                            tags.picture = [binary, type];
-                        } else {
-                            if (_debug) {
-                                console.log('Can\'t show image!');
-                            }
-                            delete tags.picture;
-                        }
+            ID3.loadTags(file.name, function() {
+                var tags = ID3.getAllTags(file.name);
+                if ("picture" in tags) {
+                    var image = tags.picture;
+                    var binary = image.data.reduce(function(str, charIndex) {
+                        return str += String.fromCharCode(charIndex);
+                    }, '');
+                    tags.picture = null;
+                    var index = binary.indexOf('JFIF');
+                    var type = "jpeg";
+                    var pos = 6;
+                    if (index === -1) {
+                        index = binary.indexOf('PNG');
+                        type = "png";
+                        pos = 1;
                     }
-                    $.each(tags, function(key) {
-                        if ($.inArray(key, ["artist", "title", "album", "picture"]) === -1) {
-                            delete tags[key];
+                    if (index === -1) {
+                        var bin = String.fromCharCode.apply(null, [255, 216, 255, 225]);
+                        index = binary.indexOf(bin);
+                        type = "jpeg";
+                        pos = 0;
+                    }
+                    if (index !== -1) {
+                        binary = binary.substr(index - pos);
+                        tags.picture = [binary, type];
+                    } else {
+                        if (_debug) {
+                            console.log('Can\'t show image!');
                         }
-                    });
+                        delete tags.picture;
+                    }
+                }
+                $.each(tags, function(key) {
+                    if ($.inArray(key, ["artist", "title", "album", "picture"]) === -1) {
+                        delete tags[key];
+                    }
+                });
 
-                    image_resize(tags['picture'], function(i_id) {
-                        if ("picture" in tags) {
-                            tags.picture = i_id;
-                        }
-                        m_cb(tags, id);
-                        view.setTags(tags);
-                    });
-                },
-                        {tags: ["artist", "title", "album", "picture"], dataReader: reader});
-            }
-            var url = file.urn || file.name;
-            var t = FileAPIReader(file);
-            loadUrl(url, null, t);
+                image_resize(tags['picture'], function(i_id) {
+                    if ("picture" in tags) {
+                        tags.picture = i_id;
+                    }
+                    m_cb(tags, id);
+                    view.setTags(tags);
+                });
+            }, {tags: ["artist", "title", "album", "picture"], dataReader: FileAPIReader(file)});
         };
         return {
             open: function(id) {
