@@ -86,7 +86,7 @@ var engine = function() {
         covers.push({id: id, len: len, data: bin});
         return id;
     };
-    var getType = function(filename) {
+    var getType = function(file) {
         var types = [
             'audio/mpeg', //0
             'audio/mp4', //1
@@ -98,8 +98,18 @@ var engine = function() {
             'video/ogg', //7
             'video/3gpp'//8
         ];
+        var exclude_ext = ["m3u"];
+        var allow_types = ["audio", "video"];
+        var type = file.type;
+        var filename = file.name;
         var ext = filename.split('.').slice(-1)[0].toLowerCase();
-        var type = undefined;
+        if (type !== undefined) {
+            if (allow_types.indexOf(type.split('/')[0]) === -1 || exclude_ext.indexOf(ext) !== -1) {
+                return;
+            }
+            return type;
+        }
+        type = undefined;
         if (ext === "mp3") {
             type = types[0];
         } else
@@ -197,10 +207,10 @@ var engine = function() {
                     _playlist.playlist.selected(current_id);
                 });
                 if ('url' in playlist[id].file) {
-                    $(audio).removeAttr('codecs');
+                    $(audio).removeAttr('type');
                     audio.src = playlist[id].file.url;
                 } else {
-                    $(audio).attr('codecs', getType(playlist[id].file.name));
+                    $(audio).attr('type', getType(playlist[id].file));
                     audio.src = window.URL.createObjectURL(playlist[id].file);
                 }
             },
@@ -498,7 +508,7 @@ var engine = function() {
             }
             var my_playlist = [];
             for (var i = 0; i < files.length; i++) {
-                if (getType(files[i].name) === undefined) {
+                if (getType(files[i]) === undefined) {
                     continue;
                 }
                 my_playlist.push({id: my_playlist.length, file: files[i], tags: null, duration: null});

@@ -87,6 +87,7 @@ var playlist = function() {
         dom_cache.playlist.scrollTop(el.offset().top + dom_cache.playlist.scrollTop() - 24);
     };
     var makeSelectList = function(arr) {
+        $('ul.list_select').remove();
         var arr = JSON.parse(JSON.stringify(arr));
         arr.sort();
         var content = '<ul class="list_select">';
