@@ -98,13 +98,16 @@ var engine = function() {
             'video/ogg', //7
             'video/3gpp'//8
         ];
-        var exclude_ext = ["m3u"];
-        var allow_types = ["audio", "video"];
+        //var exclude_ext = ["m3u"];
+        //var allow_types = ["audio", "video"];
         var type = file.type;
         var filename = file.name;
         var ext = filename.split('.').slice(-1)[0].toLowerCase();
         if (type !== undefined) {
-            if (allow_types.indexOf(type.split('/')[0]) === -1 || exclude_ext.indexOf(ext) !== -1) {
+            /*(if (allow_types.indexOf(type.split('/')[0]) === -1 || exclude_ext.indexOf(ext) !== -1) {
+             return;
+             }*/
+            if (player.canPlay(type) === 0) {
                 return;
             }
             return type;
@@ -143,6 +146,7 @@ var engine = function() {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     var player = function() {
+        var type_list = {};
         var audio = null;
         var current_id = null;
         var read_tags = function(id, m_cb) {
@@ -384,6 +388,13 @@ var engine = function() {
                 sendPlaylist(function() {
                     _playlist.playlist.selected(current_id);
                 });
+            },
+            canPlay: function(mime) {
+                if (mime in type_list) {
+                    return type_list[mime];
+                }
+                type_list[mime] = audio.canPlayType(mime).length;
+                return type_list[mime];
             },
             init: function() {
                 $('.engine').append('<audio/>');
