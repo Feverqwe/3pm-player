@@ -148,18 +148,23 @@ div.progress > a {
 }
 .player > div.controls li.prev {
     background-image: url(../images/playback_prev_w.png);
+    background-position-y: 6px;
 }
 .player > div.controls li.play {
     background-image: url(../images/playback_play_w.png);
+    background-position-y: 6px;
 }
 .player > div.controls li.pause {
     background-image: url(../images/playback_pause_w.png);
+    background-position-y: 5px;
 }
 .player > div.controls li.stop {
     background-image: url(../images/playback_stop_w.png);
+    background-position-y: 5px;
 }
 .player > div.controls li.next {
     background-image: url(../images/playback_next_w.png);
+    background-position-y: 6px;
 }
 .player > div.controls li.playlist {
     background-image: url(../images/playlist_w.png);

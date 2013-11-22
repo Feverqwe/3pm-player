@@ -127,7 +127,7 @@ div.navigation > ul > li {
     background-repeat: no-repeat;
     background-position: center;
     -webkit-app-region: no-drag;
-
+    margin-left: -3px;
 }
 div.navigation li.shuffle {
     background-image: url(../images/shuffle_w.png);
