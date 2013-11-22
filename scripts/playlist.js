@@ -23,7 +23,7 @@ var playlist = function() {
          */
         var title = '';
         var info = '';
-        var pic = undefined;
+        var pic = 'none';
         var tags = item.tags;
         if (item.tags === undefined) {
             title = item.file.name;
@@ -52,7 +52,7 @@ var playlist = function() {
         /*
          * Добавляет картинку как стиль.
          */
-        if (id === undefined) {
+        if (id === 'none') {
             return;
         }
         if ($('style.pic_' + id).length > 0) {
