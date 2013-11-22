@@ -3,12 +3,21 @@ var view = function() {
     var var_cache = {};
     var time_tipe = 0;
     var isPlaying = function() {
+        /*
+         * Выставляет статус - проигрывается.
+         */
         dom_cache.btnPlayPause.removeClass('play').addClass('pause');
     };
     var isPause = function() {
+        /*
+         * Выставляет статус - пауза.
+         */
         dom_cache.btnPlayPause.removeClass('pause').addClass('play');
     };
     var showImage = function(id) {
+        /*
+         * Отображает изображение, получает картинку из engine
+         */
         var img = engine.getCover(id);
         if (img.data === null) {
             hideImage();
@@ -17,9 +26,15 @@ var view = function() {
         dom_cache.picture.attr('data-id', id).get(0).src = img.data;
     };
     var hideImage = function() {
+        /*
+         * Выставляет статус - без обложки.
+         */
         dom_cache.picture.get(0).src = "images/no-cover.png";
     };
     var toHHMMSS = function(val) {
+        /*
+         * Выводит время трека.
+         */
         var sec_num = parseInt(val, 10); // don't forget the second parm
         if (isNaN(sec_num))
             return '00:00';
@@ -43,12 +58,18 @@ var view = function() {
         return time;
     };
     var getEntryFromDir = function(entry, cb) {
+        /*
+         * Получает массив файлов - Entry из Entry дирректории.
+         */
         var dir = entry.createReader();
         dir.readEntries(function(a) {
             cb(a);
         });
     };
     var entry2files = function(entry, cb) {
+        /*
+         * Переводит массив entry в массива file
+         */
         var files = [];
         var len = entry.length;
         var wlen = entry.length;
@@ -68,6 +89,9 @@ var view = function() {
         }
     };
     var readPlaylist = function(entry, file, cb) {
+        /*
+         * Читает m3u файл
+         */
         var stream_count = 0;
         var stream_got = 0;
         var file_list = [];
@@ -148,6 +172,9 @@ var view = function() {
         r.readAsText(file);
     };
     var readDirectory = function(entry) {
+        /*
+         * Читает открытую дирректорию, получает массив m3u файлов, и воспроизводит файлы внутри.
+         */
         getEntryFromDir(entry, function(sub_entry) {
             entry2files(sub_entry, function(files) {
                 var m3u = undefined;
@@ -166,7 +193,7 @@ var view = function() {
                 }
                 engine.open(files);
                 if (m3u !== undefined) {
-                    engine.setPlaylists(m3u);
+                    engine.setM3UPlaylists(m3u);
                     chrome.runtime.getBackgroundPage(function(bg) {
                         bg.wm.showDialog({type: "m3u", h: 200, w: 350, playlists: m3u.files});
                     });
@@ -271,20 +298,14 @@ var view = function() {
             };
             $('.close').on('click', function() {
                 save_pos();
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    var pl = bg.wm.getPlaylist();
-                    if (pl !== null) {
-                        pl.close();
-                    }
+                engine.sendPlaylist(function(window) {
+                    window.close();
                 });
                 window.close();
             });
             $('.mini').on('click', function() {
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    var pl = bg.wm.getPlaylist();
-                    if (pl !== null) {
-                        pl.playlist.minimize();
-                    }
+                engine.sendPlaylist(function(window) {
+                    window.minimize();
                 });
                 chrome.app.window.current().minimize();
             });
@@ -573,7 +594,7 @@ var view = function() {
             }
         },
         select_playlist: function(name) {
-            var filePlaylists = engine.getPlaylists();
+            var filePlaylists = engine.getM3UPlaylists();
             if (filePlaylists === undefined) {
                 return;
             }

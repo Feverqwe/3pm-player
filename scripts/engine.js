@@ -1,5 +1,4 @@
 var _debug = false;
-var _playlist = null;
 var engine = function() {
     var playlist = [];
     var playlist_name = undefined;
@@ -8,30 +7,42 @@ var engine = function() {
     var shuffle = false;
     var loop = false;
     var current_played_pos = -1;
-    var filePlaylists = undefined;
+    var M3UPlaylists = undefined;
+    var _playlist_window = undefined;
     function sendPlaylist(callback) {
-        if (_playlist === null || _playlist.window === null) {
+        /*
+         * Функция отправки действий в плэйлист
+         */
+        if (_playlist_window === undefined || _playlist_window.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
-                _playlist = bg.wm.getPlaylist();
-                if (_playlist !== null) {
-                    callback();
+                _playlist_window = bg.wm.getPlaylist();
+                if (_playlist_window !== undefined) {
+                    callback(_playlist_window);
                 }
             });
         } else {
-            callback();
+            callback(_playlist_window);
         }
     }
     var reset_playlist = function() {
+        /*
+         * Функция сброса плэйлиста.
+         */
         playlist = [];
         playlist_name = undefined;
         covers = [];
         playedlist = [];
         current_played_pos = -1;
-        sendPlaylist(function() {
-            _playlist.playlist.empty();
+        sendPlaylist(function(window) {
+            window.playlist.empty();
         });
     };
     var add_played = function(id) {
+        /*
+         * Добавляет трек в список програнного.
+         * Если такой ID уже есть в списке - он удаляется.
+         * ID добавляется в конец списка.
+         */
         var ex_id = null;
         for (var i = 0; i < playedlist.length; i++) {
             if (playedlist[i] === id) {
@@ -45,6 +56,9 @@ var engine = function() {
         playedlist.push(id);
     };
     var image_resize = function(binary, cb) {
+        /*
+         * Изменяет размер обложки.
+         */
         if (binary === undefined) {
             cb(null);
             return;
@@ -57,7 +71,7 @@ var engine = function() {
         }
         var img = new Image();
         img.onerror = function() {
-            var id = add_cover(binary.length, binary);
+            var id = add_cover(null, null);
             cb(id);
         };
         img.onload = function() {
@@ -76,6 +90,10 @@ var engine = function() {
         img.src = binary;
     };
     var add_cover = function(len, bin) {
+        /*
+         * Добавляет обложку в массив обложек.
+         * Проверяет на наличие уже существующей в списке, уберает дубли.
+         */
         for (var i = 0; i < covers.length; i++) {
             var item = covers[i];
             if (item.len === len && item.data === bin) {
@@ -87,6 +105,9 @@ var engine = function() {
         return id;
     };
     var getType = function(file) {
+        /*
+         * Определяет может ли плеер проигрывать файл, возвращает тип файла для плеера.
+         */
         var types = [
             'audio/mpeg', //0
             'audio/mp4', //1
@@ -98,13 +119,8 @@ var engine = function() {
             'video/ogg', //7
             'video/3gpp'//8
         ];
-        //var exclude_ext = ["m3u"];
-        //var allow_types = ["audio", "video"];
         var type = file.type;
         if (type !== undefined) {
-            /*(if (allow_types.indexOf(type.split('/')[0]) === -1 || exclude_ext.indexOf(ext) !== -1) {
-             return;
-             }*/
             if (player.canPlay(type) === 0) {
                 return;
             }
@@ -143,6 +159,9 @@ var engine = function() {
         return type;
     };
     function getRandomInt(min, max) {
+        /*
+         * Получает случайное число
+         */
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     var player = function() {
@@ -207,8 +226,8 @@ var engine = function() {
                     return;
                 }
                 current_id = parseInt(id);
-                sendPlaylist(function() {
-                    _playlist.playlist.selected(current_id);
+                sendPlaylist(function(window) {
+                    window.playlist.selected(current_id);
                 });
                 if ('url' in playlist[id].file) {
                     $(audio).removeAttr('type');
@@ -385,8 +404,8 @@ var engine = function() {
                 return audio.muted;
             },
             getCurrent: function() {
-                sendPlaylist(function() {
-                    _playlist.playlist.selected(current_id);
+                sendPlaylist(function(window) {
+                    window.playlist.selected(current_id);
                 });
             },
             canPlay: function(mime) {
@@ -450,8 +469,8 @@ var engine = function() {
                                 obj['picture'] = tags.picture;
                             }
                             playlist[id].tags = obj;
-                            sendPlaylist(function() {
-                                _playlist.playlist.updPlaylistItem(id, playlist[id]);
+                            sendPlaylist(function(window) {
+                                window.playlist.updPlaylistItem(id, playlist[id]);
                             });
                         });
                     } else {
@@ -528,9 +547,9 @@ var engine = function() {
                 reset_playlist();
                 playlist = my_playlist;
                 playlist_name = name;
-                sendPlaylist(function() {
-                    _playlist.playlist.setPlaylist(playlist);
-                    _playlist.playlist.setPlaylistName(playlist_name);
+                sendPlaylist(function(window) {
+                    window.playlist.setPlaylist(playlist);
+                    window.playlist.setPlaylistName(playlist_name);
                 });
                 view.state("playlist_not_empty");
                 var id = 0;
@@ -551,9 +570,9 @@ var engine = function() {
             }
             reset_playlist();
             playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: 0});
-            sendPlaylist(function() {
-                _playlist.playlist.setPlaylist(playlist);
-                _playlist.playlist.setPlaylistName(playlist_name);
+            sendPlaylist(function(window) {
+                window.playlist.setPlaylist(playlist);
+                window.playlist.setPlaylistName(playlist_name);
             });
             view.state("playlist_not_empty");
             player.open(0);
@@ -575,8 +594,8 @@ var engine = function() {
                 shuffle = !shuffle;
             }
             chrome.storage.local.set({'shuffle': shuffle});
-            sendPlaylist(function() {
-                _playlist.playlist.setShuffle(shuffle);
+            sendPlaylist(function(window) {
+                window.playlist.setShuffle(shuffle);
             });
         },
         loop: function(c) {
@@ -584,8 +603,8 @@ var engine = function() {
                 loop = !loop;
             }
             chrome.storage.local.set({'loop': loop});
-            sendPlaylist(function() {
-                _playlist.playlist.setLoop(loop);
+            sendPlaylist(function(window) {
+                window.playlist.setLoop(loop);
             });
         },
         getPlaylist: function() {
@@ -611,15 +630,16 @@ var engine = function() {
             covers[id].data = null;
             covers[id].len = null;
         },
-        setPlaylists: function(m3u) {
-            filePlaylists = m3u;
-            sendPlaylist(function() {
-                _playlist.playlist.setSelectList(filePlaylists);
+        setM3UPlaylists: function(m3u) {
+            M3UPlaylists = m3u;
+            sendPlaylist(function(window) {
+                window.playlist.setSelectList(M3UPlaylists);
             });
         },
-        getPlaylists: function() {
-            return filePlaylists;
-        }
+        getM3UPlaylists: function() {
+            return M3UPlaylists;
+        },
+        sendPlaylist: sendPlaylist
     };
 }();
 $(function() {

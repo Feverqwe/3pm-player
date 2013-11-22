@@ -1,20 +1,23 @@
-var _player = null;
 var playlist = function() {
     var engine = null;
     var dom_cache = {};
     var var_cache = {};
-    var sendPlayer = function(callback) {
-        if (_player === null || _player.window === null) {
+    var _player_window = undefined;
+    function sendPlayer(callback) {
+        /*
+         * Функция отправки действий в плеер
+         */
+        if (_player_window === undefined || _player_window.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
-                _player = bg.wm.getPlayer();
-                if (_player !== null) {
-                    callback();
+                _player_window = bg.wm.getPlayer();
+                if (_player_window !== undefined) {
+                    callback(_player_window);
                 }
             });
         } else {
-            callback();
+            callback(_player_window);
         }
-    };
+    }
     var item_read = function(item) {
         var title = '';
         var info = '';
@@ -50,8 +53,8 @@ var playlist = function() {
         if ($('style.pic_' + id).length > 0) {
             return;
         }
-        sendPlayer(function() {
-            var img = _player.engine.getCover(id);
+        sendPlayer(function(window) {
+            var img = window.engine.getCover(id);
             var data = img.data;
             if (data === null) {
                 data = "images/no-cover.png";
@@ -68,8 +71,8 @@ var playlist = function() {
             dom_cache.playlist_ul.append('<li data-id="' + n + '"><div class="gr_line"></div><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name" title="' + item.title + '">' + item.title + '</span><span class="info" title="' + item.info + '">' + item.info + '</span></li>');
             n++;
         });
-        sendPlayer(function() {
-            _player.engine.getCurrent();
+        sendPlayer(function(window) {
+            window.engine.getCurrent();
         });
     };
     var update_playlist_item = function(id, item) {
@@ -129,32 +132,32 @@ var playlist = function() {
             $('.mini').on('click', function() {
                 chrome.app.window.current().minimize();
             });
-            sendPlayer(function() {
-                if (_player.engine !== null) {
-                    write_playlist(_player.engine.getPlaylist());
+            sendPlayer(function(window) {
+                if (window.engine !== null) {
+                    write_playlist(window.engine.getPlaylist());
                 }
             });
             dom_cache.playlist_ul.on('click', 'li', function() {
                 var id = $(this).attr('data-id');
-                sendPlayer(function() {
-                    _player.engine.open_id(id);
+                sendPlayer(function(window) {
+                    window.engine.open_id(id);
                 });
             });
             dom_cache.shuffle.on('click', function() {
-                sendPlayer(function() {
-                    _player.engine.shuffle();
+                sendPlayer(function(window) {
+                    window.engine.shuffle();
                 });
             });
-            sendPlayer(function() {
-                _player.engine.shuffle(null);
+            sendPlayer(function(window) {
+                window.engine.shuffle(null);
             });
             dom_cache.loop.on('click', function() {
-                sendPlayer(function() {
-                    _player.engine.loop();
+                sendPlayer(function(window) {
+                    window.engine.loop();
                 });
             });
-            sendPlayer(function() {
-                _player.engine.loop(null);
+            sendPlayer(function(window) {
+                window.engine.loop(null);
             });
             var_cache['resize_timer'] = null;
             window.onresize = function() {
@@ -179,14 +182,14 @@ var playlist = function() {
             });
             $('body').on('click', 'ul.list_select li', function() {
                 var name = $(this).data('name');
-                sendPlayer(function() {
-                    _player.view.select_playlist(name);
+                sendPlayer(function(window) {
+                    window.view.select_playlist(name);
                 });
                 $(this).parent().hide();
             });
-            sendPlayer(function() {
-                selectPL(_player.engine.getPlaylists());
-                setTitle(_player.engine.getPlaylistName());
+            sendPlayer(function(window) {
+                selectPL(window.engine.getM3UPlaylists());
+                setTitle(window.engine.getPlaylistName());
             });
             setInterval(function() {
                 save_pos();

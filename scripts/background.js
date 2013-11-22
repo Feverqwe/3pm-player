@@ -394,10 +394,10 @@ var wm = function() {
             }
         },
         getPlayer: function() {
-            return (check() && "player" in windows) ? windows.player.contentWindow.window : null;
+            return (check() && "player" in windows) ? windows.player.contentWindow.window : undefined;
         },
         getPlaylist: function() {
-            return (check() && "playlist" in windows) ? windows.playlist.contentWindow.window : null;
+            return (check() && "playlist" in windows) ? windows.playlist.contentWindow.window : undefined;
         },
         showDialog: function(options) {
             create_dialog_window(options);
