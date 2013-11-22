@@ -101,8 +101,6 @@ var engine = function() {
         //var exclude_ext = ["m3u"];
         //var allow_types = ["audio", "video"];
         var type = file.type;
-        var filename = file.name;
-        var ext = filename.split('.').slice(-1)[0].toLowerCase();
         if (type !== undefined) {
             /*(if (allow_types.indexOf(type.split('/')[0]) === -1 || exclude_ext.indexOf(ext) !== -1) {
              return;
@@ -112,6 +110,8 @@ var engine = function() {
             }
             return type;
         }
+        var filename = file.name;
+        var ext = filename.split('.').slice(-1)[0].toLowerCase();
         type = undefined;
         if (ext === "mp3") {
             type = types[0];
