@@ -72,11 +72,6 @@ var engine = function() {
             return;
         }
         binary = "data:image/" + binary[1] + ";base64," + btoa(binary[0]);
-        if (false) {
-            var id = add_cover(binary.length, binary);
-            cb(id);
-            return;
-        }
         var img = new Image();
         img.onerror = function() {
             cb(undefined);
