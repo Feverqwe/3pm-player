@@ -18,9 +18,12 @@ var playlist = function() {
         }
     }
     var item_read = function(item) {
+        /*
+         * Создает обьект элемента для плэйлиста
+         */
         var title = '';
         var info = '';
-        var pic = 'none';
+        var pic = undefined;
         var tags = item.tags;
         if (item.tags === undefined) {
             title = item.file.name;
@@ -46,7 +49,10 @@ var playlist = function() {
         return {title: title, info: info, pic: pic};
     };
     var add_image = function(id) {
-        if (id === "none") {
+        /*
+         * Добавляет картинку как стиль.
+         */
+        if (id === undefined) {
             return;
         }
         if ($('style.pic_' + id).length > 0) {
@@ -62,6 +68,9 @@ var playlist = function() {
         });
     };
     var write_playlist = function(items) {
+        /*
+         * Выводит плэйлист на страницу.
+         */
         dom_cache.playlist_ul.empty();
         var n = 0;
         items.forEach(function(item) {
@@ -75,6 +84,9 @@ var playlist = function() {
         });
     };
     var update_playlist_item = function(id, item) {
+        /*
+         * Обновляет элемент в плэйлисте
+         */
         var itm = $('li[data-id=' + id + ']');
         item = item_read(item);
         add_image(item.pic);
@@ -83,17 +95,23 @@ var playlist = function() {
         itm.children('.info').text(item.info);
     };
     var scrool_to = function(el) {
+        /*
+         * Скролит до конкретного элемента.
+         */
         if (el.offset() === undefined) {
             return;
         }
         dom_cache.playlist.scrollTop(el.offset().top + dom_cache.playlist.scrollTop() - 24);
     };
     var makeSelectList = function(arr) {
+        /*
+         * Создает список выбора плэйлиста
+         */
         $('ul.list_select').remove();
-        var arr = JSON.parse(JSON.stringify(arr));
-        arr.sort();
+        var my_arr = JSON.parse(JSON.stringify(arr));
+        my_arr.sort();
         var content = '<ul class="list_select">';
-        arr.forEach(function(item) {
+        my_arr.forEach(function(item) {
             var name = item.substr(0, item.length - 4);
             content += '<li title="' + name + '" data-name="' + item + '">' + name + '</li>';
         });
@@ -101,6 +119,9 @@ var playlist = function() {
         $('body').append(content);
     };
     var selectPL = function(playlist) {
+        /*
+         * Показывает скрываает кнопку отображения скписка плэйлстов.
+         */
         if (playlist !== undefined) {
             makeSelectList(playlist.files);
             $('.playlist_select').show();
@@ -109,12 +130,15 @@ var playlist = function() {
         }
     };
     var setTitle = function(name) {
+        /*
+         * Выставляет заголовок плэйлистуы
+         */
         if (name === undefined) {
             name = "Playlist";
         } else {
             name = name.substr(0, name.length - 4);
         }
-        $('div.title').text(name);
+        $('div.title').text(name).attr('title',name);
     };
     return {
         show: function() {
@@ -191,7 +215,7 @@ var playlist = function() {
             setInterval(function() {
                 save_pos();
                 chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.hi("player", chrome.app.window.current());
+                    bg.wm.hi("playlist", chrome.app.window.current());
                 });
             }, 5000);
         },

@@ -16,6 +16,9 @@ var dialog = function() {
         }
     }
     var createURLform = function() {
+        /*
+         * Создает форму для ввода URL
+         */
         $('.url_dialog').show();
         $('.url_dialog input[name=open_btn]').on('click', function() {
             var text = $(this).parent().children('input[name=url]').get(0);
@@ -34,6 +37,9 @@ var dialog = function() {
         }).get(0).focus();
     };
     var playlistChiser = function() {
+        /*
+         * Создает форму выбора m3u файла
+         */
         $('.playlist_chiser').show();
         var pl = $('.playlists');
         var arr = JSON.parse(JSON.stringify(window.options.playlists));

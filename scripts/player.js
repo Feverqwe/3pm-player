@@ -117,6 +117,9 @@ var view = function() {
             });
         };
         var readEntry = function(entry, file_tree, file_arr) {
+            /*
+             * ищет внутри всех папок, в соответствие с {} file_tree, и если внутри есть файлы из [] file_arr добавляет из в массив.
+             */
             if (file_arr === undefined) {
                 file_arr = [];
             }
@@ -141,6 +144,9 @@ var view = function() {
             });
         };
         var readM3U = function(content) {
+            /*
+             * Читает m3u файл и строит дерево
+             */
             var file_tree = {};
             var lines = content.split("\n");
             var len = lines.length;

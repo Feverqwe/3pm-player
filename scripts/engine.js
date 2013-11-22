@@ -613,6 +613,10 @@ var engine = function() {
         getCover: function(id) {
             return covers[id];
         },
+        badImage: function(id) {
+            covers[id].data = null;
+            covers[id].len = null;
+        },
         shuffle: function(c) {
             if (c === undefined) {
                 shuffle = !shuffle;
@@ -649,10 +653,6 @@ var engine = function() {
             }
             var data = window.btoa(unescape(encodeURIComponent(JSON.stringify({'playlist': list}))));
             return data;
-        },
-        badImage: function(id) {
-            covers[id].data = null;
-            covers[id].len = null;
         },
         setM3UPlaylists: function(m3u) {
             M3UPlaylists = m3u;
