@@ -115,6 +115,13 @@ var engine = function() {
         /*
          * Определяет может ли плеер проигрывать файл, возвращает тип файла для плеера.
          */
+        var type = file.type;
+        if (type !== undefined && type.length > 0) {
+            if (player.canPlay(type) === 0) {
+                return;
+            }
+            return type;
+        }
         var types = [
             'audio/mpeg', //0
             'audio/mp4', //1
@@ -126,13 +133,6 @@ var engine = function() {
             'video/ogg', //7
             'video/3gpp'//8
         ];
-        var type = file.type;
-        if (type !== undefined) {
-            if (player.canPlay(type) === 0) {
-                return;
-            }
-            return type;
-        }
         var filename = file.name;
         var ext = filename.split('.').slice(-1)[0].toLowerCase();
         type = undefined;
@@ -356,7 +356,7 @@ var engine = function() {
                     var tags = playlist[current_id].tags;
                     var title = '';
                     var album = '';
-                    if (tags !== null) {
+                    if (tags !== undefined) {
                         if ("title" in tags) {
                             title = tags.title;
                         } else {

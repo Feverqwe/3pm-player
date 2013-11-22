@@ -21,6 +21,9 @@ body {
     color: #fff;
     font-size: 130%;
 }
+.player .track > .album {
+    font-size: 110%;
+}
 .player .image_box {
     width: 81px;
     height: 80px;
