@@ -311,7 +311,7 @@ var view = function() {
             });
             $('.mini').on('click', function() {
                 engine.sendPlaylist(function(window) {
-                    window.minimize();
+                    window.playlist.minimize();
                 });
                 chrome.app.window.current().minimize();
             });
