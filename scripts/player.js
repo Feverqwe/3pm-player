@@ -439,13 +439,19 @@ var view = function() {
                     if (val > 100) {
                         val = 100;
                     }
-                    engine.position(val);
+                    clearTimeout(var_cache.progress_timer);
+                    var_cache.progress_timer = setTimeout(function() {
+                        engine.position(val);
+                    }, 25);
                 } else {
                     val = (val - 25) / 10;
                     if (val < 0) {
                         val = 0;
                     }
-                    engine.position(val);
+                    clearTimeout(var_cache.progress_timer);
+                    var_cache.progress_timer = setTimeout(function() {
+                        engine.position(val);
+                    }, 25);
                 }
             };
             dom_cache.btnPlaylist.unbind().on('click', function() {

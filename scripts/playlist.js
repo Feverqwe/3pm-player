@@ -1,5 +1,4 @@
 var playlist = function() {
-    var engine = null;
     var dom_cache = {};
     var var_cache = {};
     var _player_window = undefined;
@@ -23,7 +22,7 @@ var playlist = function() {
         var info = '';
         var pic = 'none';
         var tags = item.tags;
-        if (item.tags === null) {
+        if (item.tags === undefined) {
             title = item.file.name;
         } else {
             if ("title" in tags) {
@@ -133,9 +132,7 @@ var playlist = function() {
                 chrome.app.window.current().minimize();
             });
             sendPlayer(function(window) {
-                if (window.engine !== null) {
-                    write_playlist(window.engine.getPlaylist());
-                }
+                write_playlist(window.engine.getPlaylist());
             });
             dom_cache.playlist_ul.on('click', 'li', function() {
                 var id = $(this).attr('data-id');

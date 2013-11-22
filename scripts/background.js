@@ -36,7 +36,7 @@ var web_socket = function() {
             return response_(socketId, headerMap, stringToArrayBuffer("Don't have url!"), ['404 Not Found']);
         }
         var player = wm.getPlayer();
-        if (player === null) {
+        if (player === undefined) {
             return response_(socketId, headerMap, stringToArrayBuffer("Player don't run!"), ['200 OK']);
         }
         if (headerMap.url === '/') {
