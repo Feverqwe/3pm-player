@@ -108,7 +108,7 @@ div.progress > a {
 .player > div.controls li.volume_controll > .volume {
     height: 5px;
     background-color: #111111;
-    margin-top: 10px;
+    margin-top: 8px;
     margin-left: 20px;
     -webkit-app-region: no-drag;
     cursor: pointer;
@@ -135,7 +135,7 @@ div.progress > a {
     height: 25px;
     width: 16px;
     background-image: url(../images/sound_high_w.png);
-    background-position: left 4px;
+    background-position: left 3px;
     background-repeat: no-repeat;
     cursor: pointer;
 }
