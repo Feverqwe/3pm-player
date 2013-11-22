@@ -485,20 +485,24 @@ var view = function() {
             if (tags === null) {
                 tags = {};
             }
+            var title = "";
+            var trackalbum = "";
             if ("title" in tags) {
-                dom_cache.trackname.text(tags.title);
+                title = tags.title;
             } else {
-                dom_cache.trackname.text(engine.get_filename());
+                title = engine.get_filename();
             }
             if ("album" in tags && "artist" in tags) {
-                dom_cache.trackalbum.text(tags.artist + ' - ' + tags.album);
+                trackalbum = tags.artist + ' - ' + tags.album;
             } else
             if ("artist" in tags) {
-                dom_cache.trackalbum.text(tags.artist);
+                trackalbum = tags.artist;
             } else
             if ("album" in tags) {
-                dom_cache.trackalbum.text(tags.album);
+                trackalbum = tags.album;
             }
+            dom_cache.trackname.text(title).parent().attr("title", title);
+            dom_cache.trackalbum.text(trackalbum).parent().attr("title", trackalbum);
             if ("picture" in tags) {
                 showImage(tags.picture);
             } else {
