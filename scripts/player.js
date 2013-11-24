@@ -371,26 +371,16 @@ var view = function() {
                     } else
                     if (event.keyCode === 39) {
                         event.preventDefault();
-                        var val = dom_cache.progress.slider("value");
-                        val = (val + 25) / 10;
-                        if (val > 100) {
-                            val = 100;
-                        }
                         clearTimeout(var_cache.progress_keydown_timer);
                         var_cache.progress_keydown_timer = setTimeout(function() {
-                            engine.position(val);
+                            engine.position("+10");
                         }, 25);
                     } else
                     if (event.keyCode === 37) {
                         event.preventDefault();
-                        var val = dom_cache.progress.slider("value");
-                        val = (val - 25) / 10;
-                        if (val < 0) {
-                            val = 0;
-                        }
                         clearTimeout(var_cache.progress_keydown_timer);
                         var_cache.progress_keydown_timer = setTimeout(function() {
-                            engine.position(val);
+                            engine.position("-10");
                         }, 25);
                     }
                 }
@@ -477,40 +467,22 @@ var view = function() {
                 }
             });
             dom_cache.volume.parent().get(0).onmousewheel = function(e) {
-                var val = dom_cache.volume.slider("value");
                 if (e.wheelDelta > 0) {
-                    val = val + 10;
-                    if (val > 100) {
-                        val = 100;
-                    }
-                    engine.volume(val);
+                    engine.volume("+10");
                 } else {
-                    val = val - 10;
-                    if (val < 0) {
-                        val = 0;
-                    }
-                    engine.volume(val);
+                    engine.volume("-10");
                 }
             };
             dom_cache.progress.get(0).onmousewheel = function(e) {
-                var val = dom_cache.progress.slider("value");
                 if (e.wheelDelta > 0) {
-                    val = (val + 25) / 10;
-                    if (val > 100) {
-                        val = 100;
-                    }
                     clearTimeout(var_cache.progress_timer);
                     var_cache.progress_timer = setTimeout(function() {
-                        engine.position(val);
+                        engine.position("+10");
                     }, 25);
                 } else {
-                    val = (val - 25) / 10;
-                    if (val < 0) {
-                        val = 0;
-                    }
                     clearTimeout(var_cache.progress_timer);
                     var_cache.progress_timer = setTimeout(function() {
-                        engine.position(val);
+                        engine.position("-10");
                     }, 25);
                 }
             };

@@ -418,6 +418,25 @@ var engine = function() {
             position: function(persent) {
                 if (isNaN(audio.duration))
                     return;
+                if (typeof (persent) === "string") {
+                    if (persent.substr(0, 1) === "+") {
+                        persent = parseFloat(persent.substr(1));
+                    } else {
+                        persent = -1 * parseFloat(persent.substr(1));
+                    }
+                    if (isNaN(persent)) {
+                        return;
+                    }
+                    var new_val = audio.currentTime + persent;
+                    if (new_val > audio.duration) {
+                        new_val = audio.duration;
+                    } else
+                    if (new_val < 0) {
+                        new_val = 0;
+                    }
+                    audio.currentTime = new_val;
+                    return;
+                }
                 audio.currentTime = audio.duration / 100 * persent;
             },
             mute: function() {
