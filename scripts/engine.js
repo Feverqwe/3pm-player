@@ -67,11 +67,17 @@ var engine = function() {
         /*
          * Изменяет размер обложки.
          */
+        var resize_enable = true;
         if (binary === undefined) {
             cb(undefined);
             return;
         }
         binary = "data:image/" + binary[1] + ";base64," + btoa(binary[0]);
+        if (!resize_enable) {
+            var id = add_cover(binary.length, binary);
+            cb(id);
+            return;
+        }
         var img = new Image();
         img.onerror = function() {
             cb(undefined);
@@ -178,11 +184,8 @@ var engine = function() {
             ID3.loadTags(file.name, function() {
                 var tags = ID3.getAllTags(file.name);
                 if ("picture" in tags) {
-                    var image = tags.picture;
-                    var binary = image.data.reduce(function(str, charIndex) {
-                        return str += String.fromCharCode(charIndex);
-                    }, '');
-                    tags.picture = null;
+                    var binary = tags.picture.data;
+                    tags.picture = undefined;
                     var index = binary.indexOf('JFIF');
                     var type = "jpeg";
                     var pos = 6;

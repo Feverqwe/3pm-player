@@ -1210,7 +1210,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
             "format": format.toString(),
             "type": type,
             "description": desc.toString(),
-            "data": data.getBytesAt(offset, (start + length) - offset)
+            "data": data.getStringAt(offset, (start + length) - offset)
         };
     };
 
