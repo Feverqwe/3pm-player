@@ -346,17 +346,17 @@ var view = function() {
                 } else
                 if (event.keyCode === 115 || event.keyCode === 83) {
                     event.preventDefault();
-                    dom_cache.engine.shuffle();
+                    engine.shuffle();
                 } else
                 if (event.keyCode === 114 || event.keyCode === 82) {
                     event.preventDefault();
-                    dom_cache.engine.loop();
+                    engine.loop();
                 } else
-                if (event.keyCode === 112) {
+                if (event.keyCode === 113) {
                     event.preventDefault();
                     engine.next();
                 } else
-                if (event.keyCode === 113) {
+                if (event.keyCode === 112) {
                     event.preventDefault();
                     engine.preview();
                 } else

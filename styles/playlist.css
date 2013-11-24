@@ -81,6 +81,17 @@ div.playlist > ul > li.selected {
     background-color: #39516F;
     color: #fff;
 }
+@-webkit-keyframes loading {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+div.playlist > ul > li.loading .cover {
+    -webkit-animation: loading 3s infinite linear;
+    background-image: url(../images/loading.png) !important;
+    -webkit-filter: invert(1);
+    background-size: 24px;
+    background-position: center;
+}
 div.playlist > ul > li .cover {
     height: 39px;
     width: 39px;

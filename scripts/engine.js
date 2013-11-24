@@ -477,6 +477,10 @@ var engine = function() {
                 });
                 $(audio).on('loadeddata', function(e) {
                     if (playlist[current_id].tags === undefined) {
+                        playlist[current_id].state = "loading";
+                        sendPlaylist(function(window) {
+                            window.playlist.updPlaylistItem(current_id, playlist[current_id]);
+                        });
                         read_tags(current_id, function(tags, id) {
                             var obj = {};
                             if ("title" in tags) {
@@ -492,6 +496,7 @@ var engine = function() {
                                 obj['picture'] = tags.picture;
                             }
                             playlist[id].tags = obj;
+                            playlist[id].state = "dune";
                             sendPlaylist(function(window) {
                                 window.playlist.updPlaylistItem(id, playlist[id]);
                             });
@@ -588,7 +593,7 @@ var engine = function() {
                 return;
             }
             reset_player();
-            playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: 0});
+            playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: 0, state: ""});
             sendPlaylist(function(window) {
                 window.playlist.setPlaylist(playlist);
                 window.playlist.setPlaylistName(playlist_name);

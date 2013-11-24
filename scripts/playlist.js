@@ -88,6 +88,11 @@ var playlist = function() {
          * Обновляет элемент в плэйлисте
          */
         var itm = $('li[data-id=' + id + ']');
+        if (item.state === "loading") {
+            itm.addClass("loading");
+        } else {
+            itm.removeClass("loading");
+        }
         item = item_read(item);
         add_image(item.pic);
         itm.children('.cover').attr('class', 'cover pic_' + item.pic);
@@ -138,7 +143,7 @@ var playlist = function() {
         } else {
             name = name.substr(0, name.length - 4);
         }
-        $('div.title').text(name).attr('title',name);
+        $('div.title').text(name).attr('title', name);
     };
     return {
         show: function() {
