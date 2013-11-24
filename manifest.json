@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "3pm-player",
-    "version": "0.5.37",
+    "version": "0.5.38",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "icon_16.png",
