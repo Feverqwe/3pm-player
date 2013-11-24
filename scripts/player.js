@@ -332,13 +332,67 @@ var view = function() {
                     engine.volume();
                 }
             });
-            $(window).keypress(function(event) {
+            $(document).keydown(function(event) {
                 if ('keyCode' in event === false) {
                     return;
                 }
                 if (event.keyCode === 32) {
                     event.preventDefault();
                     dom_cache.btnPlayPause.trigger('click');
+                } else
+                if (event.keyCode === 118 || event.keyCode === 86) {
+                    event.preventDefault();
+                    dom_cache.mute.trigger('click');
+                } else
+                if (event.keyCode === 115 || event.keyCode === 83) {
+                    event.preventDefault();
+                    dom_cache.engine.shuffle();
+                } else
+                if (event.keyCode === 114 || event.keyCode === 82) {
+                    event.preventDefault();
+                    dom_cache.engine.loop();
+                } else
+                if (event.keyCode === 112) {
+                    event.preventDefault();
+                    engine.next();
+                } else
+                if (event.keyCode === 113) {
+                    event.preventDefault();
+                    engine.preview();
+                } else
+                if (event.ctrlKey) {
+                    if (event.keyCode === 38) {
+                        event.preventDefault();
+                        engine.volume("+10");
+                    } else
+                    if (event.keyCode === 40) {
+                        event.preventDefault();
+                        engine.volume("-10");
+                    } else
+                    if (event.keyCode === 39) {
+                        event.preventDefault();
+                        var val = dom_cache.progress.slider("value");
+                        val = (val + 25) / 10;
+                        if (val > 100) {
+                            val = 100;
+                        }
+                        clearTimeout(var_cache.progress_keydown_timer);
+                        var_cache.progress_keydown_timer = setTimeout(function() {
+                            engine.position(val);
+                        }, 25);
+                    } else
+                    if (event.keyCode === 37) {
+                        event.preventDefault();
+                        var val = dom_cache.progress.slider("value");
+                        val = (val - 25) / 10;
+                        if (val < 0) {
+                            val = 0;
+                        }
+                        clearTimeout(var_cache.progress_keydown_timer);
+                        var_cache.progress_keydown_timer = setTimeout(function() {
+                            engine.position(val);
+                        }, 25);
+                    }
                 }
             });
             $('.click_for_open').on('click', function() {
