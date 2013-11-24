@@ -255,6 +255,13 @@ var engine = function() {
             get_filename: function() {
                 return playlist[current_id].file.name;
             },
+            playToggle: function() {
+                if (audio.paused) {
+                    player.play();
+                } else {
+                    player.pause();
+                }
+            },
             play: function() {
                 if (current_id === undefined || playlist[current_id] === undefined) {
                     return;
@@ -621,6 +628,7 @@ var engine = function() {
             player.open(0);
         },
         play: player.play,
+        playToggle: player.playToggle,
         open_id: player.open,
         pause: player.pause,
         next: player.next,

@@ -335,14 +335,14 @@ var view = function() {
             $(document).keydown(function(event) {
                 if ('keyCode' in event === false) {
                     return;
-                }
+                } 
                 if (event.keyCode === 32) {
                     event.preventDefault();
-                    dom_cache.btnPlayPause.trigger('click');
+                    engine.playToggle();
                 } else
                 if (event.keyCode === 118 || event.keyCode === 86) {
                     event.preventDefault();
-                    dom_cache.mute.trigger('click');
+                    engine.mute();
                 } else
                 if (event.keyCode === 115 || event.keyCode === 83) {
                     event.preventDefault();

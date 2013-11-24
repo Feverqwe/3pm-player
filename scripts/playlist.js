@@ -217,6 +217,79 @@ var playlist = function() {
                 selectPL(window.engine.getM3UPlaylists());
                 setTitle(window.engine.getPlaylistName());
             });
+            $(document).keydown(function(event) {
+                if ('keyCode' in event === false) {
+                    return;
+                }
+                if (event.keyCode === 32) {
+                    event.preventDefault();
+                    sendPlayer(function(window) {
+                        window.engine.playToggle();
+                    });
+                } else
+                if (event.keyCode === 118 || event.keyCode === 86) {
+                    event.preventDefault();
+                    sendPlayer(function(window) {
+                        window.engine.mute();
+                    });
+                } else
+                if (event.keyCode === 115 || event.keyCode === 83) {
+                    event.preventDefault();
+                    sendPlayer(function(window) {
+                        window.engine.shuffle();
+                    });
+                } else
+                if (event.keyCode === 114 || event.keyCode === 82) {
+                    event.preventDefault();
+                    sendPlayer(function(window) {
+                        window.engine.loop();
+                    });
+                } else
+                if (event.keyCode === 113) {
+                    event.preventDefault();
+                    sendPlayer(function(window) {
+                        window.engine.next();
+                    });
+                } else
+                if (event.keyCode === 112) {
+                    event.preventDefault();
+                    sendPlayer(function(window) {
+                        window.engine.preview();
+                    });
+                } else
+                if (event.ctrlKey) {
+                    if (event.keyCode === 38) {
+                        event.preventDefault();
+                        sendPlayer(function(window) {
+                            window.engine.volume("+10");
+                        });
+                    } else
+                    if (event.keyCode === 40) {
+                        event.preventDefault();
+                        sendPlayer(function(window) {
+                            window.engine.volume("-10");
+                        });
+                    } else
+                    if (event.keyCode === 39) {
+                        event.preventDefault();
+                        clearTimeout(var_cache.progress_keydown_timer);
+                        var_cache.progress_keydown_timer = setTimeout(function() {
+                            sendPlayer(function(window) {
+                                window.engine.position("+10");
+                            });
+                        }, 25);
+                    } else
+                    if (event.keyCode === 37) {
+                        event.preventDefault();
+                        clearTimeout(var_cache.progress_keydown_timer);
+                        var_cache.progress_keydown_timer = setTimeout(function() {
+                            sendPlayer(function(window) {
+                                window.engine.position("-10");
+                            });
+                        }, 25);
+                    }
+                }
+            });
             setInterval(function() {
                 save_pos();
                 chrome.runtime.getBackgroundPage(function(bg) {
