@@ -137,8 +137,6 @@ var playlist = function() {
          */
         if (name === undefined) {
             name = "Playlist";
-        } else {
-            name = name.substr(0, name.length - 4);
         }
         $('div.title').text(name).attr('title', name);
     };

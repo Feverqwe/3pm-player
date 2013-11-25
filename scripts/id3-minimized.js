@@ -544,7 +544,11 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
             var isID3v2 = null;
             var size = null;
             reader.onprogress = function(event) {
-                if (isID3v2 === false || event.target.result.length < 28) {
+                if (isID3v2 === false) {
+                    reader.onprogress = undefined;
+                    return;
+                }
+                if (event.target.result.length < 28) {
                     return;
                 }
                 if (isID3v2 === null) {
