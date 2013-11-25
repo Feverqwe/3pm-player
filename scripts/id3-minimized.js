@@ -554,7 +554,10 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                 if (isID3v2) {
                     if (size === null) {
                         data = new BinaryFile(event.target.result);
-                        size = ns.ID3v2.readSynchsafeInteger32At(6, data);
+                        size = parseInt(ns.ID3v2.readSynchsafeInteger32At(6, data));
+                        if (isNaN(size)) {
+                            size = null;
+                        }
                     }
                     if (event.loaded >= size) {
                         if (data === null) {
