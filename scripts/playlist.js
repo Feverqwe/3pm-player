@@ -113,12 +113,9 @@ var playlist = function() {
          * Создает список выбора плэйлиста
          */
         $('ul.list_select').remove();
-        var my_arr = JSON.parse(JSON.stringify(arr));
-        my_arr.sort();
         var content = '<ul class="list_select">';
-        my_arr.forEach(function(item) {
-            var name = item.substr(0, item.length - 4);
-            content += '<li title="' + name + '" data-name="' + item + '">' + name + '</li>';
+        arr.forEach(function(item) {
+            content += '<li title="' + item.name + '" data-id="' + item.id + '">' + item.name + '</li>';
         });
         content += '</ul>';
         $('body').append(content);
@@ -128,7 +125,7 @@ var playlist = function() {
          * Показывает скрываает кнопку отображения скписка плэйлстов.
          */
         if (playlist !== undefined) {
-            makeSelectList(playlist.files);
+            makeSelectList(playlist.list);
             $('.playlist_select').show();
         } else {
             $('.playlist_select').hide();
@@ -207,9 +204,9 @@ var playlist = function() {
                 $('ul.list_select').toggle();
             });
             $('body').on('click', 'ul.list_select li', function() {
-                var name = $(this).data('name');
+                var id = $(this).data('id');
                 sendPlayer(function(window) {
-                    window.view.select_playlist(name);
+                    window.view.select_playlist(id);
                 });
                 $(this).parent().hide();
             });

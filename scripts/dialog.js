@@ -42,16 +42,14 @@ var dialog = function() {
          */
         $('.playlist_chiser').show();
         var pl = $('.playlists');
-        var arr = JSON.parse(JSON.stringify(window.options.playlists));
-        arr.sort();
+        var arr = window.options.playlists;
         arr.forEach(function(item) {
-            var name = item.substr(0, item.length - 4);
-            pl.append('<li class="pl_file" data-name="' + item + '"><div class="gr_line"></div><span title="' + name + '">' + name + '</span></li>');
+            pl.append('<li class="pl_file" data-id="' + item.id + '"><div class="gr_line"></div><span title="' + item.name + '">' + item.name + '</span></li>');
         });
         $('body').on('click', 'li.pl_file', function() {
-            var name = $(this).data("name");
+            var id = $(this).data("id");
             sendPlayer(function(window) {
-                window.view.select_playlist(name);
+                window.view.select_playlist(id);
             });
             window.close();
         });

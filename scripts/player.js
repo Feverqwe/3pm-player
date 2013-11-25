@@ -186,22 +186,28 @@ var view = function() {
                 var m3u = undefined;
                 var fl = files.length;
                 for (var n = 0; n < fl; n++) {
-                    var ext = files[n].name.split('.').slice(-1)[0].toLowerCase();
+                    var filename = files[n].name;
+                    var ext = filename.split('.').slice(-1)[0].toLowerCase();
                     if (ext !== "m3u") {
                         continue;
                     }
+                    var sname = filename.substr(0, filename.length - ext.length);
                     if (m3u === undefined) {
-                        m3u = {entry: entry, files: [files[n].name], data: [files[n]]};
+                        m3u = {entry: entry, data: [files[n]], list: [{name: sname, id: 0}]};
                     } else {
-                        m3u.files.push(files[n].name);
                         m3u.data.push(files[n]);
+                        var id = m3u.list.length;
+                        m3u.list.push({name: sname, id: id});
                     }
                 }
                 engine.open(files);
                 if (m3u !== undefined) {
+                    m3u.list.sort(function(a, b) {
+                        return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+                    });
                     engine.setM3UPlaylists(m3u);
                     chrome.runtime.getBackgroundPage(function(bg) {
-                        bg.wm.showDialog({type: "m3u", h: 200, w: 350, playlists: m3u.files});
+                        bg.wm.showDialog({type: "m3u", h: 200, w: 350, playlists: m3u.list});
                     });
                 }
             });
@@ -335,7 +341,7 @@ var view = function() {
             $(document).keydown(function(event) {
                 if ('keyCode' in event === false) {
                     return;
-                } 
+                }
                 if (event.keyCode === 32) {
                     event.preventDefault();
                     engine.playToggle();
@@ -635,16 +641,18 @@ var view = function() {
                 engine.play();
             }
         },
-        select_playlist: function(name) {
+        select_playlist: function(id) {
             var filePlaylists = engine.getM3UPlaylists();
             if (filePlaylists === undefined) {
                 return;
             }
-            var ind = filePlaylists.files.indexOf(name);
-            if (ind === -1) {
-                return;
-            }
-            readPlaylist(filePlaylists.entry, filePlaylists.data[ind], function(files) {
+            var name = undefined;
+            filePlaylists.list.forEach(function(item) {
+                if (item.id === id) {
+                    name = item.name;
+                }
+            });
+            readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
                 engine.open(files, name);
             });
         }
