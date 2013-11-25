@@ -181,7 +181,19 @@ var engine = function() {
             if (file.size > 31457280) {
                 return;
             }
+            playlist[id].state = "loading";
+            sendPlaylist(function(window) {
+                window.playlist.updPlaylistItem(id, playlist[id]);
+            });
+            /*
+             var startDate = new Date().getTime();
+             */
             ID3.loadTags(file.name, function() {
+                /*
+                 var endDate = new Date().getTime();
+                 if (typeof console !== "undefined")
+                 console.log("Time: " + ((endDate - startDate) / 1000) + "s");
+                 */
                 var tags = ID3.getAllTags(file.name);
                 ID3.clearAll();
                 if ("picture" in tags) {
@@ -228,6 +240,18 @@ var engine = function() {
                 });
             }, {tags: ["artist", "title", "album", "picture"], dataReader: FileAPIReader(file)});
         };
+        var cache_track = function(item, cb) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var ab = event.target.result;
+                var file_blob = new Blob([ab], {type: item.file.type});
+                file_blob.name = item.file.name;
+                var url = window.URL.createObjectURL(file_blob);
+                playlist[item.id].blob = file_blob;
+                cb(url, item.id);
+            };
+            reader.readAsArrayBuffer(item.file);
+        };
         return {
             open: function(id) {
                 id = parseInt(id);
@@ -253,6 +277,14 @@ var engine = function() {
                             $(audio).attr('type', type);
                         }
                     }
+                    /*
+                     cache_track(playlist[id], function(url, id) {
+                     if (current_id === id) {
+                     audio.src = url; // window.URL.createObjectURL(playlist[id].file);
+                     } else {
+                     delete playlist[id].blob;
+                     }
+                     });*/
                     audio.src = window.URL.createObjectURL(playlist[id].file);
                 }
             },
@@ -507,10 +539,6 @@ var engine = function() {
                 });
                 $(audio).on('loadeddata', function(e) {
                     if (playlist[current_id].tags === undefined) {
-                        playlist[current_id].state = "loading";
-                        sendPlaylist(function(window) {
-                            window.playlist.updPlaylistItem(current_id, playlist[current_id]);
-                        });
                         read_tags(current_id, function(tags, id) {
                             var obj = {};
                             if ("title" in tags) {

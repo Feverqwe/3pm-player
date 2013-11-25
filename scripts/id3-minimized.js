@@ -539,10 +539,41 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
 
             reader.onload = function(event) {
                 var result = event.target.result;
+                if (cb) {
+                    return;
+                }
                 fncCallback(new BinaryFile(result));
             };
+            var isID3v2 = null;
+            var size = null;
+            var cb = false;
+            reader.onprogress = function(event) {
+                if (isID3v2 === false || event.target.result.length < 28) {
+                    return;
+                }
+                if (isID3v2 === null) {
+                    isID3v2 = (event.target.result.substr(0, 3) === "ID3");
+                }
+                var data = null;
+                if (isID3v2) {
+                    if (size === null) {
+                        data = new BinaryFile(event.target.result);
+                        size = ns.ID3v2.readSynchsafeInteger32At(6, data);
+                    }
+                    if (event.loaded >= size) {
+                        if (data === null) {
+                            data = new BinaryFile(event.target.result);
+                        }
+                        event.target.abort();
+                        isID3v2 = false;
+                        cb = true;
+                        fncCallback(data);
+                        return;
+                    }
+                }
+            };
             reader.readAsBinaryString(file);
-        }
+        };
     };
 })(this);
 /*
@@ -905,9 +936,9 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                 | ((size3 & 0x7f) << 7)
                 | ((size2 & 0x7f) << 14)
                 | ((size1 & 0x7f) << 21);
-
         return size;
     }
+    ID3v2.readSynchsafeInteger32At = readSynchsafeInteger32At;
 
     function readFrameFlags(data, offset)
     {
