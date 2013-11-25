@@ -191,7 +191,7 @@ var view = function() {
                     if (ext !== "m3u") {
                         continue;
                     }
-                    var sname = filename.substr(0, filename.length - ext.length);
+                    var sname = filename.substr(0, filename.length - 1 - ext.length);
                     if (m3u === undefined) {
                         m3u = {entry: entry, data: [files[n]], list: [{name: sname, id: 0}]};
                     } else {
