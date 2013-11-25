@@ -183,6 +183,7 @@ var engine = function() {
             }
             ID3.loadTags(file.name, function() {
                 var tags = ID3.getAllTags(file.name);
+                ID3.clearAll();
                 if ("picture" in tags) {
                     var binary = tags.picture.data;
                     tags.picture = undefined;
