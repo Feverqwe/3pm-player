@@ -536,46 +536,31 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
     ns["FileAPIReader"] = function(file) {
         return function(url, fncCallback, fncError) {
             var reader = new FileReader();
-
             reader.onload = function(event) {
                 var result = event.target.result;
                 fncCallback(new BinaryFile(result));
             };
-            var isID3v2 = null;
-            var size = null;
-            reader.onprogress = function(event) {
-                if (isID3v2 === false) {
-                    reader.onprogress = undefined;
-                    return;
-                }
-                if (event.target.result.length < 28) {
-                    return;
-                }
-                if (isID3v2 === null) {
-                    isID3v2 = (event.target.result.substr(0, 3) === "ID3");
-                }
-                var data = null;
-                if (isID3v2) {
-                    if (size === null) {
-                        data = new BinaryFile(event.target.result);
-                        size = parseInt(ns.ID3v2.readSynchsafeInteger32At(6, data));
-                        if (isNaN(size)) {
-                            size = null;
-                        }
+            var check_id3v2 = function(file, cb) {
+                var id3v2_reader = new FileReader();
+                id3v2_reader.onload = function(event) {
+                    var data = event.target.result;
+                    if (data.substr(0, 3) === "ID3") {
+                        data = new BinaryFile(data);
+                        var size = ns.ID3v2.readSynchsafeInteger32At(6, data);
+                        var tags_body = file.slice(0, size);
+                        cb(tags_body);
+                    } else
+                    if (data.substr(4, 7) === "ftypM4A") {
+                        cb(file);
+                    } else {
+                        cb(file.slice(file.size - 1 - 128, file.size));
                     }
-                    if (event.loaded >= size) {
-                        if (data === null) {
-                            data = new BinaryFile(event.target.result);
-                        }
-                        event.target.abort();
-                        isID3v2 = false;
-                        reader.onload = undefined;
-                        reader.onprogress = undefined;
-                        fncCallback(data);
-                    }
-                }
+                };
+                id3v2_reader.readAsBinaryString(file.slice(0, 28));
             };
-            reader.readAsBinaryString(file);
+            check_id3v2(file, function(result) {
+                reader.readAsBinaryString(result);
+            });
         };
     };
 })(this);
