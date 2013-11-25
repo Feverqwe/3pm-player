@@ -539,14 +539,10 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
 
             reader.onload = function(event) {
                 var result = event.target.result;
-                if (cb) {
-                    return;
-                }
                 fncCallback(new BinaryFile(result));
             };
             var isID3v2 = null;
             var size = null;
-            var cb = false;
             reader.onprogress = function(event) {
                 if (isID3v2 === false || event.target.result.length < 28) {
                     return;
@@ -566,9 +562,9 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                         }
                         event.target.abort();
                         isID3v2 = false;
-                        cb = true;
+                        reader.onload = undefined;
+                        reader.onprogress = undefined;
                         fncCallback(data);
-                        return;
                     }
                 }
             };
