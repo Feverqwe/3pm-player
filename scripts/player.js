@@ -274,7 +274,7 @@ var view = function() {
                 var entrys = event.originalEvent.dataTransfer.items;
                 if (files.length === 1) {
                     var entry = entrys[0].webkitGetAsEntry();
-                    if (entry.isDirectory) {
+                    if ("isDirectory" in entry && entry.isDirectory) {
                         readDirectory(entry);
                         return;
                     }
