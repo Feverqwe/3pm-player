@@ -238,7 +238,7 @@ var engine = function() {
                     }
                     rt_cb(tags, id);
                 });
-            }, {tags: ["artist", "title", "album", "picture"], dataReader: FileAPIReader(file)});
+            }, {tags: ["artist", "title", "album", "picture"], file: file/* , dataReader: FileAPIReader(file) */});
         };
         var cache_track = function(item, cb) {
             var reader = new FileReader();
