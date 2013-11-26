@@ -148,21 +148,26 @@ div.navigation li.loop {
     background-image: url(../images/loop_w.png);
     background-position-y: 7px;
 }
-div.playlist {
-    margin-right: 3px;
-}
+ul.list_select::-webkit-scrollbar,
 div.playlist::-webkit-scrollbar {
-    width: 6px;
+    height: 15px;
+    width: 15px;
 }
+ul.list_select::-webkit-scrollbar-button,
+div.playlist::-webkit-scrollbar-button {
+    height: 0;
+    width: 0;
+}
+ul.list_select::-webkit-scrollbar-thumb:vertical,
 div.playlist::-webkit-scrollbar-thumb:vertical {
-    margin: 5px;
+    background-clip: padding-box;
     background-color: #565A61;
-    -webkit-border-radius: 5px;
-}
-div.playlist::-webkit-scrollbar-button:start:decrement,
-div.playlist::-webkit-scrollbar-button:end:increment {
-    height: 0px;
-    display: block;
+    border: 5px solid transparent;
+    border-radius: 10px;
+    min-height: 20px;
+    min-width: 20px;
+    height: 5px;
+    width: 5px;
 }
 div.title {
     text-align: center;
@@ -175,7 +180,7 @@ div.title {
 ul.list_select {
     position: absolute;
     top: 20px;
-    right: 5px;
+    right: 0px;
     background-color: #252525;
     border: 1px solid #000;
     border-radius: 3px;
@@ -201,17 +206,4 @@ ul.list_select li:hover {
     background-color: #39516F;
     color: #fff;
     cursor: pointer;
-}
-ul.list_select::-webkit-scrollbar {
-    width: 6px;
-}
-ul.list_select::-webkit-scrollbar-thumb:vertical {
-    margin: 5px;
-    background-color: #565A61;
-    -webkit-border-radius: 5px;
-}
-ul.list_select::-webkit-scrollbar-button:start:decrement,
-ul.list_select::-webkit-scrollbar-button:end:increment {
-    height: 0px;
-    display: block;
 }

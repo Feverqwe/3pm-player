@@ -70,21 +70,23 @@ input {
     margin-top: 12px;
     font-size: 120%;
 }
-.playlist_chiser ul {
-    margin-right: 3px;
-}
 .playlist_chiser ul::-webkit-scrollbar {
-    width: 6px;
+    height: 15px;
+    width: 15px;
+}
+.playlist_chiser ul::-webkit-scrollbar-button {
+    height: 0;
+    width: 0;
 }
 .playlist_chiser ul::-webkit-scrollbar-thumb:vertical {
-    margin: 5px;
+    background-clip: padding-box;
     background-color: #565A61;
-    -webkit-border-radius: 5px;
-}
-.playlist_chiser ul::-webkit-scrollbar-button:start:decrement,
-.playlist_chiser ul::-webkit-scrollbar-button:end:increment {
-    height: 0px;
-    display: block;
+    border: 5px solid transparent;
+    border-radius: 10px;
+    min-height: 20px;
+    min-width: 20px;
+    height: 5px;
+    width: 5px;
 }
 .t_btn {
     background-size: 14px 14px;

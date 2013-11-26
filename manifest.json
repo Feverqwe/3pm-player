@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "3pm-player",
     "description": "Small mp3 player!",
-    "version": "0.5.50",
+    "version": "0.5.51",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "icon_16.png",
