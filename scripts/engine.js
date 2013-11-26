@@ -625,6 +625,10 @@ var engine = function() {
             }
             var my_playlist = [];
             for (var i = 0; i < files.length; i++) {
+                if ("url" in files[i]) {
+                    my_playlist.push({id: my_playlist.length, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
+                    continue;
+                }
                 if (getType(files[i]) === undefined) {
                     continue;
                 }
@@ -645,19 +649,6 @@ var engine = function() {
                 }
                 player.open(id);
             }
-        },
-        open_url: function(url) {
-            if (url.length === 0) {
-                return;
-            }
-            reset_player();
-            playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: 0});
-            sendPlaylist(function(window) {
-                window.playlist.setPlaylist(playlist);
-                window.playlist.setPlaylistName(playlist_name);
-            });
-            view.state("playlist_not_empty");
-            player.open(0);
         },
         play: player.play,
         playToggle: player.playToggle,

@@ -106,7 +106,7 @@ var playlist = function() {
         if (el.offset() === undefined) {
             return;
         }
-        dom_cache.playlist.scrollTop(el.offset().top + dom_cache.playlist.scrollTop() - 24);
+        dom_cache.playlist.scrollTop(el.offset().top + dom_cache.playlist.scrollTop() - (dom_cache.playlist.height() / 2));
     };
     var makeSelectList = function(arr) {
         /*

@@ -61,6 +61,10 @@ var view = function() {
         /*
          * Получает массив файлов - Entry из Entry дирректории.
          */
+        if ("isDirectory" in entry === false || entry.isDirectory === false) {
+            cb([]);
+            return;
+        }
         var dir = entry.createReader();
         dir.readEntries(function(a) {
             cb(a);
@@ -74,6 +78,10 @@ var view = function() {
         var len = entry.length;
         var wlen = entry.length;
         var n = 0;
+        if (len === 0) {
+            cb(files);
+            return;
+        }
         for (var i = 0; i < len; i++) {
             if (entry[i].isDirectory) {
                 wlen--;
@@ -96,6 +104,7 @@ var view = function() {
         var stream_got = 0;
         var file_list = [];
         var ordered_name_list = [];
+        var url_list = [];
         var file_getter = function(files) {
             stream_got++;
             file_list = file_list.concat(files);
@@ -113,6 +122,10 @@ var view = function() {
                 }
             }
             entry2files(arr, function(files) {
+                var url_list_len = url_list.length;
+                for (var i = 0; i < url_list_len; i++) {
+                    files.push({url: url_list[i]});
+                }
                 cb(files);
             });
         };
@@ -155,6 +168,11 @@ var view = function() {
                 if (line.length < 1 || line.substr(0, 1) === "#") {
                     continue;
                 }
+                var proto_url = line.substr(0, 7).toLowerCase();
+                if (proto_url === "http://" || proto_url === "https:/") {
+                    url_list.push(line);
+                    continue;
+                }
                 var path_arr = line.split('/');
                 var path_len = path_arr.length;
                 ordered_name_list.push(path_arr[path_len - 1]);
@@ -177,39 +195,42 @@ var view = function() {
         };
         r.readAsText(file);
     };
+    var readFileArray = function(files, entry) {
+        var m3u = undefined;
+        var fl = files.length;
+        for (var n = 0; n < fl; n++) {
+            var filename = files[n].name;
+            var ext = filename.split('.').slice(-1)[0].toLowerCase();
+            if (ext !== "m3u") {
+                continue;
+            }
+            var sname = filename.substr(0, filename.length - 1 - ext.length);
+            if (m3u === undefined) {
+                m3u = {entry: entry, data: [files[n]], list: [{name: sname, id: 0}]};
+            } else {
+                m3u.data.push(files[n]);
+                var id = m3u.list.length;
+                m3u.list.push({name: sname, id: id});
+            }
+        }
+        engine.open(files);
+        if (m3u !== undefined) {
+            m3u.list.sort(function(a, b) {
+                return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+            });
+            engine.setM3UPlaylists(m3u);
+            chrome.runtime.getBackgroundPage(function(bg) {
+                bg.wm.showDialog({type: "m3u", h: 200, w: 350, playlists: m3u.list});
+            });
+        }
+    };
     var readDirectory = function(entry) {
         /*
          * Читает открытую дирректорию, получает массив m3u файлов, и воспроизводит файлы внутри.
          */
         getEntryFromDir(entry, function(sub_entry) {
             entry2files(sub_entry, function(files) {
-                var m3u = undefined;
-                var fl = files.length;
-                for (var n = 0; n < fl; n++) {
-                    var filename = files[n].name;
-                    var ext = filename.split('.').slice(-1)[0].toLowerCase();
-                    if (ext !== "m3u") {
-                        continue;
-                    }
-                    var sname = filename.substr(0, filename.length - 1 - ext.length);
-                    if (m3u === undefined) {
-                        m3u = {entry: entry, data: [files[n]], list: [{name: sname, id: 0}]};
-                    } else {
-                        m3u.data.push(files[n]);
-                        var id = m3u.list.length;
-                        m3u.list.push({name: sname, id: id});
-                    }
-                }
-                engine.open(files);
-                if (m3u !== undefined) {
-                    m3u.list.sort(function(a, b) {
-                        return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
-                    });
-                    engine.setM3UPlaylists(m3u);
-                    chrome.runtime.getBackgroundPage(function(bg) {
-                        bg.wm.showDialog({type: "m3u", h: 200, w: 350, playlists: m3u.list});
-                    });
-                }
+                readFileArray(files, entry);
             });
         });
     };
@@ -279,7 +300,7 @@ var view = function() {
                         return;
                     }
                 }
-                engine.open(files);
+                readFileArray(files, entrys);
             });
             var drag_timeout = null;
             dom_cache.body.on('dragover', function(event) {
@@ -400,7 +421,7 @@ var view = function() {
                         return;
                     }
                     entry2files(entry, function(files) {
-                        engine.open(files);
+                        readFileArray(files, entry);
                     });
                 });
             });
@@ -483,12 +504,12 @@ var view = function() {
                 if (e.wheelDelta > 0) {
                     clearTimeout(var_cache.progress_timer);
                     var_cache.progress_timer = setTimeout(function() {
-                        engine.position("+10");
+                        engine.position("+5");
                     }, 25);
                 } else {
                     clearTimeout(var_cache.progress_timer);
                     var_cache.progress_timer = setTimeout(function() {
-                        engine.position("-10");
+                        engine.position("-5");
                     }, 25);
                 }
             };
