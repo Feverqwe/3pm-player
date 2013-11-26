@@ -628,7 +628,7 @@ var engine = function() {
                 if (getType(files[i]) === undefined) {
                     continue;
                 }
-                my_playlist.push({id: my_playlist.length, file: files[i], tags: undefined, duration: undefined});
+                my_playlist.push({id: my_playlist.length, file: files[i], tags: undefined, duration: undefined, state: ""});
             }
             if (my_playlist.length > 0) {
                 reset_player();
