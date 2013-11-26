@@ -628,7 +628,7 @@ var engine = function() {
                 if (getType(files[i]) === undefined) {
                     continue;
                 }
-                my_playlist.push({id: my_playlist.length, file: files[i], tags: undefined, duration: undefined, state: ""});
+                my_playlist.push({id: my_playlist.length, file: files[i], tags: undefined, duration: undefined});
             }
             if (my_playlist.length > 0) {
                 reset_player();
@@ -651,7 +651,7 @@ var engine = function() {
                 return;
             }
             reset_player();
-            playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: 0, state: ""});
+            playlist.push({id: playlist.length, file: {name: url, url: url}, tags: {}, duration: 0});
             sendPlaylist(function(window) {
                 window.playlist.setPlaylist(playlist);
                 window.playlist.setPlaylistName(playlist_name);
