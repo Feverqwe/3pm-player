@@ -12,6 +12,7 @@ body {
 }
 .player .track {
     margin-left: 83px;
+    overflow: hidden;
 }
 .player .track > div {
     word-wrap: break-word;
