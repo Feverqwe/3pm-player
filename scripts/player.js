@@ -198,6 +198,7 @@ var view = function() {
     var readFileArray = function(files, entry) {
         var m3u = undefined;
         var fl = files.length;
+        var pl_name = ("isDirectory" in entry && entry.isDirectory) ? entry.name : undefined;
         for (var n = 0; n < fl; n++) {
             var filename = files[n].name;
             var ext = filename.split('.').slice(-1)[0].toLowerCase();
@@ -213,7 +214,7 @@ var view = function() {
                 m3u.list.push({name: sname, id: id});
             }
         }
-        engine.open(files);
+        engine.open(files, pl_name);
         if (m3u !== undefined) {
             m3u.list.sort(function(a, b) {
                 return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
