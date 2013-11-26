@@ -28,18 +28,18 @@ var playlist = function() {
         if (item.tags === undefined) {
             title = item.file.name;
         } else {
-            if ("title" in tags) {
+            if ("title" in tags && tags.title.length > 0) {
                 title = item.tags.title;
             } else {
                 title = item.file.name;
             }
-            if ("album" in tags && "artist" in tags) {
+            if ("album" in tags && "artist" in tags && tags.album.length > 0 && tags.artist.length > 0) {
                 info = tags.artist + ' - ' + tags.album;
             } else
-            if ("artist" in tags) {
+            if ("artist" in tags && tags.artist.length > 0) {
                 info = tags.artist;
             } else
-            if ("album" in tags) {
+            if ("album" in tags && tags.album.length > 0) {
                 info = tags.album;
             }
             if ("picture" in tags) {

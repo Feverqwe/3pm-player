@@ -395,18 +395,18 @@ var engine = function() {
                     var title = '';
                     var album = '';
                     if (tags !== undefined) {
-                        if ("title" in tags) {
+                        if ("title" in tags && tags.title.length > 0) {
                             title = tags.title;
                         } else {
                             title = playlist[current_id].file.name;
                         }
-                        if ("album" in tags && "artist" in tags) {
+                        if ("album" in tags && "artist" in tags && tags.album.length > 0 && tags.artist.length > 0) {
                             album = tags.artist + ' - ' + tags.album;
                         } else
-                        if ("artist" in tags) {
+                        if ("artist" in tags && tags.artist.length > 0) {
                             album = tags.artist;
                         } else
-                        if ("album" in tags) {
+                        if ("album" in tags && tags.album.length > 0) {
                             album = tags.album;
                         }
                         if (album.length > 0) {

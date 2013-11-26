@@ -519,18 +519,18 @@ var view = function() {
             }
             var title = "";
             var trackalbum = "";
-            if ("title" in tags) {
+            if ("title" in tags && tags.title.length > 0) {
                 title = tags.title;
             } else {
                 title = engine.get_filename();
             }
-            if ("album" in tags && "artist" in tags) {
+            if ("album" in tags && "artist" in tags && tags.album.length > 0 && tags.artist.length > 0) {
                 trackalbum = tags.artist + ' - ' + tags.album;
             } else
-            if ("artist" in tags) {
+            if ("artist" in tags && tags.artist.length > 0) {
                 trackalbum = tags.artist;
             } else
-            if ("album" in tags) {
+            if ("album" in tags && tags.album.length > 0) {
                 trackalbum = tags.album;
             }
             dom_cache.trackname.text(title).parent().attr("title", title);
