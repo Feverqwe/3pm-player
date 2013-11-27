@@ -362,7 +362,7 @@ var engine = function() {
                 } else {
                     var pl = sorted_playlist || playlist;
                     var indx = getObjArrayPos(pl, "id", current_id) + 1;
-                    if (isNaN(pl[indx])) {
+                    if (pl[indx] !== undefined) {
                         id = pl[indx].id;
                     } else {
                         id = 0;
@@ -390,7 +390,7 @@ var engine = function() {
                 } else {
                     var pl = sorted_playlist || playlist;
                     var indx = getObjArrayPos(pl, "id", current_id) - 1;
-                    if (isNaN(pl[indx])) {
+                    if (pl[indx] !== undefined) {
                         id = pl[indx].id;
                     } else {
                         id = -1;

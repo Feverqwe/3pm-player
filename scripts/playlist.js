@@ -189,16 +189,16 @@ var playlist = function() {
                     if (type === 0) {
                         type = 1;
                         list_for_sort.sort(function(a, b) {
-                            a = a.file.name || a.file.url;
-                            b = b.file.name || b.file.url;
-                            return (a === b) ? 0 : (a > b) ? 1 : -1;
+                            var c = a.file.name || a.file.url;
+                            var d = b.file.name || b.file.url;
+                            return (c === d) ? 0 : (c > d) ? 1 : -1;
                         });
                     } else {
                         type = 0;
                         list_for_sort.sort(function(a, b) {
-                            a = a.id || a.id;
-                            b = b.id || b.id;
-                            return (a === b) ? 0 : (a > b) ? 1 : -1;
+                            var c = a.id;
+                            var d = b.id;
+                            return (c === d) ? 0 : (c > d) ? 1 : -1;
                         });
                     }
                     window.engine.setSortedList(list_for_sort, type);
