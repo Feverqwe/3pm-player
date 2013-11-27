@@ -23,7 +23,7 @@ var dialog = function() {
         $('.url_dialog input[name=open_btn]').on('click', function() {
             var text = $(this).parent().children('input[name=url]').get(0);
             sendPlayer(function(window) {
-                window.engine.open([{url: text.value}],"URL");
+                window.engine.open([{url: text.value}], "URL");
             });
             window.close();
         });
@@ -41,7 +41,7 @@ var dialog = function() {
          * Создает форму выбора m3u файла
          */
         $('.playlist_chiser').show();
-        var pl = $('.playlists');
+        var pl = $('.playlists').children("ul");
         var arr = window.options.playlists;
         arr.forEach(function(item) {
             pl.append('<li class="pl_file" data-id="' + item.id + '"><div class="gr_line"></div><span title="' + item.name + '">' + item.name + '</span></li>');
@@ -56,7 +56,6 @@ var dialog = function() {
     };
     return {
         run: function() {
-            $('body').height(window.options.h);
             $('.close').on('click', function() {
                 window.close();
             });

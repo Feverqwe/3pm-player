@@ -221,7 +221,7 @@ var view = function() {
             });
             engine.setM3UPlaylists(m3u);
             chrome.runtime.getBackgroundPage(function(bg) {
-                bg.wm.showDialog({type: "m3u", h: 200, w: 350, playlists: m3u.list});
+                bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: m3u.list});
             });
         }
     };
@@ -460,7 +460,7 @@ var view = function() {
                     } else
                     if (info.menuItemId === "2") {
                         chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "url", h: 76});
+                            bg.wm.showDialog({type: "url", h: 60});
                         });
                     } else
                     if (info.menuItemId === "3") {

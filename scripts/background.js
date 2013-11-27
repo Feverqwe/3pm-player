@@ -345,7 +345,7 @@ var wm = function() {
                     top: p_t
                 },
                 frame: "none",
-                resizable: false
+                resizable: options.r || false
             }, function(win) {
                 win.contentWindow.options = options;
                 windows.dialog = win;

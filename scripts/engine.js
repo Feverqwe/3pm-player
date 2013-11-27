@@ -271,7 +271,8 @@ var engine = function() {
         return {
             open: function(id) {
                 id = parseInt(id);
-                if (isNaN(id) || playlist[id] === undefined) {
+                var item = playlist[id];
+                if (item === undefined) {
                     return;
                 }
                 current_id = id;
@@ -279,13 +280,13 @@ var engine = function() {
                     window.playlist.selected(current_id);
                 });
                 var current_type = $(audio).attr('type');
-                if ('url' in playlist[id].file) {
+                if ('url' in item.file) {
                     if (current_type !== undefined) {
                         $(audio).removeAttr('type');
                     }
-                    audio.src = playlist[id].file.url;
+                    audio.src = item.file.url;
                 } else {
-                    var type = getType(playlist[id].file);
+                    var type = getType(item.file);
                     if (current_type !== type) {
                         if (type === undefined) {
                             $(audio).removeAttr('type');
@@ -294,14 +295,14 @@ var engine = function() {
                         }
                     }
                     /*
-                     cache_track(playlist[id], function(url, id) {
+                     cache_track(item, function(url, id) {
                      if (current_id === id) {
-                     audio.src = url; // window.URL.createObjectURL(playlist[id].file);
+                     audio.src = url; // window.URL.createObjectURL(item.file);
                      } else {
-                     delete playlist[id].blob;
+                     delete item.blob;
                      }
                      });*/
-                    audio.src = window.URL.createObjectURL(playlist[id].file);
+                    audio.src = window.URL.createObjectURL(item.file);
                 }
             },
             get_filename: function() {

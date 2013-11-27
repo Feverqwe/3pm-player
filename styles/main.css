@@ -1,11 +1,12 @@
+html {
+    height: 100%;
+}
 body {
     margin: 0;
     -webkit-app-region: drag;
     background: -webkit-linear-gradient(top, #565A61 0%,#212125 100%);
     color: #C9C9C9;
-}
-.player {
-    margin-bottom: -2px;
+    height: 100%;
 }
 .player .image, .player > .track {
     display: inline-block;

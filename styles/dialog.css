@@ -1,12 +1,16 @@
+html {
+    height: 100%;
+}
 body {
     margin: 0;
     -webkit-app-region: drag;
-    background: -webkit-linear-gradient(top, #565A61 0%,#212125 100%);
+    background: -webkit-linear-gradient(top, #565A61 0%,#212125 120px,#212125 100%);
     color: #C9C9C9;
+    height: 100%;
 }
 body > .dialog {
     display: none;
-    margin-top: 15px;
+    margin-top: 3px;
 }
 input {
     -webkit-app-region: no-drag;
@@ -24,13 +28,16 @@ input {
 .playlist_chiser {
     padding-left: 18px;
     padding-right: 15px;
+    height: 100%;
 }
-.playlist_chiser ul {
+.playlist_chiser div.playlists {
     -webkit-app-region: no-drag;
-    list-style-type: none;
-    height: 160px;
-    max-height: 160px;
+    height: calc(100% - 48px);
     overflow: auto;
+    margin-top: 2px;
+}
+.playlist_chiser div.playlists > ul {
+    list-style-type: none;
     padding: 0;
     margin: 0;
 }
@@ -70,15 +77,15 @@ input {
     margin-top: 12px;
     font-size: 120%;
 }
-.playlist_chiser ul::-webkit-scrollbar {
+.playlist_chiser > div.playlists::-webkit-scrollbar {
     height: 15px;
     width: 15px;
 }
-.playlist_chiser ul::-webkit-scrollbar-button {
+.playlist_chiser > div.playlists::-webkit-scrollbar-button {
     height: 0;
     width: 0;
 }
-.playlist_chiser ul::-webkit-scrollbar-thumb:vertical {
+.playlist_chiser > div.playlists::-webkit-scrollbar-thumb:vertical {
     background-clip: padding-box;
     background-color: #565A61;
     border: 5px solid transparent;
