@@ -2,6 +2,8 @@ var _debug = false;
 var engine = function() {
     var playlist = [];
     var playlist_name = undefined;
+    var sorted_playlist = undefined;
+    var sort_type = 0;
     var covers = [];
     var playedlist = [];
     var shuffle = false;
@@ -34,6 +36,10 @@ var engine = function() {
         playlist = [];
         //название плэйлиста
         playlist_name = undefined;
+        //сортированный лист
+        sorted_playlist = undefined;
+        //сбрасываем текущий тип сортировки
+        sort_type = 0;
         //кэш изображений альбомов
         covers = [];
         //список проигранных компазиций
@@ -166,12 +172,22 @@ var engine = function() {
         }
         return type;
     };
-    function getRandomInt(min, max) {
+    var getRandomInt = function(min, max) {
         /*
          * Получает случайное число
          */
         return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+    };
+    var getObjArrayPos = function(array, type, value) {
+        var index = undefined;
+        array.forEach(function(item, n) {
+            if (item[type] === value) {
+                index = n;
+                return false;
+            }
+        });
+        return index;
+    };
     var player = function() {
         var type_list = {};
         var audio = null;
@@ -344,6 +360,13 @@ var engine = function() {
                         n--;
                     }
                 } else {
+                    var pl = sorted_playlist || playlist;
+                    var indx = getObjArrayPos(pl, "id", current_id) + 1;
+                    if (isNaN(pl[indx])) {
+                        id = pl[indx].id;
+                    } else {
+                        id = 0;
+                    }
                     if (playlist.length <= id) {
                         id = 0;
                     }
@@ -365,6 +388,13 @@ var engine = function() {
                     current_played_pos = pos - 1;
                     id = playedlist[current_played_pos];
                 } else {
+                    var pl = sorted_playlist || playlist;
+                    var indx = getObjArrayPos(pl, "id", current_id) - 1;
+                    if (isNaN(pl[indx])) {
+                        id = pl[indx].id;
+                    } else {
+                        id = -1;
+                    }
                     if (id < 0) {
                         id = playlist.length - 1;
                     }
@@ -686,7 +716,7 @@ var engine = function() {
             });
         },
         getPlaylist: function() {
-            return playlist;
+            return sorted_playlist || playlist;
         },
         getPlaylistName: function() {
             return playlist_name;
@@ -713,7 +743,18 @@ var engine = function() {
         getM3UPlaylists: function() {
             return M3UPlaylists;
         },
-        sendPlaylist: sendPlaylist
+        sendPlaylist: sendPlaylist,
+        setSortedList: function(playlist, type) {
+            sorted_playlist = playlist;
+            sort_type = type;
+            sendPlaylist(function(window) {
+                window.playlist.setPlaylist(sorted_playlist);
+            });
+        },
+        getSortedList: function() {
+            var list = (sorted_playlist || playlist).slice();
+            return [sort_type, list];
+        }
     };
 }();
 $(function() {

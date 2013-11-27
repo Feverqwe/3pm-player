@@ -73,10 +73,10 @@ var playlist = function() {
          */
         dom_cache.playlist_ul.empty();
         var n = 0;
-        items.forEach(function(item) {
-            item = item_read(item);
+        items.forEach(function(obj) {
+            var item = item_read(obj);
             add_image(item.pic);
-            dom_cache.playlist_ul.append('<li data-id="' + n + '"><div class="gr_line"></div><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name" title="' + item.title + '">' + item.title + '</span><span class="info" title="' + item.info + '">' + item.info + '</span></li>');
+            dom_cache.playlist_ul.append('<li data-id="' + obj.id + '"><div class="gr_line"></div><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name" title="' + item.title + '">' + item.title + '</span><span class="info" title="' + item.info + '">' + item.info + '</span></li>');
             n++;
         });
         sendPlayer(function(window) {
@@ -146,7 +146,8 @@ var playlist = function() {
                 playlist: $('div.playlist'),
                 playlist_ul: $('div.playlist ul'),
                 shuffle: $('.shuffle.btn'),
-                loop: $('.loop.btn')
+                loop: $('.loop.btn'),
+                order: $('.sort.btn')
             };
             $('.close').on('click', function() {
                 save_pos();
@@ -179,6 +180,29 @@ var playlist = function() {
             });
             sendPlayer(function(window) {
                 window.engine.loop(null);
+            });
+            dom_cache.order.on('click', function() {
+                sendPlayer(function(window) {
+                    var type = window.engine.getSortedList();
+                    var list_for_sort = type[1];
+                    var type = type[0];
+                    if (type === 0) {
+                        type = 1;
+                        list_for_sort.sort(function(a, b) {
+                            a = a.file.name || a.file.url;
+                            b = b.file.name || b.file.url;
+                            return (a === b) ? 0 : (a > b) ? 1 : -1;
+                        });
+                    } else {
+                        type = 0;
+                        list_for_sort.sort(function(a, b) {
+                            a = a.id || a.id;
+                            b = b.id || b.id;
+                            return (a === b) ? 0 : (a > b) ? 1 : -1;
+                        });
+                    }
+                    window.engine.setSortedList(list_for_sort, type);
+                });
             });
             var_cache['resize_timer'] = null;
             window.onresize = function() {
