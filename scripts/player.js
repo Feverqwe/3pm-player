@@ -576,6 +576,9 @@ var view = function() {
         },
         setVolume: function(pos) {
             if (engine.getMute()) {
+                if (var_cache['volume_image'] === -1) {
+                    return;
+                }
                 dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_mute_w.png)');
                 var_cache['volume_image'] = -1;
                 return;
