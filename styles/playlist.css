@@ -188,7 +188,7 @@ div.title {
 }
 ul.list_select {
     position: absolute;
-    top: 20px;
+    top: 19px;
     right: 0px;
     background-color: #252525;
     border: 1px solid #000;
@@ -201,7 +201,7 @@ ul.list_select {
     display: none;
     overflow: auto;
     max-width: 200px;
-    max-height: calc(100% - 53px);
+    max-height: calc(100% - 52px);
     color: #fff;
 }
 ul.list_select li {
