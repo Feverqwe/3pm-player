@@ -726,9 +726,10 @@ var engine = function() {
             return JSON.stringify(player.status());
         },
         APIplaylist: function() {
+            var pl = sorted_playlist || playlist;
             var list = [];
-            for (var i = 0; i < playlist.length; i++) {
-                var item = playlist[i];
+            for (var i = 0; i < pl.length; i++) {
+                var item = pl[i];
                 list.push({id: item.id, title: item.file.name});
             }
             var data = window.btoa(unescape(encodeURIComponent(JSON.stringify({'playlist': list}))));
