@@ -213,6 +213,9 @@ ul.pl_list_select > li {
     border-bottom: 1px solid #585858;
     color: #C9C9C9;
 }
+ul.pl_list_select > li:last-child {
+    border-bottom: 0;
+}
 ul.pl_list_select > li:hover {
     background-color: #39516F;
     color: #fff;
