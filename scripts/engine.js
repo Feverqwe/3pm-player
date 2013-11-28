@@ -746,9 +746,12 @@ var engine = function() {
             return M3UPlaylists;
         },
         sendPlaylist: sendPlaylist,
-        setSortedList: function(playlist, type) {
+        setSortedList: function(playlist, type, hide) {
             sorted_playlist = playlist;
             sort_type = type;
+            if (hide) {
+                return;
+            }
             sendPlaylist(function(window) {
                 window.playlist.setPlaylist(sorted_playlist);
             });

@@ -76,7 +76,7 @@ var playlist = function() {
         items.forEach(function(obj) {
             var item = item_read(obj);
             add_image(item.pic);
-            dom_cache.playlist_ul.append('<li data-id="' + obj.id + '"><div class="gr_line"></div><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name" title="' + item.title + '">' + item.title + '</span><span class="info" title="' + item.info + '">' + item.info + '</span></li>');
+            dom_cache.playlist_ul.append('<li data-id="' + obj.id + '"><div class="gr_line"></div><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name" title="' + item.title + '">' + item.title + '</span><span class="info" title="' + item.info + '">' + item.info + '</span><div class="move" title="Move item"></div></li>');
             n++;
         });
         sendPlayer(function(window) {
@@ -168,6 +168,27 @@ var playlist = function() {
                 sendPlayer(function(window) {
                     window.engine.open_id(id);
                 });
+            });
+            dom_cache.playlist_ul.sortable({handle: ".move", axis: "y", stop: function() {
+                    sendPlayer(function(window) {
+                        var type = window.engine.getSortedList();
+                        var old_sort_list = type[1];
+                        var type = type[0];
+                        type = -1;
+                        var arr = $.makeArray(dom_cache.playlist_ul.children('li'));
+                        var new_arr = [];
+                        arr.forEach(function(item) {
+                            var id = parseInt($(item).attr('data-id'));
+                            old_sort_list.forEach(function(old_item) {
+                                if (old_item.id === id) {
+                                    new_arr.push(old_item);
+                                    return 0;
+                                }
+                            });
+                        });
+                        window.engine.setSortedList(new_arr, type, 1);
+                    });
+                }
             });
             dom_cache.shuffle.on('click', function() {
                 sendPlayer(function(window) {

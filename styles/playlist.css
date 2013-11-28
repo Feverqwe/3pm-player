@@ -70,6 +70,23 @@ div.playlist > ul > li {
     padding: 3px;
     border-radius: 3px;
 }
+div.playlist > ul > li .move {
+    display: none;
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 14px;
+    right: 10px;
+    cursor: n-resize;
+    background-image: url(../images/moveble.png);
+    opacity: 0.5;
+}
+div.playlist > ul > li:hover .move {
+    display: block;
+}
+div.playlist > ul > li .move:hover {
+    opacity: 1;
+}
 div.playlist > ul > li > .gr_line {
     background: -webkit-linear-gradient(left, transparent 0%, rgba(109, 109, 109, 1) 50%, transparent 100%);
     height: 1px;
