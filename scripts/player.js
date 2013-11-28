@@ -214,7 +214,7 @@ var view = function() {
                 m3u.list.push({name: sname, id: id});
             }
         }
-        engine.open(files, pl_name);
+        engine.open(files, {name: pl_name});
         if (m3u !== undefined) {
             m3u.list.sort(function(a, b) {
                 return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
@@ -678,7 +678,7 @@ var view = function() {
                 }
             });
             readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
-                engine.open(files, name);
+                engine.open(files, {name: name, id: id});
             });
         }
     };

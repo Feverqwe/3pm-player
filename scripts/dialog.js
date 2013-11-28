@@ -23,7 +23,7 @@ var dialog = function() {
         $('.url_dialog input[name=open_btn]').on('click', function() {
             var text = $(this).parent().children('input[name=url]').get(0);
             sendPlayer(function(window) {
-                window.engine.open([{url: text.value}], "URL");
+                window.engine.open([{url: text.value}], {name: "URL"});
             });
             window.close();
         });

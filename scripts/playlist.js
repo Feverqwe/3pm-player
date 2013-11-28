@@ -87,7 +87,7 @@ var playlist = function() {
         /*
          * Обновляет элемент в плэйлисте
          */
-        var itm = $('li[data-id=' + id + ']');
+        var itm = dom_cache.playlist_ul.children('li[data-id=' + id + ']');
         if (item.state === "loading") {
             itm.addClass("loading");
         } else {
@@ -112,13 +112,11 @@ var playlist = function() {
         /*
          * Создает список выбора плэйлиста
          */
-        $('ul.list_select').remove();
-        var content = '<ul class="list_select">';
+        var content = '';
         arr.forEach(function(item) {
             content += '<li title="' + item.name + '" data-id="' + item.id + '">' + item.name + '</li>';
         });
-        content += '</ul>';
-        $('body').append(content);
+        dom_cache.pl_list.html(content);
     };
     var selectPL = function(playlist) {
         /*
@@ -131,14 +129,18 @@ var playlist = function() {
             $('.playlist_select').hide();
         }
     };
-    var setTitle = function(name) {
+    var setInfo = function(info) {
         /*
          * Выставляет заголовок плэйлистуы
          */
-        if (name === undefined) {
-            name = "Playlist";
+        if (info === undefined) {
+            info = {name: "Playlist"};
         }
-        $('div.title').text(name).attr('title', name);
+        dom_cache.title.text(info.name).attr('title', info.name);
+        dom_cache.pl_list.children('li.selected').removeClass("selected");
+        if ("id" in info) {
+            dom_cache.pl_list.children('li[data-id=' + info.id + ']').addClass("selected");
+        }
     };
     return {
         show: function() {
@@ -147,7 +149,9 @@ var playlist = function() {
                 playlist_ul: $('div.playlist ul'),
                 shuffle: $('.shuffle.btn'),
                 loop: $('.loop.btn'),
-                order: $('.sort.btn')
+                order: $('.sort.btn'),
+                pl_list: $('.pl_list_select'),
+                title: $('body').children('div.title')
             };
             $('.close').on('click', function() {
                 save_pos();
@@ -222,9 +226,9 @@ var playlist = function() {
                 }
             };
             $('div.playlist_select').on('click', function() {
-                $('ul.list_select').toggle();
+                dom_cache.pl_list.toggle();
             });
-            $('body').on('click', 'ul.list_select li', function() {
+            dom_cache.pl_list.on('click', 'li', function() {
                 var id = $(this).data('id');
                 sendPlayer(function(window) {
                     window.view.select_playlist(id);
@@ -233,7 +237,7 @@ var playlist = function() {
             });
             sendPlayer(function(window) {
                 selectPL(window.engine.getM3UPlaylists());
-                setTitle(window.engine.getPlaylistName());
+                setInfo(window.engine.getPlaylistInfo());
             });
             $(document).keydown(function(event) {
                 if ('keyCode' in event === false) {
@@ -318,13 +322,13 @@ var playlist = function() {
         setPlaylist: function(items) {
             write_playlist(items);
         },
-        setPlaylistName: setTitle,
+        setPlaylistInfo: setInfo,
         updPlaylistItem: function(id, item) {
             update_playlist_item(id, item);
         },
         selected: function(id) {
-            $('li.selected').removeClass('selected');
-            var el = $('li[data-id=' + id + ']').addClass('selected');
+            dom_cache.playlist_ul.children('li.selected').removeClass('selected');
+            var el = dom_cache.playlist_ul.children('li[data-id=' + id + ']').addClass('selected');
             scrool_to(el);
         },
         setShuffle: function(status) {
@@ -344,7 +348,7 @@ var playlist = function() {
         empty: function() {
             $('style.cover').remove();
             dom_cache.playlist_ul.empty();
-            setTitle();
+            setInfo();
         },
         minimize: function() {
             $('.mini').trigger('click');

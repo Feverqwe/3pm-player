@@ -1,7 +1,7 @@
 var _debug = false;
 var engine = function() {
     var playlist = [];
-    var playlist_name = undefined;
+    var playlist_info = undefined;
     var sorted_playlist = undefined;
     var sort_type = 0;
     var covers = [];
@@ -35,7 +35,7 @@ var engine = function() {
         //массив плэйлиста
         playlist = [];
         //название плэйлиста
-        playlist_name = undefined;
+        playlist_info = undefined;
         //сортированный лист
         sorted_playlist = undefined;
         //сбрасываем текущий тип сортировки
@@ -650,7 +650,7 @@ var engine = function() {
             player.init();
         },
         get_filename: player.get_filename,
-        open: function(files, name) {
+        open: function(files, info) {
             if (files.length === 0) {
                 return;
             }
@@ -668,10 +668,10 @@ var engine = function() {
             if (my_playlist.length > 0) {
                 reset_player();
                 playlist = my_playlist;
-                playlist_name = name;
+                playlist_info = info;
                 sendPlaylist(function(window) {
                     window.playlist.setPlaylist(playlist);
-                    window.playlist.setPlaylistName(playlist_name);
+                    window.playlist.setPlaylistInfo(playlist_info);
                 });
                 view.state("playlist_not_empty");
                 var id = 0;
@@ -719,8 +719,8 @@ var engine = function() {
         getPlaylist: function() {
             return sorted_playlist || playlist;
         },
-        getPlaylistName: function() {
-            return playlist_name;
+        getPlaylistInfo: function() {
+            return playlist_info;
         },
         getCurrent: player.getCurrent,
         APIstatus: function() {

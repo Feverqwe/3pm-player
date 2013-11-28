@@ -156,17 +156,17 @@ div.navigation li.sort {
     background-image: url(../images/sort_w.png);
     background-position-y: 5px;
 }
-ul.list_select::-webkit-scrollbar,
+ul.pl_list_select::-webkit-scrollbar,
 div.playlist::-webkit-scrollbar {
     height: 15px;
     width: 15px;
 }
-ul.list_select::-webkit-scrollbar-button,
+ul.pl_list_select::-webkit-scrollbar-button,
 div.playlist::-webkit-scrollbar-button {
     height: 0;
     width: 0;
 }
-ul.list_select::-webkit-scrollbar-thumb:vertical,
+ul.pl_list_select::-webkit-scrollbar-thumb:vertical,
 div.playlist::-webkit-scrollbar-thumb:vertical {
     background-clip: padding-box;
     background-color: #565A61;
@@ -185,8 +185,9 @@ div.title {
     margin-left: 50px;
     margin-right: 50px;
     overflow: hidden;
+    color: #fff;
 }
-ul.list_select {
+ul.pl_list_select {
     position: absolute;
     top: 19px;
     right: 0px;
@@ -204,15 +205,21 @@ ul.list_select {
     max-height: calc(100% - 52px);
     color: #fff;
 }
-ul.list_select li {
+ul.pl_list_select > li {
     position: relative;
     padding: 3px;
     margin-top: 1px;
     margin-bottom: 1px;
-    border-radius: 3px;
+    border-bottom: 1px solid #585858;
+    color: #C9C9C9;
 }
-ul.list_select li:hover {
+ul.pl_list_select > li:hover {
     background-color: #39516F;
+    color: #fff;
+    cursor: pointer;
+}
+ul.pl_list_select > li.selected {
+    background-color: #000000;
     color: #fff;
     cursor: pointer;
 }
