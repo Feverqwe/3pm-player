@@ -624,9 +624,11 @@ var engine = function() {
                         if (playedlist.length !== playlist.length || loop) {
                             player.next();
                         }
-                    } else
-                    if (current_id !== playlist.length - 1 || loop) {
-                        player.next();
+                    } else {
+                        var pl = sorted_playlist || playlist;
+                        if (loop || current_id !== pl[pl.length - 1].id) {
+                            player.next();
+                        }
                     }
                     view.state("ended");
                 });
