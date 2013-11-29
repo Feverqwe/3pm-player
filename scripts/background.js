@@ -324,6 +324,20 @@ var wm = function() {
             create_window(lt[0], lt[1], wh[0], wh[1]);
         });
     };
+    var create_viz_window = function() {
+        var create_window = function(p_l, p_t, pl_w, pl_h) {
+            chrome.app.window.create('viz.html', {
+                bounds: {
+                    width: pl_w || 335,
+                    height: pl_h || 400,
+                    left: p_l,
+                    top: p_t
+                },
+                frame: "none"
+            });
+        };
+        create_window(undefined, undefined, 0, 0);
+    };
     var create_dialog_window = function(options) {
         if ("dialog" in windows) {
             if (windows.dialog.contentWindow.window === null) {
@@ -385,6 +399,7 @@ var wm = function() {
                 }
                 windows.player.focus();
             }
+            //create_viz_window();
         },
         toggle_playlist: function() {
             if (check() && "playlist" in windows) {
