@@ -407,23 +407,36 @@ var BufferedBinaryFileReader = function(file, fncCallback, fncError) {
         var downloadedBytesCount = 0;
         var binaryFile = new BinaryFile("", 0, iLength);
         var dataFile = new Uint8Array(iLength);
+        var gotDataRange = [];
+        var inRange = function(value) {
+            var ex = 0;
+            gotDataRange.forEach(function(item) {
+                if (value >= item[0] && value < item[1]) {
+                    ex = 1;
+                    return 0;
+                }
+            });
+            return ex;
+        };
 
         /**
          * @param {?function()} callback If a function is passed then this function will be asynchronous and the callback invoked when the blocks have been loaded, otherwise it blocks script execution until the request is completed.
          */
         var waitForBlocks = function(range, callback) {
-            while (dataFile[range[0]] !== 0) {
+            while (inRange(range[0]) !== 0) {
                 range[0]++;
                 if (range[0] > range[1])
                     return callback ? callback() : undefined;
             }
-            while (dataFile[range[1]] !== 0) {
+            while (inRange(range[1]) !== 0) {
                 range[1]--;
                 if (range[0] > range[1])
                     return callback ? callback() : undefined;
             }
             var reader = new FileReader();
             reader.onload = function(event) {
+                //console.log("Got range:", range);
+                gotDataRange.push(range);
                 var bytes = new Uint8Array(event.target.result);
                 var len = bytes.byteLength;
                 var t = [];
@@ -453,11 +466,9 @@ var BufferedBinaryFileReader = function(file, fncCallback, fncError) {
          */
         this.getByteAt = function(offset) {
             var data = dataFile[offset];
-            /*
-             if (data === 0) {
-             console.log("Empty data:", offset);
-             }
-             */
+            /*if (inRange(offset) === 0) {
+                console.log("Data don't loaded:", offset, dataFile[offset]);
+            }*/
             return data;
         };
 
@@ -681,7 +692,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
 
     var _files = {};
     // location of the format identifier
-    var _formatIDRange = [0, 7];
+    var _formatIDRange = [0, 11];
 
     /**
      * Finds out the tag format of this data and returns the appropriate
@@ -749,24 +760,24 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         });
     };
     /*
-    ID3.loadTags = function(url, cb, options) {
-        options = options || {};
-        var dataReader = (options["file"]) ? BufferedBinaryFileReader : (options["dataReader"] || BufferedBinaryAjax);
-
-        dataReader(options["file"] || url, function(data) {
-            // preload the format identifier
-            data.loadRange(_formatIDRange, function() {
-                var reader = getTagReader(data);
-                reader.loadData(data, function() {
-                    readTags(reader, data, url, options["tags"]);
-                    if (cb) {
-                        cb();
-                    }
-                });
-            });
-        });
-    };
-    */
+     ID3.loadTags = function(url, cb, options) {
+     options = options || {};
+     var dataReader = (options["file"]) ? BufferedBinaryFileReader : (options["dataReader"] || BufferedBinaryAjax);
+     
+     dataReader(options["file"] || url, function(data) {
+     // preload the format identifier
+     data.loadRange(_formatIDRange, function() {
+     var reader = getTagReader(data);
+     reader.loadData(data, function() {
+     readTags(reader, data, url, options["tags"]);
+     if (cb) {
+     cb();
+     }
+     });
+     });
+     });
+     };
+     */
     ID3.getAllTags = function(url) {
         if (!_files[url])
             return null;
@@ -1504,7 +1515,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
 
     ID4.loadData = function(data, callback) {
         // load the header of the first block
-        data.loadRange([0, 7], function() {
+        data.loadRange([0, 9], function() {
             loadAtom(data, 0, data.getLength(), callback);
         });
     };
@@ -1518,7 +1529,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         // When reading the current block we always read 8 more bytes in order
         // to also read the header of the next block.
         var atomSize = data.getLongAt(offset, true);
-        if (atomSize == 0)
+        if (isNaN(atomSize) || atomSize === 0)
             return callback();
         var atomName = data.getStringAt(offset + 4, 4);
 
@@ -1553,7 +1564,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         while (seek < offset + length)
         {
             var atomSize = data.getLongAt(seek, true);
-            if (atomSize == 0)
+            if (isNaN(atomSize) || atomSize == 0)
                 return;
             var atomName = data.getStringAt(seek + 4, 4);
             // Container atoms
@@ -1596,7 +1607,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                         case 'png':
                             atomData = {
                                 format: "image/" + type,
-                                data: data.getBytesAt(dataStart, dataEnd)
+                                data: data.getStringAt(dataStart, dataEnd)
                             };
                             break;
                     }
