@@ -402,80 +402,41 @@ var BufferedBinaryFileReader = function(file, fncCallback, fncError) {
      * @constructor
      * @augments BinaryFile
      */
-    function BufferedBinaryFile(file, iLength, blockSize, blockRadius) {
+    var BufferedBinaryFile = function(file, iLength, blockSize, blockRadius) {
         var undefined;
         var downloadedBytesCount = 0;
         var binaryFile = new BinaryFile("", 0, iLength);
-        var blocks = [];
-
-        blockSize = blockSize || 1024 * 2;
-        blockRadius = (typeof blockRadius === "undefined") ? 0 : blockRadius;
-        blockTotal = ~~((iLength - 1) / blockSize) + 1;
-
-        function getBlockRangeForByteRange(range) {
-            var blockStart = ~~(range[0] / blockSize) - blockRadius;
-            var blockEnd = ~~(range[1] / blockSize) + 1 + blockRadius;
-
-            if (blockStart < 0)
-                blockStart = 0;
-            if (blockEnd >= blockTotal)
-                blockEnd = blockTotal - 1;
-
-            return [blockStart, blockEnd];
-        }
-
-        // TODO: wondering if a "recently used block" could help things around
-        //       here.
-        function getBlockAtOffset(offset) {
-            var blockRange = getBlockRangeForByteRange([offset, offset]);
-            waitForBlocks(blockRange);
-            return blocks[~~(offset / blockSize)];
-        }
+        var dataFile = new Uint8Array(iLength);
 
         /**
          * @param {?function()} callback If a function is passed then this function will be asynchronous and the callback invoked when the blocks have been loaded, otherwise it blocks script execution until the request is completed.
          */
-        function waitForBlocks(blockRange, callback) {
-            // Filter out already downloaded blocks or return if found out that
-            // the entire block range has already been downloaded.
-            while (blocks[blockRange[0]]) {
-                blockRange[0]++;
-                if (blockRange[0] > blockRange[1])
+        var waitForBlocks = function(range, callback) {
+            while (dataFile[range[0]] !== 0) {
+                range[0]++;
+                if (range[0] > range[1])
                     return callback ? callback() : undefined;
             }
-            while (blocks[blockRange[1]]) {
-                blockRange[1]--;
-                if (blockRange[0] > blockRange[1])
+            while (dataFile[range[1]] !== 0) {
+                range[1]--;
+                if (range[0] > range[1])
                     return callback ? callback() : undefined;
             }
-            var range = [blockRange[0] * blockSize, (blockRange[1] + 1) * blockSize - 1];
-            //console.log("Getting: " + range[0] + " to " +  range[1]);
-
             var reader = new FileReader();
             reader.onload = function(event) {
-
-                var size = event.loaded;
-                // Range header not supported
-                if (size == iLength) {
-                    blockRange[0] = 0;
-                    blockRange[1] = event.total - 1;
-                    range[0] = 0;
-                    range[1] = iLength - 1;
+                var bytes = new Uint8Array(event.target.result);
+                var len = bytes.byteLength;
+                var t = [];
+                for (var i = 0; i < len; i++) {
+                    t.push(bytes[i]);
                 }
-                var block = {
-                    data: event.target.result,
-                    offset: range[0]
-                };
-
-                for (var i = blockRange[0]; i <= blockRange[1]; i++) {
-                    blocks[i] = block;
-                }
+                dataFile.set(t, range[0]);
                 downloadedBytesCount += range[1] - range[0] + 1;
                 if (callback)
                     callback();
             };
-            reader.readAsBinaryString(file.slice(range[0], range[1]));
-        }
+            reader.readAsArrayBuffer(file.slice(range[0], range[1]));
+        };
 
         // Mixin all BinaryFile's methods.
         // Not using prototype linking since the constructor needs to know
@@ -486,16 +447,18 @@ var BufferedBinaryFileReader = function(file, fncCallback, fncError) {
                 this[key] = binaryFile[key];
             }
         }
+
         /** 
          * @override
          */
-        this.getByteAt = function(iOffset) {
-            var block = getBlockAtOffset(iOffset);
-            if (typeof block.data == "string") {
-                return block.data.charCodeAt(iOffset - block.offset) & 0xFF;
-            } else if (typeof block.data == "unknown") {
-                return IEBinary_getByteAt(block.data, iOffset - block.offset);
-            }
+        this.getByteAt = function(offset) {
+            var data = dataFile[offset];
+            /*
+             if (data === 0) {
+             console.log("Empty data:", offset);
+             }
+             */
+            return data;
         };
 
         /**
@@ -514,17 +477,10 @@ var BufferedBinaryFileReader = function(file, fncCallback, fncError) {
          * @param {?function()} callback The function to invoke when the blocks have been downloaded, this makes this call asynchronous.
          */
         this.loadRange = function(range, callback) {
-            var blockRange = getBlockRangeForByteRange(range);
-            waitForBlocks(blockRange, callback);
+            waitForBlocks(range, callback);
         };
-    }
-
-    function init() {
-
-        fncCallback(new BufferedBinaryFile(file, file.size));
-    }
-
-    init();
+    };
+    fncCallback(new BufferedBinaryFile(file, file.size));
 };
 
 /**
@@ -761,6 +717,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
      * @param {function()} cb The callback function to be invoked when all tags have been read.
      * @param {{tags: Array.<string>, dataReader: function(string, function(BinaryReader))}} options The set of options that can specify the tags to be read and the dataReader to use in order to read the file located at url.
      */
+
     ID3.loadTags = function(url, cb, options) {
         //BufferedBinaryFileReader
         options = options || {};
@@ -791,7 +748,25 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
             }
         });
     };
+    /*
+    ID3.loadTags = function(url, cb, options) {
+        options = options || {};
+        var dataReader = (options["file"]) ? BufferedBinaryFileReader : (options["dataReader"] || BufferedBinaryAjax);
 
+        dataReader(options["file"] || url, function(data) {
+            // preload the format identifier
+            data.loadRange(_formatIDRange, function() {
+                var reader = getTagReader(data);
+                reader.loadData(data, function() {
+                    readTags(reader, data, url, options["tags"]);
+                    if (cb) {
+                        cb();
+                    }
+                });
+            });
+        });
+    };
+    */
     ID3.getAllTags = function(url) {
         if (!_files[url])
             return null;
@@ -1234,7 +1209,9 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
     }
 
     ID3v2.loadData = function(data, callback) {
-        data.loadRange([0, readSynchsafeInteger32At(6, data)], callback);
+        data.loadRange([6, 9], function() {
+            data.loadRange([0, readSynchsafeInteger32At(6, data)], callback);
+        });
     };
 
     // http://www.id3.org/id3v2.3.0

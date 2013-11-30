@@ -194,9 +194,6 @@ var engine = function() {
         var current_id = undefined;
         var read_tags = function(id, rt_cb) {
             var file = playlist[id].file;
-            if (file.size > 31457280) {
-                return;
-            }
             playlist[id].state = "loading";
             sendPlaylist(function(window) {
                 window.playlist.updPlaylistItem(id, playlist[id]);
