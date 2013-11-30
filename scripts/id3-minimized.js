@@ -1380,18 +1380,44 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                 offset += 1 + format.bytesReadCount;
                 break;
         }
-        //console.log(offset)
-        var bite = "none"; //data.getByteAt(offset, 1);
-        var type = "none"; //pictureType[bite];
-        var desc = "none"; //data.getStringWithCharsetAt(offset + 1, length - (offset - start), charset);
+        var bite = data.getByteAt(offset, 1);
+        var type = pictureType[bite];
+        var desc = data.getStringWithCharsetAt(offset + 1, length - (offset - start), charset);
 
-        //offset += 1 + desc.bytesReadCount + 1;
+        var serach_image = function(data) {
+            var index = data.indexOf('JFIF');
+            var type = "jpeg";
+            var pos = 6;
+            if (index === -1) {
+                index = data.indexOf('PNG');
+                type = "png";
+                pos = 1;
+            }
+            if (index === -1) {
+                var bin = String.fromCharCode.apply(null, [255, 216, 255, 225]);
+                index = data.indexOf(bin);
+                type = "jpeg";
+                pos = 0;
+            }
+            if (index !== -1) {
+                return [data.substr(index - pos), "image/" + type];
+            } else {
+                return undefined;
+            }
+        };
+        var image = serach_image(data.getStringAt(offset, (start + length) - offset));
+        if (image) {
+            format = image[1];
+            image = image[0];
+        }
+
+        offset += 1 + desc.bytesReadCount;
 
         return {
             "format": format.toString(),
             "type": type,
             "description": desc.toString(),
-            "data": data.getStringAt(offset, (start + length) - offset)
+            "data": image || data.getStringAt(offset, (start + length) - offset)
         };
     };
 

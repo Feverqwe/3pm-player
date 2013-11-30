@@ -78,7 +78,7 @@ var engine = function() {
             cb(undefined);
             return;
         }
-        binary = "data:image/" + binary[1] + ";base64," + btoa(binary[0]);
+        binary = "data:" + binary[1] + ";base64," + btoa(binary[0]);
         if (!resize_enable) {
             var id = add_cover(binary.length, binary);
             cb(id);
@@ -213,31 +213,7 @@ var engine = function() {
                 var tags = ID3.getAllTags(file.name);
                 ID3.clearAll();
                 if ("picture" in tags) {
-                    var binary = tags.picture.data;
-                    tags.picture = undefined;
-                    var index = binary.indexOf('JFIF');
-                    var type = "jpeg";
-                    var pos = 6;
-                    if (index === -1) {
-                        index = binary.indexOf('PNG');
-                        type = "png";
-                        pos = 1;
-                    }
-                    if (index === -1) {
-                        var bin = String.fromCharCode.apply(null, [255, 216, 255, 225]);
-                        index = binary.indexOf(bin);
-                        type = "jpeg";
-                        pos = 0;
-                    }
-                    if (index !== -1) {
-                        binary = binary.substr(index - pos);
-                        tags.picture = [binary, type];
-                    } else {
-                        if (_debug) {
-                            console.log('Can\'t show image!');
-                        }
-                        delete tags.picture;
-                    }
+                    tags.picture = [tags.picture.data, tags.picture.format];
                 }
                 $.each(tags, function(key) {
                     if ($.inArray(key, ["artist", "title", "album", "picture"]) === -1) {
