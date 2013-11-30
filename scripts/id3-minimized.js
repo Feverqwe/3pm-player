@@ -1393,12 +1393,6 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                 type = "png";
                 pos = 1;
             }
-            if (index === -1) {
-                var bin = String.fromCharCode.apply(null, [255, 216, 255, 225]);
-                index = data.indexOf(bin);
-                type = "jpeg";
-                pos = 0;
-            }
             if (index !== -1) {
                 return [data.substr(index - pos), "image/" + type];
             } else {
