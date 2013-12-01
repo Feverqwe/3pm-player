@@ -198,11 +198,11 @@ var engine = function() {
             sendPlaylist(function(window) {
                 window.playlist.updPlaylistItem(id, playlist[id]);
             });
-             /*
+            /*
              var startDate = new Date().getTime();
              */
             ID3.loadTags(file.name, function() {
-                 /*
+                /*
                  var endDate = new Date().getTime();
                  if (typeof console !== "undefined")
                  console.log("Time: " + ((endDate - startDate) / 1000) + "s");
@@ -615,6 +615,9 @@ var engine = function() {
                     view.state("volumechange");
                     view.setVolume(audio.volume);
                 });
+            },
+            getAudio: function() {
+                return audio;
             }
         };
     }();
@@ -666,6 +669,7 @@ var engine = function() {
         volume: player.volume,
         mute: player.mute,
         getMute: player.getMute,
+        getAudio: player.getAudio,
         getCover: function(id) {
             return covers[id];
         },

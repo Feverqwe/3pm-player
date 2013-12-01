@@ -235,6 +235,127 @@ var view = function() {
             });
         });
     };
+    var pre_buffering_controller = function() {
+        var interval = undefined;
+        var state = "";
+        var obj = undefined;
+        var state_pos = function(left, width) {
+            if (state !== "pos") {
+                reset_state();
+            }
+            obj.css("left", left + "%");
+            obj.css("width", width + "%");
+            state = "pos";
+        };
+        var state_hide = function() {
+            if (state === "hide") {
+                return;
+            }
+            reset_state();
+            obj.css("display", "none");
+            stop();
+            state = "hide";
+        };
+        var state_loading = function() {
+            if (state === "loading") {
+                return;
+            }
+            reset_state();
+            obj.parent().addClass("stream");
+            stop();
+            state = "loading";
+        };
+        var state_inf = function() {
+            if (state === "inf") {
+                return;
+            }
+            reset_state();
+            obj.parent().addClass("stream");
+            stop();
+            state = "inf";
+        };
+        var reset_state = function() {
+            obj.css({left: 0, width: "100%", display: "block"}).attr('class', 'loaded');
+            if (state === "inf" || state === "loading") {
+                obj.parent().removeClass("stream");
+            }
+            state = "";
+        };
+        var update = function() {
+            if (obj === undefined) {
+                return;
+            }
+            var audio = engine.getAudio();
+            var buffered = audio.buffered;
+            if (!buffered) {
+                stop();
+                return;
+            }
+            if (audio.duration === Infinity) {
+                state_inf();
+                return;
+            }
+            var dur = parseInt(audio.duration);
+            if (isNaN(dur)) {
+                state_hide();
+                return;
+            }
+            var end = 0;
+            var start = 0;
+            for (var i = 0; i < buffered.length; i++) {
+                end = parseInt(buffered.end(i));
+                start = parseInt(buffered.start(i));
+            }
+            if (end === dur) {
+                state_hide();
+                return;
+            }
+            var l_p = parseInt((start / dur) * 100);
+            var r_p = parseInt((end / dur) * 100);
+            var pr = r_p - l_p;
+            state_pos(l_p, pr);
+        };
+        var stop = function() {
+            clearInterval(interval);
+        };
+        return {
+            reset_state: function() {
+                if (obj === undefined) {
+                    return;
+                }
+            },
+            clear: function() {
+                if (obj === undefined) {
+                    return;
+                }
+            },
+            setObj: function(progress) {
+                obj = progress;
+            },
+            start: function() {
+                if (obj === undefined) {
+                    return;
+                }
+                stop();
+                interval = setInterval(function() {
+                    update();
+                });
+            },
+            stop: function() {
+                stop();
+            },
+            update: function() {
+                update();
+            },
+            hide: function() {
+                state_hide();
+            },
+            loading: function() {
+                state_loading();
+            },
+            obj: obj
+        };
+    }();
     return {
         show: function() {
             dom_cache = {
@@ -269,6 +390,10 @@ var view = function() {
                         return;
                     }
                     engine.position(ui.value / 10);
+                },
+                create: function() {
+                    dom_cache.progress.append('<div class="loaded"></div>');
+                    pre_buffering_controller.setObj(dom_cache.progress.children("div.loaded"));
                 }
             });
             dom_cache.volume.slider({
@@ -627,9 +752,12 @@ var view = function() {
             }
             if (type === "loadstart") {
                 dom_cache.loading.show();
+                pre_buffering_controller.loading();
             }
             if (type === "loadeddata") {
                 dom_cache.loading.hide();
+                pre_buffering_controller.update();
+                pre_buffering_controller.start();
             }
             if (type === "emptied") {
                 dom_cache.loading.hide();
@@ -642,9 +770,13 @@ var view = function() {
                 var_cache['volume_w'] = dom_cache.volume.width();
                 isPause();
                 view.setProgress(0.1, 0);
+                pre_buffering_controller.stop();
+                pre_buffering_controller.hide();
             }
             if (type === "error") {
                 dom_cache.loading.hide();
+                pre_buffering_controller.stop();
+                pre_buffering_controller.hide();
                 isPause();
             }
             if (type === "waiting") {
@@ -686,4 +818,3 @@ var view = function() {
 $(function() {
     view.show();
 });
-var tmp = {};

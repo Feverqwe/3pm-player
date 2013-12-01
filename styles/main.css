@@ -91,6 +91,8 @@ div.progress > div {
     height: 5px;
     z-index: 1;
     box-shadow: 0px 0px 5px rgba(255, 155, 5, 0.7);
+    position: absolute;
+    top: 0;
 }
 div.progress > a {
     background-color: rgb(241, 241, 241);
@@ -99,6 +101,39 @@ div.progress > a {
     z-index: 2;
     position: absolute;
     top: 0;
+}
+div.progress > div.loaded {
+    position: absolute;
+    width: 0;
+    top: 0;
+    z-index: 0;
+    background-image: -webkit-gradient(linear, left top, right bottom, 
+        color-stop(.25, rgba(255, 255, 255, .1)), 
+        color-stop(.25, transparent), 
+        color-stop(.5, transparent), 
+        color-stop(.5, rgba(255, 255, 255, .1)), 
+        color-stop(.75, rgba(255, 255, 255, .1))
+        );
+    box-shadow: 0 0 0;
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    background-color: rgb(75, 0, 0);
+    -webkit-animation: pre_progress_move 1s linear infinite;
+}
+@-webkit-keyframes pre_progress_move {
+    0% {
+        background-position: 0 20px;
+    }
+    100% {
+        background-position: 20px 20px;
+    }
+}
+div.progress.stream > div.ui-slider-range,
+div.progress.stream > a {
+    display: none;
+}
+div.progress.stream > div.loaded {
+    background-color: initial;
 }
 .player > div.controls li.volume_controll {
     background-color: initial;
