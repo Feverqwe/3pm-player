@@ -28,7 +28,7 @@ java -jar compiler.jar --js .\scripts\dialog.js --js_output_file .\build\scripts
 :: make www/style.css
 java -jar yuicompressor-2.4.8.jar .\www\css\style.css -o .\build\www\css\style.css
 :: make main.css
-java -jar yuicompressor-2.4.8.jar .\styles\main.css -o .\build\styles\main.css
+::java -jar yuicompressor-2.4.8.jar .\styles\main.css -o .\build\styles\main.css
 :: make playlist.css
 java -jar yuicompressor-2.4.8.jar .\styles\playlist.css -o .\build\styles\playlist.css
 :: make dialog.css

@@ -114,7 +114,7 @@ div.progress > div.loaded {
         color-stop(.5, rgba(255, 255, 255, .1)), 
         color-stop(.75, rgba(255, 255, 255, .1))
         );
-    box-shadow: 0 0 0;
+    box-shadow: none;
     background-repeat: repeat;
     background-size: 20px 20px;
     background-color: rgb(75, 0, 0);
