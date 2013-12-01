@@ -198,11 +198,11 @@ var engine = function() {
             sendPlaylist(function(window) {
                 window.playlist.updPlaylistItem(id, playlist[id]);
             });
-            /*
+             /*
              var startDate = new Date().getTime();
              */
             ID3.loadTags(file.name, function() {
-                /*
+                 /*
                  var endDate = new Date().getTime();
                  if (typeof console !== "undefined")
                  console.log("Time: " + ((endDate - startDate) / 1000) + "s");
