@@ -438,12 +438,7 @@ var BufferedBinaryFileReader = function(file, fncCallback, fncError) {
                 //console.log("Got range:", range);
                 gotDataRange.push(range);
                 var bytes = new Uint8Array(event.target.result);
-                var len = bytes.byteLength;
-                var t = [];
-                for (var i = 0; i < len; i++) {
-                    t.push(bytes[i]);
-                }
-                dataFile.set(t, range[0]);
+                dataFile.set(bytes, range[0]);
                 downloadedBytesCount += range[1] - range[0] + 1;
                 if (callback)
                     callback();
