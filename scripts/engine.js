@@ -614,7 +614,7 @@ var engine = function() {
             readAllTags: function() {
                 //var startDate = new Date().getTime();
                 var thread = 0;
-                var item_id = 0;
+                var item_id = -1;
                 var item_len = playlist.length;
                 var next_item = function() {
                     if (thread < 4) {
@@ -631,6 +631,7 @@ var engine = function() {
                         if (item.tags !== undefined) {
                             thread--;
                             next_item();
+                            return;
                         }
                         read_item(item);
                     }

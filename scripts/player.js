@@ -236,19 +236,25 @@ var view = function() {
         });
     };
     var pre_buffering_controller = function() {
+        var cache = {};
         var interval = undefined;
         var state = "";
         var obj = undefined;
         var state_pos = function(left, width) {
+            if (cache.left === left && cache.width === width) {
+                return;
+            }
             if (state !== "pos") {
                 reset_state();
             }
-            obj.css("left", left + "%");
-            obj.css("width", width + "%");
+            cache.left = left;
+            cache.width = width;
+            obj.css({"left": left + "%", "width": width + "%"});
             state = "pos";
         };
         var state_hide = function() {
             if (state === "hide") {
+                stop();
                 return;
             }
             reset_state();
@@ -258,6 +264,7 @@ var view = function() {
         };
         var state_loading = function() {
             if (state === "loading") {
+                stop();
                 return;
             }
             reset_state();
@@ -267,6 +274,7 @@ var view = function() {
         };
         var state_inf = function() {
             if (state === "inf") {
+                stop();
                 return;
             }
             reset_state();
@@ -275,6 +283,7 @@ var view = function() {
             state = "inf";
         };
         var reset_state = function() {
+            cache = {};
             obj.css({left: 0, width: "100%", display: "block"}).attr('class', 'loaded');
             if (state === "inf" || state === "loading") {
                 obj.parent().removeClass("stream");
@@ -339,7 +348,7 @@ var view = function() {
                 stop();
                 interval = setInterval(function() {
                     update();
-                });
+                }, 1000);
             },
             stop: function() {
                 stop();
