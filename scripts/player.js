@@ -241,11 +241,11 @@ var view = function() {
         var state = "";
         var obj = undefined;
         var state_pos = function(left, width) {
-            if (cache.left === left && cache.width === width) {
-                return;
-            }
             if (state !== "pos") {
                 reset_state();
+            }
+            if (cache.left === left && cache.width === width) {
+                return;
             }
             cache.left = left;
             cache.width = width;
