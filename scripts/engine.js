@@ -619,7 +619,7 @@ var engine = function() {
                 var item_id = -1;
                 var item_len = playlist.length;
                 var next_item = function() {
-                    if (thread < 4) {
+                    if (thread < 5) {
                         item_id++;
                         thread++;
                         if (item_id >= item_len) {

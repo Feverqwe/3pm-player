@@ -462,8 +462,8 @@ var BufferedBinaryFileReader = function(file, fncCallback, fncError) {
         this.getByteAt = function(offset) {
             var data = dataFile[offset];
             /*if (inRange(offset) === 0) {
-                console.log("Data don't loaded:", offset, dataFile[offset]);
-            }*/
+             console.log("Data don't loaded:", offset, dataFile[offset]);
+             }*/
             return data;
         };
 
@@ -723,56 +723,57 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
      * @param {function()} cb The callback function to be invoked when all tags have been read.
      * @param {{tags: Array.<string>, dataReader: function(string, function(BinaryReader))}} options The set of options that can specify the tags to be read and the dataReader to use in order to read the file located at url.
      */
-
-    ID3.loadTags = function(url, cb, options) {
-        //BufferedBinaryFileReader
-        options = options || {};
-        var dataReader = options["dataReader"] || BufferedBinaryAjax;
-        dataReader(url, function(data) {
-            if (typeof (data) === "string" && options["file"]) {
-                dataReader = BufferedBinaryFileReader;
-                dataReader(options["file"], function(data) {
-                    data.loadRange(_formatIDRange, function() {
-                        var reader = getTagReader(data);
-                        reader.loadData(data, function() {
-                            readTags(reader, data, url, options["tags"]);
-                            if (cb)
-                                cb();
-                        });
-                    });
-                });
-            } else {
-                // preload the format identifier
-                data.loadRange(_formatIDRange, function() {
-                    var reader = getTagReader(data);
-                    reader.loadData(data, function() {
-                        readTags(reader, data, url, options["tags"]);
-                        if (cb)
-                            cb();
-                    });
-                });
-            }
-        });
-    };
     /*
      ID3.loadTags = function(url, cb, options) {
+     //BufferedBinaryFileReader
      options = options || {};
-     var dataReader = (options["file"]) ? BufferedBinaryFileReader : (options["dataReader"] || BufferedBinaryAjax);
-     
-     dataReader(options["file"] || url, function(data) {
+     var dataReader = options["dataReader"] || BufferedBinaryAjax;
+     dataReader(url, function(data) {
+     if (typeof (data) === "string" && options["file"]) {
+     dataReader = BufferedBinaryFileReader;
+     dataReader(options["file"], function(data) {
+     data.loadRange(_formatIDRange, function() {
+     var reader = getTagReader(data);
+     reader.loadData(data, function() {
+     readTags(reader, data, url, options["tags"]);
+     if (cb)
+     cb();
+     });
+     });
+     });
+     } else {
      // preload the format identifier
      data.loadRange(_formatIDRange, function() {
      var reader = getTagReader(data);
      reader.loadData(data, function() {
      readTags(reader, data, url, options["tags"]);
-     if (cb) {
+     if (cb)
      cb();
+     });
+     });
      }
-     });
-     });
      });
      };
      */
+    // /*
+    ID3.loadTags = function(url, cb, options) {
+        options = options || {};
+        var dataReader = (options["file"]) ? BufferedBinaryFileReader : (options["dataReader"] || BufferedBinaryAjax);
+
+        dataReader(options["file"] || url, function(data) {
+            // preload the format identifier
+            data.loadRange(_formatIDRange, function() {
+                var reader = getTagReader(data);
+                reader.loadData(data, function() {
+                    readTags(reader, data, url, options["tags"]);
+                    if (cb) {
+                        cb();
+                    }
+                });
+            });
+        });
+    };
+    //  */
     ID3.getAllTags = function(url) {
         if (!_files[url])
             return null;
@@ -1346,6 +1347,22 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         return (time.hours > 0 ? time.hours + ':' : '') + minutes + ':' + seconds;
     }
 
+    var serach_image = function(data) {
+        var index = data.indexOf('JFIF');
+        var type = "jpeg";
+        var pos = 6;
+        if (index === -1) {
+            index = data.indexOf('PNG');
+            type = "png";
+            pos = 1;
+        }
+        if (index !== -1) {
+            return [data.substr(index - pos), "image/" + type];
+        } else {
+            return undefined;
+        }
+    };
+
     ID3v2.readFrameData['APIC'] = function readPictureFrame(offset, length, data, flags, v) {
         v = v || '3';
 
@@ -1367,21 +1384,6 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         var type = pictureType[bite];
         var desc = data.getStringWithCharsetAt(offset + 1, length - (offset - start), charset);
 
-        var serach_image = function(data) {
-            var index = data.indexOf('JFIF');
-            var type = "jpeg";
-            var pos = 6;
-            if (index === -1) {
-                index = data.indexOf('PNG');
-                type = "png";
-                pos = 1;
-            }
-            if (index !== -1) {
-                return [data.substr(index - pos), "image/" + type];
-            } else {
-                return undefined;
-            }
-        };
         var image = serach_image(data.getStringAt(offset, (start + length) - offset));
         if (image) {
             format = image[1];
