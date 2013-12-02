@@ -45,6 +45,10 @@ body {
     right: 34px;
     display: none;
 }
+.read_tags {
+    background-image: url('../images/read_tags.png');
+    right: 2px;
+}
 ul.track_list {
 }
 div.playlist {

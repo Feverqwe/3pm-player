@@ -246,8 +246,13 @@ var playlist = function() {
                     chrome.storage.local.set({'pl_pos_left': wl, 'pl_pos_top': wr});
                 }
             };
-            $('div.playlist_select').on('click', function() {
+            $('.playlist_select').on('click', function() {
                 dom_cache.pl_list.toggle();
+            });
+            $('.read_tags.btn').on('click', function() {
+                sendPlayer(function(window) {
+                    window.engine.readAllTags();
+                });
             });
             dom_cache.pl_list.on('click', 'li', function() {
                 var id = $(this).data('id');

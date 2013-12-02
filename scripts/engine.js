@@ -204,7 +204,6 @@ var engine = function() {
             ID3.loadTags(file.name, function() {
                 /*
                  var endDate = new Date().getTime();
-                 if (typeof console !== "undefined")
                  console.log("Time: " + ((endDate - startDate) / 1000) + "s");
                  */
                 var tags = ID3.getAllTags(file.name);
@@ -545,18 +544,11 @@ var engine = function() {
                     if (playlist[current_id].tags === undefined) {
                         read_tags(current_id, function(tags, id) {
                             var obj = {};
-                            if ("title" in tags) {
-                                obj['title'] = tags.title;
-                            }
-                            if ("artist" in tags) {
-                                obj['artist'] = tags.artist;
-                            }
-                            if ("album" in tags) {
-                                obj['album'] = tags.album;
-                            }
-                            if ("picture" in tags) {
-                                obj['picture'] = tags.picture;
-                            }
+                            $.each(tags, function(key, value) {
+                                if (key in ["title", "artist", "album", "picture"] !== -1) {
+                                    obj[key] = value;
+                                }
+                            });
                             playlist[id].tags = obj;
                             playlist[id].state = "dune";
                             sendPlaylist(function(window) {
@@ -618,6 +610,50 @@ var engine = function() {
             },
             getAudio: function() {
                 return audio;
+            },
+            readAllTags: function() {
+                //var startDate = new Date().getTime();
+                var thread = 0;
+                var item_id = 0;
+                var item_len = playlist.length;
+                var next_item = function() {
+                    if (thread < 4) {
+                        item_id++;
+                        thread++;
+                        if (item_id >= item_len) {
+                            /*
+                             var endDate = new Date().getTime();
+                             console.log("Time: " + ((endDate - startDate) / 1000) + "s");
+                             */
+                            return;
+                        }
+                        var item = playlist[item_id];
+                        if (item.tags !== undefined) {
+                            thread--;
+                            next_item();
+                        }
+                        read_item(item);
+                    }
+                };
+                var read_item = function(item) {
+                    next_item();
+                    read_tags(item.id, function(tags, id) {
+                        var obj = {};
+                        $.each(tags, function(key, value) {
+                            if (key in ["title", "artist", "album", "picture"] !== -1) {
+                                obj[key] = value;
+                            }
+                        });
+                        playlist[id].tags = obj;
+                        playlist[id].state = "dune";
+                        sendPlaylist(function(window) {
+                            window.playlist.updPlaylistItem(id, playlist[id]);
+                        });
+                        thread--;
+                        next_item();
+                    });
+                };
+                next_item();
             }
         };
     }();
@@ -738,7 +774,8 @@ var engine = function() {
         getSortedList: function() {
             var list = (sorted_playlist || playlist).slice();
             return [sort_type, list];
-        }
+        },
+        readAllTags: player.readAllTags
     };
 }();
 $(function() {
