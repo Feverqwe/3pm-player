@@ -612,7 +612,9 @@ var engine = function() {
                 return audio;
             },
             readAllTags: function() {
-                //var startDate = new Date().getTime();
+                 /*
+                var startDate = new Date().getTime();
+                 */
                 var thread = 0;
                 var item_id = -1;
                 var item_len = playlist.length;
@@ -621,9 +623,9 @@ var engine = function() {
                         item_id++;
                         thread++;
                         if (item_id >= item_len) {
-                            /*
-                             var endDate = new Date().getTime();
-                             console.log("Time: " + ((endDate - startDate) / 1000) + "s");
+                             /*
+                            var endDate = new Date().getTime();
+                            console.log("Time: " + ((endDate - startDate) / 1000) + "s");
                              */
                             return;
                         }
