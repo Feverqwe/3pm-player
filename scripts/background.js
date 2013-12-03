@@ -326,6 +326,10 @@ var wm = function() {
     };
     var create_viz_window = function() {
         var create_window = function(p_l, p_t, pl_w, pl_h) {
+            p_l = 0;
+            p_t = 0;
+            pl_w = 1024;
+            pl_h = 768;
             chrome.app.window.create('viz.html', {
                 bounds: {
                     width: pl_w || 335,
@@ -334,6 +338,8 @@ var wm = function() {
                     top: p_t
                 },
                 frame: "none"
+            }, function(win) {
+                windows.viz = win;
             });
         };
         create_window(undefined, undefined, 0, 0);
@@ -387,6 +393,14 @@ var wm = function() {
                 delete windows.playlist;
             }
         }
+        if ("viz" in windows) {
+            if (player_off) {
+                windows.viz.contentWindow.close();
+            }
+            if (windows.viz.contentWindow.window === null) {
+                delete windows.viz;
+            }
+        }
         return 1;
     };
     return {
@@ -399,7 +413,10 @@ var wm = function() {
                 }
                 windows.player.focus();
             }
-            //create_viz_window();
+            setTimeout(function() {
+                create_viz_window();
+                vizw = create_viz_window;
+            }, 1000);
         },
         toggle_playlist: function() {
             if (check() && "playlist" in windows) {
@@ -413,6 +430,9 @@ var wm = function() {
         },
         getPlaylist: function() {
             return (check() && "playlist" in windows) ? windows.playlist.contentWindow.window : undefined;
+        },
+        getViz: function() {
+            return (check() && "viz" in windows) ? windows.viz.contentWindow.window : undefined;
         },
         showDialog: function(options) {
             create_dialog_window(options);

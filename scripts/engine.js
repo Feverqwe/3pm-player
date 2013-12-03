@@ -11,6 +11,8 @@ var engine = function() {
     var current_played_pos = -1;
     var M3UPlaylists = undefined;
     var _playlist_window = undefined;
+    var _viz_window = undefined;
+    var adapter = undefined;
     function sendPlaylist(callback) {
         /*
          * Функция отправки действий в плэйлист
@@ -24,6 +26,21 @@ var engine = function() {
             });
         } else {
             callback(_playlist_window);
+        }
+    }
+    function sendViz(callback) {
+        /*
+         * Функция отправки действий в плэйлист
+         */
+        if (_viz_window === undefined || _viz_window.window === null) {
+            chrome.runtime.getBackgroundPage(function(bg) {
+                _viz_window = bg.wm.getViz();
+                if (_viz_window !== undefined) {
+                    callback(_viz_window);
+                }
+            });
+        } else {
+            callback(_viz_window);
         }
     }
     var reset_player = function() {
@@ -539,6 +556,9 @@ var engine = function() {
                         playlist[current_id].duration = this.duration;
                     }
                     view.state("loadedmetadata");
+                    sendViz(function(window) {
+                        window.viz.audio_state('loadedmetadata');
+                    });
                 });
                 $(audio).on('loadeddata', function(e) {
                     if (playlist[current_id].tags === undefined) {
@@ -612,8 +632,8 @@ var engine = function() {
                 return audio;
             },
             readAllTags: function() {
-                 /*
-                var startDate = new Date().getTime();
+                /*
+                 var startDate = new Date().getTime();
                  */
                 var thread = 0;
                 var item_id = -1;
@@ -623,9 +643,9 @@ var engine = function() {
                         item_id++;
                         thread++;
                         if (item_id >= item_len) {
-                             /*
-                            var endDate = new Date().getTime();
-                            console.log("Time: " + ((endDate - startDate) / 1000) + "s");
+                            /*
+                             var endDate = new Date().getTime();
+                             console.log("Time: " + ((endDate - startDate) / 1000) + "s");
                              */
                             return;
                         }
@@ -778,7 +798,16 @@ var engine = function() {
             var list = (sorted_playlist || playlist).slice();
             return [sort_type, list];
         },
-        readAllTags: player.readAllTags
+        readAllTags: player.readAllTags,
+        getAdapter: function() {
+            if (adapter === undefined) {
+                adapter = {};
+                adapter.context = new window.webkitAudioContext();
+                adapter.audio = player.getAudio();
+                adapter.source = adapter.context.createMediaElementSource(adapter.audio);
+            }
+            return adapter;
+        }
     };
 }();
 $(function() {

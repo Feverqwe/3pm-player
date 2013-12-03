@@ -1,4 +1,5 @@
 build.zip
 nbproject/
 build/
-viz/
+/old_viz/
+/old_viz.html
