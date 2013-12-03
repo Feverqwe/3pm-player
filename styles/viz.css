@@ -14,3 +14,9 @@ body {
     top: 0px;
     left: 0px;
 }
+.need_addon {
+    text-align: center;
+    font-size: 300%;
+    color: #67C2FF;
+    -webkit-app-region: no-drag;
+}

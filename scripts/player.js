@@ -584,12 +584,12 @@ var view = function() {
                     id: "ws",
                     title: "Enable webUI (0.0.0.0:9898)",
                     contexts: ["all"]
-                });/*
+                });
                 chrome.contextMenus.create({
                     id: "viz",
                     title: "Visualization",
                     contexts: ["all"]
-                });*/
+                });
                 chrome.runtime.getBackgroundPage(function(bg) {
                     chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
                 });
@@ -601,12 +601,12 @@ var view = function() {
                         chrome.runtime.getBackgroundPage(function(bg) {
                             bg.wm.showDialog({type: "url", h: 60});
                         });
-                    } else/*
+                    } else
                     if (info.menuItemId === "viz") {
                         chrome.runtime.getBackgroundPage(function(bg) {
                             bg.wm.showViz();
                         });
-                    } else*/
+                    } else
                     if (info.menuItemId === "3") {
                         chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
                             if (!entry) {
