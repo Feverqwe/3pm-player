@@ -6,6 +6,7 @@ xcopy .\scripts .\build\scripts\ /E
 xcopy .\images .\build\images\ /E
 xcopy .\styles .\build\styles\ /E
 xcopy .\www .\build\www\ /E
+xcopy .\viz .\build\viz\ /E
 copy .\*.html .\build\.
 copy .\*.json .\build\.
 copy .\*.png .\build\.
@@ -24,6 +25,13 @@ java -jar compiler.jar --js .\scripts\player.js --js_output_file .\build\scripts
 java -jar compiler.jar --js .\scripts\playlist.js --js_output_file .\build\scripts\playlist.js
 :: make dialog.js
 java -jar compiler.jar --js .\scripts\dialog.js --js_output_file .\build\scripts\dialog.js
+::viz====
+java -jar compiler.jar --js .\viz\adapterWebkit.js --js_output_file .\build\viz\adapterWebkit.js
+java -jar compiler.jar --js .\viz\boot.js --js_output_file .\build\viz\boot.js
+java -jar compiler.jar --js .\viz\dancer.js --js_output_file .\build\viz\dancer.js
+java -jar compiler.jar --js .\viz\kick.js --js_output_file .\build\viz\kick.js
+java -jar compiler.jar --js .\viz\support.js --js_output_file .\build\viz\support.js
+::viz====
 
 :: make www/style.css
 java -jar yuicompressor-2.4.8.jar .\www\css\style.css -o .\build\www\css\style.css

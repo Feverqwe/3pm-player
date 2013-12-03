@@ -412,11 +412,11 @@ var wm = function() {
                     windows.playlist.focus();
                 }
                 windows.player.focus();
-            }
+            }/*
             setTimeout(function() {
                 create_viz_window();
                 vizw = create_viz_window;
-            }, 1000);
+            }, 1000);*/
         },
         toggle_playlist: function() {
             if (check() && "playlist" in windows) {
@@ -433,6 +433,13 @@ var wm = function() {
         },
         getViz: function() {
             return (check() && "viz" in windows) ? windows.viz.contentWindow.window : undefined;
+        },
+        showViz: function() {
+            if (check() && "viz" in windows) {
+                windows.viz.contentWindow.close();
+            } else {
+                create_viz_window();
+            }
         },
         showDialog: function(options) {
             create_dialog_window(options);

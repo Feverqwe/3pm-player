@@ -585,6 +585,11 @@ var view = function() {
                     title: "Enable webUI (0.0.0.0:9898)",
                     contexts: ["all"]
                 });
+                chrome.contextMenus.create({
+                    id: "viz",
+                    title: "Visualization",
+                    contexts: ["all"]
+                });
                 chrome.runtime.getBackgroundPage(function(bg) {
                     chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
                 });
@@ -595,6 +600,11 @@ var view = function() {
                     if (info.menuItemId === "2") {
                         chrome.runtime.getBackgroundPage(function(bg) {
                             bg.wm.showDialog({type: "url", h: 60});
+                        });
+                    } else
+                    if (info.menuItemId === "viz") {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.showViz();
                         });
                     } else
                     if (info.menuItemId === "3") {
