@@ -3,7 +3,6 @@ var viz = function() {
     var var_cache = {};
     var dom_cache = {};
     var dancerInited = false;
-    var isFullscreen = false;
     var _player_window = undefined;
     function sendPlayer(callback) {
         /*
@@ -115,7 +114,7 @@ var viz = function() {
             window.onresize = function() {
                 clearTimeout(var_cache.resize_timer);
                 var_cache.resize_timer = setTimeout(function() {
-                    if (isFullscreen) {
+                    if (document.webkitIsFullScreen) {
                         return;
                     }
                     chrome.storage.local.set({viz_w: window.innerWidth, viz_h: window.innerHeight});
@@ -123,7 +122,7 @@ var viz = function() {
             };
             $(window).trigger('resize');
             var save_pos = function() {
-                if (isFullscreen) {
+                if (document.webkitIsFullScreen) {
                     return;
                 }
                 var wl = window.screenLeft;
