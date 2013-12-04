@@ -36,6 +36,9 @@ var viz = function() {
                 if ('keyCode' in event === false) {
                     return;
                 }
+                if (event.altKey) {
+                    return;
+                }
                 if (event.keyCode === 32) {
                     event.preventDefault();
                     sendPlayer(function(window) {
@@ -133,17 +136,18 @@ var viz = function() {
             };
             $('.close').on('click', function() {
                 save_pos();
+                sendPlayer(function(window) {
+                    window.engine.discAdapter();
+                });
                 window.close();
             });
             $('.mini').on('click', function() {
                 chrome.app.window.current().minimize();
             });
             $('.full').on('click', function() {
-                if ($(this).hasClass('exit')) {
-                    $(this).removeClass('exit');
-                    document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT)
+                if (!document.webkitIsFullScreen) {
+                    document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
                 } else {
-                    $(this).addClass('exit');
                     document.webkitCancelFullScreen();
                 }
             });

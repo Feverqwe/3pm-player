@@ -498,6 +498,9 @@ var view = function() {
                 if ('keyCode' in event === false) {
                     return;
                 }
+                if (event.altKey) {
+                    return;
+                }
                 if (event.keyCode === 32) {
                     event.preventDefault();
                     engine.playToggle();

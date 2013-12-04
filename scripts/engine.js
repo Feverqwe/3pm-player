@@ -209,6 +209,12 @@ var engine = function() {
         });
         return index;
     };
+    var discAdapter = function() {
+        if (adapter !== undefined && adapter.adapter !== undefined) {
+            adapter.adapter.proc.disconnect();
+            adapter.adapter = undefined;
+        }
+    };
     var player = function() {
         var type_list = {};
         var audio = null;
@@ -248,12 +254,6 @@ var engine = function() {
                     rt_cb(tags, id);
                 });
             }, {tags: ["artist", "title", "album", "picture"], dataReader: FileAPIReader(file), file: file});
-        };
-        var discAdapter = function() {
-            if (adapter !== undefined && adapter.adapter !== undefined) {
-                adapter.adapter.proc.disconnect();
-                adapter.adapter = undefined;
-            }
         };
         var getTagBody = function(id) {
             if (id in playlist === false) {
