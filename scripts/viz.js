@@ -153,7 +153,7 @@ var viz = function() {
             setInterval(function() {
                 save_pos();
                 chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.hi("playlist", chrome.app.window.current());
+                    bg.wm.hi("viz", chrome.app.window.current());
                 });
             }, 5000);
         },
