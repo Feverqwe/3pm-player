@@ -249,24 +249,39 @@ var engine = function() {
                 });
             }, {tags: ["artist", "title", "album", "picture"], dataReader: FileAPIReader(file), file: file});
         };
-        var cache_track = function(item, cb) {
-            var reader = new FileReader();
-            reader.onload = function(event) {
-                var ab = event.target.result;
-                var file_blob = new Blob([ab], {type: item.file.type});
-                file_blob.name = item.file.name;
-                var url = window.URL.createObjectURL(file_blob);
-                playlist[item.id].blob = file_blob;
-                cb(url, item.id);
-            };
-            reader.readAsArrayBuffer(item.file);
-        };
         var discAdapter = function() {
             if (adapter !== undefined && adapter.adapter !== undefined) {
                 adapter.adapter.proc.disconnect();
+                adapter.adapter = undefined;
             }
         };
+        var getTagBody = function(id) {
+            var tags = playlist[id].tags;
+            if (tags === undefined) {
+                return [playlist[id].file.name, ""];
+            }
+            var title = "";
+            var album = "";
+            if ("title" in tags && tags.title.length > 0) {
+                title = tags.title;
+            } else {
+                title = playlist[id].file.name;
+            }
+            if ("album" in tags && "artist" in tags && tags.album.length > 0 && tags.artist.length > 0) {
+                album = tags.artist + ' - ' + tags.album;
+            } else
+            if ("artist" in tags && tags.artist.length > 0) {
+                album = tags.artist;
+            } else
+            if ("album" in tags && tags.album.length > 0) {
+                album = tags.album;
+            }
+            return [title, album];
+        };
         return {
+            getTagBody : function() {
+                return getTagBody(current_id)
+            },
             open: function(id) {
                 id = parseInt(id);
                 var item = playlist[id];
@@ -292,14 +307,6 @@ var engine = function() {
                             $(audio).attr('type', type);
                         }
                     }
-                    /*
-                     cache_track(item, function(url, id) {
-                     if (current_id === id) {
-                     audio.src = url; // window.URL.createObjectURL(item.file);
-                     } else {
-                     delete item.blob;
-                     }
-                     });*/
                     audio.src = window.URL.createObjectURL(item.file);
                 }
             },
@@ -424,20 +431,9 @@ var engine = function() {
                     var title = '';
                     var album = '';
                     if (tags !== undefined) {
-                        if ("title" in tags && tags.title.length > 0) {
-                            title = tags.title;
-                        } else {
-                            title = playlist[current_id].file.name;
-                        }
-                        if ("album" in tags && "artist" in tags && tags.album.length > 0 && tags.artist.length > 0) {
-                            album = tags.artist + ' - ' + tags.album;
-                        } else
-                        if ("artist" in tags && tags.artist.length > 0) {
-                            album = tags.artist;
-                        } else
-                        if ("album" in tags && tags.album.length > 0) {
-                            album = tags.album;
-                        }
+                        var title = getTagBody(current_id);
+                        var album = title[1];
+                        title = title[0];
                         if (album.length > 0) {
                             status['title'] = encode_name(title + ' – ' + album);
                         } else {
@@ -535,6 +531,9 @@ var engine = function() {
                 $(audio).on('loadstart', function(e) {
                     view.setTags(playlist[current_id].tags || {});
                     view.state("loadstart");
+                    sendViz(function(window) {
+                        window.viz.audio_state('track', getTagBody(current_id));
+                    });
                 });
                 $(audio).on('progress', function(e) {
                     view.state("progress");
@@ -590,6 +589,9 @@ var engine = function() {
                     } else {
                         view.setTags(playlist[current_id].tags);
                     }
+                    sendViz(function(window) {
+                        window.viz.audio_state('track', getTagBody(current_id));
+                    });
                     view.state("loadeddata");
                 });
                 $(audio).on('waiting', function(e) {
@@ -821,7 +823,8 @@ var engine = function() {
         },
         discAdapter: function() {
             discAdapter();
-        }
+        },
+        getTagBody: player.getTagBody
     };
 }();
 $(function() {

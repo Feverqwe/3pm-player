@@ -134,6 +134,9 @@ if (reality === undefined) {
             });
             this.music.bind('loaded', function()
             {
+                if ("dancerInit" in viz) {
+                    viz.dancerInit(true);
+                }
                 reality.music.mag = 0;
                 reality.toLoad.indexOf('music') !== -1 && reality.$document.trigger('try', ['music']);
                 reality.music.kick = reality.music.createKick({threshold: .2, onKick: function(mag) {
