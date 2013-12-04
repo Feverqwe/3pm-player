@@ -835,6 +835,11 @@ var engine = function() {
             sendViz(function(window) {
                 window.viz.randomPreset();
             });
+        },
+        vizClose: function() {
+            sendViz(function(window) {
+                window.close();
+            });
         }
     };
 }();

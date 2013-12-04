@@ -469,6 +469,7 @@ var view = function() {
                 engine.sendPlaylist(function(window) {
                     window.close();
                 });
+                engine.vizClose();
                 window.close();
             });
             $('.mini').on('click', function() {
