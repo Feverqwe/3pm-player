@@ -79,7 +79,7 @@ var viz = function() {
                 } else
                 if (event.keyCode === 78) {
                     event.preventDefault();
-                    reality.randomPreset();
+                    viz.randomPreset();
                 } else
                 if (event.ctrlKey) {
                     if (event.keyCode === 38) {
