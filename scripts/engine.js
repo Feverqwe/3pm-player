@@ -800,6 +800,9 @@ var engine = function() {
                         });
                         var n = 0;
                         all_albums.forEach(function(item) {
+                            if (item.album_id in albums === false) {
+                                albums[item.album_id] = {tracks: []};
+                            }
                             albums[item.album_id].name = item.title;
                             albums[item.album_id].id = n;
                             n++;
