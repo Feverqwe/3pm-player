@@ -326,14 +326,10 @@ var wm = function() {
     };
     var create_viz_window = function() {
         var create_window = function(p_l, p_t, pl_w, pl_h) {
-            p_l = 0;
-            p_t = 0;
-            pl_w = 1024;
-            pl_h = 768;
             chrome.app.window.create('viz.html', {
                 bounds: {
-                    width: pl_w || 335,
-                    height: pl_h || 400,
+                    width: pl_w || 1024,
+                    height: pl_h || 768,
                     left: p_l,
                     top: p_t
                 },
@@ -342,7 +338,11 @@ var wm = function() {
                 windows.viz = win;
             });
         };
-        create_window(undefined, undefined, 0, 0);
+        chrome.storage.local.get(function(storage) {
+            var lt = win_top_left_pos(storage.viz_pos_left, storage.viz_pos_top);
+            var wh = win_w_h_pos(storage.viz_w, storage.viz_h);
+            create_window(lt[0], lt[1], wh[0], wh[1]);
+        });
     };
     var create_dialog_window = function(options) {
         if ("dialog" in windows) {

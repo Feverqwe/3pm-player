@@ -256,7 +256,7 @@ var engine = function() {
             }
         };
         var getTagBody = function(id) {
-            if (id in playlist) {
+            if (id in playlist === false) {
                 return ["3pm-player", ""];
             }
             var tags = playlist[id].tags;
@@ -283,7 +283,7 @@ var engine = function() {
         };
         return {
             getTagBody: function() {
-                return getTagBody(current_id)
+                return getTagBody(current_id);
             },
             open: function(id) {
                 id = parseInt(id);
@@ -588,13 +588,16 @@ var engine = function() {
                                 window.playlist.updPlaylistItem(id, playlist[id]);
                             });
                             view.setTags(playlist[id].tags);
+                            sendViz(function(window) {
+                                window.viz.audio_state('track', getTagBody(current_id));
+                            });
                         });
                     } else {
+                        sendViz(function(window) {
+                            window.viz.audio_state('track', getTagBody(current_id));
+                        });
                         view.setTags(playlist[current_id].tags);
                     }
-                    sendViz(function(window) {
-                        window.viz.audio_state('track', getTagBody(current_id));
-                    });
                     view.state("loadeddata");
                 });
                 $(audio).on('waiting', function(e) {
