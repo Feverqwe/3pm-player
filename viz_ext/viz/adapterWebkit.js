@@ -104,6 +104,7 @@
             _this.audio = ad.audio;
             //_this.context = ad.context;
             _this.source = ad.source;//this.context.createMediaElementSource(this.audio);
+            ad.adapter = _this;
             _this.source.disconnect();
             _this.source.connect(_this.proc);
             _this.source.connect(_this.gain);

@@ -28,7 +28,7 @@ var engine = function() {
             callback(_playlist_window);
         }
     }
-    function sendViz(callback) {
+    function sendViz(callback, fail) {
         /*
          * Функция отправки действий в плэйлист
          */
@@ -37,6 +37,10 @@ var engine = function() {
                 _viz_window = bg.wm.getViz();
                 if (_viz_window !== undefined) {
                     callback(_viz_window);
+                } else {
+                    if (fail !== undefined) {
+                        fail();
+                    }
                 }
             });
         } else {
@@ -256,6 +260,11 @@ var engine = function() {
                 cb(url, item.id);
             };
             reader.readAsArrayBuffer(item.file);
+        };
+        var discAdapter = function() {
+            if (adapter !== undefined && adapter.adapter !== undefined) {
+                adapter.adapter.proc.disconnect();
+            }
         };
         return {
             open: function(id) {
@@ -558,6 +567,8 @@ var engine = function() {
                     view.state("loadedmetadata");
                     sendViz(function(window) {
                         window.viz.audio_state('loadedmetadata');
+                    }, function() {
+                        discAdapter();
                     });
                 });
                 $(audio).on('loadeddata', function(e) {
@@ -807,6 +818,9 @@ var engine = function() {
                 adapter.source = adapter.context.createMediaElementSource(adapter.audio);
             }
             return adapter;
+        },
+        discAdapter: function() {
+            discAdapter();
         }
     };
 }();
