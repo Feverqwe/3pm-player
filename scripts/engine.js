@@ -699,6 +699,154 @@ var engine = function() {
             }
         };
     }();
+    var vk = function() {
+        var token = undefined;
+        var timeout = 500;
+        var getTracks = function(cb) {
+            var url = "https://api.vk.com/method/audio.get?v=5.5&access_token=" + token;
+            var tracks = [];
+            var offset = 0;
+            var getPage = function(offset) {
+                $.getJSON(url + "&count=6000&offset=" + offset, function(data) {
+                    if (!'response' in data) {
+                        return;
+                    }
+                    data = data.response;
+                    if (!'items' in data) {
+                        return;
+                    }
+                    var len = 0;
+                    data.items.forEach(function(item) {
+                        tracks.push({id: tracks.length, album_id: item.album_id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
+                        len++;
+                    });
+                    if (len <= 0) {
+                        return;
+                    }
+                    if (tracks.length !== data.count) {
+                        offset += len;
+                        setTimeout(function() {
+                            getPage(offset);
+                        }, timeout);
+                    } else {
+                        cb(tracks);
+                    }
+                });
+            };
+            getPage(offset);
+        };
+        var getAlbums = function(cb) {
+            var url = "https://api.vk.com/method/audio.getAlbums?v=5.5&access_token=" + token;
+            var albums = [];
+            var offset = 0;
+            var getPage = function(offset) {
+                $.getJSON(url + "&count=100&offset=" + offset, function(data) {
+                    if (!'response' in data) {
+                        return;
+                    }
+                    data = data.response;
+                    if (!'items' in data) {
+                        return;
+                    }
+                    var len = 0;
+                    data.items.forEach(function(item) {
+                        albums.push({id: albums.length, album_id: item.album_id, title: item.title});
+                        len++;
+                    });
+                    if (len <= 0) {
+                        return;
+                    }
+                    if (albums.length !== data.count) {
+                        offset += len;
+                        setTimeout(function() {
+                            getPage(offset);
+                        }, timeout);
+                    } else {
+                        cb(albums);
+                    }
+                });
+            };
+            getPage(offset);
+        };
+        var getToken = function(cb) {
+            if (token !== undefined) {
+                cb(token);
+                return;
+            }
+            chrome.storage.local.get('vk_token', function(obj) {
+                if ('vk_token' in obj) {
+                    token = obj.vk_token;
+                    cb(token);
+                } else {
+                    vkAuth(cb);
+                }
+            });
+        };
+        var makeLists = function(cb) {
+            var list = [];
+            getToken(function() {
+                getAlbums(function(all_albums) {
+                    all_albums.push({title: "[noname]", album_id: undefined});
+                    getTracks(function(tracks) {
+                        var albums = {};
+                        tracks.forEach(function(item) {
+                            if ("album_id" in item === false) {
+                                item.album_id = "noname";
+                            }
+                            if (item.album_id in albums === false) {
+                                albums[item.album_id] = {tracks: []};
+                            }
+                            albums[item.album_id].tracks.push(item);
+                        });
+                        var n = 0;
+                        all_albums.forEach(function(item) {
+                            albums[item.album_id].name = item.title;
+                            albums[item.album_id].id = n;
+                            n++;
+                        });
+                        $.each(albums, function(k, v) {
+                            list.push(v);
+                        });
+                        cb(list);
+                    });
+                });
+            });
+        };
+        var vkAuth = function(cb) {
+            var client_id = "4037628";
+            var settings = "audio";
+            var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
+            var display = "page";
+            var url = 'https://oauth.vk.com/authorize?v=5.5&client_id=' + client_id + '&scope=' + settings + '&redirect_uri=' + redirect_uri + '&display=' + display + '&response_type=token';
+            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
+            function(responseURL) {
+                if (!responseURL) {
+                    return;
+                }
+                token = responseURL.replace(/.*_token=([a-zA-Z0-9]*)&.*/, "$1");
+                chrome.storage.local.set({vk_token: token});
+                cb(token);
+            });
+        };
+        return {
+            getToken: function(cb) {
+                getToken(cb);
+            },
+            getTracks: function(cb) {
+                if (!token) {
+                    return;
+                }
+                getTracks(cb);
+            },
+            getAlbums: function(cb) {
+                if (!token) {
+                    return;
+                }
+                getAlbums(cb);
+            },
+            makeLists: makeLists
+        };
+    }();
     return {
         run: function() {
             $('.engine').remove();
@@ -712,6 +860,11 @@ var engine = function() {
             }
             var my_playlist = [];
             for (var i = 0; i < files.length; i++) {
+                if ("id" in files[i] && "file" in files[i] && "tags" in files[i]) {
+                    files[i].id = my_playlist.length;
+                    my_playlist.push(files[i]);
+                    continue;
+                }
                 if ("url" in files[i]) {
                     my_playlist.push({id: my_playlist.length, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
                     continue;
@@ -840,7 +993,8 @@ var engine = function() {
             sendViz(function(window) {
                 window.close();
             });
-        }
+        },
+        vk: vk
     };
 }();
 $(function() {

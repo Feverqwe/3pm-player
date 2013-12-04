@@ -598,6 +598,11 @@ var view = function() {
                     title: "Visualization",
                     contexts: ["all"]
                 });
+                chrome.contextMenus.create({
+                    id: "vk",
+                    title: "Get Music from VK",
+                    contexts: ["all"]
+                });
                 chrome.runtime.getBackgroundPage(function(bg) {
                     chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
                 });
@@ -608,6 +613,14 @@ var view = function() {
                     if (info.menuItemId === "2") {
                         chrome.runtime.getBackgroundPage(function(bg) {
                             bg.wm.showDialog({type: "url", h: 60});
+                        });
+                    } else
+                    if (info.menuItemId === "vk") {
+                        engine.vk.makeLists(function(list) {
+                            engine.setM3UPlaylists({list: list});
+                            chrome.runtime.getBackgroundPage(function(bg) {
+                                bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
+                            });
                         });
                     } else
                     if (info.menuItemId === "viz") {
@@ -830,15 +843,19 @@ var view = function() {
             if (filePlaylists === undefined) {
                 return;
             }
-            var name = undefined;
+            var list = {name: undefined};
             filePlaylists.list.forEach(function(item) {
                 if (item.id === id) {
-                    name = item.name;
+                    list = item;
                 }
             });
-            readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
-                engine.open(files, {name: name, id: id});
-            });
+            if ("entry" in filePlaylists) {
+                readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
+                    engine.open(files, {name: list.name, id: id});
+                });
+            } else {
+                engine.open(list.tracks, {name: list.name, id: id});
+            }
         }
     };
 }();

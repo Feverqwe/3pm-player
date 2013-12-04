@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "3pm-player",
     "description": "Small mp3 player!",
-    "version": "0.5.81",
+    "version": "0.5.82",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "icon_16.png",
@@ -14,5 +14,5 @@
         }
     },
     "offline_enabled": true,
-    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}, {"fileSystem": ["retainEntries", "directory"]},"fullscreen"]
+    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}, {"fileSystem": ["retainEntries", "directory"]},"fullscreen","identity","https://api.vk.com/*"]
 }
