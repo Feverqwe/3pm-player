@@ -256,6 +256,9 @@ var engine = function() {
             }
         };
         var getTagBody = function(id) {
+            if (id in playlist) {
+                return ["3pm-player", ""];
+            }
             var tags = playlist[id].tags;
             if (tags === undefined) {
                 return [playlist[id].file.name, ""];
@@ -279,7 +282,7 @@ var engine = function() {
             return [title, album];
         };
         return {
-            getTagBody : function() {
+            getTagBody: function() {
                 return getTagBody(current_id)
             },
             open: function(id) {
