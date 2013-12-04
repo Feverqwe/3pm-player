@@ -20,6 +20,9 @@ var viz = function() {
         }
     }
     var setTags = function(value) {
+        if (!"track" in dom_cache) {
+            return;
+        }
         dom_cache.track.html(value[0] + "<br/>" + value[1]);
     };
     return {
@@ -44,27 +47,23 @@ var viz = function() {
                         window.engine.playToggle();
                     });
                 } else
-                if (event.keyCode === 118 || event.keyCode === 86) {
+                if (event.keyCode === 86) {
                     event.preventDefault();
                     sendPlayer(function(window) {
                         window.engine.mute();
                     });
                 } else
-                if (event.keyCode === 115 || event.keyCode === 83) {
+                if (event.keyCode === 83) {
                     event.preventDefault();
                     sendPlayer(function(window) {
                         window.engine.shuffle();
                     });
                 } else
-                if (event.keyCode === 114 || event.keyCode === 82) {
+                if (event.keyCode === 82) {
                     event.preventDefault();
                     sendPlayer(function(window) {
                         window.engine.loop();
                     });
-                } else
-                if (event.keyCode === 78) {
-                    event.preventDefault();
-                    reality.randomPreset();
                 } else
                 if (event.keyCode === 113) {
                     event.preventDefault();
@@ -77,6 +76,10 @@ var viz = function() {
                     sendPlayer(function(window) {
                         window.engine.preview();
                     });
+                } else
+                if (event.keyCode === 78) {
+                    event.preventDefault();
+                    reality.randomPreset();
                 } else
                 if (event.ctrlKey) {
                     if (event.keyCode === 38) {
@@ -179,6 +182,11 @@ var viz = function() {
         },
         dancerInit: function(val) {
             dancerInited = val;
+        },
+        randomPreset: function() {
+            if ("randomPreset" in reality) {
+                reality.randomPreset();
+            }
         }
     };
 }();

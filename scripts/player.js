@@ -505,15 +505,15 @@ var view = function() {
                     event.preventDefault();
                     engine.playToggle();
                 } else
-                if (event.keyCode === 118 || event.keyCode === 86) {
+                if (event.keyCode === 86) {
                     event.preventDefault();
                     engine.mute();
                 } else
-                if (event.keyCode === 115 || event.keyCode === 83) {
+                if (event.keyCode === 83) {
                     event.preventDefault();
                     engine.shuffle();
                 } else
-                if (event.keyCode === 114 || event.keyCode === 82) {
+                if (event.keyCode === 82) {
                     event.preventDefault();
                     engine.loop();
                 } else
@@ -524,6 +524,10 @@ var view = function() {
                 if (event.keyCode === 112) {
                     event.preventDefault();
                     engine.preview();
+                } else
+                if (event.keyCode === 78) {
+                    event.preventDefault();
+                    engine.vizRandomPreset();
                 } else
                 if (event.ctrlKey) {
                     if (event.keyCode === 38) {

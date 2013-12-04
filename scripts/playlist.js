@@ -278,19 +278,19 @@ var playlist = function() {
                         window.engine.playToggle();
                     });
                 } else
-                if (event.keyCode === 118 || event.keyCode === 86) {
+                if (event.keyCode === 86) {
                     event.preventDefault();
                     sendPlayer(function(window) {
                         window.engine.mute();
                     });
                 } else
-                if (event.keyCode === 115 || event.keyCode === 83) {
+                if (event.keyCode === 83) {
                     event.preventDefault();
                     sendPlayer(function(window) {
                         window.engine.shuffle();
                     });
                 } else
-                if (event.keyCode === 114 || event.keyCode === 82) {
+                if (event.keyCode === 82) {
                     event.preventDefault();
                     sendPlayer(function(window) {
                         window.engine.loop();
@@ -306,6 +306,12 @@ var playlist = function() {
                     event.preventDefault();
                     sendPlayer(function(window) {
                         window.engine.preview();
+                    });
+                } else
+                if (event.keyCode === 78) {
+                    event.preventDefault();
+                    sendPlayer(function(window) {
+                        window.engine.vizRandomPreset();
                     });
                 } else
                 if (event.ctrlKey) {

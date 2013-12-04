@@ -830,7 +830,12 @@ var engine = function() {
         discAdapter: function() {
             discAdapter();
         },
-        getTagBody: player.getTagBody
+        getTagBody: player.getTagBody,
+        vizRandomPreset: function() {
+            sendViz(function(window) {
+                window.viz.randomPreset();
+            });
+        }
     };
 }();
 $(function() {
