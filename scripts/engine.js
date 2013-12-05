@@ -705,8 +705,8 @@ var engine = function() {
     var vk = function() {
         var token = undefined;
         var timeout = 500;
-        var getTracks = function(cb) {
-            var url = "https://api.vk.com/method/audio.get?v=5.5&access_token=" + token;
+        var getTracks = function(cb, album_id) {
+            var url = 'https://api.vk.com/method/audio.get?v=5.5&access_token=' + token + ((album_id !== undefined) ? '&album_id=' + album_id : '');
             var tracks = [];
             var offset = 0;
             var getPage = function(offset) {
@@ -748,7 +748,7 @@ var engine = function() {
             getPage(offset);
         };
         var getAlbums = function(cb) {
-            var url = "https://api.vk.com/method/audio.getAlbums?v=5.5&access_token=" + token;
+            var url = 'https://api.vk.com/method/audio.getAlbums?v=5.5&access_token=' + token;
             var albums = [];
             var offset = 0;
             var getPage = function(offset) {
@@ -804,28 +804,32 @@ var engine = function() {
             });
         };
         var makeLists = function(cb) {
+            //deprecated method
             var list = [];
             getToken(function() {
                 getAlbums(function(all_albums) {
-                    all_albums.push({title: "[No group]", album_id: "nogroup"});
+                    all_albums.push({title: "[All]", album_id: "nogroup"});
                     getTracks(function(tracks) {
                         if (tracks.length === 0) {
                             return;
                         }
-                        var albums = {};
+                        var albums = {nogroup: {tracks: []}};
                         tracks.forEach(function(item) {
                             if (item.album_id === undefined) {
                                 item.album_id = "nogroup";
+                                albums.nogroup.tracks.push(item);
+                                return 1;
                             }
                             if (item.album_id in albums === false) {
                                 albums[item.album_id] = {tracks: []};
                             }
                             albums[item.album_id].tracks.push(item);
+                            albums.nogroup.tracks.push(item);
                         });
                         var n = 0;
                         all_albums.forEach(function(item) {
                             if (item.album_id in albums === false) {
-                                albums[item.album_id] = {tracks: []};
+                                return 1;
                             }
                             albums[item.album_id].name = item.title;
                             albums[item.album_id].id = n;
@@ -836,6 +840,18 @@ var engine = function() {
                         });
                         cb(list);
                     });
+                });
+            });
+        };
+        var makeAlbums = function(cb) {
+            getToken(function() {
+                getAlbums(function(all_albums) {
+                    all_albums.push({title: "[All]", album_id: "nogroup"});
+                    var list = [];
+                    all_albums.forEach(function(item) {
+                        list.push({name: item.title, album_id: item.album_id, id: list.length, type: "vk"});
+                    });
+                    cb(list);
                 });
             });
         };
@@ -860,6 +876,19 @@ var engine = function() {
                 }
             });
         };
+        var makeAlbumTracks = function(id, cb) {
+            if (id === "nogroup") {
+                id = undefined;
+            }
+            getToken(function() {
+                getTracks(function(tracks) {
+                    if (tracks.length === 0) {
+                        return;
+                    }
+                    cb(tracks);
+                }, id);
+            });
+        };
         return {
             getToken: function(cb) {
                 getToken(cb);
@@ -876,7 +905,8 @@ var engine = function() {
                 }
                 getAlbums(cb);
             },
-            makeLists: makeLists
+            makeAlbums: makeAlbums,
+            makeAlbumTracks: makeAlbumTracks
         };
     }();
     return {

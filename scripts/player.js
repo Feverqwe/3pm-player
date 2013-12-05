@@ -617,11 +617,16 @@ var view = function() {
                         });
                     } else
                     if (info.menuItemId === "vk") {
-                        engine.vk.makeLists(function(list) {
+                        engine.vk.makeAlbums(function(list) {
                             engine.setM3UPlaylists({list: list});
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
-                            });
+                            if (list.length === 1) {
+                                view.select_playlist(list[0].id);
+                            } else
+                            if (list.length > 0) {
+                                chrome.runtime.getBackgroundPage(function(bg) {
+                                    bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
+                                });
+                            }
                         });
                     } else
                     if (info.menuItemId === "viz") {
@@ -858,7 +863,12 @@ var view = function() {
                     engine.open(files, {name: list.name, id: id});
                 });
             } else {
-                engine.open(list.tracks, {name: list.name, id: id});
+                if (list.type === "vk") {
+                    engine.vk.makeAlbumTracks(list.album_id, function(tracks) {
+                        engine.open(tracks, {name: list.name, id: id});
+                    });
+                }
+
             }
         }
     };
