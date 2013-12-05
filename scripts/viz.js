@@ -41,14 +41,11 @@ var viz = function() {
             };
             $(window).trigger('resize');
             var save_pos = function() {
-                if (document.webkitIsFullScreen) {
+                if (document.webkitIsFullScreen || document.webkitHidden) {
                     return;
                 }
                 var wl = window.screenLeft;
                 var wr = window.screenTop;
-                if (wl < 1000 || wr < 1000) {
-                    return;
-                }
                 if (var_cache['wl'] !== wl || var_cache['wr'] !== wr) {
                     var_cache['wl'] = wl;
                     var_cache['wr'] = wr;

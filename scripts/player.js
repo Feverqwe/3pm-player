@@ -685,11 +685,11 @@ var view = function() {
                 });
             });
             var save_pos = function() {
-                var wl = window.screenLeft;
-                var wr = window.screenTop;
-                if (wl < 1000 || wr < 1000) {
+                if (document.webkitHidden) {
                     return;
                 }
+                var wl = window.screenLeft;
+                var wr = window.screenTop;
                 if (var_cache['wl'] !== wl || var_cache['wr'] !== wr) {
                     var_cache['wl'] = wl;
                     var_cache['wr'] = wr;
