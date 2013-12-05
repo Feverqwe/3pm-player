@@ -964,7 +964,12 @@ var engine = function() {
                 var item = pl[i];
                 var title = item.file.name;
                 if ('url' in item.file) {
-                    title = player.getTagBody(item.id).join(' - ');
+                    title = player.getTagBody(item.id);
+                    if (title[1].length === 0) {
+                        title = title[0];
+                    } else {
+                        title = title.join(' - ');
+                    }
                 }
                 list.push({id: item.id, title: title});
             }
