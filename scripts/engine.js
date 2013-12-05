@@ -282,8 +282,11 @@ var engine = function() {
             return [title, album];
         };
         return {
-            getTagBody: function() {
-                return getTagBody(current_id);
+            getTagBody: function(id) {
+                if (id === undefined) {
+                    id = current_id;
+                }
+                return getTagBody(id);
             },
             open: function(id) {
                 id = parseInt(id);
@@ -959,7 +962,11 @@ var engine = function() {
             var list = [];
             for (var i = 0; i < pl.length; i++) {
                 var item = pl[i];
-                list.push({id: item.id, title: item.file.name});
+                var title = item.file.name;
+                if ('url' in item.file) {
+                    title = player.getTagBody(item.id).join(' - ');
+                }
+                list.push({id: item.id, title: title});
             }
             var data = window.btoa(unescape(encodeURIComponent(JSON.stringify({'playlist': list}))));
             return data;
