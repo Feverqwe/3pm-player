@@ -32,7 +32,7 @@ var web_socket = function() {
     };
 
     var readUrl = function(headerMap, socketId) {
-        if (!'url' in headerMap) {
+        if ('url' in headerMap === false) {
             return response_(socketId, headerMap, stringToArrayBuffer("Don't have url!"), ['404 Not Found']);
         }
         var player = wm.getPlayer();

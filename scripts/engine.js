@@ -708,11 +708,16 @@ var engine = function() {
             var offset = 0;
             var getPage = function(offset) {
                 $.getJSON(url + "&count=6000&offset=" + offset, function(data) {
-                    if (!'response' in data) {
+                    if ('error' in data) {
+                        token = undefined;
+                        chrome.storage.local.remove('vk_token');
+                        return;
+                    }
+                    if ('response' in data === false) {
                         return;
                     }
                     data = data.response;
-                    if (!'items' in data) {
+                    if ('items' in data === false) {
                         return;
                     }
                     var len = 0;
@@ -741,11 +746,16 @@ var engine = function() {
             var offset = 0;
             var getPage = function(offset) {
                 $.getJSON(url + "&count=100&offset=" + offset, function(data) {
-                    if (!'response' in data) {
+                    if ('error' in data) {
+                        token = undefined;
+                        chrome.storage.local.remove('vk_token');
+                        return;
+                    }
+                    if ('response' in data === false) {
                         return;
                     }
                     data = data.response;
-                    if (!'items' in data) {
+                    if ('items' in data === false) {
                         return;
                     }
                     var len = 0;
@@ -786,12 +796,12 @@ var engine = function() {
             var list = [];
             getToken(function() {
                 getAlbums(function(all_albums) {
-                    all_albums.push({title: "[noname]", album_id: undefined});
+                    all_albums.push({title: "[No group]", album_id: "nogroup"});
                     getTracks(function(tracks) {
                         var albums = {};
                         tracks.forEach(function(item) {
-                            if ("album_id" in item === false) {
-                                item.album_id = "noname";
+                            if (item.album_id === undefined) {
+                                item.album_id = "nogroup";
                             }
                             if (item.album_id in albums === false) {
                                 albums[item.album_id] = {tracks: []};
@@ -826,9 +836,14 @@ var engine = function() {
                 if (!responseURL) {
                     return;
                 }
-                token = responseURL.replace(/.*_token=([a-zA-Z0-9]*)&.*/, "$1");
-                chrome.storage.local.set({vk_token: token});
-                cb(token);
+                if (responseURL.indexOf("access_token=") !== -1) {
+                    token = responseURL.replace(/.*access_token=([a-zA-Z0-9]*)&.*/, "$1");
+                    chrome.storage.local.set({vk_token: token});
+                    cb(token);
+                } else {
+                    chrome.storage.remove('vk_token');
+                    vkAuth(cb);
+                }
             });
         };
         return {

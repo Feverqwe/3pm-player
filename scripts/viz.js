@@ -20,7 +20,7 @@ var viz = function() {
         }
     }
     var setTags = function(value) {
-        if (!"track" in dom_cache) {
+        if ("track" in dom_cache === false) {
             return;
         }
         dom_cache.track.html(value[0] + "<br/>" + value[1]);
