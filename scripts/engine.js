@@ -720,7 +720,7 @@ var engine = function() {
                         return;
                     }
                     data = data.response;
-                    if ('items' in data === false) {
+                    if ('items' in data === false || 'count' in data === false) {
                         return;
                     }
                     if (data.count === 0) {
@@ -762,7 +762,7 @@ var engine = function() {
                         return;
                     }
                     data = data.response;
-                    if ('items' in data === false) {
+                    if ('items' in data === false || 'count' in data === false) {
                         return;
                     }
                     if (data.count === 0) {
