@@ -723,6 +723,10 @@ var engine = function() {
                     if ('items' in data === false) {
                         return;
                     }
+                    if (data.count === 0) {
+                        cb(tracks);
+                        return;
+                    }
                     var len = 0;
                     data.items.forEach(function(item) {
                         tracks.push({id: tracks.length, album_id: item.album_id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
@@ -761,12 +765,16 @@ var engine = function() {
                     if ('items' in data === false) {
                         return;
                     }
+                    if (data.count === 0) {
+                        cb(albums);
+                        return;
+                    }
                     var len = 0;
                     data.items.forEach(function(item) {
                         albums.push({id: albums.length, album_id: item.album_id, title: item.title});
                         len++;
                     });
-                    if (len <= 0 && data.count !== 0) {
+                    if (len <= 0) {
                         return;
                     }
                     if (albums.length !== data.count) {
@@ -801,6 +809,9 @@ var engine = function() {
                 getAlbums(function(all_albums) {
                     all_albums.push({title: "[No group]", album_id: "nogroup"});
                     getTracks(function(tracks) {
+                        if (tracks.length === 0) {
+                            return;
+                        }
                         var albums = {};
                         tracks.forEach(function(item) {
                             if (item.album_id === undefined) {
