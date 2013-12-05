@@ -26,10 +26,60 @@ var viz = function() {
         dom_cache.track.html(value[0] + "<br/>" + value[1]);
     };
     return {
-        run: function() {
+        preload: function() {
             dom_cache.body = $('body');
             dom_cache.body.append('<div class="track"></div>');
             dom_cache.track = $('div.track');
+            window.onresize = function() {
+                clearTimeout(var_cache.resize_timer);
+                var_cache.resize_timer = setTimeout(function() {
+                    if (document.webkitIsFullScreen) {
+                        return;
+                    }
+                    chrome.storage.local.set({viz_w: window.innerWidth, viz_h: window.innerHeight});
+                }, 500);
+            };
+            $(window).trigger('resize');
+            var save_pos = function() {
+                if (document.webkitIsFullScreen) {
+                    return;
+                }
+                var wl = window.screenLeft;
+                var wr = window.screenTop;
+                if (wl < 1000 || wr < 1000) {
+                    return;
+                }
+                if (var_cache['wl'] !== wl || var_cache['wr'] !== wr) {
+                    var_cache['wl'] = wl;
+                    var_cache['wr'] = wr;
+                    chrome.storage.local.set({'viz_pos_left': wl, 'viz_pos_top': wr});
+                }
+            };
+            $('.close').on('click', function() {
+                save_pos();
+                sendPlayer(function(window) {
+                    window.engine.discAdapter();
+                });
+                window.close();
+            });
+            $('.mini').on('click', function() {
+                chrome.app.window.current().minimize();
+            });
+            $('.full').on('click', function() {
+                if (!document.webkitIsFullScreen) {
+                    document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                } else {
+                    document.webkitCancelFullScreen();
+                }
+            });
+            setInterval(function() {
+                save_pos();
+                chrome.runtime.getBackgroundPage(function(bg) {
+                    bg.wm.hi("viz", chrome.app.window.current());
+                });
+            }, 5000);
+        },
+        run: function() {
             sendPlayer(function(window) {
                 audio = window.engine.getAudio();
                 setTags(window.engine.getTagBody());
@@ -114,51 +164,6 @@ var viz = function() {
                     }
                 }
             });
-            window.onresize = function() {
-                clearTimeout(var_cache.resize_timer);
-                var_cache.resize_timer = setTimeout(function() {
-                    if (document.webkitIsFullScreen) {
-                        return;
-                    }
-                    chrome.storage.local.set({viz_w: window.innerWidth, viz_h: window.innerHeight});
-                }, 500);
-            };
-            $(window).trigger('resize');
-            var save_pos = function() {
-                if (document.webkitIsFullScreen) {
-                    return;
-                }
-                var wl = window.screenLeft;
-                var wr = window.screenTop;
-                if (var_cache['wl'] !== wl || var_cache['wr'] !== wr) {
-                    var_cache['wl'] = wl;
-                    var_cache['wr'] = wr;
-                    chrome.storage.local.set({'viz_pos_left': wl, 'viz_pos_top': wr});
-                }
-            };
-            $('.close').on('click', function() {
-                save_pos();
-                sendPlayer(function(window) {
-                    window.engine.discAdapter();
-                });
-                window.close();
-            });
-            $('.mini').on('click', function() {
-                chrome.app.window.current().minimize();
-            });
-            $('.full').on('click', function() {
-                if (!document.webkitIsFullScreen) {
-                    document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-                } else {
-                    document.webkitCancelFullScreen();
-                }
-            });
-            setInterval(function() {
-                save_pos();
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.hi("viz", chrome.app.window.current());
-                });
-            }, 5000);
         },
         audio_state: function(key, value) {
             if (dancerInited === false && key === "loadedmetadata") {
@@ -191,6 +196,7 @@ var viz = function() {
     };
 }();
 $(function() {
+    viz.preload();
     var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
     var ext_url = "chrome-extension://" + aid + "/viz/";
     reality = (typeof reality === 'undefined' ? {} : reality);
