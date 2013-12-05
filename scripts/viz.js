@@ -189,6 +189,9 @@ var viz = function() {
             if ("randomPreset" in reality) {
                 reality.randomPreset();
             }
+        },
+        minimize: function() {
+            $('.mini').trigger('click');
         }
     };
 }();

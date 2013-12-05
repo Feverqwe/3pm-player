@@ -1024,6 +1024,11 @@ var engine = function() {
                 window.close();
             });
         },
+        vizMini: function() {
+            sendViz(function(window) {
+                window.viz.minimize();
+            });
+        },
         vk: vk
     };
 }();

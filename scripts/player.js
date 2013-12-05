@@ -476,6 +476,7 @@ var view = function() {
                 engine.sendPlaylist(function(window) {
                     window.playlist.minimize();
                 });
+                engine.vizMini();
                 chrome.app.window.current().minimize();
             });
             dom_cache.time.on('click', function() {
