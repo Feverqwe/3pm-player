@@ -766,7 +766,7 @@ var engine = function() {
                         albums.push({id: albums.length, album_id: item.album_id, title: item.title});
                         len++;
                     });
-                    if (len <= 0) {
+                    if (len <= 0 && data.count !== 0) {
                         return;
                     }
                     if (albums.length !== data.count) {
