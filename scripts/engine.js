@@ -544,6 +544,7 @@ var engine = function() {
                 $('.engine').append('<audio/>');
                 audio = $('.engine > audio').get(0);
                 $(audio).on('loadstart', function(e) {
+                    add_played(current_id);
                     view.setTags(playlist[current_id].tags || {});
                     view.state("loadstart");
                     sendViz(function(window) {
@@ -616,7 +617,6 @@ var engine = function() {
                     view.state("waiting");
                 });
                 $(audio).on('playing', function(e) {
-                    add_played(current_id);
                     view.state("playing");
                 });
                 $(audio).on('canplay', function(e) {
