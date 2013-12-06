@@ -303,7 +303,16 @@ var engine = function() {
                     if (current_type !== undefined) {
                         $(audio).removeAttr('type');
                     }
-                    audio.src = item.file.url;
+                    if (item.type === "db" && item.file.url === undefined) {
+                        db.getMedia(function(url) {
+                            $.ajax({type: "HEAD", url: url, success: function() {
+                                    audio.src = url;
+                                }});
+                            item.file.url = url;
+                        }, item.root, item.path);
+                    } else {
+                        audio.src = item.file.url;
+                    }
                 } else {
                     var type = getType(item.file);
                     if (current_type !== type) {
@@ -945,13 +954,38 @@ var engine = function() {
                 if (xhr.readyState === 4)
                 {
                     var data = JSON.parse(xhr.responseText);
-                    console.log(data);
                     if ('error' in data) {
                         token = undefined;
                         chrome.storage.local.remove('db_token');
                         return;
                     }
                     cb(data);
+                }
+            };
+            xhr.send(null);
+        };
+        var getMedia = function(cb, root, path) {
+            if (root === undefined) {
+                root = 'dropbox';
+            }
+            if (path === undefined) {
+                path = '';
+            }
+            var url = 'https://api.dropbox.com/1/media/' + root + path;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.setRequestHeader("Authorization", "Bearer " + token);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4)
+                {
+                    var data = JSON.parse(xhr.responseText);
+                    if ('error' in data) {
+                        token = undefined;
+                        chrome.storage.local.remove('db_token');
+                        cb(undefined);
+                        return;
+                    }
+                    cb(data.url);
                 }
             };
             xhr.send(null);
@@ -972,7 +1006,16 @@ var engine = function() {
         };
         return {
             getToken: getToken,
-            getFilelist: getFilelist
+            getFilelist: function(a, b, c) {
+                getToken(function() {
+                    getFilelist(a, b, c);
+                });
+            },
+            getMedia: function(a, b, c) {
+                getToken(function() {
+                    getMedia(a, b, c);
+                });
+            }
         };
     }();
     return {

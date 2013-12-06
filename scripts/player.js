@@ -640,7 +640,7 @@ var view = function() {
                         engine.db.getToken(function() {
                             engine.db.getFilelist(function(list) {
                                 chrome.runtime.getBackgroundPage(function(bg) {
-                                    bg.wm.showDialog({type: "db", h: 450, w: 350, r: true, filelist: list});
+                                    bg.wm.showDialog({type: "db", h: 315, w: 350, r: true, filelist: list});
                                 });
                             });
                         });
@@ -883,6 +883,9 @@ var view = function() {
                     engine.vk.makeAlbumTracks(list.album_id, function(tracks) {
                         engine.open(tracks, {name: list.name, id: id});
                     });
+                } else
+                if (list.type === "db") {
+                    engine.open(list.tracks, {name: list.name, id: id});
                 }
 
             }

@@ -32,7 +32,7 @@ input {
 }
 .playlist_chiser div.playlists {
     -webkit-app-region: no-drag;
-    height: calc(100% - 48px);
+    height: calc(100% - 40px);
     overflow: auto;
     margin-top: 2px;
 }
@@ -77,14 +77,17 @@ input {
     margin-top: 12px;
     font-size: 120%;
 }
+div.filelist::-webkit-scrollbar,
 .playlist_chiser > div.playlists::-webkit-scrollbar {
     height: 15px;
     width: 15px;
 }
+div.filelist::-webkit-scrollbar-button,
 .playlist_chiser > div.playlists::-webkit-scrollbar-button {
     height: 0;
     width: 0;
 }
+div.filelist::-webkit-scrollbar-thumb:vertical,
 .playlist_chiser > div.playlists::-webkit-scrollbar-thumb:vertical {
     background-clip: padding-box;
     background-color: #565A61;
@@ -129,14 +132,74 @@ input {
     padding-right: 15px;
     height: 100%;
 }
+.dropbox_choice input[type="button"] {
+    margin-top: 5px;
+    float: right;
+    background-color: rgba(53, 53, 53, 0.59);
+    border: rgb(95, 95, 95) solid 1px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: #ccc;
+    cursor: pointer;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    height: 34px;
+    padding-left: 12px;
+    padding-right: 12px;
+    outline: none;
+}
+.dropbox_choice input[type="button"]:hover {
+    background-color: #424242;
+}
+.dropbox_choice input[type="button"]:active {
+    background-color: #585858;
+}
+.dropbox_choice input[type="button"]:disabled {
+    background-color: #000;
+}
 .dropbox_choice div.filelist {
     -webkit-app-region: no-drag;
-    height: calc(100% - 48px);
+    height: calc(100% - 65px);
     overflow: auto;
     margin-top: 2px;
+    margin-right: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.46);
 }
 .dropbox_choice div.filelist > ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
+}
+.dropbox_choice ul > li {
+    padding: 2px;
+    cursor: pointer;
+    position: relative;
+    padding-right: 24px;
+}
+.dropbox_choice ul > li:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.38);
+}
+.dropbox_choice ul > li:hover {
+    background-color: rgba(66, 121, 204, 0.38);
+}
+.dropbox_choice ul > li .play { 
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 16px;
+    width: 16px;
+    background: url(../images/playback_play_w.png) no-repeat center;
+    background-position-y: 2px;
+    opacity: 0.7;
+}
+.dropbox_choice ul > li .play:hover {
+    opacity: 1;
+}
+.dropbox_choice ul > li input { 
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+.dropbox_choice ul > li.selected {
+    background-color: #0E4E72;
 }

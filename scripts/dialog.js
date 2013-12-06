@@ -57,6 +57,7 @@ var dialog = function() {
         });
     };
     var db_writefilelist = function(list) {
+        dom_cache.dropbox_button.attr('disabled', 'disabled');
         var fl = dom_cache.dropbox_ul;
         fl.empty();
         if (list.path.length > 1) {
@@ -64,10 +65,17 @@ var dialog = function() {
         }
         var n = 0;
         list.contents.forEach(function(item) {
-            fl.append('<li class="db_file" data-id="' + n + '"><span title="' + item.path + '">' + item.path + '</span></li>');
+            var filename = item.path.split('/').slice(-1)[0];
+            var action = '';
+            if (item.is_dir) {
+                action += '<div class="play" title="Play folder"></div>';
+            } else {
+                action += '<input name="id' + n + '" type="checkbox"/>';
+            }
+            fl.append('<li class="db_file" data-id="' + n + '"><span title="' + filename + '">' + filename + '</span>' + action + '</li>');
             n++;
         });
-        dom_cache.db_list = list;
+        var_cache.db_list = list;
     };
     var dropboxChoice = function() {
         /*
@@ -75,22 +83,28 @@ var dialog = function() {
          */
         dom_cache.dropbox = $('.dropbox_choice');
         dom_cache.dropbox.show();
+        dom_cache.dropbox_button = dom_cache.dropbox.find('input[type="button"]').eq(0);
         dom_cache.dropbox_ul = dom_cache.dropbox.find("ul").eq(0);
         db_writefilelist(window.options.filelist);
-        dom_cache.dropbox.on('click', 'li.db_file', function() {
+        dom_cache.dropbox.on('click', 'li.db_file', function(e) {
+            if (e.target.nodeName === "INPUT") {
+                return;
+            }
             var id = parseInt($(this).data("id"));
             var path = undefined;
             var root = undefined;
             if (id === -1) {
-                path = dom_cache.db_list.path + '/..';
-                root = dom_cache.db_list.root + '/..';
+                path = var_cache.db_list.path + '/..';
+                root = var_cache.db_list.root;
             } else {
-                var item = dom_cache.db_list.contents[id];
+                var item = var_cache.db_list.contents[id];
                 if (item.is_dir) {
                     path = item.path;
                     root = item.root;
                 } else {
-                    console.log(item);
+                    var ch_box = $(this).children('input');
+                    ch_box.get(0).checked = !ch_box.get(0).checked;
+                    ch_box.trigger('change');
                     return;
                 }
             }
@@ -99,7 +113,76 @@ var dialog = function() {
                     db_writefilelist(list);
                 }, root, path);
             });
-            // window.close();
+        });
+        dom_cache.dropbox.on('change', 'input[type="checkbox"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var checked = this.checked;
+            if (checked) {
+                $(this).parent().addClass('selected');
+            } else {
+                $(this).parent().removeClass('selected');
+            }
+            var count = dom_cache.dropbox.find('input[type="checkbox"]:checked').length;
+            if (count > 0) {
+                dom_cache.dropbox_button.removeAttr('disabled');
+            } else {
+                dom_cache.dropbox_button.attr('disabled', 'disabled');
+            }
+        });
+        dom_cache.dropbox.on('click', 'li > .play', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = parseInt($(this).parent().data("id"));
+            var item = var_cache.db_list.contents[id];
+            if (!item.is_dir) {
+                return;
+            }
+            var path = item.path;
+            var root = item.root;
+            var _window = window;
+            sendPlayer(function(window) {
+                window.engine.db.getFilelist(function(list) {
+                    var playlist = {name: "Dropbox", id: 0, type: "db", tracks: []};
+                    list.contents.forEach(function(item) {
+                        if (item.is_dir) {
+                            return 1;
+                        }
+                        var filename = item.path.split('/').slice(-1)[0];
+                        playlist.tracks.push({id: -1, file: {name: filename, url: undefined}, tags: {}, duration: 0, type: "db", root: item.root, path: item.path});
+                    });
+                    if (playlist.tracks.length === 0) {
+                        return;
+                    }
+                    sendPlayer(function(window) {
+                        window.engine.setM3UPlaylists({list: [playlist]});
+                        window.view.select_playlist(0);
+                    });
+                    _window.close();
+                }, root, path);
+            });
+        });
+        dom_cache.dropbox_button.on('click', function(e) {
+            e.preventDefault();
+            var playlist = {name: "Dropbox", id: 0, type: "db", tracks: []};
+            var items = $.makeArray(dom_cache.dropbox.find('input[type="checkbox"]:checked'));
+            items.forEach(function(item) {
+                var id = $(item).parent().data('id');
+                item = var_cache.db_list.contents[id];
+                if (item.is_dir) {
+                    return 1;
+                }
+                var filename = item.path.split('/').slice(-1)[0];
+                playlist.tracks.push({id: -1, file: {name: filename, url: undefined}, tags: {}, duration: 0, type: "db", root: item.root, path: item.path});
+            });
+            if (playlist.tracks.length === 0) {
+                return;
+            }
+            sendPlayer(function(window) {
+                window.engine.setM3UPlaylists({list: [playlist]});
+                window.view.select_playlist(0);
+            });
+            window.close();
         });
     };
     return {
