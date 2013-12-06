@@ -143,7 +143,8 @@ var dialog = function() {
             var _window = window;
             sendPlayer(function(window) {
                 window.engine.db.getFilelist(function(list) {
-                    var playlist = {name: "Dropbox", id: 0, type: "db", tracks: []};
+                    var pl_name = list.path.split('/').slice(-1)[0] || "Dropbox";
+                    var playlist = {name: pl_name, id: 0, type: "db", tracks: []};
                     list.contents.forEach(function(item) {
                         if (item.is_dir) {
                             return 1;
@@ -164,7 +165,8 @@ var dialog = function() {
         });
         dom_cache.dropbox_button.on('click', function(e) {
             e.preventDefault();
-            var playlist = {name: "Dropbox", id: 0, type: "db", tracks: []};
+            var pl_name = var_cache.db_list.path.split('/').slice(-1)[0] || "Dropbox";
+            var playlist = {name: pl_name, id: 0, type: "db", tracks: []};
             var items = $.makeArray(dom_cache.dropbox.find('input[type="checkbox"]:checked'));
             items.forEach(function(item) {
                 var id = $(item).parent().data('id');
