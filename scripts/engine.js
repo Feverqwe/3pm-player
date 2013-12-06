@@ -13,6 +13,7 @@ var engine = function() {
     var _playlist_window = undefined;
     var _viz_window = undefined;
     var adapter = undefined;
+    var_tmp = {};
     function sendPlaylist(callback) {
         /*
          * Функция отправки действий в плэйлист
@@ -544,7 +545,10 @@ var engine = function() {
                 $('.engine').append('<audio/>');
                 audio = $('.engine > audio').get(0);
                 $(audio).on('loadstart', function(e) {
-                    add_played(current_id);
+                    clearTimeout(var_tmp.add_played);
+                    var_tmp.add_played = setTimeout(function() {
+                        add_played(current_id);
+                    }, 5000);
                     view.setTags(playlist[current_id].tags || {});
                     view.state("loadstart");
                     sendViz(function(window) {
@@ -812,56 +816,14 @@ var engine = function() {
                 }
             });
         };
-        var makeLists = function(cb) {
-            //deprecated method
-            var list = [];
-            getToken(function() {
-                getAlbums(function(all_albums) {
-                    all_albums.push({title: "[All]", album_id: "nogroup"});
-                    getTracks(function(tracks) {
-                        if (tracks.length === 0) {
-                            return;
-                        }
-                        var albums = {nogroup: {tracks: []}};
-                        tracks.forEach(function(item) {
-                            if (item.album_id === undefined) {
-                                item.album_id = "nogroup";
-                                albums.nogroup.tracks.push(item);
-                                return 1;
-                            }
-                            if (item.album_id in albums === false) {
-                                albums[item.album_id] = {tracks: []};
-                            }
-                            albums[item.album_id].tracks.push(item);
-                            albums.nogroup.tracks.push(item);
-                        });
-                        var n = 0;
-                        all_albums.forEach(function(item) {
-                            if (item.album_id in albums === false) {
-                                return 1;
-                            }
-                            albums[item.album_id].name = item.title;
-                            albums[item.album_id].id = n;
-                            n++;
-                        });
-                        $.each(albums, function(k, v) {
-                            list.push(v);
-                        });
-                        cb(list);
-                    });
-                });
-            });
-        };
         var makeAlbums = function(cb) {
-            getToken(function() {
-                getAlbums(function(all_albums) {
-                    all_albums.push({title: "[All]", album_id: "nogroup"});
-                    var list = [];
-                    all_albums.forEach(function(item) {
-                        list.push({name: item.title, album_id: item.album_id, id: list.length, type: "vk"});
-                    });
-                    cb(list);
+            getAlbums(function(all_albums) {
+                all_albums.push({title: "[All]", album_id: "nogroup"});
+                var list = [];
+                all_albums.forEach(function(item) {
+                    list.push({name: item.title, album_id: item.album_id, id: list.length, type: "vk"});
                 });
+                cb(list);
             });
         };
         var vkAuth = function(cb) {
@@ -889,33 +851,24 @@ var engine = function() {
             if (id === "nogroup") {
                 id = undefined;
             }
-            getToken(function() {
-                getTracks(function(tracks) {
-                    if (tracks.length === 0) {
-                        return;
-                    }
-                    cb(tracks);
-                }, id);
-            });
+            getTracks(function(tracks) {
+                if (tracks.length === 0) {
+                    return;
+                }
+                cb(tracks);
+            }, id);
         };
         return {
-            getToken: function(cb) {
-                getToken(cb);
+            makeAlbums: function(a) {
+                getToken(function() {
+                    makeAlbums(a);
+                });
             },
-            getTracks: function(cb) {
-                if (!token) {
-                    return;
-                }
-                getTracks(cb);
-            },
-            getAlbums: function(cb) {
-                if (!token) {
-                    return;
-                }
-                getAlbums(cb);
-            },
-            makeAlbums: makeAlbums,
-            makeAlbumTracks: makeAlbumTracks
+            makeAlbumTracks: function(a, b) {
+                getToken(function() {
+                    makeAlbumTracks(a, b);
+                });
+            }
         };
     }();
     var db = function() {
