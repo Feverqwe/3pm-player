@@ -1,4 +1,6 @@
 var dialog = function() {
+    var var_cache = {};
+    var dom_cache = {};
     var _player_window = undefined;
     function sendPlayer(callback) {
         /*
@@ -54,6 +56,52 @@ var dialog = function() {
             window.close();
         });
     };
+    var db_writefilelist = function(list) {
+        var fl = dom_cache.dropbox_ul;
+        fl.empty();
+        if (list.path.length > 1) {
+            fl.append('<li class="db_file" data-id="-1"><span title="Go Back">Go Back</span></li>');
+        }
+        var n = 0;
+        list.contents.forEach(function(item) {
+            fl.append('<li class="db_file" data-id="' + n + '"><span title="' + item.path + '">' + item.path + '</span></li>');
+            n++;
+        });
+        dom_cache.db_list = list;
+    };
+    var dropboxChoice = function() {
+        /*
+         * Создает форму выбора папок иди файлов для DropBox
+         */
+        dom_cache.dropbox = $('.dropbox_choice');
+        dom_cache.dropbox.show();
+        dom_cache.dropbox_ul = dom_cache.dropbox.find("ul").eq(0);
+        db_writefilelist(window.options.filelist);
+        dom_cache.dropbox.on('click', 'li.db_file', function() {
+            var id = parseInt($(this).data("id"));
+            var path = undefined;
+            var root = undefined;
+            if (id === -1) {
+                path = dom_cache.db_list.path + '/..';
+                root = dom_cache.db_list.root + '/..';
+            } else {
+                var item = dom_cache.db_list.contents[id];
+                if (item.is_dir) {
+                    path = item.path;
+                    root = item.root;
+                } else {
+                    console.log(item);
+                    return;
+                }
+            }
+            sendPlayer(function(window) {
+                window.engine.db.getFilelist(function(list) {
+                    db_writefilelist(list);
+                }, root, path);
+            });
+            // window.close();
+        });
+    };
     return {
         run: function() {
             $('.close').on('click', function() {
@@ -67,6 +115,9 @@ var dialog = function() {
             }
             if (window.options.type === "m3u") {
                 playlistChiser();
+            }
+            if (window.options.type === "db") {
+                dropboxChoice();
             }
         }
     };

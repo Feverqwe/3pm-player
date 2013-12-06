@@ -937,14 +937,15 @@ var engine = function() {
             if (path === undefined) {
                 path = '';
             }
-            var url = 'https://api.dropbox.com/1/metadata/' + root + '/' + path;
+            var url = 'https://api.dropbox.com/1/metadata/' + root + path;
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url);
             xhr.setRequestHeader("Authorization", "Bearer " + token);
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200)
+                if (xhr.readyState === 4)
                 {
                     var data = JSON.parse(xhr.responseText);
+                    console.log(data);
                     if ('error' in data) {
                         token = undefined;
                         chrome.storage.local.remove('db_token');

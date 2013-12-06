@@ -123,3 +123,20 @@ input {
     background-image: url('../images/x.png');
     right: 2px;
 }
+
+.dropbox_choice {
+    padding-left: 18px;
+    padding-right: 15px;
+    height: 100%;
+}
+.dropbox_choice div.filelist {
+    -webkit-app-region: no-drag;
+    height: calc(100% - 48px);
+    overflow: auto;
+    margin-top: 2px;
+}
+.dropbox_choice div.filelist > ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
