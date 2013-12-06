@@ -733,8 +733,7 @@ var engine = function() {
                     if (is_error(data) || 'response' in data === false) {
                         return;
                     }
-                    data = data.response;
-                    data.forEach(function(item) {
+                    data.response.forEach(function(item) {
                         tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
                     });
                     cb(tracks);
@@ -750,8 +749,7 @@ var engine = function() {
                     if (is_error(data) || 'response' in data === false) {
                         return;
                     }
-                    data = data.response;
-                    data.forEach(function(item) {
+                    data.response.forEach(function(item) {
                         tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
                     });
                     cb(tracks);
