@@ -604,6 +604,13 @@ var view = function() {
                     title: "Get Music from VK",
                     contexts: ["all"]
                 });
+               // /*
+                chrome.contextMenus.create({
+                    id: "db",
+                    title: "Get Music from DropBox",
+                    contexts: ["all"]
+                });
+               // */
                 chrome.runtime.getBackgroundPage(function(bg) {
                     chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
                 });
@@ -628,6 +635,9 @@ var view = function() {
                                 });
                             }
                         });
+                    } else
+                    if (info.menuItemId === "db") {
+                        engine.db.run();
                     } else
                     if (info.menuItemId === "viz") {
                         chrome.runtime.getBackgroundPage(function(bg) {

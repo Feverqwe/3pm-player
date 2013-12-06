@@ -909,6 +909,71 @@ var engine = function() {
             makeAlbumTracks: makeAlbumTracks
         };
     }();
+    var db = function() {
+        var token = undefined;
+        var dbAuth = function(cb) {
+            var client_id = "t8uqhrqkw9rz5x8";
+            var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
+            var url = 'https://www.dropbox.com/1/oauth2/authorize?client_id=' + client_id + '&response_type=token&redirect_uri=' + redirect_uri;
+            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
+            function(responseURL) {
+                if (!responseURL) {
+                    return;
+                }
+                if (responseURL.indexOf("access_token=") !== -1) {
+                    token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-]*)&.*/, "$1");
+                    chrome.storage.local.set({db_token: token});
+                    cb(token);
+                } else {
+                    chrome.storage.remove('db_token');
+                    dbAuth(cb);
+                }
+            });
+        };
+        var getFilelist = function(cb, root, path) {
+            if (root === undefined) {
+                root = 'dropbox';
+            }
+            if (path === undefined) {
+                path = '';
+            }
+            var url = 'https://api.dropbox.com/1/metadata/' + root + '/' + path;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.setRequestHeader("Authorization", "Bearer " + token);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200)
+                {
+                    var data = JSON.parse(xhr.responseText);
+                    if ('error' in data) {
+                        token = undefined;
+                        chrome.storage.local.remove('db_token');
+                        return;
+                    }
+                    cb(data);
+                }
+            };
+            xhr.send(null);
+        };
+        var getToken = function(cb) {
+            if (token !== undefined) {
+                cb(token);
+                return;
+            }
+            chrome.storage.local.get('db_token', function(obj) {
+                if ('db_token' in obj) {
+                    token = obj.db_token;
+                    cb(token);
+                } else {
+                    dbAuth(cb);
+                }
+            });
+        };
+        return {
+            getToken: getToken,
+            getFilelist: getFilelist
+        };
+    }();
     return {
         run: function() {
             $('.engine').remove();
@@ -1070,7 +1135,8 @@ var engine = function() {
                 window.viz.minimize();
             });
         },
-        vk: vk
+        vk: vk,
+        db: db
     };
 }();
 $(function() {
