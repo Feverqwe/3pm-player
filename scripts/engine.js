@@ -13,7 +13,6 @@ var engine = function() {
     var _playlist_window = undefined;
     var _viz_window = undefined;
     var adapter = undefined;
-    var_tmp = {};
     function sendPlaylist(callback) {
         /*
          * Функция отправки действий в плэйлист
@@ -545,10 +544,6 @@ var engine = function() {
                 $('.engine').append('<audio/>');
                 audio = $('.engine > audio').get(0);
                 $(audio).on('loadstart', function(e) {
-                    clearTimeout(var_tmp.add_played);
-                    var_tmp.add_played = setTimeout(function() {
-                        add_played(current_id);
-                    }, 5000);
                     view.setTags(playlist[current_id].tags || {});
                     view.state("loadstart");
                     sendViz(function(window) {
@@ -621,6 +616,7 @@ var engine = function() {
                     view.state("waiting");
                 });
                 $(audio).on('playing', function(e) {
+                    add_played(current_id);
                     view.state("playing");
                 });
                 $(audio).on('canplay', function(e) {
