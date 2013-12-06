@@ -607,7 +607,7 @@ var view = function() {
                 // /*
                 chrome.contextMenus.create({
                     id: "db",
-                    title: "Get Music from DropBox",
+                    title: "Get Music from Dropbox",
                     contexts: ["all"]
                 });
                 // */

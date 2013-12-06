@@ -79,7 +79,7 @@ var dialog = function() {
     };
     var dropboxChoice = function() {
         /*
-         * Создает форму выбора папок иди файлов для DropBox
+         * Создает форму выбора папок иди файлов для Dropbox
          */
         dom_cache.dropbox = $('.dropbox_choice');
         dom_cache.dropbox.show();
