@@ -714,24 +714,61 @@ var engine = function() {
     var vk = function() {
         var token = undefined;
         var timeout = 500;
+        var is_error = function(data) {
+            if ('error' in data) {
+                token = undefined;
+                chrome.storage.local.remove('vk_token');
+                return true;
+            }
+            return false;
+        };
+        var getPopular = function(cb, genre_id) {
+            if (genre_id === undefined) {
+                genre_id = 0;
+            }
+            var url = 'https://api.vk.com/method/audio.getPopular?v=5.5&access_token=' + token + '&count=100&genre_id=' + genre_id;
+            var tracks = [];
+            var getPage = function() {
+                $.getJSON(url, function(data) {
+                    if (is_error(data) || 'response' in data === false) {
+                        return;
+                    }
+                    data = data.response;
+                    data.forEach(function(item) {
+                        tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
+                    });
+                    cb(tracks);
+                });
+            };
+            getPage();
+        };
+        var getRecommendations = function(cb) {
+            var url = 'https://api.vk.com/method/audio.getRecommendations?v=5.5&access_token=' + token + '&count=100&shuffle=1';
+            var tracks = [];
+            var getPage = function() {
+                $.getJSON(url, function(data) {
+                    if (is_error(data) || 'response' in data === false) {
+                        return;
+                    }
+                    data = data.response;
+                    data.forEach(function(item) {
+                        tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
+                    });
+                    cb(tracks);
+                });
+            };
+            getPage();
+        };
         var getTracks = function(cb, album_id) {
             var url = 'https://api.vk.com/method/audio.get?v=5.5&access_token=' + token + ((album_id !== undefined) ? '&album_id=' + album_id : '');
             var tracks = [];
             var offset = 0;
             var getPage = function(offset) {
                 $.getJSON(url + "&count=6000&offset=" + offset, function(data) {
-                    if ('error' in data) {
-                        token = undefined;
-                        chrome.storage.local.remove('vk_token');
-                        return;
-                    }
-                    if ('response' in data === false) {
+                    if (is_error(data) || 'response' in data === false || 'items' in data.response === false || 'count' in data.response === false) {
                         return;
                     }
                     data = data.response;
-                    if ('items' in data === false || 'count' in data === false) {
-                        return;
-                    }
                     if (data.count === 0) {
                         cb(tracks);
                         return;
@@ -762,18 +799,10 @@ var engine = function() {
             var offset = 0;
             var getPage = function(offset) {
                 $.getJSON(url + "&count=100&offset=" + offset, function(data) {
-                    if ('error' in data) {
-                        token = undefined;
-                        chrome.storage.local.remove('vk_token');
-                        return;
-                    }
-                    if ('response' in data === false) {
+                    if (is_error(data) || 'response' in data === false || 'items' in data.response === false || 'count' in data.response === false) {
                         return;
                     }
                     data = data.response;
-                    if ('items' in data === false || 'count' in data === false) {
-                        return;
-                    }
                     if (data.count === 0) {
                         cb(albums);
                         return;
@@ -815,6 +844,29 @@ var engine = function() {
         var makeAlbums = function(cb) {
             getAlbums(function(all_albums) {
                 all_albums.push({title: "[All]", album_id: "nogroup"});
+                all_albums.push({title: "[Recommendations]", album_id: "recommendations"});
+                all_albums.push({title: "[Popular]", album_id: "popular0"});
+                all_albums.push({title: "[Rock]", album_id: "popular1"});
+                all_albums.push({title: "[Pop]", album_id: "popular2"});
+                all_albums.push({title: "[Rap & Hip-Hop]", album_id: "popular3"});
+                all_albums.push({title: "[Easy Listening]", album_id: "popular4"});
+                all_albums.push({title: "[Dance & House]", album_id: "popular5"});
+                all_albums.push({title: "[Instrumental]", album_id: "popular6"});
+                all_albums.push({title: "[Metal]", album_id: "popular7"});
+                all_albums.push({title: "[Alternative]", album_id: "popular21"});
+                all_albums.push({title: "[Dubstep]", album_id: "popular8"});
+                all_albums.push({title: "[Jazz & Blues]", album_id: "popular9"});
+                all_albums.push({title: "[Drum & Bass]", album_id: "popular10"});
+                all_albums.push({title: "[Trance]", album_id: "popular11"});
+                all_albums.push({title: "[Chanson]", album_id: "popular12"});
+                all_albums.push({title: "[Ethnic]", album_id: "popular13"});
+                all_albums.push({title: "[Acoustic & Vocal]", album_id: "popular14"});
+                all_albums.push({title: "[Reggae]", album_id: "popular15"});
+                all_albums.push({title: "[Classical]", album_id: "popular16"});
+                all_albums.push({title: "[Indie Pop]", album_id: "popular17"});
+                all_albums.push({title: "[Speech]", album_id: "popular19"});
+                all_albums.push({title: "[Electropop & Disco]", album_id: "popular22"});
+                all_albums.push({title: "[Other]", album_id: "popular18"});
                 var list = [];
                 all_albums.forEach(function(item) {
                     list.push({name: item.title, album_id: item.album_id, id: list.length, type: "vk"});
@@ -844,6 +896,28 @@ var engine = function() {
             });
         };
         var makeAlbumTracks = function(id, cb) {
+            if (id !== undefined) {
+                if (id.length > 7 && id.substr(0, 7) === "popular") {
+                    var sid = parseInt(id.substr(7));
+                    if (isNaN(sid)) {
+                        return;
+                    }
+                    getPopular(function(tracks) {
+                        if (tracks.length === 0) {
+                            return;
+                        }
+                        cb(tracks);
+                    }, sid);
+                } else
+                if (id === "recommendations") {
+                    getRecommendations(function(tracks) {
+                        if (tracks.length === 0) {
+                            return;
+                        }
+                        cb(tracks);
+                    });
+                }
+            }
             if (id === "nogroup") {
                 id = undefined;
             }
