@@ -352,7 +352,7 @@ var engine = function() {
                 if (current_id === undefined || playlist[current_id] === undefined) {
                     return;
                 }
-                if ('url' in playlist[current_id].file) {
+                if ('url' in playlist[current_id].file && audio.duration === Infinity) {
                     audio.pause();
                     audio.src = "";
                 } else {
