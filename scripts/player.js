@@ -650,7 +650,7 @@ var view = function() {
                         });
                     } else
                     if (info.menuItemId === "box") {
-                        engine.db.getFilelist(function(list) {
+                        engine.box.getFilelist(function(list) {
                             chrome.runtime.getBackgroundPage(function(bg) {
                                 bg.wm.showDialog({type: "box", h: 315, w: 350, r: true, filelist: list});
                             });

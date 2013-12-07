@@ -1136,21 +1136,21 @@ var engine = function() {
             if (id === undefined) {
                 id = 0;
             }
-            var url = 'https://api.box.com/2.0/folders/' + id + '/items';
+            var url = 'https://api.box.com/2.0/folders/' + id + '/items?fields=parent,shared_link,name,path_collection';
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url);
             xhr.setRequestHeader("Authorization", "Bearer " + token);
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4)
                 {
-                    var data = JSON.parse(xhr.responseText);
-                    console.log(data);
-                    if ('error' in data) {
+                    if (xhr.status !== 200) {
                         code = undefined;
                         token = undefined;
                         chrome.storage.sync.remove(['box_code', 'box_token', 'box_expires_in', 'box_refresh_token']);
                         return;
                     }
+                    var data = JSON.parse(xhr.responseText);
+                    console.log(data);
                     cb(data);
                 }
             };

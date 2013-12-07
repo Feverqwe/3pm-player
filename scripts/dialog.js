@@ -191,22 +191,24 @@ var dialog = function() {
         dom_cache.box_button.attr('disabled', 'disabled');
         var fl = dom_cache.box_ul;
         fl.empty();
-        if (list.path.length > 1) {
-            fl.append($('<li>', {'class': 'db_file', 'data-id': -1}).append($('<span>', {title: "Go Back", text: "Go Back"})));
+        if (var_cache.box_parent !== undefined && var_cache.box_parent.length > 0) {
+            var prew_folder = var_cache.box_parent.slice(-1)[0].id;
+            if (prew_folder !== 0) {
+                fl.append($('<li>', {'class': 'box_file', 'data-id': -1, 'data-parent': prew_folder}).append($('<span>', {title: "Go Back", text: "Go Back"})));
+            }
         }
         var n = 0;
-        list.contents.forEach(function(item) {
-            var filename = item.path.split('/').slice(-1)[0];
+        list.entries.forEach(function(item) {
             var action = '';
-            if (item.is_dir) {
+            if (item.type === "folder") {
                 action = $('<div>', {'class': 'play', title: 'Play folder'});
             } else {
                 action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
-            fl.append($('<li>', {'class': 'db_file', 'data-id': n}).append($('<span>', {title: filename, text: filename}), action));
+            fl.append($('<li>', {'class': 'box_file', 'data-id': n}).append($('<span>', {title: item.name, text: item.name}), action));
             n++;
         });
-        var_cache.db_list = list;
+        var_cache.box_list = list;
     };
     var boxChoice = function() {
         /*
@@ -216,37 +218,38 @@ var dialog = function() {
         dom_cache.box.show();
         dom_cache.box_button = dom_cache.box.find('input[type="button"]').eq(0);
         dom_cache.box_ul = dom_cache.box.find("ul").eq(0);
+        dom_cache.box_folder = 0;
         box_writefilelist(window.options.filelist);
-        /*
-        dom_cache.dropbox.on('click', 'li.db_file', function(e) {
+        dom_cache.box.on('click', 'li.box_file', function(e) {
             if (e.target.nodeName === "INPUT") {
                 return;
             }
             var id = parseInt($(this).data("id"));
-            var path = undefined;
-            var root = undefined;
+            var folder_id = undefined;
             if (id === -1) {
-                path = var_cache.db_list.path + '/..';
-                root = var_cache.db_list.root;
+                folder_id = parseInt($(this).data('parent'));
+                var_cache.box_parent = var_cache.box_parent.slice(0, -1);
             } else {
-                var item = var_cache.db_list.contents[id];
-                if (item.is_dir) {
-                    path = item.path;
-                    root = item.root;
+                var item = var_cache.box_list.entries[id];
+                if (item.type === "folder") {
+                    folder_id = item.id;
+                    var_cache.box_parent = item.path_collection.entries;
                 } else {
-                    var ch_box = $(this).children('input');
-                    ch_box.get(0).checked = !ch_box.get(0).checked;
-                    ch_box.trigger('change');
+                    /*
+                     var ch_box = $(this).children('input');
+                     ch_box.get(0).checked = !ch_box.get(0).checked;
+                     ch_box.trigger('change');
+                     */
                     return;
                 }
             }
             sendPlayer(function(window) {
-                window.engine.db.getFilelist(function(list) {
-                    db_writefilelist(list);
-                }, root, path);
+                window.engine.box.getFilelist(function(list) {
+                    box_writefilelist(list);
+                }, folder_id);
             });
         });
-        dom_cache.dropbox.on('change', 'input[type="checkbox"]', function(e) {
+        dom_cache.box.on('change', 'input[type="checkbox"]', function(e) {
             e.preventDefault();
             e.stopPropagation();
             var checked = this.checked;
@@ -255,13 +258,14 @@ var dialog = function() {
             } else {
                 $(this).parent().removeClass('selected');
             }
-            var count = dom_cache.dropbox.find('input[type="checkbox"]:checked').length;
+            var count = dom_cache.box.find('input[type="checkbox"]:checked').length;
             if (count > 0) {
-                dom_cache.dropbox_button.removeAttr('disabled');
+                dom_cache.box.removeAttr('disabled');
             } else {
-                dom_cache.dropbox_button.attr('disabled', 'disabled');
+                dom_cache.box.attr('disabled', 'disabled');
             }
         });
+         /*
         dom_cache.dropbox.on('click', 'li > .play', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -318,7 +322,7 @@ var dialog = function() {
             });
             window.close();
         });
-        */
+         */
     };
     return {
         run: function() {
@@ -337,7 +341,7 @@ var dialog = function() {
             if (window.options.type === "db") {
                 dropboxChoice();
             }
-            if (window.options.type === "db") {
+            if (window.options.type === "box") {
                 boxChoice();
             }
         }
