@@ -447,6 +447,9 @@ var wm = function() {
                 if (options.playlists !== undefined) {
                     len = options.playlists.length;
                 }
+                if (len === 0) {
+                    len = 1;
+                }
                 if (len > 8) {
                     len = 8;
                 }
