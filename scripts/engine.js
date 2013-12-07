@@ -738,6 +738,7 @@ var engine = function() {
             var getPage = function() {
                 $.getJSON(url, function(data) {
                     if (is_error(data) || 'response' in data === false) {
+                        console.log("VK", "getPopular", "API error", data);
                         return;
                     }
                     data.response.forEach(function(item) {
@@ -754,6 +755,7 @@ var engine = function() {
             var getPage = function() {
                 $.getJSON(url, function(data) {
                     if (is_error(data) || 'response' in data === false) {
+                        console.log("VK", "getRecommendations", "API error", data);
                         return;
                     }
                     data.response.forEach(function(item) {
@@ -771,6 +773,7 @@ var engine = function() {
             var getPage = function(offset) {
                 $.getJSON(url + "&count=6000&offset=" + offset, function(data) {
                     if (is_error(data) || 'response' in data === false || 'items' in data.response === false || 'count' in data.response === false) {
+                        console.log("VK", "getTracks", "API error", data);
                         return;
                     }
                     data = data.response;
@@ -784,6 +787,7 @@ var engine = function() {
                         len++;
                     });
                     if (len <= 0) {
+                        console.log("VK", "getTracks", "len = 0", data);
                         return;
                     }
                     if (tracks.length !== data.count) {
@@ -805,6 +809,7 @@ var engine = function() {
             var getPage = function(offset) {
                 $.getJSON(url + "&count=100&offset=" + offset, function(data) {
                     if (is_error(data) || 'response' in data === false || 'items' in data.response === false || 'count' in data.response === false) {
+                        console.log("VK", "getAlbums", "API error", data);
                         return;
                     }
                     data = data.response;
@@ -818,6 +823,7 @@ var engine = function() {
                         len++;
                     });
                     if (len <= 0) {
+                        console.log("VK", "getAlbums", "len = 0", data);
                         return;
                     }
                     if (albums.length !== data.count) {
@@ -888,6 +894,7 @@ var engine = function() {
             chrome.identity.launchWebAuthFlow({url: url, interactive: true},
             function(responseURL) {
                 if (!responseURL) {
+                    console.log("VK", "No url");
                     return;
                 }
                 if (responseURL.indexOf("access_token=") !== -1) {
@@ -897,10 +904,14 @@ var engine = function() {
                 } else {
                     chrome.storage.sync.remove('vk_token');
                     token = undefined;
+                    console.log("VK", "No token", responseURL);
                 }
             });
         };
         var makeAlbumTracks = function(id, cb) {
+            if (id === "nogroup") {
+                id = undefined;
+            }
             if (id !== undefined) {
                 if (id.length > 7 && id.substr(0, 7) === "popular") {
                     var sid = parseInt(id.substr(7));
@@ -922,9 +933,6 @@ var engine = function() {
                         cb(tracks);
                     });
                 }
-            }
-            if (id === "nogroup") {
-                id = undefined;
             }
             getTracks(function(tracks) {
                 if (tracks.length === 0) {
@@ -955,6 +963,7 @@ var engine = function() {
             chrome.identity.launchWebAuthFlow({url: url, interactive: true},
             function(responseURL) {
                 if (!responseURL) {
+                    console.log("DB", "No url");
                     return;
                 }
                 if (responseURL.indexOf("access_token=") !== -1) {
@@ -964,6 +973,7 @@ var engine = function() {
                 } else {
                     chrome.storage.sync.remove('db_token');
                     token = undefined;
+                    console.log("DB", "No token", responseURL);
                 }
             });
         };
@@ -984,6 +994,7 @@ var engine = function() {
                     if ('error' in data) {
                         token = undefined;
                         chrome.storage.sync.remove('db_token');
+                        console.log("DB", "getFilelist", "API Error", data);
                         return;
                     }
                     cb(data);
@@ -1010,6 +1021,7 @@ var engine = function() {
                         token = undefined;
                         chrome.storage.sync.remove('db_token');
                         cb(undefined);
+                        console.log("DB", "getMedia", "API Error", data);
                         return;
                     }
                     cb(data.url);
