@@ -126,13 +126,11 @@ div.filelist::-webkit-scrollbar-thumb:vertical,
     background-image: url('../images/x.png');
     right: 2px;
 }
-.box_choice,
 .dropbox_choice {
     padding-left: 18px;
     padding-right: 15px;
     height: 100%;
 }
-.box_choice input[type="button"],
 .dropbox_choice input[type="button"] {
     margin-top: 5px;
     float: right;
@@ -149,19 +147,15 @@ div.filelist::-webkit-scrollbar-thumb:vertical,
     padding-right: 12px;
     outline: none;
 }
-.box_choice input[type="button"]:hover,
 .dropbox_choice input[type="button"]:hover {
     background-color: #424242;
 }
-.box_choice input[type="button"]:active,
 .dropbox_choice input[type="button"]:active {
     background-color: #585858;
 }
-.box_choice input[type="button"]:disabled,
 .dropbox_choice input[type="button"]:disabled {
     background-color: #000;
 }
-.box_choice div.filelist,
 .dropbox_choice div.filelist {
     -webkit-app-region: no-drag;
     height: calc(100% - 65px);
@@ -170,28 +164,23 @@ div.filelist::-webkit-scrollbar-thumb:vertical,
     margin-right: 3px;
     border: 1px solid rgba(0, 0, 0, 0.46);
 }
-.box_choice div.filelist > ul,
 .dropbox_choice div.filelist > ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
 }
-.box_choice ul > li,
 .dropbox_choice ul > li {
     padding: 2px;
     cursor: pointer;
     position: relative;
     padding-right: 24px;
 }
-.box_choice ul > li:nth-of-type(odd),
 .dropbox_choice ul > li:nth-of-type(odd) {
     background-color: rgba(0, 0, 0, 0.38);
 }
-.box_choice ul > li:hover,
 .dropbox_choice ul > li:hover {
     background-color: rgba(66, 121, 204, 0.38);
 }
-.box_choice ul > li .play,
 .dropbox_choice ul > li .play { 
     position: absolute;
     right: 0px;
@@ -202,17 +191,14 @@ div.filelist::-webkit-scrollbar-thumb:vertical,
     background-position-y: 2px;
     opacity: 0.7;
 }
-.box_choice ul > li .play:hover,
 .dropbox_choice ul > li .play:hover {
     opacity: 1;
 }
-.box_choice ul > li input,
 .dropbox_choice ul > li input { 
     position: absolute;
     right: 0px;
     top: 0px;
 }
-.box_choice ul > li.selected,
 .dropbox_choice ul > li.selected {
     background-color: #0E4E72;
 }

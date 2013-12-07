@@ -610,13 +610,6 @@ var view = function() {
                     title: "Get Music from Dropbox",
                     contexts: ["all"]
                 });
-                // /*
-                chrome.contextMenus.create({
-                    id: "box",
-                    title: "Get Music from box.com",
-                    contexts: ["all"]
-                });
-                // */
                 chrome.runtime.getBackgroundPage(function(bg) {
                     chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
                 });
@@ -646,13 +639,6 @@ var view = function() {
                         engine.db.getFilelist(function(list) {
                             chrome.runtime.getBackgroundPage(function(bg) {
                                 bg.wm.showDialog({type: "db", h: 315, w: 350, r: true, filelist: list});
-                            });
-                        });
-                    } else
-                    if (info.menuItemId === "box") {
-                        engine.box.getFilelist(function(list) {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.showDialog({type: "box", h: 315, w: 350, r: true, filelist: list});
                             });
                         });
                     } else
@@ -902,9 +888,6 @@ var view = function() {
                     });
                 } else
                 if (list.type === "db") {
-                    engine.open(list.tracks, {name: list.name, id: id});
-                } else
-                if (list.type === "box") {
                     engine.open(list.tracks, {name: list.name, id: id});
                 }
 

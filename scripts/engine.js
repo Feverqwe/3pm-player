@@ -316,11 +316,6 @@ var engine = function() {
                                 });
                                 item.file.url = url;
                             }, item.root, item.path);
-                        } else
-                        if (item.type === "box") {
-                            box.getMedia(function(url) {
-                                item.file.url = url;
-                            }, item.file_id);
                         }
                     } else {
                         audio.src = item.file.url;
@@ -1050,153 +1045,6 @@ var engine = function() {
             }
         };
     }();
-    var box = function() {
-        var code = undefined;
-        var client_id = 'g527juooilqjql1ggzpohrzyf7a8troc';
-        var client_secret = 'PTEyM5lwSgNkvqK5BjBp5iGj4ypPx2wd';
-        var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
-        var token = undefined;
-        var boxCode = function(cb) {
-            var url = 'https://www.box.com/api/oauth2/authorize?response_type=code&client_id=' + client_id + '&redirect_uri=' + redirect_uri;
-            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
-            function(responseURL) {
-                if (!responseURL) {
-                    return;
-                }
-                if (responseURL.indexOf("code=") !== -1) {
-                    code = responseURL.replace(/.*code=([a-zA-Z0-9]*)&?.*/, "$1");
-                    chrome.storage.sync.set({box_code: code});
-                    cb(code);
-                } else {
-                    chrome.storage.sync.remove('box_code');
-                    code = undefined;
-                }
-            });
-        };
-        var boxAuth = function(cb) {
-            var url = 'https://www.box.com/api/oauth2/token';
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: {
-                    grant_type: 'authorization_code',
-                    code: code,
-                    client_id: client_id,
-                    client_secret: client_secret,
-                    redirect_uri: redirect_uri
-                },
-                success: function(data) {
-                    if ('access_token' in data === false || 'expires_in' in data === false || 'refresh_token' in data === false) {
-                        console.log('boxAuth data problem', data);
-                        return;
-                    }
-                    chrome.storage.sync.set({box_token: data.access_token, box_expires_in: data.expires_in, box_refresh_token: data.refresh_token});
-                    token = data.access_token;
-                    cb(token);
-                },
-                error: function() {
-                    console.log('boxAuth resp. error');
-                    code = undefined;
-                    token = undefined;
-                    chrome.storage.sync.remove(['box_code', 'box_token', 'box_expires_in', 'box_refresh_token']);
-                }
-            });
-        };
-        var getCode = function(cb) {
-            if (code !== undefined) {
-                cb(code);
-                return;
-            }
-            chrome.storage.sync.get('box_code', function(obj) {
-                if ('box_code' in obj) {
-                    code = obj.box_code;
-                    cb(code);
-                } else {
-                    boxCode(cb);
-                }
-            });
-        };
-        var getToken = function(cb, r) {
-            if (code === undefined) {
-                if (r !== undefined) {
-                    return;
-                }
-                getCode(function() {
-                    getToken(cb, 1);
-                });
-                return;
-            }
-            if (token !== undefined) {
-                cb(token);
-                return;
-            }
-            chrome.storage.sync.get('box_token', function(obj) {
-                if ('box_token' in obj) {
-                    token = obj.box_token;
-                    cb(token);
-                } else {
-                    boxAuth(cb);
-                }
-            });
-        };
-        var getFilelist = function(cb, id) {
-            if (id === undefined) {
-                id = 0;
-            }
-            var url = 'https://api.box.com/2.0/folders/' + id + '/items?fields=parent,shared_link,name,path_collection';
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.setRequestHeader("Authorization", "Bearer " + token);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
-                    if (xhr.status !== 200) {
-                        code = undefined;
-                        token = undefined;
-                        chrome.storage.sync.remove(['box_code', 'box_token', 'box_expires_in', 'box_refresh_token']);
-                        return;
-                    }
-                    var data = JSON.parse(xhr.responseText);
-                    console.log(data);
-                    cb(data);
-                }
-            };
-            xhr.send(null);
-        };
-        var getMedia = function(cb, id) {
-            var url = 'https://api.box.com/2.0/files/' + id;
-            var parems = '{"shared_link": {"access": "open"}}';
-            var xhr = new XMLHttpRequest();
-            xhr.open("PUT", url);
-            xhr.setRequestHeader("Authorization", "Bearer " + token);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
-                    if (xhr.status !== 200) {
-                        code = undefined;
-                        token = undefined;
-                        chrome.storage.sync.remove(['box_code', 'box_token', 'box_expires_in', 'box_refresh_token']);
-                        return;
-                    }
-                    var data = JSON.parse(xhr.responseText);
-                    cb(data.shared_link.download_url);
-                }
-            };
-            xhr.send(parems);
-        };
-        return {
-            getFilelist: function(cb, id) {
-                getToken(function() {
-                    getFilelist(cb, id);
-                });
-            },
-            getMedia: function(a, b) {
-                getToken(function() {
-                    getMedia(a, b);
-                });
-            }
-        };
-    }();
     return {
         run: function() {
             $('.engine').remove();
@@ -1359,8 +1207,7 @@ var engine = function() {
             });
         },
         vk: vk,
-        db: db,
-        box: box
+        db: db
     };
 }();
 $(function() {
