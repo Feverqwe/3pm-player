@@ -717,7 +717,7 @@ var engine = function() {
         var is_error = function(data) {
             if ('error' in data) {
                 token = undefined;
-                chrome.storage.local.remove('vk_token');
+                chrome.storage.sync.remove('vk_token');
                 return true;
             }
             return false;
@@ -830,7 +830,7 @@ var engine = function() {
                 cb(token);
                 return;
             }
-            chrome.storage.local.get('vk_token', function(obj) {
+            chrome.storage.sync.get('vk_token', function(obj) {
                 if ('vk_token' in obj) {
                     token = obj.vk_token;
                     cb(token);
@@ -885,10 +885,10 @@ var engine = function() {
                 }
                 if (responseURL.indexOf("access_token=") !== -1) {
                     token = responseURL.replace(/.*access_token=([a-zA-Z0-9]*)&.*/, "$1");
-                    chrome.storage.local.set({vk_token: token});
+                    chrome.storage.sync.set({vk_token: token});
                     cb(token);
                 } else {
-                    chrome.storage.remove('vk_token');
+                    chrome.storage.sync.remove('vk_token');
                     vkAuth(cb);
                 }
             });
@@ -952,10 +952,10 @@ var engine = function() {
                 }
                 if (responseURL.indexOf("access_token=") !== -1) {
                     token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-]*)&.*/, "$1");
-                    chrome.storage.local.set({db_token: token});
+                    chrome.storage.sync.set({db_token: token});
                     cb(token);
                 } else {
-                    chrome.storage.remove('db_token');
+                    chrome.storage.sync.remove('db_token');
                     dbAuth(cb);
                 }
             });
@@ -977,7 +977,7 @@ var engine = function() {
                     var data = JSON.parse(xhr.responseText);
                     if ('error' in data) {
                         token = undefined;
-                        chrome.storage.local.remove('db_token');
+                        chrome.storage.sync.remove('db_token');
                         return;
                     }
                     cb(data);
@@ -1002,7 +1002,7 @@ var engine = function() {
                     var data = JSON.parse(xhr.responseText);
                     if ('error' in data) {
                         token = undefined;
-                        chrome.storage.local.remove('db_token');
+                        chrome.storage.sync.remove('db_token');
                         cb(undefined);
                         return;
                     }
@@ -1016,7 +1016,7 @@ var engine = function() {
                 cb(token);
                 return;
             }
-            chrome.storage.local.get('db_token', function(obj) {
+            chrome.storage.sync.get('db_token', function(obj) {
                 if ('db_token' in obj) {
                     token = obj.db_token;
                     cb(token);

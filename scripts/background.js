@@ -413,10 +413,10 @@ var wm = function() {
                 }
                 windows.player.focus();
             }/*
-            setTimeout(function() {
-                create_viz_window();
-                vizw = create_viz_window;
-            }, 1000);*/
+             setTimeout(function() {
+             create_viz_window();
+             vizw = create_viz_window;
+             }, 1000);*/
         },
         toggle_playlist: function() {
             if (check() && "playlist" in windows) {
@@ -442,6 +442,16 @@ var wm = function() {
             }
         },
         showDialog: function(options) {
+            if (options.type === 'm3u') {
+                var len = 3;
+                if (options.playlists !== undefined) {
+                    len = options.playlists.length;
+                }
+                if (len > 8) {
+                    len = 8;
+                }
+                options.h = len * 52 + 43;
+            }
             create_dialog_window(options);
         },
         ws: web_socket,
