@@ -816,6 +816,12 @@ var view = function() {
             if (type === "playlist_not_empty") {
                 dom_cache.click_for_open.hide();
             }
+            if (type === "db_preloading") {
+                dom_cache.loading.show();
+            }
+            if (type === "db_preloading_fail") {
+                dom_cache.loading.hide();
+            }
             if (type === "loadstart") {
                 dom_cache.loading.show();
                 pre_buffering_controller.loading();

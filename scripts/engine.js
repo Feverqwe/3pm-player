@@ -305,8 +305,11 @@ var engine = function() {
                     }
                     if (item.type === "db" && item.file.url === undefined) {
                         db.getMedia(function(url) {
+                            view.state("db_preloading");
                             $.ajax({type: "HEAD", url: url, success: function() {
                                     audio.src = url;
+                                }, error: function() {
+                                    view.state("db_preloading_fail");
                                 }});
                             item.file.url = url;
                         }, item.root, item.path);
@@ -972,8 +975,7 @@ var engine = function() {
             xhr.open("GET", url);
             xhr.setRequestHeader("Authorization", "Bearer " + token);
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
+                if (xhr.readyState === 4) {
                     var data = JSON.parse(xhr.responseText);
                     if ('error' in data) {
                         token = undefined;
