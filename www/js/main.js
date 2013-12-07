@@ -36,7 +36,7 @@ var view = function() {
             dom_cache.playlist.empty();
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
-                dom_cache.playlist.append('<a href="#" class="list-group-item" data-id="' + item.id + '">' + item.title + '</a>');
+                dom_cache.playlist.append($('<a>', {href: '#', 'class': 'list-group-item', 'data-id': item.id, text: item.title}));
             }
         }
         if ('title' in data) {
