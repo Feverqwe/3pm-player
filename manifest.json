@@ -14,5 +14,5 @@
         }
     },
     "offline_enabled": true,
-    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}, {"fileSystem": ["retainEntries", "directory"]},"fullscreen","identity","https://api.vk.com/*","https://www.box.com/api/oauth2/token","https://api.box.com/*"]
+    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}, {"fileSystem": ["retainEntries", "directory"]},"fullscreen","identity","https://api.vk.com/*"]
 }
