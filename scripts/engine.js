@@ -303,18 +303,25 @@ var engine = function() {
                     if (current_type !== undefined) {
                         $(audio).removeAttr('type');
                     }
-                    if (item.type === "db" && item.file.url === undefined) {
-                        db.getMedia(function(url) {
-                            view.state("db_preloading");
-                            $.ajax({type: "HEAD", url: url,
-                                success: function() {
-                                    audio.src = url;
-                                }, error: function() {
-                                    view.state("db_preloading_fail");
-                                }
-                            });
-                            item.file.url = url;
-                        }, item.root, item.path);
+                    if (item.file.url === undefined) {
+                        if (item.type === "db") {
+                            db.getMedia(function(url) {
+                                view.state("db_preloading");
+                                $.ajax({type: "HEAD", url: url,
+                                    success: function() {
+                                        audio.src = url;
+                                    }, error: function() {
+                                        view.state("db_preloading_fail");
+                                    }
+                                });
+                                item.file.url = url;
+                            }, item.root, item.path);
+                        } else
+                        if (item.type === "box") {
+                            box.getMedia(function(url) {
+                                item.file.url = url;
+                            }, item.file_id);
+                        }
                     } else {
                         audio.src = item.file.url;
                     }
@@ -1156,10 +1163,36 @@ var engine = function() {
             };
             xhr.send(null);
         };
+        var getMedia = function(cb, id) {
+            var url = 'https://api.box.com/2.0/files/' + id;
+            var parems = '{"shared_link": {"access": "open"}}';
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", url);
+            xhr.setRequestHeader("Authorization", "Bearer " + token);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4)
+                {
+                    if (xhr.status !== 200) {
+                        code = undefined;
+                        token = undefined;
+                        chrome.storage.sync.remove(['box_code', 'box_token', 'box_expires_in', 'box_refresh_token']);
+                        return;
+                    }
+                    var data = JSON.parse(xhr.responseText);
+                    cb(data.shared_link.download_url);
+                }
+            };
+            xhr.send(parems);
+        };
         return {
             getFilelist: function(cb, id) {
                 getToken(function() {
                     getFilelist(cb, id);
+                });
+            },
+            getMedia: function(a, b) {
+                getToken(function() {
+                    getMedia(a, b);
                 });
             }
         };

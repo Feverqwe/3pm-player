@@ -265,28 +265,25 @@ var dialog = function() {
                 dom_cache.box.attr('disabled', 'disabled');
             }
         });
-         /*
-        dom_cache.dropbox.on('click', 'li > .play', function(e) {
+        dom_cache.box.on('click', 'li > .play', function(e) {
             e.preventDefault();
             e.stopPropagation();
             var id = parseInt($(this).parent().data("id"));
-            var item = var_cache.db_list.contents[id];
-            if (!item.is_dir) {
+            var item = var_cache.box_list.entries[id];
+            if (item.type !== "folder") {
                 return;
             }
-            var path = item.path;
-            var root = item.root;
+            var folder_id = item.id;
+            var folder_name = item.name;
             var _window = window;
             sendPlayer(function(window) {
-                window.engine.db.getFilelist(function(list) {
-                    var pl_name = list.path.split('/').slice(-1)[0] || "Dropbox";
-                    var playlist = {name: pl_name, id: 0, type: "db", tracks: []};
-                    list.contents.forEach(function(item) {
-                        if (item.is_dir) {
+                window.engine.box.getFilelist(function(list) {
+                    var playlist = {name: folder_name, id: 0, type: "box", tracks: []};
+                    list.entries.forEach(function(item) {
+                        if (item.type === "folder") {
                             return 1;
                         }
-                        var filename = item.path.split('/').slice(-1)[0];
-                        playlist.tracks.push({id: -1, file: {name: filename, url: undefined}, tags: {}, duration: 0, type: "db", root: item.root, path: item.path});
+                        playlist.tracks.push({id: -1, file: {name: item.name, url: undefined}, tags: {}, duration: 0, type: "box", file_id: item.id});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
@@ -296,9 +293,10 @@ var dialog = function() {
                         window.view.select_playlist(0);
                     });
                     _window.close();
-                }, root, path);
+                }, folder_id);
             });
         });
+         /*
         dom_cache.dropbox_button.on('click', function(e) {
             e.preventDefault();
             var pl_name = var_cache.db_list.path.split('/').slice(-1)[0] || "Dropbox";

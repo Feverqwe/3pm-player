@@ -903,6 +903,9 @@ var view = function() {
                 } else
                 if (list.type === "db") {
                     engine.open(list.tracks, {name: list.name, id: id});
+                } else
+                if (list.type === "box") {
+                    engine.open(list.tracks, {name: list.name, id: id});
                 }
 
             }
