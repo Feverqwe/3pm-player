@@ -1132,11 +1132,11 @@ var engine = function() {
                 }
             });
         };
-        var getFolder = function(cb, id) {
+        var getFilelist = function(cb, id) {
             if (id === undefined) {
                 id = 0;
             }
-            var url = 'https://api.box.com/2.0/folders/'+id+'/items';
+            var url = 'https://api.box.com/2.0/folders/' + id + '/items';
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url);
             xhr.setRequestHeader("Authorization", "Bearer " + token);
@@ -1146,21 +1146,20 @@ var engine = function() {
                     var data = JSON.parse(xhr.responseText);
                     console.log(data);
                     if ('error' in data) {
-                        //token = undefined;
-                        //chrome.storage.sync.remove('db_token');
-                        //cb(undefined);
+                        code = undefined;
+                        token = undefined;
+                        chrome.storage.sync.remove(['box_code', 'box_token', 'box_expires_in', 'box_refresh_token']);
                         return;
                     }
-                    return;
-                    cb(data.url);
+                    cb(data);
                 }
             };
             xhr.send(null);
         };
         return {
-            getFolder: function(cb) {
+            getFilelist: function(cb, id) {
                 getToken(function() {
-                    getFolder(cb);
+                    getFilelist(cb, id);
                 });
             }
         };

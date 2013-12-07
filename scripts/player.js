@@ -643,16 +643,18 @@ var view = function() {
                         });
                     } else
                     if (info.menuItemId === "db") {
-                        engine.db.getToken(function() {
-                            engine.db.getFilelist(function(list) {
-                                chrome.runtime.getBackgroundPage(function(bg) {
-                                    bg.wm.showDialog({type: "db", h: 315, w: 350, r: true, filelist: list});
-                                });
+                        engine.db.getFilelist(function(list) {
+                            chrome.runtime.getBackgroundPage(function(bg) {
+                                bg.wm.showDialog({type: "db", h: 315, w: 350, r: true, filelist: list});
                             });
                         });
                     } else
                     if (info.menuItemId === "box") {
-                        engine.box.getFolder();
+                        engine.db.getFilelist(function(list) {
+                            chrome.runtime.getBackgroundPage(function(bg) {
+                                bg.wm.showDialog({type: "box", h: 315, w: 350, r: true, filelist: list});
+                            });
+                        });
                     } else
                     if (info.menuItemId === "viz") {
                         chrome.runtime.getBackgroundPage(function(bg) {
