@@ -1060,7 +1060,7 @@ var engine = function() {
     return {
         run: function() {
             $('.engine').remove();
-            $('body').append('<div class="engine"/>');
+            $('body').append($('<div>', {'class': 'engine'}));
             player.init();
         },
         get_filename: player.get_filename,

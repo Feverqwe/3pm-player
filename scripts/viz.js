@@ -199,7 +199,7 @@ $(function() {
     viz.preload();
     var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
     var ext_url = "chrome-extension://" + aid + "/viz/";
-    reality = (typeof reality === 'undefined' ? {} : reality);
+    window.reality = (typeof reality === 'undefined' ? {} : reality);
     $.extend(true, reality, {timing: {boot: new Date().getTime()}});
     var add_script = function(path) {
         var script = document.createElement('script');
@@ -209,7 +209,7 @@ $(function() {
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(script, s);
     };
-    $('head').append('<base href="' + ext_url + '"/>');
+    $('head').append($('<base>', {href: ext_url}));
     $.ajax({
         url: ext_url + 'ping',
         success: function() {
@@ -220,7 +220,7 @@ $(function() {
             });
         },
         error: function() {
-            $('body').append('<a class="need_addon" target="_blank" href="https://chrome.google.com/webstore/detail/' + aid + '">Need install visualizatitoin extension!</a>');
+            $('body').append($('<a>', {'class': 'need_addon', target: '_blank', href: 'https://chrome.google.com/webstore/detail/' + aid, text: 'Need install visualizatitoin extension!'}));
         }
     });
 });
