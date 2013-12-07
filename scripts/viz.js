@@ -23,13 +23,13 @@ var viz = function() {
         if ("track" in dom_cache === false) {
             return;
         }
-        dom_cache.track.html(value[0] + "<br/>" + value[1]);
+        dom_cache.track.empty().append($('<span>', {text: value[0]}), $('<br>'), $('<span>', {text: value[1]}));
     };
     return {
         preload: function() {
             dom_cache.body = $('body');
-            dom_cache.body.append('<div class="track"></div>');
-            dom_cache.track = $('div.track');
+            dom_cache.track = $('<div>', {'class': 'track'});
+            dom_cache.body.append(dom_cache.track);
             window.onresize = function() {
                 clearTimeout(var_cache.resize_timer);
                 var_cache.resize_timer = setTimeout(function() {

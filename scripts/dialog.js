@@ -46,7 +46,7 @@ var dialog = function() {
         var pl = $('.playlists').children("ul");
         var arr = window.options.playlists;
         arr.forEach(function(item) {
-            pl.append('<li class="pl_file" data-id="' + item.id + '"><div class="gr_line"></div><span title="' + item.name + '">' + item.name + '</span></li>');
+            pl.append($('<li>', {'class': 'pl_file', 'data-id': item.id}).append($('<div>', {'class': 'gr_line'}), $('<span>', {title: item.name, text: item.name})));
         });
         $('body').on('click', 'li.pl_file', function() {
             var id = $(this).data("id");
@@ -61,18 +61,18 @@ var dialog = function() {
         var fl = dom_cache.dropbox_ul;
         fl.empty();
         if (list.path.length > 1) {
-            fl.append('<li class="db_file" data-id="-1"><span title="Go Back">Go Back</span></li>');
+            fl.append($('<li>', {'class': 'db_file', 'data-id': -1}).append($('<span>', {title: "Go Back", text: "Go Back"})));
         }
         var n = 0;
         list.contents.forEach(function(item) {
             var filename = item.path.split('/').slice(-1)[0];
             var action = '';
             if (item.is_dir) {
-                action += '<div class="play" title="Play folder"></div>';
+                action = $('<div>', {'class': 'play', title: 'Play folder'});
             } else {
-                action += '<input name="id' + n + '" type="checkbox"/>';
+                action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
-            fl.append('<li class="db_file" data-id="' + n + '"><span title="' + filename + '">' + filename + '</span>' + action + '</li>');
+            fl.append($('<li>', {'class': 'db_file', 'data-id': n}).append($('<span>', {title: filename, text: filename}), action));
             n++;
         });
         var_cache.db_list = list;

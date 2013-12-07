@@ -401,8 +401,9 @@ var view = function() {
                     engine.position(ui.value / 10);
                 },
                 create: function() {
-                    dom_cache.progress.append('<div class="loaded"></div>');
-                    pre_buffering_controller.setObj(dom_cache.progress.children("div.loaded"));
+                    var div_loaded = $('<div>', {'class': 'loaded'});
+                    dom_cache.progress.append(div_loaded);
+                    pre_buffering_controller.setObj(div_loaded);
                 }
             });
             dom_cache.volume.slider({
@@ -762,7 +763,7 @@ var view = function() {
             } else {
                 var time = toHHMMSS(pos);
             }
-            dom_cache.time.html(time);
+            dom_cache.time.text(time);
         },
         setVolume: function(pos) {
             if (engine.getMute()) {

@@ -76,7 +76,13 @@ var playlist = function() {
         items.forEach(function(obj) {
             var item = item_read(obj);
             add_image(item.pic);
-            dom_cache.playlist_ul.append('<li data-id="' + obj.id + '"><div class="gr_line"></div><div class="cover ' + 'pic_' + item.pic + '"></div><span class="name" title="' + item.title + '">' + item.title + '</span><span class="info" title="' + item.info + '">' + item.info + '</span><div class="move" title="Move item"></div></li>');
+            dom_cache.playlist_ul.append($('<li>', {'data-id': obj.id}).append(
+                    $('<div>', {'class': 'gr_line'}),
+            $('<div>', {'class': 'cover pic_' + item.pic}),
+            $('<span>', {'class': 'name', title: item.title, text: item.title}),
+            $('<span>', {'class': 'info', title: item.info, text: item.info}),
+            $('<div>', {'class': 'move', title: 'Move item'})
+                    ));
             n++;
         });
         sendPlayer(function(window) {
@@ -112,11 +118,11 @@ var playlist = function() {
         /*
          * Создает список выбора плэйлиста
          */
-        var content = '';
+        var content = [];
         arr.forEach(function(item) {
-            content += '<li title="' + item.name + '" data-id="' + item.id + '">' + item.name + '</li>';
+            content.push($('<li>', {title: item.name, 'data-id': item.id, text: item.name}));
         });
-        dom_cache.pl_list.html(content);
+        dom_cache.pl_list.empty().append(content);
     };
     var selectPL = function(playlist) {
         /*
