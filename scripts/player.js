@@ -577,45 +577,45 @@ var view = function() {
                 chrome.contextMenus.create({
                     id: "1",
                     title: "Open files",
-                    contexts: ['page','launcher']
+                    contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "3",
                     title: "Open folder",
-                    contexts: ['page','launcher']
+                    contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "2",
                     title: "Open URL",
-                    contexts: ['page','launcher']
+                    contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     type: "checkbox",
                     id: "ws",
                     title: "Enable webUI (0.0.0.0:9898)",
-                    contexts: ['page','launcher']
+                    contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "viz",
                     title: "Visualization",
-                    contexts: ['page','launcher']
+                    contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "cloud",
                     title: "Cloud",
-                    contexts: ['page','launcher']
+                    contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "vk",
                     parentId: "cloud",
                     title: "vk.com",
-                    contexts: ['page','launcher']
+                    contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "db",
                     parentId: "cloud",
                     title: "dropbox.com",
-                    contexts: ['page','launcher']
+                    contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "p_play_pause",
@@ -658,6 +658,13 @@ var view = function() {
                                 });
                             }
                         });
+                        return;
+                    }
+                    if (info.menuItemId === "save_vk") {
+                        var track = engine.getCurrentTrack();
+                        if (track !== undefined && track.track_id !== undefined) {
+                            engine.vk.addInLibrarty(track.track_id, track.owner_id);
+                        }
                         return;
                     }
                     if (info.menuItemId === "db") {
@@ -925,7 +932,7 @@ var view = function() {
             } else {
                 if (list.type === "vk") {
                     engine.vk.makeAlbumTracks(list.album_id, function(tracks) {
-                        engine.open(tracks, {name: list.name, id: id});
+                        engine.open(tracks, {name: list.name, id: id, vk_save: (list.vk_save === true)});
                     });
                 } else
                 if (list.type === "db") {

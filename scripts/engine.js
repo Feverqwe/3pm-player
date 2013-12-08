@@ -13,6 +13,7 @@ var engine = function() {
     var _playlist_window = undefined;
     var _viz_window = undefined;
     var adapter = undefined;
+    var var_cache = {};
     function sendPlaylist(callback) {
         /*
          * Функция отправки действий в плэйлист
@@ -715,6 +716,9 @@ var engine = function() {
                     });
                 };
                 next_item();
+            },
+            getCurrentTrack: function() {
+                return playlist[current_id];
             }
         };
     }();
@@ -735,36 +739,30 @@ var engine = function() {
             }
             var url = 'https://api.vk.com/method/audio.getPopular?v=5.5&access_token=' + token + '&count=100&genre_id=' + genre_id;
             var tracks = [];
-            var getPage = function() {
-                $.getJSON(url, function(data) {
-                    if (is_error(data) || 'response' in data === false) {
-                        console.log("VK", "getPopular", "API error", data);
-                        return;
-                    }
-                    data.response.forEach(function(item) {
-                        tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
-                    });
-                    cb(tracks);
+            $.getJSON(url, function(data) {
+                if (is_error(data) || 'response' in data === false) {
+                    console.log("VK", "getPopular", "API error", data);
+                    return;
+                }
+                data.response.forEach(function(item) {
+                    tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
                 });
-            };
-            getPage();
+                cb(tracks);
+            });
         };
         var getRecommendations = function(cb) {
             var url = 'https://api.vk.com/method/audio.getRecommendations?v=5.5&access_token=' + token + '&count=100&shuffle=1';
             var tracks = [];
-            var getPage = function() {
-                $.getJSON(url, function(data) {
-                    if (is_error(data) || 'response' in data === false) {
-                        console.log("VK", "getRecommendations", "API error", data);
-                        return;
-                    }
-                    data.response.forEach(function(item) {
-                        tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
-                    });
-                    cb(tracks);
+            $.getJSON(url, function(data) {
+                if (is_error(data) || 'response' in data === false) {
+                    console.log("VK", "getRecommendations", "API error", data);
+                    return;
+                }
+                data.response.forEach(function(item) {
+                    tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
                 });
-            };
-            getPage();
+                cb(tracks);
+            });
         };
         var getTracks = function(cb, album_id) {
             var url = 'https://api.vk.com/method/audio.get?v=5.5&access_token=' + token + ((album_id !== undefined) ? '&album_id=' + album_id : '');
@@ -855,32 +853,32 @@ var engine = function() {
         var makeAlbums = function(cb) {
             getAlbums(function(all_albums) {
                 all_albums.push({title: "[All]", album_id: "nogroup"});
-                all_albums.push({title: "[Recommendations]", album_id: "recommendations"});
-                all_albums.push({title: "[Popular]", album_id: "popular0"});
-                all_albums.push({title: "[Rock]", album_id: "popular1"});
-                all_albums.push({title: "[Pop]", album_id: "popular2"});
-                all_albums.push({title: "[Rap & Hip-Hop]", album_id: "popular3"});
-                all_albums.push({title: "[Easy Listening]", album_id: "popular4"});
-                all_albums.push({title: "[Dance & House]", album_id: "popular5"});
-                all_albums.push({title: "[Instrumental]", album_id: "popular6"});
-                all_albums.push({title: "[Metal]", album_id: "popular7"});
-                all_albums.push({title: "[Alternative]", album_id: "popular21"});
-                all_albums.push({title: "[Dubstep]", album_id: "popular8"});
-                all_albums.push({title: "[Jazz & Blues]", album_id: "popular9"});
-                all_albums.push({title: "[Drum & Bass]", album_id: "popular10"});
-                all_albums.push({title: "[Trance]", album_id: "popular11"});
-                all_albums.push({title: "[Chanson]", album_id: "popular12"});
-                all_albums.push({title: "[Ethnic]", album_id: "popular13"});
-                all_albums.push({title: "[Acoustic & Vocal]", album_id: "popular14"});
-                all_albums.push({title: "[Reggae]", album_id: "popular15"});
-                all_albums.push({title: "[Classical]", album_id: "popular16"});
-                all_albums.push({title: "[Indie Pop]", album_id: "popular17"});
-                all_albums.push({title: "[Speech]", album_id: "popular19"});
-                all_albums.push({title: "[Electropop & Disco]", album_id: "popular22"});
-                all_albums.push({title: "[Other]", album_id: "popular18"});
+                all_albums.push({title: "[Recommendations]", album_id: "recommendations", vk_save: true});
+                all_albums.push({title: "[Popular]", album_id: "popular0", vk_save: true});
+                all_albums.push({title: "[Rock]", album_id: "popular1", vk_save: true});
+                all_albums.push({title: "[Pop]", album_id: "popular2", vk_save: true});
+                all_albums.push({title: "[Rap & Hip-Hop]", album_id: "popular3", vk_save: true});
+                all_albums.push({title: "[Easy Listening]", album_id: "popular4", vk_save: true});
+                all_albums.push({title: "[Dance & House]", album_id: "popular5", vk_save: true});
+                all_albums.push({title: "[Instrumental]", album_id: "popular6", vk_save: true});
+                all_albums.push({title: "[Metal]", album_id: "popular7", vk_save: true});
+                all_albums.push({title: "[Alternative]", album_id: "popular21", vk_save: true});
+                all_albums.push({title: "[Dubstep]", album_id: "popular8", vk_save: true});
+                all_albums.push({title: "[Jazz & Blues]", album_id: "popular9", vk_save: true});
+                all_albums.push({title: "[Drum & Bass]", album_id: "popular10", vk_save: true});
+                all_albums.push({title: "[Trance]", album_id: "popular11", vk_save: true});
+                all_albums.push({title: "[Chanson]", album_id: "popular12", vk_save: true});
+                all_albums.push({title: "[Ethnic]", album_id: "popular13", vk_save: true});
+                all_albums.push({title: "[Acoustic & Vocal]", album_id: "popular14", vk_save: true});
+                all_albums.push({title: "[Reggae]", album_id: "popular15", vk_save: true});
+                all_albums.push({title: "[Classical]", album_id: "popular16", vk_save: true});
+                all_albums.push({title: "[Indie Pop]", album_id: "popular17", vk_save: true});
+                all_albums.push({title: "[Speech]", album_id: "popular19", vk_save: true});
+                all_albums.push({title: "[Electropop & Disco]", album_id: "popular22", vk_save: true});
+                all_albums.push({title: "[Other]", album_id: "popular18", vk_save: true});
                 var list = [];
                 all_albums.forEach(function(item) {
-                    list.push({name: item.title, album_id: item.album_id, id: list.length, type: "vk"});
+                    list.push({name: item.title, album_id: item.album_id, id: list.length, type: "vk", vk_save: (item.vk_save === true)});
                 });
                 cb(list);
             });
@@ -943,6 +941,18 @@ var engine = function() {
                 cb(tracks);
             }, id);
         };
+        var addInLibrarty = function(id, oid, cb) {
+            var url = 'https://api.vk.com/method/audio.add?v=5.5&audio_id=' + id + '&owner_id=' + oid + '&access_token=' + token;
+            $.getJSON(url, function(data) {
+                if (is_error(data) || 'response' in data === false) {
+                    console.log("VK", "addInLibrarty", "API error", data);
+                    return;
+                }
+                if (cb !== undefined) {
+                    cb(true);
+                }
+            });
+        };
         return {
             makeAlbums: function(a) {
                 getToken(function() {
@@ -952,6 +962,11 @@ var engine = function() {
             makeAlbumTracks: function(a, b) {
                 getToken(function() {
                     makeAlbumTracks(a, b);
+                });
+            },
+            addInLibrarty: function(id, oid, cb) {
+                getToken(function() {
+                    addInLibrarty(id, oid, cb);
                 });
             }
         };
@@ -1099,6 +1114,18 @@ var engine = function() {
                     id = getRandomInt(0, playlist.length - 1);
                 }
                 player.open(id);
+                if (playlist_info !== undefined && playlist_info.vk_save === true) {
+                    var_cache.vk_save_ctx = true;
+                    chrome.contextMenus.create({
+                        id: "save_vk",
+                        title: "Save track in library",
+                        contexts: ['page', 'launcher']
+                    });
+                } else
+                if (var_cache.vk_save_ctx) {
+                    chrome.contextMenus.remove('save_vk');
+                    var_cache.vk_save_ctx = false;
+                }
             }
         },
         play: player.play,
@@ -1112,6 +1139,7 @@ var engine = function() {
         mute: player.mute,
         getMute: player.getMute,
         getAudio: player.getAudio,
+        getCurrentTrack: player.getCurrentTrack,
         getCover: function(id) {
             return covers[id];
         },
