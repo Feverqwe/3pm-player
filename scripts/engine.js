@@ -924,6 +924,7 @@ var engine = function() {
                         }
                         cb(tracks);
                     }, sid);
+                    return;
                 } else
                 if (id === "recommendations") {
                     getRecommendations(function(tracks) {
@@ -932,6 +933,7 @@ var engine = function() {
                         }
                         cb(tracks);
                     });
+                    return;
                 }
             }
             getTracks(function(tracks) {
@@ -1044,7 +1046,6 @@ var engine = function() {
             });
         };
         return {
-            getToken: getToken,
             getFilelist: function(a, b, c) {
                 getToken(function() {
                     getFilelist(a, b, c);
