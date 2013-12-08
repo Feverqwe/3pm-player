@@ -50,6 +50,7 @@ div.image img {
 .player .box {
     overflow: hidden;
     height: 80px;
+    /* height: calc(100% - 39px);*/
 }
 .player .info {
     position: relative;

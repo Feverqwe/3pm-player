@@ -725,6 +725,7 @@ var engine = function() {
     var vk = function() {
         var token = undefined;
         var timeout = 500;
+        var saved_tracks = [];
         var is_error = function(data) {
             if ('error' in data) {
                 token = undefined;
@@ -960,11 +961,17 @@ var engine = function() {
                 });
             },
             makeAlbumTracks: function(a, b) {
+                saved_tracks = [];
                 getToken(function() {
                     makeAlbumTracks(a, b);
                 });
             },
             addInLibrarty: function(id, oid, cb) {
+                if (saved_tracks.indexOf(id + '_' + oid) !== -1) {
+                    console.log('VK', 'addInLibrarty', 'The track has already been added.');
+                    return;
+                }
+                saved_tracks.push(id + '_' + oid);
                 getToken(function() {
                     addInLibrarty(id, oid, cb);
                 });

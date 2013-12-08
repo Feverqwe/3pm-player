@@ -285,11 +285,15 @@ var wm = function() {
         return [w, h];
     };
     var create_player_window = function() {
+        var dpr = window.devicePixelRatio;
+        if (dpr === undefined) {
+            dpr = 1;
+        }
         var create_window = function(p_l, p_t) {
             chrome.app.window.create('index.html', {
                 bounds: {
-                    width: 335,
-                    height: 116,
+                    width: parseInt(335 * dpr),
+                    height: parseInt(116 * dpr),
                     left: p_l,
                     top: p_t
                 },
