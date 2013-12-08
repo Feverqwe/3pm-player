@@ -4,8 +4,8 @@ mkdir ./build
 
 cp -r ./scripts ./build/scripts
 cp -r ./images ./build/images
-cp -r  ./styles ./build/styles
-cp -r  ./www ./build/www
+cp -r ./styles ./build/styles
+cp -r ./www ./build/www
 cp ./*.html ./build/.
 cp ./*.json ./build/.
 cp ./*.png ./build/.
