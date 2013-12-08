@@ -128,7 +128,7 @@ var viz = function() {
                     event.preventDefault();
                     viz.randomPreset();
                 } else
-                if (event.ctrlKey) {
+                if (event.ctrlKey || event.metaKey) {
                     if (event.keyCode === 38) {
                         event.preventDefault();
                         sendPlayer(function(window) {

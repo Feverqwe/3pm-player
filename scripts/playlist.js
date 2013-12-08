@@ -323,7 +323,7 @@ var playlist = function() {
                         window.engine.vizRandomPreset();
                     });
                 } else
-                if (event.ctrlKey) {
+                if (event.ctrlKey || event.metaKey) {
                     if (event.keyCode === 38) {
                         event.preventDefault();
                         sendPlayer(function(window) {
