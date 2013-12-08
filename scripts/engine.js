@@ -1080,7 +1080,7 @@ var engine = function() {
             }
             chrome.contextMenus.create({
                 id: "save_vk",
-                title: "Save track in library",
+                title: "Save current track in VK",
                 contexts: ['page', 'launcher']
             });
             var_cache.vk_save_ctx = true;
