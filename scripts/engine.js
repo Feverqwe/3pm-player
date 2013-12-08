@@ -1073,6 +1073,23 @@ var engine = function() {
             }
         };
     }();
+    var add_in_ctx_menu = function(playlist_info) {
+        if (playlist_info !== undefined && playlist_info.vk_save === true) {
+            if (var_cache.vk_save_ctx) {
+                return;
+            }
+            chrome.contextMenus.create({
+                id: "save_vk",
+                title: "Save track in library",
+                contexts: ['page', 'launcher']
+            });
+            var_cache.vk_save_ctx = true;
+        } else
+        if (var_cache.vk_save_ctx) {
+            chrome.contextMenus.remove('save_vk');
+            var_cache.vk_save_ctx = false;
+        }
+    }
     return {
         run: function() {
             $('.engine').remove();
@@ -1114,18 +1131,7 @@ var engine = function() {
                     id = getRandomInt(0, playlist.length - 1);
                 }
                 player.open(id);
-                if (playlist_info !== undefined && playlist_info.vk_save === true) {
-                    var_cache.vk_save_ctx = true;
-                    chrome.contextMenus.create({
-                        id: "save_vk",
-                        title: "Save track in library",
-                        contexts: ['page', 'launcher']
-                    });
-                } else
-                if (var_cache.vk_save_ctx) {
-                    chrome.contextMenus.remove('save_vk');
-                    var_cache.vk_save_ctx = false;
-                }
+                add_in_ctx_menu(playlist_info);
             }
         },
         play: player.play,
