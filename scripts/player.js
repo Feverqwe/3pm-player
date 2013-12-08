@@ -532,7 +532,7 @@ var view = function() {
                     event.preventDefault();
                     engine.vizRandomPreset();
                 } else
-                if (event.ctrlKey) {
+                if (event.ctrlKey || event.metaKey) {
                     if (event.keyCode === 38) {
                         event.preventDefault();
                         engine.volume("+10");
