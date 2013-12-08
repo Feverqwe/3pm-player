@@ -299,7 +299,7 @@ var wm = function() {
                 windows.player = win;
             });
         };
-        chrome.storage.local.get(function(storage) {
+        chrome.storage.local.get(['pos_left', 'pos_top'], function(storage) {
             var lt = win_top_left_pos(storage.pos_left, storage.pos_top);
             create_window(lt[0], lt[1]);
         });
@@ -318,7 +318,7 @@ var wm = function() {
                 windows.playlist = win;
             });
         };
-        chrome.storage.local.get(function(storage) {
+        chrome.storage.local.get(['pl_pos_left', 'pl_pos_top', 'pl_w', 'pl_h'], function(storage) {
             var lt = win_top_left_pos(storage.pl_pos_left, storage.pl_pos_top);
             var wh = win_w_h_pos(storage.pl_w, storage.pl_h);
             create_window(lt[0], lt[1], wh[0], wh[1]);
@@ -338,7 +338,7 @@ var wm = function() {
                 windows.viz = win;
             });
         };
-        chrome.storage.local.get(function(storage) {
+        chrome.storage.local.get(['viz_pos_left', 'viz_pos_top', 'viz_w', 'viz_h'], function(storage) {
             var lt = win_top_left_pos(storage.viz_pos_left, storage.viz_pos_top);
             var wh = win_w_h_pos(storage.viz_w, storage.viz_h);
             create_window(lt[0], lt[1], wh[0], wh[1]);
@@ -371,10 +371,8 @@ var wm = function() {
                 windows.dialog = win;
             });
         };
-        chrome.storage.local.get(function(storage) {
-            var lt = win_top_left_pos(screen[0] / 2 - parseInt(w / 2), screen[1] / 2 - parseInt(h / 2));
-            create_window(lt[0], lt[1]);
-        });
+        var lt = win_top_left_pos(screen[0] / 2 - parseInt(w / 2), screen[1] / 2 - parseInt(h / 2));
+        create_window(lt[0], lt[1]);
     };
     var check = function() {
         var player_off = true;
