@@ -30,7 +30,7 @@ java -jar compiler.jar --js ./scripts/viz.js --js_output_file ./build/scripts/vi
 #make www/style.css
 java -jar yuicompressor-2.4.8.jar ./www/css/style.css -o ./build/www/css/style.css
 #make main.css
-::java -jar yuicompressor-2.4.8.jar ./styles/main.css -o ./build/styles/main.css
+#java -jar yuicompressor-2.4.8.jar ./styles/main.css -o ./build/styles/main.css
 #make playlist.css
 java -jar yuicompressor-2.4.8.jar ./styles/playlist.css -o ./build/styles/playlist.css
 #make dialog.css
