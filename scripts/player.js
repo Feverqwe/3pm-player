@@ -577,38 +577,60 @@ var view = function() {
                 chrome.contextMenus.create({
                     id: "1",
                     title: "Open files",
-                    contexts: ["all"]
+                    contexts: ['page','launcher']
                 });
                 chrome.contextMenus.create({
                     id: "3",
                     title: "Open folder",
-                    contexts: ["all"]
+                    contexts: ['page','launcher']
                 });
                 chrome.contextMenus.create({
                     id: "2",
                     title: "Open URL",
-                    contexts: ["all"]
+                    contexts: ['page','launcher']
                 });
                 chrome.contextMenus.create({
                     type: "checkbox",
                     id: "ws",
                     title: "Enable webUI (0.0.0.0:9898)",
-                    contexts: ["all"]
+                    contexts: ['page','launcher']
                 });
                 chrome.contextMenus.create({
                     id: "viz",
                     title: "Visualization",
-                    contexts: ["all"]
+                    contexts: ['page','launcher']
+                });
+                chrome.contextMenus.create({
+                    id: "cloud",
+                    title: "Cloud",
+                    contexts: ['page','launcher']
                 });
                 chrome.contextMenus.create({
                     id: "vk",
-                    title: "Get Music from VK",
-                    contexts: ["all"]
+                    parentId: "cloud",
+                    title: "vk.com",
+                    contexts: ['page','launcher']
                 });
                 chrome.contextMenus.create({
                     id: "db",
-                    title: "Get Music from Dropbox",
-                    contexts: ["all"]
+                    parentId: "cloud",
+                    title: "dropbox.com",
+                    contexts: ['page','launcher']
+                });
+                chrome.contextMenus.create({
+                    id: "p_play_pause",
+                    title: "Play/Pause",
+                    contexts: ['launcher']
+                });
+                chrome.contextMenus.create({
+                    id: "p_next",
+                    title: "Next",
+                    contexts: ['launcher']
+                });
+                chrome.contextMenus.create({
+                    id: "p_previous",
+                    title: "Previous",
+                    contexts: ['launcher']
                 });
                 chrome.runtime.getBackgroundPage(function(bg) {
                     chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
@@ -616,12 +638,14 @@ var view = function() {
                 chrome.contextMenus.onClicked.addListener(function(info) {
                     if (info.menuItemId === "1") {
                         $('.click_for_open').trigger('click');
-                    } else
+                        return;
+                    }
                     if (info.menuItemId === "2") {
                         chrome.runtime.getBackgroundPage(function(bg) {
                             bg.wm.showDialog({type: "url", h: 60});
                         });
-                    } else
+                        return;
+                    }
                     if (info.menuItemId === "vk") {
                         engine.vk.makeAlbums(function(list) {
                             engine.setM3UPlaylists({list: list});
@@ -634,19 +658,22 @@ var view = function() {
                                 });
                             }
                         });
-                    } else
+                        return;
+                    }
                     if (info.menuItemId === "db") {
                         engine.db.getFilelist(function(list) {
                             chrome.runtime.getBackgroundPage(function(bg) {
                                 bg.wm.showDialog({type: "db", h: 315, w: 350, r: true, filelist: list});
                             });
                         });
-                    } else
+                        return;
+                    }
                     if (info.menuItemId === "viz") {
                         chrome.runtime.getBackgroundPage(function(bg) {
                             bg.wm.showViz();
                         });
-                    } else
+                        return;
+                    }
                     if (info.menuItemId === "3") {
                         chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
                             if (!entry) {
@@ -654,7 +681,8 @@ var view = function() {
                             }
                             readDirectory(entry);
                         });
-                    } else
+                        return;
+                    }
                     if (info.menuItemId === "ws") {
                         if (info.checked) {
                             chrome.runtime.getBackgroundPage(function(bg) {
@@ -665,6 +693,19 @@ var view = function() {
                                 bg.wm.ws.stop();
                             });
                         }
+                        return;
+                    }
+                    if (info.menuItemId === "p_play_pause") {
+                        engine.playToggle();
+                        return;
+                    }
+                    if (info.menuItemId === "p_next") {
+                        engine.next();
+                        return;
+                    }
+                    if (info.menuItemId === "p_previous") {
+                        engine.preview();
+                        return;
                     }
                 });
             });

@@ -410,11 +410,7 @@ var wm = function() {
                     windows.playlist.focus();
                 }
                 windows.player.focus();
-            }/*
-             setTimeout(function() {
-             create_viz_window();
-             vizw = create_viz_window;
-             }, 1000);*/
+            }
         },
         toggle_playlist: function() {
             if (check() && "playlist" in windows) {
