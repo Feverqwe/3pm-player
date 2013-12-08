@@ -1080,6 +1080,123 @@ var engine = function() {
             }
         };
     }();
+    var sc = function() {
+        var client_id = '13f6a1d3bbd03d754387a51dccd8bf83';
+        var token = undefined;
+        var user_id = undefined;
+        var scAuth = function(cb) {
+            var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
+            var url = 'https://soundcloud.com/connect?client_id=' + client_id + '&response_type=token&redirect_uri=' + redirect_uri;
+            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
+            function(responseURL) {
+                if (!responseURL) {
+                    console.log("SC", "No url");
+                    return;
+                }
+                if (responseURL.indexOf("access_token=") !== -1) {
+                    token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-]*)&.*/, "$1");
+                    chrome.storage.sync.set({sc_token: token});
+                    cb(token);
+                } else {
+                    chrome.storage.sync.remove('sc_token');
+                    token = undefined;
+                    user_id = undefined;
+                    console.log("SC", "No token", responseURL);
+                }
+            });
+        };
+        var scUserId = function(cb) {
+            var url = 'https://api.soundcloud.com/me.json?oauth_token=' + token;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4)
+                {
+                    var data = JSON.parse(xhr.responseText);
+                    if ('error' in data || 'id' in data === false) {
+                        token = undefined;
+                        user_id = undefined;
+                        chrome.storage.sync.remove('sc_token');
+                        cb(undefined);
+                        console.log("SC", "getUserId", "API Error", data);
+                        return;
+                    }
+                    user_id = data.id;
+                    cb(data.id);
+                }
+            };
+            xhr.send(null);
+        };
+        var getUserId = function(cb) {
+            if (user_id !== undefined) {
+                cb(user_id);
+                return;
+            }
+            chrome.storage.sync.get('sc_user_id', function(obj) {
+                if ('sc_user_id' in obj) {
+                    user_id = obj.sc_user_id;
+                    cb(user_id);
+                } else {
+                    scUserId(cb);
+                }
+            });
+        };
+        var getToken = function(cb) {
+            if (token !== undefined) {
+                cb(token);
+                return;
+            }
+            chrome.storage.sync.get('sc_token', function(obj) {
+                if ('sc_token' in obj) {
+                    token = obj.sc_token;
+                    cb(token);
+                } else {
+                    scAuth(cb);
+                }
+            });
+        };
+        var getAlbums = function(cb) {
+            var url = 'http://api.soundcloud.com/users/' + user_id + '/playlists.json?client_id=' + client_id;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4)
+                {
+                    var data = JSON.parse(xhr.responseText);
+                    if ('error' in data) {
+                        token = undefined;
+                        user_id = undefined;
+                        chrome.storage.sync.remove('sc_token');
+                        cb(undefined);
+                        console.log("SC", "getAlbums", "API Error", data);
+                        return;
+                    }
+                    var list = [];
+                    data.forEach(function(item) {
+                        var tracks = [];
+                        item.tracks.forEach(function(track) {
+                            tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: {title: track.title, artist: track.user.username}, artwork: track.artwork_url, duration: track.duration});
+                        });
+                        list.push({name: item.title, id: list.length, type: "sc", tracks: tracks});
+                    });
+                    if (list.length === 0) {
+                        return;
+                    }
+                    cb(list);
+                }
+            };
+            xhr.send(null);
+        };
+        return {
+            makeAlbums: function(cb) {
+                getToken(function() {
+                    getUserId(function() {
+                        getAlbums(cb);
+                    });
+                });
+            }
+        };
+    }();
     var add_in_ctx_menu = function(playlist_info) {
         if (playlist_info !== undefined && playlist_info.vk_save === true) {
             if (var_cache.vk_save_ctx) {
@@ -1096,7 +1213,7 @@ var engine = function() {
             chrome.contextMenus.remove('save_vk');
             var_cache.vk_save_ctx = false;
         }
-    }
+    };
     return {
         run: function() {
             $('.engine').remove();
@@ -1261,7 +1378,8 @@ var engine = function() {
             });
         },
         vk: vk,
-        db: db
+        db: db,
+        sc: sc
     };
 }();
 $(function() {

@@ -612,6 +612,12 @@ var view = function() {
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
+                    id: "sc",
+                    parentId: "cloud",
+                    title: "soundcloud.com",
+                    contexts: ['page', 'launcher']
+                });
+                chrome.contextMenus.create({
                     id: "db",
                     parentId: "cloud",
                     title: "dropbox.com",
@@ -648,6 +654,20 @@ var view = function() {
                     }
                     if (info.menuItemId === "vk") {
                         engine.vk.makeAlbums(function(list) {
+                            engine.setM3UPlaylists({list: list});
+                            if (list.length === 1) {
+                                view.select_playlist(list[0].id);
+                            } else
+                            if (list.length > 0) {
+                                chrome.runtime.getBackgroundPage(function(bg) {
+                                    bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
+                                });
+                            }
+                        });
+                        return;
+                    }
+                    if (info.menuItemId === 'sc') {
+                        engine.sc.makeAlbums(function(list) {
                             engine.setM3UPlaylists({list: list});
                             if (list.length === 1) {
                                 view.select_playlist(list[0].id);
@@ -937,6 +957,9 @@ var view = function() {
                 } else
                 if (list.type === "db") {
                     engine.open(list.tracks, {name: list.name, id: id});
+                } else
+                if (list.type === "sc") {
+                    engine.open(list.tracks, {name: list.name, id: id, type: "sc"});
                 }
 
             }
