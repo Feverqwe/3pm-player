@@ -260,6 +260,10 @@ var web_socket = function() {
 var wm = function() {
     var windows = {};
     var screen = [window.screen.width, window.screen.height];
+    var dpr = window.devicePixelRatio;
+    if (dpr === undefined) {
+        dpr = 1;
+    }
     var win_top_left_pos = function(l, t) {
         if (l === undefined || l > screen[0]) {
             l = 30;
@@ -285,10 +289,6 @@ var wm = function() {
         return [w, h];
     };
     var create_player_window = function() {
-        var dpr = window.devicePixelRatio;
-        if (dpr === undefined) {
-            dpr = 1;
-        }
         var create_window = function(p_l, p_t) {
             chrome.app.window.create('index.html', {
                 bounds: {
@@ -312,8 +312,8 @@ var wm = function() {
         var create_window = function(p_l, p_t, pl_w, pl_h) {
             chrome.app.window.create('playlist.html', {
                 bounds: {
-                    width: pl_w || 335,
-                    height: pl_h || 400,
+                    width: pl_w || parseInt(335 * dpr),
+                    height: pl_h || parseInt(400 * dpr),
                     left: p_l,
                     top: p_t
                 },
@@ -332,8 +332,8 @@ var wm = function() {
         var create_window = function(p_l, p_t, pl_w, pl_h) {
             chrome.app.window.create('viz.html', {
                 bounds: {
-                    width: pl_w || 1024,
-                    height: pl_h || 768,
+                    width: pl_w || parseInt(1024 * dpr),
+                    height: pl_h || parseInt(768 * dpr),
                     left: p_l,
                     top: p_t
                 },
@@ -360,6 +360,8 @@ var wm = function() {
         options.h = options.h || 120;
         var w = options.w;
         var h = options.h;
+        w = parseInt(w * dpr);
+        h = parseInt(h * dpr);
         var create_window = function(p_l, p_t) {
             chrome.app.window.create('dialog.html', {
                 bounds: {
