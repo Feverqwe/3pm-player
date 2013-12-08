@@ -142,6 +142,7 @@ div.playlist > ul > li .info {
 div.navigation {
     position: fixed;
     bottom: 0px;
+    max-height: 27px;
 }
 div.navigation > ul {
     margin: 0;
