@@ -1195,6 +1195,80 @@ var engine = function() {
             }
         };
     }();
+    var gd = function() {
+        var token = undefined;
+        var clear_data = function() {
+            chrome.storage.sync.remove('gd_token');
+            token = undefined;
+        };
+        var gdAuth = function(cb) {
+            var client_id = '304269969384-d9cvnmhdquebnm8ulkne9ecveij7cjap.apps.googleusercontent.com';
+            var scope = 'https://www.googleapis.com/auth/drive';
+            var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
+            var url = 'https://accounts.google.com/o/oauth2/auth?client_id=' + client_id + '&response_type=token&redirect_uri=' + redirect_uri + '&scope=' + scope;
+            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
+            function(responseURL) {
+                if (!responseURL) {
+                    console.log("GD", "No url");
+                    return;
+                }
+                if (responseURL.indexOf("access_token=") !== -1) {
+                    token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-\._]*)&.*/, "$1");
+                    chrome.storage.sync.set({gd_token: token});
+                    cb(token);
+                } else {
+                    clear_data();
+                    console.log("GD", "No token", responseURL);
+                }
+            });
+        };
+        var getFilelist = function(id, cb) {
+            if (id === undefined) {
+                id = 'root';
+            }
+            var colums = encodeURIComponent('items(downloadUrl,id,mimeType,parents(isRoot),title)');
+            var url = 'https://www.googleapis.com/drive/v2/files?q=\'' + id + '\'+in+parents&fields=' + colums;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.setRequestHeader("Authorization", "Bearer " + token);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4)
+                {
+                    if (xhr.status !== 200) {
+                        clear_data();
+                        console.log("GD", "getFilelist", "API Error", data);
+                        return;
+                    }
+                    var data = JSON.parse(xhr.responseText);
+                    cb(data);
+                }
+            };
+            xhr.send(null);
+
+        };
+        var getToken = function(cb) {
+            if (token !== undefined) {
+                cb(token);
+                return;
+            }
+            chrome.storage.sync.get('gd_token', function(obj) {
+                if ('gd_token' in obj) {
+                    token = obj.gd_token;
+                    cb(token);
+                } else {
+                    gdAuth(cb);
+                }
+            });
+        };
+        return {
+            getToken: getToken,
+            getFilelist: function(id, cb) {
+                getToken(function() {
+                    getFilelist(id, cb);
+                });
+            }
+        };
+    }();
     var add_in_ctx_menu = function(playlist_info) {
         if (playlist_info !== undefined && playlist_info.vk_save === true) {
             if (var_cache.vk_save_ctx) {
@@ -1377,7 +1451,8 @@ var engine = function() {
         },
         vk: vk,
         db: db,
-        sc: sc
+        sc: sc,
+        gd: gd
     };
 }();
 $(function() {

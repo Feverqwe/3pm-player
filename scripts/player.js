@@ -618,6 +618,12 @@ var view = function() {
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
+                    id: "gd",
+                    parentId: "cloud",
+                    title: "drive.google.com",
+                    contexts: ['page', 'launcher']
+                });
+                chrome.contextMenus.create({
                     id: "db",
                     parentId: "cloud",
                     title: "dropbox.com",
@@ -691,6 +697,14 @@ var view = function() {
                         engine.db.getFilelist(function(list) {
                             chrome.runtime.getBackgroundPage(function(bg) {
                                 bg.wm.showDialog({type: "db", h: 315, w: 350, r: true, filelist: list});
+                            });
+                        });
+                        return;
+                    }
+                    if (info.menuItemId === "gd") {
+                        engine.gd.getFilelist(undefined, function(list) {
+                            chrome.runtime.getBackgroundPage(function(bg) {
+                                bg.wm.showDialog({type: "gd", h: 315, w: 350, r: true, filelist: list});
                             });
                         });
                         return;
@@ -960,8 +974,10 @@ var view = function() {
                 } else
                 if (list.type === "sc") {
                     engine.open(list.tracks, {name: list.name, id: id, type: "sc"});
+                } else
+                if (list.type === "gd") {
+                    engine.open(list.tracks, {name: list.name, id: id});
                 }
-
             }
         }
     };
