@@ -102,8 +102,8 @@ var playlist = function() {
         item = item_read(item);
         add_image(item.pic);
         itm.children('.cover').attr('class', 'cover pic_' + item.pic);
-        itm.children('.name').text(item.title);
-        itm.children('.info').text(item.info);
+        itm.children('.name').attr('title',item.title).text(item.title);
+        itm.children('.info').attr('title',item.info).text(item.info);
     };
     var scrool_to = function(el) {
         /*
