@@ -1112,15 +1112,14 @@ var engine = function() {
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4)
                 {
-                    var data = JSON.parse(xhr.responseText);
-                    if ('error' in data || 'id' in data === false) {
+                    if (xhr.status !== 200) {
                         token = undefined;
                         user_id = undefined;
                         chrome.storage.sync.remove('sc_token');
-                        cb(undefined);
-                        console.log("SC", "getUserId", "API Error", data);
+                        console.log("SC", "scUserId", "API Error", data);
                         return;
                     }
+                    var data = JSON.parse(xhr.responseText);
                     user_id = data.id;
                     cb(data.id);
                 }
@@ -1162,15 +1161,14 @@ var engine = function() {
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4)
                 {
-                    var data = JSON.parse(xhr.responseText);
-                    if ('error' in data) {
+                    if (xhr.status !== 200) {
                         token = undefined;
                         user_id = undefined;
                         chrome.storage.sync.remove('sc_token');
-                        cb(undefined);
                         console.log("SC", "getAlbums", "API Error", data);
                         return;
                     }
+                    var data = JSON.parse(xhr.responseText);
                     var list = [];
                     data.forEach(function(item) {
                         var tracks = [];
