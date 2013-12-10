@@ -341,7 +341,7 @@ var engine = function() {
                     }
                     if (item.file.url === undefined) {
                         if (item.type === "db") {
-                            db.getMedia(function(url) {
+                            cloud.db.getMedia(function(url) {
                                 view.state("db_preloading");
                                 $.ajax({type: "HEAD", url: url,
                                     success: function() {
