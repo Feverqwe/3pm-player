@@ -835,10 +835,10 @@ var view = function() {
             if (type === "playlist_not_empty") {
                 dom_cache.click_for_open.hide();
             }
-            if (type === "db_preloading") {
+            if (type === "preloading") {
                 dom_cache.loading.show();
             }
-            if (type === "db_preloading_fail") {
+            if (type === "preloading_dune") {
                 dom_cache.loading.hide();
             }
             if (type === "loadstart") {

@@ -346,16 +346,16 @@ var dialog = function() {
             });
             if (window.options === undefined) {
                 return;
-            }
+            } else
             if (window.options.type === "url") {
                 createURLform();
-            }
+            } else
             if (window.options.type === "m3u") {
                 playlistChiser();
-            }
+            } else
             if (window.options.type === "db") {
                 dropboxChoice();
-            }
+            } else
             if (window.options.type === "gd") {
                 driveChoice();
             }

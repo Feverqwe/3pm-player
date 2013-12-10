@@ -252,6 +252,11 @@ var cloud = function() {
                 getToken(function() {
                     addInLibrarty(id, oid, cb);
                 });
+            },
+            on_select_list: function(list, cb) {
+                engine.vk.makeAlbumTracks(list.album_id, function(tracks) {
+                    cb(tracks, {name: list.name, id: list.id, vk_save: (list.vk_save === true)});
+                });
             }
         };
     }();
@@ -355,6 +360,31 @@ var cloud = function() {
                 getToken(function() {
                     getMedia(a, b, c);
                 });
+            },
+            onplay: function(track, cb) {
+                var getHead = function(url) {
+                    $.ajax({type: "HEAD", url: url,
+                        success: function() {
+                            track.file.head = true;
+                            cb(url);
+                        }, error: function() {
+                            track.file.head = false;
+                            cb('');
+                        }
+                    });
+                };
+                if (track.file.url !== undefined && track.file.head === true) {
+                    cb(track.file.url);
+                    return;
+                }
+                if (track.file.head === false) {
+                    getHead(track.file.url);
+                    return;
+                }
+                db.getMedia(function(url) {
+                    track.file.url = url;
+                    getHead(url);
+                }, track.root, track.path);
             }
         };
     }();
@@ -450,7 +480,7 @@ var cloud = function() {
                     data.forEach(function(item) {
                         var tracks = [];
                         item.tracks.forEach(function(track) {
-                            if (track.streamable === false || ( track.original_format === "wav" && track.track_type === 'original' ) ) {
+                            if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
                                 return 1;
                             }
                             tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}, duration: track.duration, type: 'sc'});
@@ -472,6 +502,39 @@ var cloud = function() {
                         getAlbums(cb);
                     });
                 });
+            },
+            read_tags: function(track, cb) {
+                var tags = {title: track.meta.title, artist: track.meta.artist};
+                var xhr = new XMLHttpRequest();
+                var url = track.meta.artwork;
+                if (url === null) {
+                    cb(tags);
+                    return;
+                }
+                xhr.open("GET", url, true);
+                xhr.responseType = "arraybuffer";
+                xhr.onload = function() {
+                    var binary = '';
+                    var bytes = new Uint8Array(xhr.response);
+                    var len = bytes.byteLength;
+                    for (var i = 0; i < len; i++) {
+                        binary += String.fromCharCode(bytes[ i ]);
+                    }
+                    var ext = url.split('.').slice(-1)[0].toLowerCase().split('?')[0];
+                    var mime = 'image/jpeg';
+                    if (ext === 'png') {
+                        mime = 'image/png';
+                    }
+                    tags.picture = [binary, mime];
+                    cb(tags);
+                };
+                xhr.onerror = function() {
+                    cb(tags);
+                };
+                xhr.send(null);
+            },
+            on_select_list: function(list, cb) {
+                cb(list.tracks, {name: list.name, id: list.id, type: "sc"});
             }
         };
     }();

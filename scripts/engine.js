@@ -221,38 +221,24 @@ var engine = function() {
         var audio = null;
         var current_id = undefined;
         var read_tags = function(id, rt_cb) {
-            if (playlist[id].type === 'sc') {
+            if (playlist[id].type !== undefined && typeof (cloud[playlist[id].type].read_tags) === 'function') {
                 playlist[id].state = "loading";
-                var tags = {title: playlist[id].meta.title, artist: playlist[id].meta.artist};
-                var xhr = new XMLHttpRequest();
-                var url = playlist[id].meta.artwork;
-                if (url === null) {
-                    rt_cb(tags, id);
-                    return;
-                }
-                xhr.open("GET", url, true);
-                xhr.responseType = "arraybuffer";
-                xhr.onload = function() {
-                    var binary = '';
-                    var bytes = new Uint8Array(xhr.response);
-                    var len = bytes.byteLength;
-                    for (var i = 0; i < len; i++) {
-                        binary += String.fromCharCode(bytes[ i ]);
-                    }
-                    var ext = url.split('.').slice(-1)[0].toLowerCase();
-                    var mime = 'image/jpeg';
-                    if (ext === 'png') {
-                        mime = 'image/png';
-                    }
-                    image_resize([binary, mime], function(i_id) {
-                        tags.picture = i_id;
+                sendPlaylist(function(window) {
+                    window.playlist.updPlaylistItem(id, playlist[id]);
+                });
+                cloud[playlist[id].type].read_tags(playlist[id], function(tags) {
+                    // NOTE: tags.picture = [binary, mime]
+                    image_resize(tags.picture, function(i_id) {
+                        if (i_id === undefined) {
+                            if ("picture" in tags) {
+                                delete tags.picture;
+                            }
+                        } else {
+                            tags.picture = i_id;
+                        }
                         rt_cb(tags, id);
                     });
-                };
-                xhr.onerror = function() {
-                    rt_cb(tags, id);
-                };
-                xhr.send(null);
+                });
                 return;
             }
             var file = playlist[id].file;
@@ -339,20 +325,17 @@ var engine = function() {
                     if (current_type !== undefined) {
                         $(audio).removeAttr('type');
                     }
-                    if (item.file.url === undefined) {
-                        if (item.type === "db") {
-                            cloud.db.getMedia(function(url) {
-                                view.state("db_preloading");
-                                $.ajax({type: "HEAD", url: url,
-                                    success: function() {
-                                        audio.src = url;
-                                    }, error: function() {
-                                        view.state("db_preloading_fail");
-                                    }
-                                });
-                                item.file.url = url;
-                            }, item.root, item.path);
-                        }
+                    if (item.type !== undefined && typeof (cloud[item.type].onplay) === 'function') {
+                        view.state("preloading");
+                        cloud[item.type].onplay(item, function(url) {
+                            view.state("preloading_dune");
+                            if (url.length === 0) {
+                                console.log('No url');
+                                player.next();
+                                return;
+                            }
+                            audio.src = url;
+                        });
                     } else {
                         audio.src = item.file.url;
                     }
@@ -939,12 +922,6 @@ var engine = function() {
         },
         set_hotkeys: function(_document) {
             $(_document).keydown(function(event) {
-                if ('keyCode' in event === false) {
-                    return;
-                }
-                if (event.altKey) {
-                    return;
-                }
                 if (event.keyCode === 32) {
                     event.preventDefault();
                     engine.playToggle();
@@ -1014,21 +991,13 @@ var engine = function() {
                 readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
                     engine.open(files, {name: list.name, id: id});
                 });
+            } else
+            if (cloud[list.type] !== undefined && typeof (cloud[list.type].on_select_list) === 'function') {
+                cloud[list.type].on_select_list(list, function(track_list, info) {
+                    engine.open(track_list, info);
+                });
             } else {
-                if (list.type === "vk") {
-                    engine.vk.makeAlbumTracks(list.album_id, function(tracks) {
-                        engine.open(tracks, {name: list.name, id: id, vk_save: (list.vk_save === true)});
-                    });
-                } else
-                if (list.type === "db") {
-                    engine.open(list.tracks, {name: list.name, id: id});
-                } else
-                if (list.type === "sc") {
-                    engine.open(list.tracks, {name: list.name, id: id, type: "sc"});
-                } else
-                if (list.type === "gd") {
-                    engine.open(list.tracks, {name: list.name, id: id});
-                }
+                engine.open(list.tracks, {name: list.name, id: id});
             }
         },
         vk: cloud.vk,
