@@ -52,7 +52,7 @@ var dialog = function() {
         $('body').on('click', 'li.pl_file', function() {
             var id = $(this).data("id");
             sendPlayer(function(window) {
-                window.view.select_playlist(id);
+                window.engine.select_playlist(id);
             });
             window.close();
         });
@@ -163,7 +163,7 @@ var dialog = function() {
                     }
                     sendPlayer(function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
-                        window.view.select_playlist(0);
+                        window.engine.select_playlist(0);
                     });
                     _window.close();
                 }, root, path);
@@ -188,7 +188,7 @@ var dialog = function() {
             }
             sendPlayer(function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
-                window.view.select_playlist(0);
+                window.engine.select_playlist(0);
             });
             window.close();
         });
@@ -305,7 +305,7 @@ var dialog = function() {
                     }
                     sendPlayer(function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
-                        window.view.select_playlist(0);
+                        window.engine.select_playlist(0);
                     });
                     _window.close();
                 });
@@ -331,7 +331,7 @@ var dialog = function() {
             }
             sendPlayer(function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
-                window.view.select_playlist(0);
+                window.engine.select_playlist(0);
             });
             window.close();
         });
@@ -340,6 +340,9 @@ var dialog = function() {
         run: function() {
             $('.close').on('click', function() {
                 window.close();
+            });
+            sendPlayer(function(window) {
+                window.engine.set_hotkeys(document);
             });
             if (window.options === undefined) {
                 return;

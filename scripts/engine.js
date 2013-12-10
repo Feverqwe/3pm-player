@@ -937,6 +937,100 @@ var engine = function() {
                 window.viz.minimize();
             });
         },
+        set_hotkeys: function(_document) {
+            $(_document).keydown(function(event) {
+                if ('keyCode' in event === false) {
+                    return;
+                }
+                if (event.altKey) {
+                    return;
+                }
+                if (event.keyCode === 32) {
+                    event.preventDefault();
+                    engine.playToggle();
+                } else
+                if (event.keyCode === 86) {
+                    event.preventDefault();
+                    engine.mute();
+                } else
+                if (event.keyCode === 83) {
+                    event.preventDefault();
+                    engine.shuffle();
+                } else
+                if (event.keyCode === 82) {
+                    event.preventDefault();
+                    engine.loop();
+                } else
+                if (event.keyCode === 113) {
+                    event.preventDefault();
+                    engine.next();
+                } else
+                if (event.keyCode === 112) {
+                    event.preventDefault();
+                    engine.preview();
+                } else
+                if (event.keyCode === 78) {
+                    event.preventDefault();
+                    engine.vizRandomPreset();
+                } else
+                if (event.ctrlKey || event.metaKey) {
+                    if (event.keyCode === 38) {
+                        event.preventDefault();
+                        engine.volume("+10");
+                    } else
+                    if (event.keyCode === 40) {
+                        event.preventDefault();
+                        engine.volume("-10");
+                    } else
+                    if (event.keyCode === 39) {
+                        event.preventDefault();
+                        clearTimeout(var_cache.progress_keydown_timer);
+                        var_cache.progress_keydown_timer = setTimeout(function() {
+                            engine.position("+10");
+                        }, 25);
+                    } else
+                    if (event.keyCode === 37) {
+                        event.preventDefault();
+                        clearTimeout(var_cache.progress_keydown_timer);
+                        var_cache.progress_keydown_timer = setTimeout(function() {
+                            engine.position("-10");
+                        }, 25);
+                    }
+                }
+            });
+        },
+        select_playlist: function(id) {
+            var filePlaylists = engine.getM3UPlaylists();
+            if (filePlaylists === undefined) {
+                return;
+            }
+            var list = {name: undefined};
+            filePlaylists.list.forEach(function(item) {
+                if (item.id === id) {
+                    list = item;
+                }
+            });
+            if ("entry" in filePlaylists) {
+                readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
+                    engine.open(files, {name: list.name, id: id});
+                });
+            } else {
+                if (list.type === "vk") {
+                    engine.vk.makeAlbumTracks(list.album_id, function(tracks) {
+                        engine.open(tracks, {name: list.name, id: id, vk_save: (list.vk_save === true)});
+                    });
+                } else
+                if (list.type === "db") {
+                    engine.open(list.tracks, {name: list.name, id: id});
+                } else
+                if (list.type === "sc") {
+                    engine.open(list.tracks, {name: list.name, id: id, type: "sc"});
+                } else
+                if (list.type === "gd") {
+                    engine.open(list.tracks, {name: list.name, id: id});
+                }
+            }
+        },
         vk: cloud.vk,
         db: cloud.db,
         sc: cloud.sc,

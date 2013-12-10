@@ -497,66 +497,6 @@ var view = function() {
                     engine.volume();
                 }
             });
-            $(document).keydown(function(event) {
-                if ('keyCode' in event === false) {
-                    return;
-                }
-                if (event.altKey) {
-                    return;
-                }
-                if (event.keyCode === 32) {
-                    event.preventDefault();
-                    engine.playToggle();
-                } else
-                if (event.keyCode === 86) {
-                    event.preventDefault();
-                    engine.mute();
-                } else
-                if (event.keyCode === 83) {
-                    event.preventDefault();
-                    engine.shuffle();
-                } else
-                if (event.keyCode === 82) {
-                    event.preventDefault();
-                    engine.loop();
-                } else
-                if (event.keyCode === 113) {
-                    event.preventDefault();
-                    engine.next();
-                } else
-                if (event.keyCode === 112) {
-                    event.preventDefault();
-                    engine.preview();
-                } else
-                if (event.keyCode === 78) {
-                    event.preventDefault();
-                    engine.vizRandomPreset();
-                } else
-                if (event.ctrlKey || event.metaKey) {
-                    if (event.keyCode === 38) {
-                        event.preventDefault();
-                        engine.volume("+10");
-                    } else
-                    if (event.keyCode === 40) {
-                        event.preventDefault();
-                        engine.volume("-10");
-                    } else
-                    if (event.keyCode === 39) {
-                        event.preventDefault();
-                        clearTimeout(var_cache.progress_keydown_timer);
-                        var_cache.progress_keydown_timer = setTimeout(function() {
-                            engine.position("+10");
-                        }, 25);
-                    } else
-                    if (event.keyCode === 37) {
-                        event.preventDefault();
-                        clearTimeout(var_cache.progress_keydown_timer);
-                        var_cache.progress_keydown_timer = setTimeout(function() {
-                            engine.position("-10");
-                        }, 25);
-                    }
-                }
-            });
             $('.click_for_open').on('click', function() {
                 var accepts = [{
                         mimeTypes: ['audio/*']
@@ -573,6 +513,7 @@ var view = function() {
             dom_cache.mute.on('click', function() {
                 engine.mute();
             });
+            engine.set_hotkeys(document);
             chrome.contextMenus.removeAll(function() {
                 chrome.contextMenus.create({
                     id: "1",
@@ -662,7 +603,7 @@ var view = function() {
                         engine.vk.makeAlbums(function(list) {
                             engine.setM3UPlaylists({list: list});
                             if (list.length === 1) {
-                                view.select_playlist(list[0].id);
+                                engine.select_playlist(list[0].id);
                             } else
                             if (list.length > 0) {
                                 chrome.runtime.getBackgroundPage(function(bg) {
@@ -676,7 +617,7 @@ var view = function() {
                         engine.sc.makeAlbums(function(list) {
                             engine.setM3UPlaylists({list: list});
                             if (list.length === 1) {
-                                view.select_playlist(list[0].id);
+                                engine.select_playlist(list[0].id);
                             } else
                             if (list.length > 0) {
                                 chrome.runtime.getBackgroundPage(function(bg) {
@@ -946,38 +887,6 @@ var view = function() {
             }
             if (type === "canplay") {
                 engine.play();
-            }
-        },
-        select_playlist: function(id) {
-            var filePlaylists = engine.getM3UPlaylists();
-            if (filePlaylists === undefined) {
-                return;
-            }
-            var list = {name: undefined};
-            filePlaylists.list.forEach(function(item) {
-                if (item.id === id) {
-                    list = item;
-                }
-            });
-            if ("entry" in filePlaylists) {
-                readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
-                    engine.open(files, {name: list.name, id: id});
-                });
-            } else {
-                if (list.type === "vk") {
-                    engine.vk.makeAlbumTracks(list.album_id, function(tracks) {
-                        engine.open(tracks, {name: list.name, id: id, vk_save: (list.vk_save === true)});
-                    });
-                } else
-                if (list.type === "db") {
-                    engine.open(list.tracks, {name: list.name, id: id});
-                } else
-                if (list.type === "sc") {
-                    engine.open(list.tracks, {name: list.name, id: id, type: "sc"});
-                } else
-                if (list.type === "gd") {
-                    engine.open(list.tracks, {name: list.name, id: id});
-                }
             }
         }
     };

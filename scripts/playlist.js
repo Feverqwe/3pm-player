@@ -102,8 +102,8 @@ var playlist = function() {
         item = item_read(item);
         add_image(item.pic);
         itm.children('.cover').attr('class', 'cover pic_' + item.pic);
-        itm.children('.name').attr('title',item.title).text(item.title);
-        itm.children('.info').attr('title',item.info).text(item.info);
+        itm.children('.name').attr('title', item.title).text(item.title);
+        itm.children('.info').attr('title', item.info).text(item.info);
     };
     var scrool_to = function(el) {
         /*
@@ -266,95 +266,14 @@ var playlist = function() {
             dom_cache.pl_list.on('click', 'li', function() {
                 var id = $(this).data('id');
                 sendPlayer(function(window) {
-                    window.view.select_playlist(id);
+                    window.engine.select_playlist(id);
                 });
                 $(this).parent().hide();
             });
             sendPlayer(function(window) {
                 selectPL(window.engine.getM3UPlaylists());
                 setInfo(window.engine.getPlaylistInfo());
-            });
-            $(document).keydown(function(event) {
-                if ('keyCode' in event === false) {
-                    return;
-                }
-                if (event.altKey) {
-                    return;
-                }
-                if (event.keyCode === 32) {
-                    event.preventDefault();
-                    sendPlayer(function(window) {
-                        window.engine.playToggle();
-                    });
-                } else
-                if (event.keyCode === 86) {
-                    event.preventDefault();
-                    sendPlayer(function(window) {
-                        window.engine.mute();
-                    });
-                } else
-                if (event.keyCode === 83) {
-                    event.preventDefault();
-                    sendPlayer(function(window) {
-                        window.engine.shuffle();
-                    });
-                } else
-                if (event.keyCode === 82) {
-                    event.preventDefault();
-                    sendPlayer(function(window) {
-                        window.engine.loop();
-                    });
-                } else
-                if (event.keyCode === 113) {
-                    event.preventDefault();
-                    sendPlayer(function(window) {
-                        window.engine.next();
-                    });
-                } else
-                if (event.keyCode === 112) {
-                    event.preventDefault();
-                    sendPlayer(function(window) {
-                        window.engine.preview();
-                    });
-                } else
-                if (event.keyCode === 78) {
-                    event.preventDefault();
-                    sendPlayer(function(window) {
-                        window.engine.vizRandomPreset();
-                    });
-                } else
-                if (event.ctrlKey || event.metaKey) {
-                    if (event.keyCode === 38) {
-                        event.preventDefault();
-                        sendPlayer(function(window) {
-                            window.engine.volume("+10");
-                        });
-                    } else
-                    if (event.keyCode === 40) {
-                        event.preventDefault();
-                        sendPlayer(function(window) {
-                            window.engine.volume("-10");
-                        });
-                    } else
-                    if (event.keyCode === 39) {
-                        event.preventDefault();
-                        clearTimeout(var_cache.progress_keydown_timer);
-                        var_cache.progress_keydown_timer = setTimeout(function() {
-                            sendPlayer(function(window) {
-                                window.engine.position("+10");
-                            });
-                        }, 25);
-                    } else
-                    if (event.keyCode === 37) {
-                        event.preventDefault();
-                        clearTimeout(var_cache.progress_keydown_timer);
-                        var_cache.progress_keydown_timer = setTimeout(function() {
-                            sendPlayer(function(window) {
-                                window.engine.position("-10");
-                            });
-                        }, 25);
-                    }
-                }
+                window.engine.set_hotkeys(document);
             });
             setInterval(function() {
                 save_pos();
