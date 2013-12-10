@@ -1,4 +1,30 @@
 var cloud = function() {
+    var cookie = function() {
+        return {
+            set: function(key, value, expire) {
+                var exp = new Date().getTime() + parseInt(expire) * 1000;
+                var obj = {};
+                obj[key] = value;
+                obj[key + '_expire'] = exp;
+                chrome.storage.sync.set(obj);
+            },
+            get: function(key, cb) {
+                var exp_key = key + '_expire';
+                var arr = [key, exp_key];
+                chrome.storage.sync.get(arr, function(obj) {
+                    var time = new Date().getTime();
+                    if (key in obj && obj[exp_key] >= time) {
+                        cb(obj);
+                    } else {
+                        cb({});
+                    }
+                });
+            },
+            remove: function(key) {
+                chrome.storage.sync.remove([key, key + '_expire']);
+            }
+        };
+    }();
     var vk = function() {
         var token = undefined;
         var timeout = 500;
@@ -6,7 +32,7 @@ var cloud = function() {
         var is_error = function(data) {
             if ('error' in data) {
                 token = undefined;
-                chrome.storage.sync.remove('vk_token');
+                cookie.remove('vk_token');
                 return true;
             }
             return false;
@@ -119,9 +145,9 @@ var cloud = function() {
                 cb(token);
                 return;
             }
-            chrome.storage.sync.get('vk_token', function(obj) {
+            cookie.get('vk_token', function(obj) {
                 if ('vk_token' in obj) {
-                    token = obj.vk_token;
+                    token = obj['vk_token'];
                     cb(token);
                 } else {
                     vkAuth(cb);
@@ -175,10 +201,11 @@ var cloud = function() {
                 }
                 if (responseURL.indexOf("access_token=") !== -1) {
                     token = responseURL.replace(/.*access_token=([a-zA-Z0-9]*)&.*/, "$1");
-                    chrome.storage.sync.set({vk_token: token});
+                    var exp = responseURL.replace(/.*expires_in=([0-9]*)&?.*/, "$1");
+                    cookie.set('vk_token', token, exp);
                     cb(token);
                 } else {
-                    chrome.storage.sync.remove('vk_token');
+                    cookie.remove('vk_token');
                     token = undefined;
                     console.log("VK", "No token", responseURL);
                 }
