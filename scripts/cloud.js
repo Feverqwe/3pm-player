@@ -6,12 +6,12 @@ var cloud = function() {
                 var obj = {};
                 obj[key] = value;
                 obj[key + '_expire'] = exp;
-                chrome.storage.sync.set(obj);
+                chrome.storage.local.set(obj);
             },
             get: function(key, cb) {
                 var exp_key = key + '_expire';
                 var arr = [key, exp_key];
-                chrome.storage.sync.get(arr, function(obj) {
+                chrome.storage.local.get(arr, function(obj) {
                     var time = new Date().getTime();
                     if (key in obj && obj[exp_key] >= time) {
                         cb(obj);
@@ -21,7 +21,7 @@ var cloud = function() {
                 });
             },
             remove: function(key) {
-                chrome.storage.sync.remove([key, key + '_expire']);
+                chrome.storage.local.remove([key, key + '_expire']);
             }
         };
     }();
