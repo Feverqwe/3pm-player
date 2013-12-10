@@ -888,7 +888,8 @@ var view = function() {
             if (type === "canplay") {
                 engine.play();
             }
-        }
+        },
+        readPlaylist: readPlaylist
     };
 }();
 $(function() {

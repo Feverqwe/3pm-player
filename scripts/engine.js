@@ -988,7 +988,7 @@ var engine = function() {
                 }
             });
             if ("entry" in filePlaylists) {
-                readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
+                view.readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
                     engine.open(files, {name: list.name, id: id});
                 });
             } else
