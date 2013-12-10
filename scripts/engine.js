@@ -225,7 +225,8 @@ var engine = function() {
                 playlist[id].state = "loading";
                 var tags = {title: playlist[id].meta.title, artist: playlist[id].meta.artist};
                 var xhr = new XMLHttpRequest();
-                xhr.open("GET", playlist[id].meta.artwork, true);
+                var url = playlist[id].meta.artwork;
+                xhr.open("GET", url, true);
                 xhr.responseType = "arraybuffer";
                 xhr.onload = function() {
                     var binary = '';
@@ -234,7 +235,12 @@ var engine = function() {
                     for (var i = 0; i < len; i++) {
                         binary += String.fromCharCode(bytes[ i ]);
                     }
-                    image_resize([binary, 'image/jpeg'], function(i_id) {
+                    var ext = url.split('.').slice(-1)[0].toLowerCase();
+                    var mime = 'image/jpeg';
+                    if (ext === 'png') {
+                        mime = 'image/png';
+                    }
+                    image_resize([binary, mime], function(i_id) {
                         tags.picture = i_id;
                         rt_cb(tags, id);
                     });
