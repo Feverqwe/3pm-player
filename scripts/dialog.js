@@ -298,7 +298,7 @@ var dialog = function() {
                             return 1;
                         }
                         var filename = item.title;
-                        playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl + '&access_token=' + token}, tags: {}, duration: 0});
+                        playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl + '&access_token=' + token}, tags: {}, duration: 0, type: 'gd'});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
@@ -324,7 +324,7 @@ var dialog = function() {
                     return 1;
                 }
                 var filename = item.title;
-                playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl + '&access_token=' + token}, tags: {}, duration: 0});
+                playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl + '&access_token=' + token}, tags: {}, duration: 0, type: 'gd'});
             });
             if (playlist.tracks.length === 0) {
                 return;

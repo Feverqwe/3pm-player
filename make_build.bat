@@ -16,6 +16,8 @@ java -jar compiler.jar --js .\www\js\main.js --js_output_file .\build\www\js\mai
 java -jar compiler.jar --js .\scripts\background.js --js_output_file .\build\scripts\background.js
 :: make engine.js
 java -jar compiler.jar --js .\scripts\engine.js --js_output_file .\build\scripts\engine.js
+:: make cloud.js
+java -jar compiler.jar --js .\scripts\cloud.js --js_output_file .\build\scripts\cloud.js
 :: make id3-minimized.js
 java -jar compiler.jar --js .\scripts\id3-minimized.js --js_output_file .\build\scripts\id3-minimized.js
 :: make player.js
