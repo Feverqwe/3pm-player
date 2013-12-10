@@ -327,11 +327,11 @@ var engine = function() {
                     }
                     if (item.type !== undefined && typeof (cloud[item.type].onplay) === 'function') {
                         view.state("preloading");
-                        cloud[item.type].onplay(item, function(url) {
+                        cloud[item.type].onplay(item, view, function(url) {
                             view.state("preloading_dune");
                             if (url.length === 0) {
                                 console.log('No url');
-                                player.next();
+                                //player.next();
                                 return;
                             }
                             audio.src = url;

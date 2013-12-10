@@ -336,6 +336,141 @@ var dialog = function() {
             window.close();
         });
     };
+    var box_writefilelist = function(list) {
+        dom_cache.box_button.attr('disabled', 'disabled');
+        var fl = dom_cache.box_ul;
+        fl.empty();
+        if (var_cache.box_parent !== undefined && var_cache.box_parent.length > 0) {
+            var prew_folder = var_cache.box_parent.slice(-1)[0].id;
+            if (prew_folder !== 0) {
+                fl.append($('<li>', {'class': 'box_file', 'data-id': -1, 'data-parent': prew_folder}).append($('<span>', {title: "Go Back", text: "Go Back"})));
+            }
+        }
+        var n = -1;
+        list.entries.forEach(function(item) {
+            n++;
+            var action = '';
+            if (item.type === "folder") {
+                action = $('<div>', {'class': 'play', title: 'Play folder'});
+            } else {
+                action = $('<input>', {name: 'id' + n, type: 'checkbox'});
+            }
+            var ext = item.name.split('.').slice(-1)[0].toLowerCase();
+            if (item.type !== "folder" && allow_ext.indexOf(ext) === -1) {
+                return 1;
+            }
+            fl.append($('<li>', {'class': 'box_file', 'data-id': n}).append($('<span>', {title: item.name, text: item.name}), action));
+        });
+        var_cache.box_list = list;
+    };
+    var boxChoice = function() {
+        /*
+         * Создает форму выбора папок иди файлов для box
+         */
+        dom_cache.box = $('.box_choice');
+        dom_cache.box.show();
+        dom_cache.box_button = dom_cache.box.find('input[type="button"]').eq(0);
+        dom_cache.box_ul = dom_cache.box.find("ul").eq(0);
+        dom_cache.box_folder = 0;
+        box_writefilelist(window.options.filelist);
+        dom_cache.box.on('click', 'li.box_file', function(e) {
+            if (e.target.nodeName === "INPUT") {
+                return;
+            }
+            var id = parseInt($(this).data("id"));
+            var folder_id = undefined;
+            if (id === -1) {
+                folder_id = parseInt($(this).data('parent'));
+                var_cache.box_parent = var_cache.box_parent.slice(0, -1);
+            } else {
+                var item = var_cache.box_list.entries[id];
+                if (item.type === "folder") {
+                    folder_id = item.id;
+                    var_cache.box_parent = item.path_collection.entries;
+                } else {
+                    var ch_box = $(this).children('input');
+                    ch_box.get(0).checked = !ch_box.get(0).checked;
+                    ch_box.trigger('change');
+                    return;
+                }
+            }
+            sendPlayer(function(window) {
+                window.cloud.box.getFilelist(function(list) {
+                    box_writefilelist(list);
+                }, folder_id);
+            });
+        });
+        dom_cache.box.on('change', 'input[type="checkbox"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var checked = this.checked;
+            if (checked) {
+                $(this).parent().addClass('selected');
+            } else {
+                $(this).parent().removeClass('selected');
+            }
+            var count = dom_cache.box.find('input[type="checkbox"]:checked').length;
+            if (count > 0) {
+                dom_cache.box_button.removeAttr('disabled');
+            } else {
+                dom_cache.box_button.attr('disabled', 'disabled');
+            }
+        });
+        dom_cache.box.on('click', 'li > .play', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = parseInt($(this).parent().data("id"));
+            var item = var_cache.box_list.entries[id];
+            if (item.type !== "folder") {
+                return;
+            }
+            var folder_id = item.id;
+            var folder_name = item.name;
+            var _window = window;
+            sendPlayer(function(window) {
+                window.cloud.box.getFilelist(function(list) {
+                    var playlist = {name: folder_name, id: 0, type: "box", tracks: []};
+                    list.entries.forEach(function(item) {
+                        var ext = item.name.split('.').slice(-1)[0].toLowerCase();
+                        if (item.type === "folder" || allow_ext.indexOf(ext) === -1) {
+                            return 1;
+                        }
+                        playlist.tracks.push({id: -1, file: {name: item.name, url: undefined}, tags: {}, duration: 0, type: "box", file_id: item.id});
+                    });
+                    if (playlist.tracks.length === 0) {
+                        return;
+                    }
+                    sendPlayer(function(window) {
+                        window.engine.setM3UPlaylists({list: [playlist]});
+                        window.engine.select_playlist(0);
+                    });
+                    _window.close();
+                }, folder_id);
+            });
+        });
+        dom_cache.box_button.on('click', function(e) {
+            e.preventDefault();
+            var pl_name = "Box";
+            var playlist = {name: pl_name, id: 0, type: "box", tracks: []};
+            var items = $.makeArray(dom_cache.box.find('input[type="checkbox"]:checked'));
+            items.forEach(function(item) {
+                var id = $(item).parent().data('id');
+                item = var_cache.box_list.entries[id];
+                if (item.type === "folder") {
+                    return 1;
+                }
+                playlist.tracks.push({id: -1, file: {name: item.name, url: undefined}, tags: {}, duration: 0, type: "box", file_id: item.id});
+            });
+            if (playlist.tracks.length === 0) {
+                return;
+            }
+            sendPlayer(function(window) {
+                window.engine.setM3UPlaylists({list: [playlist]});
+                window.engine.select_playlist(0);
+            });
+            window.close();
+        });
+    };
     return {
         run: function() {
             $('.close').on('click', function() {
@@ -358,6 +493,9 @@ var dialog = function() {
             } else
             if (window.options.type === "gd") {
                 driveChoice();
+            } else
+            if (window.options.type === "box") {
+                boxChoice();
             }
         }
     };

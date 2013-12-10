@@ -136,6 +136,13 @@ div.progress.stream > a {
 div.progress.stream > div.loaded {
     background-color: initial;
 }
+div.progress.download > div.ui-slider-range,
+div.progress.download > a {
+    opacity: 0.3;
+}
+div.progress.download > div.loaded {
+    background-color: rgb(0, 40, 90);
+}
 .player > div.controls li.volume_controll {
     background-color: initial;
     width: 80px;
