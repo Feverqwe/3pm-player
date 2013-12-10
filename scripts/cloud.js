@@ -450,6 +450,9 @@ var cloud = function() {
                     data.forEach(function(item) {
                         var tracks = [];
                         item.tracks.forEach(function(track) {
+                            if (track.streamable === false || track.original_format === "wav") {
+                                return 1;
+                            }
                             tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}, duration: track.duration, type: 'sc'});
                         });
                         list.push({name: item.title, id: list.length, type: "sc", tracks: tracks});
