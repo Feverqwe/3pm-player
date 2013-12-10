@@ -412,6 +412,9 @@ var wm = function() {
             if (check() && "player" in windows === false) {
                 create_player_window();
             } else {
+                if ("viz" in windows) {
+                    windows.viz.focus();
+                }
                 if ("playlist" in windows) {
                     windows.playlist.focus();
                 }
