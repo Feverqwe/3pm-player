@@ -618,6 +618,7 @@ var cloud = function() {
         var client_secret = 'PTEyM5lwSgNkvqK5BjBp5iGj4ypPx2wd';
         var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
         var token = undefined;
+        var dl_xhr = undefined;
         var boxCode = function(cb) {
             var url = 'https://www.box.com/api/oauth2/authorize?response_type=code&client_id=' + client_id + '&redirect_uri=' + redirect_uri;
             chrome.identity.launchWebAuthFlow({url: url, interactive: true},
@@ -746,21 +747,24 @@ var cloud = function() {
             xhr.send(parems);
         };
         var getTrack = function(track, player, cb) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", 'https://api.box.com/2.0/files/' + track.file_id + '/content', true);
-            xhr.setRequestHeader("Authorization", "Bearer " + token);
-            xhr.responseType = "blob";
-            xhr.onprogress = function(e) {
+            if (dl_xhr !== undefined) {
+                dl_xhr.abort();
+            }
+            dl_xhr = new XMLHttpRequest();
+            dl_xhr.open("GET", 'https://api.box.com/2.0/files/' + track.file_id + '/content', true);
+            dl_xhr.setRequestHeader("Authorization", "Bearer " + token);
+            dl_xhr.responseType = "blob";
+            dl_xhr.onprogress = function(e) {
                 player.pre_buffering_controller.download(parseInt((e.loaded / e.total) * 100));
             };
-            xhr.onload = function() {
-                var blob = xhr.response;
+            dl_xhr.onload = function() {
+                var blob = dl_xhr.response;
                 cb(URL.createObjectURL(blob));
             };
-            xhr.onerror = function() {
+            dl_xhr.onerror = function() {
                 cb('');
             };
-            xhr.send(null);
+            dl_xhr.send(null);
         };
         return {
             getFilelist: function(cb, id) {
