@@ -226,6 +226,10 @@ var engine = function() {
                 var tags = {title: playlist[id].meta.title, artist: playlist[id].meta.artist};
                 var xhr = new XMLHttpRequest();
                 var url = playlist[id].meta.artwork;
+                if (url === null) {
+                    rt_cb(tags, id);
+                    return;
+                }
                 xhr.open("GET", url, true);
                 xhr.responseType = "arraybuffer";
                 xhr.onload = function() {
