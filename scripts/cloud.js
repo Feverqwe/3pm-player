@@ -879,6 +879,36 @@ var cloud = function() {
                 getToken(function() {
                     getFilelist(id, cb);
                 });
+            },
+            read_tags: function(track, cb) {
+                var tags = track.meta;
+                var xhr = new XMLHttpRequest();
+                var url = track.meta.artwork;
+                if (url === null) {
+                    cb(tags);
+                    return;
+                }
+                xhr.open("GET", url, true);
+                xhr.responseType = "arraybuffer";
+                xhr.onload = function() {
+                    var binary = '';
+                    var bytes = new Uint8Array(xhr.response);
+                    var len = bytes.byteLength;
+                    for (var i = 0; i < len; i++) {
+                        binary += String.fromCharCode(bytes[ i ]);
+                    }
+                    var ext = url.split('.').slice(-1)[0].toLowerCase().split('?')[0];
+                    var mime = 'image/jpeg';
+                    if (ext === 'png') {
+                        mime = 'image/png';
+                    }
+                    tags.picture = [binary, mime];
+                    cb(tags);
+                };
+                xhr.onerror = function() {
+                    cb(tags);
+                };
+                xhr.send(null);
             }
         };
     }();

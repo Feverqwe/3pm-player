@@ -471,6 +471,165 @@ var dialog = function() {
             window.close();
         });
     };
+    var sd_writefilelist = function(list, folder_id) {
+        var_cache.sd_path.push(folder_id || 'me/skydrive');
+        dom_cache.skydrive_button.attr('disabled', 'disabled');
+        var fl = dom_cache.skydrive_ul;
+        fl.empty();
+        if (var_cache.sd_path.length > 1) {
+            fl.append($('<li>', {'class': 'sd_file', 'data-id': -1}).append($('<span>', {title: "Go Back", text: "Go Back"})));
+        }
+        var n = -1;
+        list.data.forEach(function(item) {
+            n++;
+            var filename = item.name;
+            var is_dir = (item.type === 'folder');
+            if (!is_dir && item.type !== 'audio') {
+                return 1;
+            }
+            var action = '';
+            if (is_dir) {
+                action = $('<div>', {'class': 'play', title: 'Play folder'});
+            } else {
+                action = $('<input>', {name: 'id' + n, type: 'checkbox'});
+            }
+            fl.append($('<li>', {'class': 'sd_file', 'data-id': n}).append($('<span>', {title: filename, text: filename}), action));
+        });
+        var_cache.sd_list = list;
+    };
+    var skydriveChoice = function() {
+        var read_tags = function(item) {
+            var tags = {};
+            if ('album' in item) {
+                tags['album'] = item.album;
+            }
+            if ('artist' in item || 'album_artist' in item) {
+                tags['artist'] = item.artist || item.album_artist;
+            }
+            tags['title'] = item.title || item.name;
+            if ('picture' in item) {
+                tags['artwork'] = item.picture;
+            }
+            return tags;
+        }
+        /*
+         * Создает форму выбора папок иди файлов
+         */
+        var token = undefined;
+        sendPlayer(function(window) {
+            window.cloud.sd.getToken(function(token1) {
+                token = token1;
+            });
+        });
+        dom_cache.skydrive = $('.drive_choice');
+        dom_cache.skydrive.show();
+        dom_cache.skydrive_button = dom_cache.skydrive.find('input[type="button"]').eq(0);
+        dom_cache.skydrive_ul = dom_cache.skydrive.find("ul").eq(0);
+        var_cache.sd_path = [];
+        sd_writefilelist(window.options.filelist);
+        dom_cache.skydrive.on('click', 'li.sd_file', function(e) {
+            if (e.target.nodeName === "INPUT") {
+                return;
+            }
+            var id = parseInt($(this).data("id"));
+            var folder_id = undefined;
+            if (id === -1) {
+                folder_id = var_cache.sd_path.splice(-2)[0];
+            } else {
+                var item = var_cache.sd_list.data[id];
+                var is_dir = (item.type === 'folder');
+                if (is_dir) {
+                    folder_id = item.id;
+                } else {
+                    var ch_box = $(this).children('input');
+                    ch_box.get(0).checked = !ch_box.get(0).checked;
+                    ch_box.trigger('change');
+                    return;
+                }
+            }
+            sendPlayer(function(window) {
+                window.cloud.sd.getFilelist(folder_id, function(list) {
+                    sd_writefilelist(list, folder_id);
+                });
+            });
+        });
+        dom_cache.skydrive.on('change', 'input[type="checkbox"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var checked = this.checked;
+            if (checked) {
+                $(this).parent().addClass('selected');
+            } else {
+                $(this).parent().removeClass('selected');
+            }
+            var count = dom_cache.skydrive.find('input[type="checkbox"]:checked').length;
+            if (count > 0) {
+                dom_cache.skydrive_button.removeAttr('disabled');
+            } else {
+                dom_cache.skydrive_button.attr('disabled', 'disabled');
+            }
+        });
+        dom_cache.skydrive.on('click', 'li > .play', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = parseInt($(this).parent().data("id"));
+            var item = var_cache.sd_list.data[id];
+            var is_dir = (item.type === 'folder');
+            if (!is_dir) {
+                return;
+            }
+            var folder_id = item.id;
+            var _window = window;
+            var pl_name = item.name || "SkyDrive";
+            sendPlayer(function(window) {
+                window.cloud.sd.getFilelist(folder_id, function(list) {
+                    var playlist = {name: pl_name, id: 0, type: "sd", tracks: []};
+                    list.data.forEach(function(item) {
+                        var is_dir = (item.type === 'folder');
+                        if (is_dir || item.type !== 'audio') {
+                            return 1;
+                        }
+                        var filename = item.name;
+                        var tags = read_tags(item);
+                        playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.') + '&access_token=' + token}, tags: undefined, meta: tags, duration: 0, type: 'sd'});
+                    });
+                    if (playlist.tracks.length === 0) {
+                        return;
+                    }
+                    sendPlayer(function(window) {
+                        window.engine.setM3UPlaylists({list: [playlist]});
+                        window.engine.select_playlist(0);
+                    });
+                    _window.close();
+                });
+            });
+        });
+        dom_cache.skydrive_button.on('click', function(e) {
+            e.preventDefault();
+            var pl_name = "SkyDrive";
+            var playlist = {name: pl_name, id: 0, type: "sd", tracks: []};
+            var items = $.makeArray(dom_cache.skydrive.find('input[type="checkbox"]:checked'));
+            items.forEach(function(item) {
+                var id = $(item).parent().data('id');
+                item = var_cache.sd_list.data[id];
+                var is_dir = (item.type === 'folder');
+                if (is_dir) {
+                    return 1;
+                }
+                var filename = item.name;
+                var tags = read_tags(item);
+                playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.') + '&access_token=' + token}, tags: undefined, meta: tags, duration: 0, type: 'sd'});
+            });
+            if (playlist.tracks.length === 0) {
+                return;
+            }
+            sendPlayer(function(window) {
+                window.engine.setM3UPlaylists({list: [playlist]});
+                window.engine.select_playlist(0);
+            });
+            window.close();
+        });
+    };
     return {
         run: function() {
             $('.close').on('click', function() {
@@ -496,6 +655,9 @@ var dialog = function() {
             } else
             if (window.options.type === "box") {
                 boxChoice();
+            } else
+            if (window.options.type === "sd") {
+                skydriveChoice();
             }
         }
     };
