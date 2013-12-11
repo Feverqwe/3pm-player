@@ -596,6 +596,12 @@ var view = function() {
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
+                    id: "sd",
+                    parentId: "cloud",
+                    title: "skydrive.com",
+                    contexts: ['page', 'launcher']
+                });
+                chrome.contextMenus.create({
                     id: "p_play_pause",
                     title: "Play/Pause",
                     contexts: ['launcher']
@@ -681,6 +687,18 @@ var view = function() {
                                 bg.wm.showDialog({type: "box", h: 315, w: 350, r: true, filelist: list});
                             });
                         });
+                        return;
+                    }
+                    if (info.menuItemId === "sd") {
+                        cloud.sd.getFilelist(undefined,function(list) {
+                        });
+                        /*
+                         cloud.box.getFilelist(function(list) {
+                         chrome.runtime.getBackgroundPage(function(bg) {
+                         bg.wm.showDialog({type: "box", h: 315, w: 350, r: true, filelist: list});
+                         });
+                         });
+                         */
                         return;
                     }
                     if (info.menuItemId === "viz") {

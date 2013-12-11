@@ -452,7 +452,7 @@ var cloud = function() {
                 {
                     if (xhr.status !== 200) {
                         clear();
-                        console.log("SC", "scUserId", "API Error", data);
+                        console.log("SC", "scUserId", "API Error");
                         return;
                     }
                     var data = JSON.parse(xhr.responseText);
@@ -499,7 +499,7 @@ var cloud = function() {
                 {
                     if (xhr.status !== 200) {
                         clear();
-                        console.log("SC", "getAlbums", "API Error", data);
+                        console.log("SC", "getAlbums", "API Error");
                         return;
                     }
                     var data = JSON.parse(xhr.responseText);
@@ -606,7 +606,7 @@ var cloud = function() {
                 {
                     if (xhr.status !== 200) {
                         clear_data();
-                        console.log("GD", "getFilelist", "API Error", data);
+                        console.log("GD", "getFilelist", "API Error");
                         return;
                     }
                     var data = JSON.parse(xhr.responseText);
@@ -809,11 +809,85 @@ var cloud = function() {
             }
         };
     }();
+    var sd = function() {
+        var token = undefined;
+        var clear_data = function() {
+            chrome.storage.sync.remove('sd_token');
+            token = undefined;
+        };
+        var gdAuth = function(cb) {
+            var client_id = '000000004410D305';
+            var scope = 'wl.skydrive';
+            var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
+            var url = 'https://login.live.com/oauth20_authorize.srf?client_id=' + client_id + '&scope=' + scope + '&response_type=token&redirect_uri=' + redirect_uri;
+            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
+            function(responseURL) {
+                if (!responseURL) {
+                    console.log("SD", "No url");
+                    return;
+                }
+                if (responseURL.indexOf("access_token=") !== -1) {
+                    token = responseURL.replace(/.*access_token=([^&]*)&.*/, "$1");
+                    chrome.storage.sync.set({sd_token: token});
+                    cb(token);
+                } else {
+                    clear_data();
+                    console.log("SD", "No token", responseURL);
+                }
+            });
+        };
+        var getFilelist = function(id, cb) {
+            if (id === undefined) {
+                id = 'me/skydrive';
+            }
+            var url = 'https://apis.live.net/v5.0/' + id + '/files?access_token=' + token;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4)
+                {
+                    if (xhr.status !== 200) {
+                        clear_data();
+                        console.log("SD", "getFilelist", "API Error");
+                        return;
+                    }
+                    var data = JSON.parse(xhr.responseText);
+                    console.log(data);
+                    cb(data);
+                }
+            };
+            xhr.send(null);
+
+        };
+        var getToken = function(cb) {
+            if (token !== undefined) {
+                cb(token);
+                return;
+            }
+            chrome.storage.sync.get('sd_token', function(obj) {
+                if ('sd_token' in obj) {
+                    token = obj.sd_token;
+                    cb(token);
+                } else {
+                    gdAuth(cb);
+                }
+            });
+        };
+        return {
+            getToken: getToken,
+            getFilelist: function(id, cb) {
+                getToken(function() {
+                    getFilelist(id, cb);
+                });
+            }
+        };
+    }();
     return {
         vk: vk,
         db: db,
         sc: sc,
         gd: gd,
-        box: box
+        box: box,
+        sd: sd
     };
 }();
