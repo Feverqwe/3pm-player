@@ -170,8 +170,8 @@ var web_socket = function() {
         var header = stringToArrayBuffer(head + '\n\n');
         chrome.socket.write(socketId, header, function(writeInfo) {
             if (writeInfo.bytesWritten === header.byteLength) {
-                chrome.socket.write(socketId, content, function(e) {
-                    if (writeInfo.bytesWritten === header.byteLength) {
+                chrome.socket.write(socketId, content, function(writeInfo) {
+                    if (writeInfo.bytesWritten === content.byteLength) {
                         var keepAlive = headerMap['Connection'] === 'keep-alive';
                         if (keepAlive) {
                             empty_timer();
