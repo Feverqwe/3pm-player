@@ -852,7 +852,6 @@ var cloud = function() {
                         return;
                     }
                     var data = JSON.parse(xhr.responseText);
-                    console.log(data);
                     cb(data);
                 }
             };
