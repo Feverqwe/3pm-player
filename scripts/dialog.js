@@ -494,15 +494,15 @@ var dialog = function() {
     var skydriveChoice = function() {
         var read_tags = function(item) {
             var tags = {};
-            if ('album' in item) {
-                tags['album'] = item.album;
+            if ('album' in item && item.album !== null) {
+                tags.album = item.album;
             }
-            if ('artist' in item || 'album_artist' in item) {
-                tags['artist'] = item.artist || item.album_artist;
+            if (('artist' in item && item.artist !== null) || ('album_artist' in item && item.album_artist !== null)) {
+                tags.artist = item.artist || item.album_artist;
             }
-            tags['title'] = item.title || item.name;
-            if ('picture' in item) {
-                tags['artwork'] = item.picture;
+            tags.title = item.title || item.name;
+            if ('picture' in item && item.picture !== null) {
+                tags.artwork = item.picture;
             }
             return tags;
         }
