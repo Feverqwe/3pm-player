@@ -641,6 +641,11 @@ var cloud = function() {
                 getToken(function() {
                     getFilelist(id, cb);
                 });
+            },
+            onplay: function(track, player, cb) {
+                getToken(function() {
+                    cb(track.file.url + '&access_token=' + token);
+                });
             }
         };
     }();
@@ -919,6 +924,11 @@ var cloud = function() {
                     cb(tags);
                 };
                 xhr.send(null);
+            },
+            onplay: function(track, player, cb) {
+                getToken(function() {
+                    cb(track.file.url + '&access_token=' + token);
+                });
             }
         };
     }();

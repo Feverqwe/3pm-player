@@ -223,12 +223,6 @@ var dialog = function() {
         /*
          * Создает форму выбора папок иди файлов
          */
-        var token = undefined;
-        sendPlayer(function(window) {
-            window.engine.gd.getToken(function(token1) {
-                token = token1;
-            });
-        });
         dom_cache.drive = $('.drive_choice');
         dom_cache.drive.show();
         dom_cache.drive_button = dom_cache.drive.find('input[type="button"]').eq(0);
@@ -298,7 +292,7 @@ var dialog = function() {
                             return 1;
                         }
                         var filename = item.title;
-                        playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl + '&access_token=' + token}, tags: {}, duration: 0, type: 'gd'});
+                        playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl}, tags: {}, duration: 0, type: 'gd'});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
@@ -324,7 +318,7 @@ var dialog = function() {
                     return 1;
                 }
                 var filename = item.title;
-                playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl + '&access_token=' + token}, tags: {}, duration: 0, type: 'gd'});
+                playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl}, tags: {}, duration: 0, type: 'gd'});
             });
             if (playlist.tracks.length === 0) {
                 return;
@@ -515,12 +509,6 @@ var dialog = function() {
         /*
          * Создает форму выбора папок иди файлов
          */
-        var token = undefined;
-        sendPlayer(function(window) {
-            window.cloud.sd.getToken(function(token1) {
-                token = token1;
-            });
-        });
         dom_cache.skydrive = $('.drive_choice');
         dom_cache.skydrive.show();
         dom_cache.skydrive_button = dom_cache.skydrive.find('input[type="button"]').eq(0);
@@ -591,7 +579,7 @@ var dialog = function() {
                         }
                         var filename = item.name;
                         var tags = read_tags(item);
-                        playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.') + '&access_token=' + token}, tags: undefined, meta: tags, duration: 0, type: 'sd'});
+                        playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, meta: tags, duration: 0, type: 'sd'});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
@@ -618,7 +606,7 @@ var dialog = function() {
                 }
                 var filename = item.name;
                 var tags = read_tags(item);
-                playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.') + '&access_token=' + token}, tags: undefined, meta: tags, duration: 0, type: 'sd'});
+                playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, meta: tags, duration: 0, type: 'sd'});
             });
             if (playlist.tracks.length === 0) {
                 return;
