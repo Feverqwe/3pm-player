@@ -531,9 +531,13 @@ var cloud = function() {
                 });
             },
             read_tags: function(track, cb) {
-                var tags = {title: track.meta.title, artist: track.meta.artist};
+                if ('meta' in track === false) {
+                    return;
+                }
+                var tags = track.meta;
+                delete track.meta;
                 var xhr = new XMLHttpRequest();
-                var url = track.meta.artwork;
+                var url = tags.artwork;
                 if (url === null) {
                     cb(tags);
                     return;
@@ -883,9 +887,13 @@ var cloud = function() {
                 });
             },
             read_tags: function(track, cb) {
+                if ('meta' in track === false) {
+                    return;
+                }
                 var tags = track.meta;
+                delete track.meta;
                 var xhr = new XMLHttpRequest();
-                var url = track.meta.artwork;
+                var url = tags.artwork;
                 if (url === null) {
                     cb(tags);
                     return;
