@@ -666,6 +666,7 @@ var cloud = function() {
                     cb(code);
                 } else {
                     clear_data();
+                    console.log("BOX", "No code", responseURL);
                 }
             });
         };
