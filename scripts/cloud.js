@@ -290,7 +290,7 @@ var cloud = function() {
     var db = function() {
         var token = undefined;
         var clear = function() {
-            chrome.storage.sync.remove('db_token');
+            chrome.storage.local.remove('db_token');
             token = undefined;
         };
         var dbAuth = function(cb) {
@@ -305,7 +305,7 @@ var cloud = function() {
                 }
                 if (responseURL.indexOf("access_token=") !== -1) {
                     token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-]*)&.*/, "$1");
-                    chrome.storage.sync.set({db_token: token});
+                    chrome.storage.local.set({db_token: token});
                     cb(token);
                 } else {
                     clear();
@@ -368,7 +368,7 @@ var cloud = function() {
                 cb(token);
                 return;
             }
-            chrome.storage.sync.get('db_token', function(obj) {
+            chrome.storage.local.get('db_token', function(obj) {
                 if ('db_token' in obj) {
                     token = obj.db_token;
                     cb(token);
@@ -420,7 +420,7 @@ var cloud = function() {
         var token = undefined;
         var user_id = undefined;
         var clear = function() {
-            chrome.storage.sync.remove(['sc_token', 'sc_user_id']);
+            chrome.storage.local.remove(['sc_token', 'sc_user_id']);
             token = undefined;
             user_id = undefined;
         };
@@ -435,7 +435,7 @@ var cloud = function() {
                 }
                 if (responseURL.indexOf("access_token=") !== -1) {
                     token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-]*)&.*/, "$1");
-                    chrome.storage.sync.set({sc_token: token});
+                    chrome.storage.local.set({sc_token: token});
                     cb(token);
                 } else {
                     clear();
@@ -467,7 +467,7 @@ var cloud = function() {
                 cb(user_id);
                 return;
             }
-            chrome.storage.sync.get('sc_user_id', function(obj) {
+            chrome.storage.local.get('sc_user_id', function(obj) {
                 if ('sc_user_id' in obj) {
                     user_id = obj.sc_user_id;
                     cb(user_id);
@@ -481,7 +481,7 @@ var cloud = function() {
                 cb(token);
                 return;
             }
-            chrome.storage.sync.get('sc_token', function(obj) {
+            chrome.storage.local.get('sc_token', function(obj) {
                 if ('sc_token' in obj) {
                     token = obj.sc_token;
                     cb(token);
@@ -568,7 +568,7 @@ var cloud = function() {
     var gd = function() {
         var token = undefined;
         var clear_data = function() {
-            chrome.storage.sync.remove('gd_token');
+            cookie.remove('gd_token');
             token = undefined;
         };
         var gdAuth = function(cb) {
@@ -584,7 +584,8 @@ var cloud = function() {
                 }
                 if (responseURL.indexOf("access_token=") !== -1) {
                     token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-\._]*)&.*/, "$1");
-                    chrome.storage.sync.set({gd_token: token});
+                    var exp = responseURL.replace(/.*expires_in=([0-9]*)&?.*/, "$1");
+                    cookie.set('gd_token', token, exp);
                     cb(token);
                 } else {
                     clear_data();
@@ -621,7 +622,7 @@ var cloud = function() {
                 cb(token);
                 return;
             }
-            chrome.storage.sync.get('gd_token', function(obj) {
+            cookie.get('gd_token', function(obj) {
                 if ('gd_token' in obj) {
                     token = obj.gd_token;
                     cb(token);
@@ -646,6 +647,12 @@ var cloud = function() {
         var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
         var token = undefined;
         var dl_xhr = undefined;
+        var clear_data = function() {
+            code = undefined;
+            token = undefined;
+            cookie.remove('box_token');
+            chrome.storage.local.remove(['box_code', 'box_refresh_token']);
+        };
         var boxCode = function(cb) {
             var url = 'https://www.box.com/api/oauth2/authorize?response_type=code&client_id=' + client_id + '&redirect_uri=' + redirect_uri;
             chrome.identity.launchWebAuthFlow({url: url, interactive: true},
@@ -655,11 +662,10 @@ var cloud = function() {
                 }
                 if (responseURL.indexOf("code=") !== -1) {
                     code = responseURL.replace(/.*code=([a-zA-Z0-9]*)&?.*/, "$1");
-                    chrome.storage.sync.set({box_code: code});
+                    chrome.storage.local.set({box_code: code});
                     cb(code);
                 } else {
-                    chrome.storage.sync.remove('box_code');
-                    code = undefined;
+                    clear_data();
                 }
             });
         };
@@ -680,15 +686,14 @@ var cloud = function() {
                         console.log('boxAuth data problem', data);
                         return;
                     }
-                    chrome.storage.sync.set({box_token: data.access_token, box_expires_in: data.expires_in, box_refresh_token: data.refresh_token});
+                    cookie.set('box_token', data.access_token, data.expires_in);
+                    chrome.storage.local.set({box_refresh_token: data.refresh_token});
                     token = data.access_token;
                     cb(token);
                 },
                 error: function() {
                     console.log('boxAuth resp. error');
-                    code = undefined;
-                    token = undefined;
-                    chrome.storage.sync.remove(['box_code', 'box_token', 'box_expires_in', 'box_refresh_token']);
+                    clear_data();
                 }
             });
         };
@@ -697,7 +702,7 @@ var cloud = function() {
                 cb(code);
                 return;
             }
-            chrome.storage.sync.get('box_code', function(obj) {
+            chrome.storage.local.get('box_code', function(obj) {
                 if ('box_code' in obj) {
                     code = obj.box_code;
                     cb(code);
@@ -720,7 +725,7 @@ var cloud = function() {
                 cb(token);
                 return;
             }
-            chrome.storage.sync.get('box_token', function(obj) {
+            cookie.get('box_token', function(obj) {
                 if ('box_token' in obj) {
                     token = obj.box_token;
                     cb(token);
@@ -741,9 +746,7 @@ var cloud = function() {
                 if (xhr.readyState === 4)
                 {
                     if (xhr.status !== 200) {
-                        code = undefined;
-                        token = undefined;
-                        chrome.storage.sync.remove(['box_code', 'box_token', 'box_expires_in', 'box_refresh_token']);
+                        clear_data();
                         return;
                     }
                     var data = JSON.parse(xhr.responseText);
@@ -762,9 +765,7 @@ var cloud = function() {
                 if (xhr.readyState === 4)
                 {
                     if (xhr.status !== 200) {
-                        code = undefined;
-                        token = undefined;
-                        chrome.storage.sync.remove(['box_code', 'box_token', 'box_expires_in', 'box_refresh_token']);
+                        clear_data();
                         return;
                     }
                     var data = JSON.parse(xhr.responseText);
@@ -812,7 +813,7 @@ var cloud = function() {
     var sd = function() {
         var token = undefined;
         var clear_data = function() {
-            chrome.storage.sync.remove('sd_token');
+            cookie.remove('sd_token');
             token = undefined;
         };
         var gdAuth = function(cb) {
@@ -828,7 +829,8 @@ var cloud = function() {
                 }
                 if (responseURL.indexOf("access_token=") !== -1) {
                     token = responseURL.replace(/.*access_token=([^&]*)&.*/, "$1");
-                    chrome.storage.sync.set({sd_token: token});
+                    var exp = responseURL.replace(/.*expires_in=([0-9]*)&.*/, "$1");
+                    cookie.set('sd_token', token, exp);
                     cb(token);
                 } else {
                     clear_data();
@@ -863,7 +865,7 @@ var cloud = function() {
                 cb(token);
                 return;
             }
-            chrome.storage.sync.get('sd_token', function(obj) {
+            cookie.get('sd_token', function(obj) {
                 if ('sd_token' in obj) {
                     token = obj.sd_token;
                     cb(token);
