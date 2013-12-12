@@ -899,7 +899,7 @@ var cloud = function() {
                 delete track.meta;
                 var xhr = new XMLHttpRequest();
                 var url = tags.artwork;
-                if (url === null) {
+                if (url === undefined) {
                     cb(tags);
                     return;
                 }
