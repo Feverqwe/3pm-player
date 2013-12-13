@@ -13,6 +13,9 @@ var cloud = function() {
                 var arr = [key, exp_key];
                 chrome.storage.local.get(arr, function(obj) {
                     var time = new Date().getTime();
+                    if (obj[exp_key] === undefined) {
+                        cb(obj);
+                    } else
                     if (key in obj && obj[exp_key] >= time) {
                         cb(obj);
                     } else {
@@ -25,17 +28,59 @@ var cloud = function() {
             }
         };
     }();
+    var auth_getToken = function(type, url, cb) {
+        chrome.identity.launchWebAuthFlow({url: url, interactive: true},
+        function(responseURL) {
+            if (responseURL === undefined) {
+                console.log("Auth", type, "URL not found!");
+                return;
+            }
+            var token = undefined;
+            var expires = undefined;
+            if (responseURL.indexOf("access_token=") !== -1) {
+                token = responseURL.replace(/.*access_token=([^&]*).*/, "$1");
+            }
+            if (responseURL.indexOf("expires_in=") !== -1) {
+                var value = responseURL.replace(/.*expires_in=([0-9]*).*/, "$1");
+                expires = parseInt(value);
+                if (isNaN(expires)) {
+                    console.log("Auth", type, "Expaires is NaN!", expires);
+                    expires = undefined;
+                }
+            }
+            if (token !== undefined) {
+                if (expires !== undefined) {
+                    cookie.set(type + '_token', token, expires);
+                } else {
+                    var obj = {};
+                    obj[type + '_token'] = token;
+                    chrome.storage.local.set(obj);
+                }
+                cb(token);
+            } else {
+                console.log("Auth", type, "Token not found!", responseURL);
+            }
+        });
+    };
     var vk = function() {
+        var type = 'vk';
         var token = undefined;
         var timeout = 500;
         var saved_tracks = [];
-        var is_error = function(data) {
-            if ('error' in data) {
-                token = undefined;
-                cookie.remove('vk_token');
-                return true;
-            }
-            return false;
+        var clear_data = function() {
+            token = undefined;
+            cookie.remove('vk_token');
+        };
+        var vkAuth = function(cb) {
+            var client_id = "4037628";
+            var settings = "audio";
+            var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
+            var display = "page";
+            var url = 'https://oauth.vk.com/authorize?v=5.5&client_id=' + client_id + '&scope=' + settings + '&redirect_uri=' + redirect_uri + '&display=' + display + '&response_type=token';
+            auth_getToken(type, url, function(tkn) {
+                token = tkn;
+                cb(token);
+            });
         };
         var getPopular = function(cb, genre_id) {
             if (genre_id === undefined) {
@@ -43,29 +88,71 @@ var cloud = function() {
             }
             var url = 'https://api.vk.com/method/audio.getPopular?v=5.5&access_token=' + token + '&count=100&genre_id=' + genre_id;
             var tracks = [];
-            $.getJSON(url, function(data) {
-                if (is_error(data) || 'response' in data === false) {
-                    console.log("VK", "getPopular", "API error", data);
-                    return;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        vkAuth(function() {
+                            getPopular(cb, genre_id);
+                        });
+                    },
+                    200: function(data) {
+                        if ('error' in data) {
+                            clear_data();
+                            console.log("VK", "getAlbums", "API error", data);
+                            return;
+                        }
+                        if ('response' in data === false) {
+                            console.log("VK", "getPopular", "API error", data);
+                            return;
+                        }
+                        data.response.forEach(function(item) {
+                            tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
+                        });
+                        cb(tracks);
+                    }
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
                 }
-                data.response.forEach(function(item) {
-                    tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
-                });
-                cb(tracks);
             });
         };
         var getRecommendations = function(cb) {
             var url = 'https://api.vk.com/method/audio.getRecommendations?v=5.5&access_token=' + token + '&count=100&shuffle=1';
             var tracks = [];
-            $.getJSON(url, function(data) {
-                if (is_error(data) || 'response' in data === false) {
-                    console.log("VK", "getRecommendations", "API error", data);
-                    return;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        vkAuth(function() {
+                            getRecommendations(cb);
+                        });
+                    },
+                    200: function(data) {
+                        if ('error' in data) {
+                            clear_data();
+                            console.log("VK", "getAlbums", "API error", data);
+                            return;
+                        }
+                        if ('response' in data === false) {
+                            console.log("VK", "getRecommendations", "API error", data);
+                            return;
+                        }
+                        data.response.forEach(function(item) {
+                            tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
+                        });
+                        cb(tracks);
+                    }
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
                 }
-                data.response.forEach(function(item) {
-                    tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
-                });
-                cb(tracks);
             });
         };
         var getTracks = function(cb, album_id) {
@@ -73,32 +160,53 @@ var cloud = function() {
             var tracks = [];
             var offset = 0;
             var getPage = function(offset) {
-                $.getJSON(url + "&count=6000&offset=" + offset, function(data) {
-                    if (is_error(data) || 'response' in data === false || 'items' in data.response === false || 'count' in data.response === false) {
-                        console.log("VK", "getTracks", "API error", data);
-                        return;
-                    }
-                    data = data.response;
-                    if (data.count === 0) {
-                        cb(tracks);
-                        return;
-                    }
-                    var len = 0;
-                    data.items.forEach(function(item) {
-                        tracks.push({id: tracks.length, album_id: item.album_id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
-                        len++;
-                    });
-                    if (len <= 0) {
-                        console.log("VK", "getTracks", "len = 0", data);
-                        return;
-                    }
-                    if (tracks.length !== data.count) {
-                        offset += len;
-                        setTimeout(function() {
-                            getPage(offset);
-                        }, timeout);
-                    } else {
-                        cb(tracks);
+                $.ajax({
+                    url: url + "&count=6000&offset=" + offset,
+                    dataType: 'JSON',
+                    statusCode: {
+                        401: function() {
+                            vkAuth(function() {
+                                getTracks(cb, album_id);
+                            });
+                        },
+                        200: function(data) {
+                            if ('error' in data) {
+                                clear_data();
+                                console.log("VK", "getAlbums", "API error", data);
+                                return;
+                            }
+                            if ('response' in data === false || 'items' in data.response === false || 'count' in data.response === false) {
+                                console.log("VK", "getTracks", "API error", data);
+                                return;
+                            }
+                            data = data.response;
+                            if (data.count === 0) {
+                                cb(tracks);
+                                return;
+                            }
+                            var len = 0;
+                            data.items.forEach(function(item) {
+                                tracks.push({id: tracks.length, album_id: item.album_id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
+                                len++;
+                            });
+                            if (len === 0) {
+                                console.log("VK", "getTracks", "len = 0", data);
+                                return;
+                            }
+                            if (tracks.length !== data.count) {
+                                offset += len;
+                                setTimeout(function() {
+                                    getPage(offset);
+                                }, timeout);
+                            } else {
+                                cb(tracks);
+                            }
+                        }
+                    },
+                    error: function(jqXHR) {
+                        if (jqXHR.status === 401)
+                            return;
+                        clear_data();
                     }
                 });
             };
@@ -109,36 +217,90 @@ var cloud = function() {
             var albums = [];
             var offset = 0;
             var getPage = function(offset) {
-                $.getJSON(url + "&count=100&offset=" + offset, function(data) {
-                    if (is_error(data) || 'response' in data === false || 'items' in data.response === false || 'count' in data.response === false) {
-                        console.log("VK", "getAlbums", "API error", data);
-                        return;
-                    }
-                    data = data.response;
-                    if (data.count === 0) {
-                        cb(albums);
-                        return;
-                    }
-                    var len = 0;
-                    data.items.forEach(function(item) {
-                        albums.push({id: albums.length, album_id: item.album_id, title: item.title});
-                        len++;
-                    });
-                    if (len <= 0) {
-                        console.log("VK", "getAlbums", "len = 0", data);
-                        return;
-                    }
-                    if (albums.length !== data.count) {
-                        offset += len;
-                        setTimeout(function() {
-                            getPage(offset);
-                        }, timeout);
-                    } else {
-                        cb(albums);
+                $.ajax({
+                    url: url + "&count=100&offset=" + offset,
+                    dataType: 'JSON',
+                    statusCode: {
+                        401: function() {
+                            vkAuth(function() {
+                                getAlbums(cb);
+                            });
+                        },
+                        200: function(data) {
+                            if ('error' in data) {
+                                clear_data();
+                                console.log("VK", "getAlbums", "API error", data);
+                                return;
+                            }
+                            if ('response' in data === false || 'items' in data.response === false || 'count' in data.response === false) {
+                                console.log("VK", "getAlbums", "API error", data);
+                                return;
+                            }
+                            data = data.response;
+                            if (data.count === 0) {
+                                cb(albums);
+                                return;
+                            }
+                            var len = 0;
+                            data.items.forEach(function(item) {
+                                albums.push({id: albums.length, album_id: item.album_id, title: item.title});
+                                len++;
+                            });
+                            if (len === 0) {
+                                console.log("VK", "getAlbums", "len = 0", data);
+                                return;
+                            }
+                            if (albums.length !== data.count) {
+                                offset += len;
+                                setTimeout(function() {
+                                    getPage(offset);
+                                }, timeout);
+                            } else {
+                                cb(albums);
+                            }
+                        }
+                    },
+                    error: function(jqXHR) {
+                        if (jqXHR.status === 401)
+                            return;
+                        clear_data();
                     }
                 });
             };
             getPage(offset);
+        };
+        var addInLibrarty = function(id, oid, cb) {
+            var url = 'https://api.vk.com/method/audio.add?v=5.5&audio_id=' + id + '&owner_id=' + oid + '&access_token=' + token;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        vkAuth(function() {
+                            addInLibrarty(id, oid, cb);
+                        });
+                    },
+                    200: function(data) {
+                        if ('error' in data) {
+                            clear_data();
+                            console.log("VK", "getAlbums", "API error", data);
+                            return;
+                        }
+                        if ('response' in data === false) {
+                            console.log("VK", "addInLibrarty", "API error", data);
+                            return;
+                        }
+                        if (cb !== undefined) {
+                            cb(true);
+                        }
+                    }
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
+                }
+            });
         };
         var getToken = function(cb) {
             if (token !== undefined) {
@@ -187,30 +349,6 @@ var cloud = function() {
                 cb(list);
             });
         };
-        var vkAuth = function(cb) {
-            var client_id = "4037628";
-            var settings = "audio";
-            var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
-            var display = "page";
-            var url = 'https://oauth.vk.com/authorize?v=5.5&client_id=' + client_id + '&scope=' + settings + '&redirect_uri=' + redirect_uri + '&display=' + display + '&response_type=token';
-            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
-            function(responseURL) {
-                if (!responseURL) {
-                    console.log("VK", "No url");
-                    return;
-                }
-                if (responseURL.indexOf("access_token=") !== -1) {
-                    token = responseURL.replace(/.*access_token=([a-zA-Z0-9]*)&.*/, "$1");
-                    var exp = responseURL.replace(/.*expires_in=([0-9]*)&?.*/, "$1");
-                    cookie.set('vk_token', token, exp);
-                    cb(token);
-                } else {
-                    cookie.remove('vk_token');
-                    token = undefined;
-                    console.log("VK", "No token", responseURL);
-                }
-            });
-        };
         var makeAlbumTracks = function(id, cb) {
             if (id === "nogroup") {
                 id = undefined;
@@ -246,18 +384,6 @@ var cloud = function() {
                 cb(tracks);
             }, id);
         };
-        var addInLibrarty = function(id, oid, cb) {
-            var url = 'https://api.vk.com/method/audio.add?v=5.5&audio_id=' + id + '&owner_id=' + oid + '&access_token=' + token;
-            $.getJSON(url, function(data) {
-                if (is_error(data) || 'response' in data === false) {
-                    console.log("VK", "addInLibrarty", "API error", data);
-                    return;
-                }
-                if (cb !== undefined) {
-                    cb(true);
-                }
-            });
-        };
         return {
             makeAlbums: function(a) {
                 getToken(function() {
@@ -275,9 +401,13 @@ var cloud = function() {
                     console.log('VK', 'addInLibrarty', 'The track has already been added.');
                     return;
                 }
-                saved_tracks.push(id + '_' + oid);
                 getToken(function() {
-                    addInLibrarty(id, oid, cb);
+                    addInLibrarty(id, oid, function() {
+                        saved_tracks.push(id + '_' + oid);
+                        if (cb) {
+                            cb();
+                        }
+                    });
                 });
             },
             on_select_list: function(list, cb) {
@@ -288,8 +418,9 @@ var cloud = function() {
         };
     }();
     var db = function() {
+        var type = 'db';
         var token = undefined;
-        var clear = function() {
+        var clear_data = function() {
             chrome.storage.local.remove('db_token');
             token = undefined;
         };
@@ -297,20 +428,9 @@ var cloud = function() {
             var client_id = "t8uqhrqkw9rz5x8";
             var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
             var url = 'https://www.dropbox.com/1/oauth2/authorize?client_id=' + client_id + '&response_type=token&redirect_uri=' + redirect_uri;
-            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
-            function(responseURL) {
-                if (!responseURL) {
-                    console.log("DB", "No url");
-                    return;
-                }
-                if (responseURL.indexOf("access_token=") !== -1) {
-                    token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-]*)&.*/, "$1");
-                    chrome.storage.local.set({db_token: token});
-                    cb(token);
-                } else {
-                    clear();
-                    console.log("DB", "No token", responseURL);
-                }
+            auth_getToken(type, url, function(tkn) {
+                token = tkn;
+                cb(token);
             });
         };
         var getFilelist = function(cb, root, path) {
@@ -321,21 +441,28 @@ var cloud = function() {
                 path = '';
             }
             var url = 'https://api.dropbox.com/1/metadata/' + root + path;
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.setRequestHeader("Authorization", "Bearer " + token);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    var data = JSON.parse(xhr.responseText);
-                    if ('error' in data) {
-                        clear();
-                        console.log("DB", "getFilelist", "API Error", data);
-                        return;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                },
+                statusCode: {
+                    401: function() {
+                        dbAuth(function() {
+                            getFilelist(cb, root, cb);
+                        });
+                    },
+                    200: function(data) {
+                        cb(data);
                     }
-                    cb(data);
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
                 }
-            };
-            xhr.send(null);
+            });
         };
         var getMedia = function(cb, root, path) {
             if (root === undefined) {
@@ -345,23 +472,28 @@ var cloud = function() {
                 path = '';
             }
             var url = 'https://api.dropbox.com/1/media/' + root + path;
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.setRequestHeader("Authorization", "Bearer " + token);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
-                    var data = JSON.parse(xhr.responseText);
-                    if ('error' in data) {
-                        clear();
-                        cb(undefined);
-                        console.log("DB", "getMedia", "API Error", data);
-                        return;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                },
+                statusCode: {
+                    401: function() {
+                        dbAuth(function() {
+                            getMedia(cb, root, path);
+                        });
+                    },
+                    200: function(data) {
+                        cb(data.url);
                     }
-                    cb(data.url);
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
                 }
-            };
-            xhr.send(null);
+            });
         };
         var getToken = function(cb) {
             if (token !== undefined) {
@@ -416,10 +548,11 @@ var cloud = function() {
         };
     }();
     var sc = function() {
+        var type = 'sc';
         var client_id = '13f6a1d3bbd03d754387a51dccd8bf83';
         var token = undefined;
         var user_id = undefined;
-        var clear = function() {
+        var clear_data = function() {
             chrome.storage.local.remove(['sc_token', 'sc_user_id']);
             token = undefined;
             user_id = undefined;
@@ -427,40 +560,75 @@ var cloud = function() {
         var scAuth = function(cb) {
             var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
             var url = 'https://soundcloud.com/connect?client_id=' + client_id + '&response_type=token&redirect_uri=' + redirect_uri;
-            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
-            function(responseURL) {
-                if (!responseURL) {
-                    console.log("SC", "No url");
-                    return;
-                }
-                if (responseURL.indexOf("access_token=") !== -1) {
-                    token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-]*)&.*/, "$1");
-                    chrome.storage.local.set({sc_token: token});
-                    cb(token);
-                } else {
-                    clear();
-                    console.log("SC", "No token", responseURL);
-                }
+            auth_getToken(type, url, function(tkn) {
+                token = tkn;
+                cb(token);
             });
         };
         var scUserId = function(cb) {
             var url = 'https://api.soundcloud.com/me.json?oauth_token=' + token;
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
-                    if (xhr.status !== 200) {
-                        clear();
-                        console.log("SC", "scUserId", "API Error");
-                        return;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        scAuth(function() {
+                            scUserId(cb);
+                        });
+                    },
+                    200: function(data) {
+                        user_id = data.id;
+                        cb(data.id);
                     }
-                    var data = JSON.parse(xhr.responseText);
-                    user_id = data.id;
-                    cb(data.id);
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
                 }
-            };
-            xhr.send(null);
+            });
+        };
+        var getAlbums = function(cb) {
+            var url = 'http://api.soundcloud.com/users/' + user_id + '/playlists.json?client_id=' + client_id;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        scAuth(function() {
+                            if (user_id === undefined) {
+                                scUserId(function() {
+                                    getAlbums(cb);
+                                });
+                            } else {
+                                getAlbums(cb);
+                            }
+                        });
+                    },
+                    200: function(data) {
+                        var list = [];
+                        data.forEach(function(item) {
+                            var tracks = [];
+                            item.tracks.forEach(function(track) {
+                                if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
+                                    return 1;
+                                }
+                                tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}, duration: track.duration, type: 'sc'});
+                            });
+                            list.push({name: item.title, id: list.length, type: "sc", tracks: tracks});
+                        });
+                        if (list.length === 0) {
+                            return;
+                        }
+                        cb(list);
+                    }
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
+                }
+            });
         };
         var getUserId = function(cb) {
             if (user_id !== undefined) {
@@ -490,38 +658,6 @@ var cloud = function() {
                 }
             });
         };
-        var getAlbums = function(cb) {
-            var url = 'http://api.soundcloud.com/users/' + user_id + '/playlists.json?client_id=' + client_id;
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
-                    if (xhr.status !== 200) {
-                        clear();
-                        console.log("SC", "getAlbums", "API Error");
-                        return;
-                    }
-                    var data = JSON.parse(xhr.responseText);
-                    var list = [];
-                    data.forEach(function(item) {
-                        var tracks = [];
-                        item.tracks.forEach(function(track) {
-                            if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
-                                return 1;
-                            }
-                            tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}, duration: track.duration, type: 'sc'});
-                        });
-                        list.push({name: item.title, id: list.length, type: "sc", tracks: tracks});
-                    });
-                    if (list.length === 0) {
-                        return;
-                    }
-                    cb(list);
-                }
-            };
-            xhr.send(null);
-        };
         return {
             makeAlbums: function(cb) {
                 getToken(function() {
@@ -536,12 +672,12 @@ var cloud = function() {
                 }
                 var tags = track.meta;
                 delete track.meta;
-                var xhr = new XMLHttpRequest();
                 var url = tags.artwork;
                 if (url === null) {
                     cb(tags);
                     return;
                 }
+                var xhr = new XMLHttpRequest();
                 xhr.open("GET", url, true);
                 xhr.responseType = "arraybuffer";
                 xhr.onload = function() {
@@ -551,11 +687,7 @@ var cloud = function() {
                     for (var i = 0; i < len; i++) {
                         binary += String.fromCharCode(bytes[ i ]);
                     }
-                    var ext = url.split('.').slice(-1)[0].toLowerCase().split('?')[0];
                     var mime = 'image/jpeg';
-                    if (ext === 'png') {
-                        mime = 'image/png';
-                    }
                     tags.picture = [binary, mime];
                     cb(tags);
                 };
@@ -570,6 +702,7 @@ var cloud = function() {
         };
     }();
     var gd = function() {
+        var type = 'gd';
         var token = undefined;
         var clear_data = function() {
             cookie.remove('gd_token');
@@ -580,21 +713,9 @@ var cloud = function() {
             var scope = 'https://www.googleapis.com/auth/drive';
             var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
             var url = 'https://accounts.google.com/o/oauth2/auth?client_id=' + client_id + '&response_type=token&redirect_uri=' + redirect_uri + '&scope=' + scope;
-            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
-            function(responseURL) {
-                if (!responseURL) {
-                    console.log("GD", "No url");
-                    return;
-                }
-                if (responseURL.indexOf("access_token=") !== -1) {
-                    token = responseURL.replace(/.*access_token=([a-zA-Z0-9\-\._]*)&.*/, "$1");
-                    var exp = responseURL.replace(/.*expires_in=([0-9]*)&?.*/, "$1");
-                    cookie.set('gd_token', token, exp);
-                    cb(token);
-                } else {
-                    clear_data();
-                    console.log("GD", "No token", responseURL);
-                }
+            auth_getToken(type, url, function(tkn) {
+                token = tkn;
+                cb(token);
             });
         };
         var getFilelist = function(id, cb) {
@@ -603,23 +724,28 @@ var cloud = function() {
             }
             var colums = encodeURIComponent('items(downloadUrl,id,mimeType,parents(isRoot),title)');
             var url = 'https://www.googleapis.com/drive/v2/files?q=\'' + id + '\'+in+parents&fields=' + colums;
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.setRequestHeader("Authorization", "Bearer " + token);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
-                    if (xhr.status !== 200) {
-                        clear_data();
-                        console.log("GD", "getFilelist", "API Error");
-                        return;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                },
+                statusCode: {
+                    401: function() {
+                        gdAuth(function() {
+                            getFilelist(id, cb);
+                        });
+                    },
+                    200: function(data) {
+                        cb(data);
                     }
-                    var data = JSON.parse(xhr.responseText);
-                    cb(data);
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
                 }
-            };
-            xhr.send(null);
-
+            });
         };
         var getToken = function(cb) {
             if (token !== undefined) {
@@ -749,40 +875,57 @@ var cloud = function() {
                 id = 0;
             }
             var url = 'https://api.box.com/2.0/folders/' + id + '/items?fields=parent,shared_link,name,path_collection';
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.setRequestHeader("Authorization", "Bearer " + token);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
-                    if (xhr.status !== 200) {
-                        clear_data();
-                        return;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                },
+                statusCode: {
+                    401: function() {
+                        boxAuth(function() {
+                            getFilelist(cb, id);
+                        });
+                    },
+                    200: function(data) {
+                        cb(data);
                     }
-                    var data = JSON.parse(xhr.responseText);
-                    cb(data);
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
                 }
-            };
-            xhr.send(null);
+            });
         };
         var getMedia = function(cb, id) {
             var url = 'https://api.box.com/2.0/files/' + id;
             var parems = '{"shared_link": {"access": "open"}}';
-            var xhr = new XMLHttpRequest();
-            xhr.open("PUT", url);
-            xhr.setRequestHeader("Authorization", "Bearer " + token);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
-                    if (xhr.status !== 200) {
-                        clear_data();
-                        return;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                data: {shared_link: {access: "open"}},
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                },
+                statusCode: {
+                    401: function() {
+                        boxAuth(function() {
+                            getMedia(cb, id);
+                        });
+                    },
+                    200: function(data) {
+                        if ('shared_link' in data && 'download_url' && data.shared_link) {
+                            cb(data.shared_link.download_url);
+                        }
                     }
-                    var data = JSON.parse(xhr.responseText);
-                    cb(data.shared_link.download_url);
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
                 }
-            };
-            xhr.send(parems);
+            });
         };
         var getTrack = function(track, player, cb) {
             if (dl_xhr !== undefined) {
@@ -821,31 +964,20 @@ var cloud = function() {
         };
     }();
     var sd = function() {
+        var type = 'sd';
         var token = undefined;
         var clear_data = function() {
             cookie.remove('sd_token');
             token = undefined;
         };
-        var gdAuth = function(cb) {
+        var sdAuth = function(cb) {
             var client_id = '000000004410D305';
             var scope = 'wl.skydrive';
             var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
             var url = 'https://login.live.com/oauth20_authorize.srf?client_id=' + client_id + '&scope=' + scope + '&response_type=token&redirect_uri=' + redirect_uri;
-            chrome.identity.launchWebAuthFlow({url: url, interactive: true},
-            function(responseURL) {
-                if (!responseURL) {
-                    console.log("SD", "No url");
-                    return;
-                }
-                if (responseURL.indexOf("access_token=") !== -1) {
-                    token = responseURL.replace(/.*access_token=([^&]*)&.*/, "$1");
-                    var exp = responseURL.replace(/.*expires_in=([0-9]*)&.*/, "$1");
-                    cookie.set('sd_token', token, exp);
-                    cb(token);
-                } else {
-                    clear_data();
-                    console.log("SD", "No token", responseURL);
-                }
+            auth_getToken(type, url, function(tkn) {
+                token = tkn;
+                cb(token);
             });
         };
         var getFilelist = function(id, cb) {
@@ -853,22 +985,25 @@ var cloud = function() {
                 id = 'me/skydrive';
             }
             var url = 'https://apis.live.net/v5.0/' + id + '/files?access_token=' + token;
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4)
-                {
-                    if (xhr.status !== 200) {
-                        clear_data();
-                        console.log("SD", "getFilelist", "API Error");
-                        return;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        sdAuth(function() {
+                            getFilelist(id, cb);
+                        });
+                    },
+                    200: function(data) {
+                        cb(data);
                     }
-                    var data = JSON.parse(xhr.responseText);
-                    cb(data);
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
                 }
-            };
-            xhr.send(null);
-
+            });
         };
         var getToken = function(cb) {
             if (token !== undefined) {
@@ -880,7 +1015,7 @@ var cloud = function() {
                     token = obj.sd_token;
                     cb(token);
                 } else {
-                    gdAuth(cb);
+                    sdAuth(cb);
                 }
             });
         };
@@ -897,12 +1032,12 @@ var cloud = function() {
                 }
                 var tags = track.meta;
                 delete track.meta;
-                var xhr = new XMLHttpRequest();
                 var url = tags.artwork;
                 if (url === undefined) {
                     cb(tags);
                     return;
                 }
+                var xhr = new XMLHttpRequest();
                 xhr.open("GET", url, true);
                 xhr.responseType = "arraybuffer";
                 xhr.onload = function() {
@@ -912,11 +1047,7 @@ var cloud = function() {
                     for (var i = 0; i < len; i++) {
                         binary += String.fromCharCode(bytes[ i ]);
                     }
-                    var ext = url.split('.').slice(-1)[0].toLowerCase().split('?')[0];
                     var mime = 'image/jpeg';
-                    if (ext === 'png') {
-                        mime = 'image/png';
-                    }
                     tags.picture = [binary, mime];
                     cb(tags);
                 };
