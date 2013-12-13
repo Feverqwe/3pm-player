@@ -827,9 +827,15 @@ var cloud = function() {
                     token = data.access_token;
                     cb(token);
                 },
-                error: function() {
-                    console.log('boxAuth resp. error');
+                error: function(jqXHR) {
+                    if (jqXHR.status === 400) {
+                        boxCode(function() {
+                            boxAuth(cb);
+                        });
+                        return;
+                    }
                     clear_data();
+                    console.log('boxAuth resp. error');
                 }
             });
         };
