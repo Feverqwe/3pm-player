@@ -256,6 +256,9 @@ var view = function() {
         });
     };
     var findMusicInFolder = function(entry, cb) {
+        /*
+         * Проверяет наличие хотя бы одного файла в каталоге.
+         */
         getEntryFromDir(entry, function(sub_entry) {
             var sub_entry_len = sub_entry.length;
             var next = function(i) {
@@ -280,6 +283,9 @@ var view = function() {
         });
     };
     var getFilesFromFolder = function(entry, cb) {
+        /*
+         * Отдает список файлов в папке
+         */
         getEntryFromDir(entry, function(sub_entry) {
             entry2files(sub_entry, function(files) {
                 cb(files);
@@ -287,6 +293,11 @@ var view = function() {
         });
     };
     var readDirectoryWithSub = function(entry) {
+        /*
+         * Читает дирректорию и дирректории внутри их..
+         * Уровень вложенности - 1.
+         * Формирует плэйлисты из вложенных папок.
+         */
         getEntryFromDir(entry, function(sub_entry) {
             var list_dir = [];
             var add_root = false;
