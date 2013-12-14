@@ -275,7 +275,7 @@ var view = function() {
                 }
             }
             if (add_root) {
-                list_dir.push(sub_entry);
+                list_dir.push(entry);
             }
             var playlist = [];
             var list_dir_len = list_dir.length;
