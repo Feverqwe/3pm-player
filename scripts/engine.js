@@ -991,6 +991,11 @@ var engine = function() {
                     engine.open(files, {name: list.name, id: id});
                 });
             } else
+            if (list.type === 'subfiles') {
+                view.getFilesFromFolder(list.entry, function(files) {
+                    engine.open(files, {name: list.name, id: id});
+                });
+            } else
             if (cloud[list.type] !== undefined && typeof (cloud[list.type].on_select_list) === 'function') {
                 cloud[list.type].on_select_list(list, function(track_list, info) {
                     engine.open(track_list, info);

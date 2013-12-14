@@ -75,26 +75,28 @@ var view = function() {
          * Переводит массив entry в массива file
          */
         var files = [];
-        var len = entry.length;
-        var wlen = entry.length;
-        var n = 0;
-        if (len === 0) {
+        var entry_len = entry.length;
+        if (entry_len === 0) {
             cb(files);
             return;
         }
-        for (var i = 0; i < len; i++) {
-            if (entry[i].isDirectory) {
-                wlen--;
-                continue;
+        var dune_count = 0;
+        var dune = function() {
+            dune_count++;
+            if (dune_count === entry_len) {
+                cb(files);
             }
-            entry[i].file(function(file) {
+        };
+        entry.forEach(function(item) {
+            if (item.isDirectory) {
+                dune();
+                return 1;
+            }
+            item.file(function(file) {
                 files.push(file);
-                n++;
-                if (n === wlen && cb) {
-                    cb(files);
-                }
+                dune();
             });
-        }
+        });
     };
     var readPlaylist = function(entry, file, cb) {
         /*
@@ -232,6 +234,69 @@ var view = function() {
         getEntryFromDir(entry, function(sub_entry) {
             entry2files(sub_entry, function(files) {
                 readFileArray(files, entry);
+            });
+        });
+    };
+    var findMusicInFolder = function(entry, cb) {
+        getEntryFromDir(entry, function(sub_entry) {
+            entry2files(sub_entry, function(files) {
+                var len = files.length;
+                var canplay = false;
+                for (var i = 0; i < len; i++) {
+                    if (engine.canPlay(files[i].type)) {
+                        canplay = true;
+                        cb(true);
+                        break;
+                    }
+                }
+                if (!canplay) {
+                    cb(false);
+                }
+            });
+        });
+    };
+    var getFilesFromFolder = function(entry, cb) {
+        getEntryFromDir(entry, function(sub_entry) {
+            entry2files(sub_entry, function(files) {
+                cb(files);
+            });
+        });
+    };
+    var readDirectoryWithSub = function(entry) {
+        getEntryFromDir(entry, function(sub_entry) {
+            var list_dir = [];
+            var add_root = false;
+            var sub_entry_len = sub_entry.length;
+            for (var i = 0; i < sub_entry_len; i++) {
+                if (sub_entry[i].isDirectory) {
+                    list_dir.push(sub_entry[i]);
+                } else {
+                    add_root = true;
+                }
+            }
+            if (add_root) {
+                list_dir.push(sub_entry);
+            }
+            var playlist = [];
+            var list_dir_len = list_dir.length;
+            var dune_count = 0;
+            var dune = function() {
+                dune_count++;
+                if (dune_count === list_dir_len) {
+                    var lists = {list: playlist};
+                    engine.setM3UPlaylists(lists);
+                    chrome.runtime.getBackgroundPage(function(bg) {
+                        bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: lists.list});
+                    });
+                }
+            };
+            list_dir.forEach(function(item) {
+                findMusicInFolder(item, function(canplay) {
+                    if (canplay) {
+                        playlist.push({name: item.name, entry: item, id: playlist.length, type: "subfiles"});
+                    }
+                    dune();
+                });
             });
         });
     };
@@ -951,6 +1016,7 @@ var view = function() {
             }
         },
         readPlaylist: readPlaylist,
+        getFilesFromFolder: getFilesFromFolder,
         pre_buffering_controller: pre_buffering_controller
     };
 }();
