@@ -232,9 +232,27 @@ var view = function() {
          * Читает открытую дирректорию, получает массив m3u файлов, и воспроизводит файлы внутри.
          */
         getEntryFromDir(entry, function(sub_entry) {
-            entry2files(sub_entry, function(files) {
-                readFileArray(files, entry);
-            });
+            var sub_entry_len = sub_entry.length;
+            var dir_count = 0;
+            var file_count = 0;
+            for (var i = 0; i < sub_entry_len; i++) {
+                var item = sub_entry[i];
+                if ("isDirectory" in item && item.isDirectory) {
+                    dir_count++;
+                } else {
+                    file_count++;
+                }
+            }
+            if (file_count === 0 && dir_count === 0) {
+                return;
+            } else
+            if (file_count === 0 && dir_count > 0) {
+                readDirectoryWithSub(entry);
+            } else {
+                entry2files(sub_entry, function(files) {
+                    readFileArray(files, entry);
+                });
+            }
         });
     };
     var findMusicInFolder = function(entry, cb) {
