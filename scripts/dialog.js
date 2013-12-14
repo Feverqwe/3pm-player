@@ -1,5 +1,5 @@
 var dialog = function() {
-    var allow_ext = ['mp3', 'mp4', 'm4a', 'm4v', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
+    var allow_ext = undefined;
     var var_cache = {};
     var dom_cache = {};
     var _player_window = undefined;
@@ -625,6 +625,7 @@ var dialog = function() {
             });
             sendPlayer(function(window) {
                 window.engine.set_hotkeys(document);
+                allow_ext = window.engine.get_allow_ext();
             });
             if (window.options === undefined) {
                 return;

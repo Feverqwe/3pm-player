@@ -1,5 +1,7 @@
 var _debug = false;
 var engine = function() {
+    //allow_ext - only for files without mime.
+    var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
     var playlist = [];
     var playlist_info = undefined;
     var sorted_playlist = undefined;
@@ -151,46 +153,35 @@ var engine = function() {
             }
             return type;
         }
-        var types = [
-            'audio/mpeg', //0
-            'audio/mp4', //1
-            'audio/ogg', //2
-            'audio/webm', //3
-            'audio/wav', //4
-            'audio/x-flv', //5
-            'audio/rtmp', //6
-            'video/ogg', //7
-            'video/3gpp'//8
-        ];
         var filename = file.name;
         var ext = filename.split('.').slice(-1)[0].toLowerCase();
         type = undefined;
         if (ext === "mp3") {
-            type = types[0];
+            type = 'audio/mpeg';
         } else
         if (ext === "m4a" || ext === "m4v" || ext === "mp4") {
-            type = types[1];
+            type = 'audio/mp4';
         } else
         if (ext === "ogg" || ext === "oga" || ext === "spx") {
-            type = types[2];
+            type = 'audio/ogg';
         } else
         if (ext === "webm" || ext === "webma") {
-            type = types[3];
+            type = 'audio/webm';
         } else
         if (ext === "wav") {
-            type = types[4];
+            type = 'audio/wav';
         } else
         if (ext === "fla") {
-            type = types[5];
+            type = 'audio/x-flv';
         } else
         if (ext === "rtmpa") {
-            type = types[6];
+            type = 'audio/rtmp';
         } else
         if (ext === "ogv") {
-            type = types[7];
+            type = 'video/ogg';
         } else
         if (ext === "3gp") {
-            type = types[8];
+            type = 'video/3gpp';
         }
         return type;
     };
@@ -560,6 +551,10 @@ var engine = function() {
                 });
             },
             canPlay: function(mime) {
+                if (mime[0] === '.') {
+                    var ext = mime.substr(1);
+                    return (allow_ext.indexOf(ext) > 0);
+                }
                 if (mime in type_list) {
                     return type_list[mime];
                 }
@@ -920,6 +915,10 @@ var engine = function() {
                 window.viz.minimize();
             });
         },
+        get_allow_ext: function() {
+            return allow_ext;
+        },
+        canPlay: player.canPlay,
         set_hotkeys: function(_document) {
             $(_document).keydown(function(event) {
                 if (event.keyCode === 32) {

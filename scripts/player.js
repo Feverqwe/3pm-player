@@ -545,6 +545,11 @@ var view = function() {
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
+                    id: "o_f_sub",
+                    title: "Open folder with subfolders",
+                    contexts: ['page', 'launcher']
+                });
+                chrome.contextMenus.create({
                     id: "2",
                     title: "Open URL",
                     contexts: ['page', 'launcher']
@@ -709,6 +714,15 @@ var view = function() {
                                 return;
                             }
                             readDirectory(entry);
+                        });
+                        return;
+                    }
+                    if (info.menuItemId === 'o_f_sub') {
+                        chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
+                            if (!entry) {
+                                return;
+                            }
+                            readDirectoryWithSub(entry);
                         });
                         return;
                     }
