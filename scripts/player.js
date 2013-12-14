@@ -257,20 +257,26 @@ var view = function() {
     };
     var findMusicInFolder = function(entry, cb) {
         getEntryFromDir(entry, function(sub_entry) {
-            entry2files(sub_entry, function(files) {
-                var len = files.length;
-                var canplay = false;
-                for (var i = 0; i < len; i++) {
-                    if (engine.canPlay(files[i].type)) {
-                        canplay = true;
-                        cb(true);
-                        break;
-                    }
-                }
-                if (!canplay) {
+            var sub_entry_len = sub_entry.length;
+            var next = function(i) {
+                if (i >= sub_entry_len) {
                     cb(false);
+                    return;
                 }
-            });
+                var item = sub_entry[i];
+                if (item.isDirectory) {
+                    next(i + 1);
+                    return;
+                }
+                item.file(function(file) {
+                    if (engine.canPlay(file.type)) {
+                        cb(true);
+                    } else {
+                        next(i + 1);
+                    }
+                });
+            };
+            next(0);
         });
     };
     var getFilesFromFolder = function(entry, cb) {
@@ -300,7 +306,7 @@ var view = function() {
             var dune_count = 0;
             var dune = function() {
                 dune_count++;
-                if (dune_count === list_dir_len) {
+                if (dune_count === list_dir_len && playlist.length > 0) {
                     var lists = {list: playlist};
                     engine.setM3UPlaylists(lists);
                     chrome.runtime.getBackgroundPage(function(bg) {
