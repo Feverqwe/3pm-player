@@ -849,6 +849,9 @@ var engine = function() {
             $('body').append($('<div>', {'class': 'engine'}));
             player.init();
         },
+        updateSettings: function(settings) {
+            next_track_notification = settings['next_track_notification'];
+        },
         get_filename: player.get_filename,
         open: function(files, info) {
             if (files.length === 0) {

@@ -1,9 +1,25 @@
 var options = function() {
+    var _player_window = undefined;
     var def_settings = {
         next_track_notification: {"v": 0, "t": "checkbox"},
         extend_voolume_scroll: {"v": 0, "t": "checkbox"},
         pin_playlist: {"v": 0, "t": "checkbox"}
     };
+    function sendPlayer(callback) {
+        /*
+         * Функция отправки действий в плеер
+         */
+        if (_player_window === undefined || _player_window.window === null) {
+            chrome.runtime.getBackgroundPage(function(bg) {
+                _player_window = bg.wm.getPlayer();
+                if (_player_window !== undefined) {
+                    callback(_player_window);
+                }
+            });
+        } else {
+            callback(_player_window);
+        }
+    }
     var loadSettings = function(cb) {
         var opt_list = [];
         $.each(def_settings, function(k) {
@@ -17,10 +33,6 @@ var options = function() {
             cb(settings);
         });
     };
-    var settings = {};
-    loadSettings(function(stngs) {
-        settings = stngs;
-    });
     var set_place_holder = function(settings) {
         $.each(def_settings, function(k, v) {
             var set = settings;
@@ -113,6 +125,9 @@ var options = function() {
         chrome.storage.local.set(onSave, function() {
             loadSettings(function(stgs) {
                 set_place_holder(stgs);
+                sendPlayer(function(window){
+                    window.engine.updateSettings(stgs);
+                });
             });
         });
     };
@@ -154,7 +169,10 @@ var options = function() {
                 }, 200);
             });
             //<<<<<<<<<<
-            set_place_holder(settings);
+            loadSettings(function(sett) {
+                settings = sett;
+                set_place_holder(sett);
+            });
         }
     };
 }();
