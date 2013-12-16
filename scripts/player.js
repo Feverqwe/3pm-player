@@ -602,6 +602,8 @@ var view = function() {
             dom_cache.time.on('click', function() {
                 time_tipe = (time_tipe) ? 0 : 1;
                 chrome.storage.local.set({'time_tipe': time_tipe});
+                var audio = engine.getAudio();
+                view.setProgress(audio.duration, audio.currentTime);
             });
             chrome.storage.local.get('time_tipe', function(storage) {
                 if ('time_tipe' in storage) {
@@ -949,10 +951,11 @@ var view = function() {
         setProgress: function(max, pos) {
             var width_persent = pos / max * 100;
             dom_cache.progress.slider("value", width_persent * 10);
+            var time = undefined;
             if (time_tipe) {
-                var time = "-" + toHHMMSS(max - pos);
+                time = "-" + toHHMMSS(max - pos);
             } else {
-                var time = toHHMMSS(pos);
+                time = toHHMMSS(pos);
             }
             dom_cache.time.text(time);
         },
