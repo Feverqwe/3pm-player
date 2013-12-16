@@ -6,6 +6,9 @@ var engine = function() {
         extend_voolume_scroll: {"v": 0, "t": "checkbox"},
         pin_playlist: {"v": 0, "t": "checkbox"}
     };
+    var updateSettings = function(settings) {
+        next_track_notification = settings['next_track_notification'] || def_settings.next_track_notification.v;
+    };
     //<<<<<<<
     //allow_ext - only for files without mime.
     var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
@@ -336,13 +339,21 @@ var engine = function() {
                         return;
                     }
                     clearTimeout(timer);
-                    chrome.notifications.clear('current_track', function() {
+                    chrome.notifications.clear('current_track', function(obj) {
                     });
                     if (b === 1) {
                         player.preview();
                     } else {
                         player.next();
                     }
+                });
+                chrome.notifications.onClicked.addListener(function(a, b) {
+                    clearTimeout(timer);
+                    chrome.notifications.clear('current_track', function(obj) {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.run_player();
+                        });
+                    });
                 });
             }();
             return {
@@ -359,18 +370,18 @@ var engine = function() {
                             notification.update();
                             return;
                         }
-                        chrome.notifications.create('current_track', opt, function() {
+                        chrome.notifications.create('current_track', opt, function(obj) {
                             starTimer();
                         });
                     });
                 },
                 update: function() {
                     chrome.notifications.getAll(function(obj) {
-                        if ('current_track' in obj !== true) {
+                        if ('current_track' in obj === false) {
                             return;
                         }
                         var opt = getOpt();
-                        chrome.notifications.update('current_track', opt, function() {
+                        chrome.notifications.update('current_track', opt, function(obj) {
                         });
                     });
                 }
@@ -842,16 +853,14 @@ var engine = function() {
     };
     return {
         run: function() {
-            chrome.storage.local.get(['next_track_notification'], function(obj) {
-                next_track_notification = obj['next_track_notification'] || def_settings.next_track_notification.v;
+            chrome.storage.local.get(function(obj) {
+                updateSettings(obj);
             });
             $('.engine').remove();
             $('body').append($('<div>', {'class': 'engine'}));
             player.init();
         },
-        updateSettings: function(settings) {
-            next_track_notification = settings['next_track_notification'];
-        },
+        updateSettings: updateSettings,
         get_filename: player.get_filename,
         open: function(files, info) {
             if (files.length === 0) {
