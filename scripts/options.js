@@ -1,37 +1,8 @@
 var options = function() {
     var def_settings = {
         HideLeech: {"v": 1, "t": "checkbox"},
-        HideSeed: {"v": 0, "t": "checkbox"},
-        ShowIcons: {"v": 1, "t": "checkbox"},
-        SubCategoryFilter: {"v": 0, "t": "checkbox"},
-        HideZeroSeed: {"v": 0, "t": "checkbox"},
         AdvFiltration: {"v": 2, "t": "radio"},
-        TeaserFilter: {"v": 1, "t": "checkbox"},
-        add_in_omnibox: {"v": 1, "t": "checkbox"},
-        context_menu: {"v": 1, "t": "checkbox"},
-        search_popup: {"v": 1, "t": "checkbox"},
-        AutoComplite_opt: {"v": 1, "t": "checkbox"},
-        use_english_postername: {"v": 0, "t": "checkbox"},
-        google_proxy: {"v": 0, "t": "checkbox"},
-        google_analytics: {"v": 0, "t": "checkbox"},
-        autoSetCat: {"v": 1, "t": "checkbox"},
-        allow_get_description: {"v": 1, "t": "checkbox"},
-        allow_favorites_sync: {"v": 0, "t": "checkbox"},
-        sub_select_enable: {"v": 1, "t": "checkbox"},
-        kinopoisk_category: {"v": 1, "t": "checkbox"},
-        kinopoisk_f_id: {"v": 1, "t": "number"},
-        filter_panel_to_left: {"v": 0, "t": "checkbox"},
-        /*sync_trackers: {"v": 0, "t": "checkbox"},*/
-        hideTopSearch: {"v": 0, "t": "checkbox"},
-        s_films: {"v": 1, "t": "checkbox"},
-        s_top_films: {"v": 1, "t": "checkbox"},
-        s_serials: {"v": 1, "t": "checkbox"},
-        s_imdb_films: {"v": 0, "t": "checkbox"},
-        s_imdb_top_films: {"v": 0, "t": "checkbox"},
-        s_imdb_serials: {"v": 0, "t": "checkbox"},
-        s_games_n: {"v": 1, "t": "checkbox"},
-        s_games: {"v": 1, "t": "checkbox"},
-        s_games_a: {"v": 1, "t": "checkbox"}
+        kinopoisk_f_id: {"v": 1, "t": "number"}
     };
     var loadSettings = function(cb) {
         var opt_list = [];
