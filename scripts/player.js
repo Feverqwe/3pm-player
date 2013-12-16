@@ -721,10 +721,21 @@ var view = function() {
                     title: "Previous",
                     contexts: ['launcher']
                 });
+                chrome.contextMenus.create({
+                    id: "options",
+                    title: "Setup",
+                    contexts: ['page', 'launcher']
+                });
                 chrome.runtime.getBackgroundPage(function(bg) {
                     chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
                 });
                 chrome.contextMenus.onClicked.addListener(function(info) {
+                    if (info.menuItemId === "options") {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.showOptions();
+                        });
+                        return;
+                    }
                     if (info.menuItemId === "1") {
                         $('.click_for_open').trigger('click');
                         return;

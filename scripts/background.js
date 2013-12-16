@@ -380,6 +380,37 @@ var wm = function() {
         var lt = win_top_left_pos(screen[0] / 2 - parseInt(w / 2), screen[1] / 2 - parseInt(h / 2));
         create_window(lt[0], lt[1]);
     };
+    var create_option_window = function() {
+        if ("option" in windows) {
+            if (windows.option.contentWindow.window === null) {
+                delete windows.option;
+            } else {
+                windows.option.contentWindow.close();
+            }
+        }
+        w = 820;
+        h = 480;
+        var w = w;
+        var h = h;
+        w = parseInt(w * dpr);
+        h = parseInt(h * dpr);
+        var create_window = function(p_l, p_t) {
+            chrome.app.window.create('options.html', {
+                bounds: {
+                    width: w,
+                    height: h,
+                    left: p_l,
+                    top: p_t
+                },
+                frame: "none",
+                resizable: true
+            }, function(win) {
+                windows.option = win;
+            });
+        };
+        var lt = win_top_left_pos(screen[0] / 2 - parseInt(w / 2), screen[1] / 2 - parseInt(h / 2));
+        create_window(lt[0], lt[1]);
+    };
     var check = function() {
         var player_off = true;
         if ("player" in windows) {
@@ -459,6 +490,9 @@ var wm = function() {
                 options.h = len * 52 + 43;
             }
             create_dialog_window(options);
+        },
+        showOptions: function() {
+            create_option_window();
         },
         ws: web_socket,
         hi: function(type, win) {

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head> 	
+        <meta charset="utf-8" />
+        <title>3pm-player</title>
+        <link rel="stylesheet" type="text/css" href="styles/options.css">
+        <script src="scripts/jquery-2.0.3.min.js"></script>
+        <script src="scripts/lang.js"></script>
+        <script src="scripts/options.js"></script>
+    </head>
+    <body>
+        <div class="title">
+            <h1>3pm-player</h1>
+        </div>
+        <ul class="menu">
+            <li><a class="active" href="#main" data-page="main" data-lang="">Player</a></li>
+            <li><a href="#viz" data-page="viz" data-lang="">Visualization</a></li>
+            <li class="save_btn"><a href="#save" data-lang="">Save</a></li>
+        </ul>
+        <div class="page main active">
+            <fieldset class="lang">
+                <legend data-lang="4">Language</legend>
+                <div>
+                    <select name="language"><option value="en">English</option><option value="ru">Русский</option></select>
+                </div>
+            </fieldset>
+        </div>
+        <div class="bottom">
+            <div class="donate"></div>
+            <div class="author"><a href="mailto:leonardspbox@gmail.com">Anton</a>, 2013</div>
+        </div>
+        <div class="topbtn" title="Up!"></div>
+    </body>
+</html>
