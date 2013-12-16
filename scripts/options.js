@@ -1,8 +1,8 @@
 var options = function() {
     var def_settings = {
-        HideLeech: {"v": 1, "t": "checkbox"},
-        AdvFiltration: {"v": 2, "t": "radio"},
-        kinopoisk_f_id: {"v": 1, "t": "number"}
+        next_track_notification: {"v": 0, "t": "checkbox"},
+        extend_voolume_scroll: {"v": 0, "t": "checkbox"},
+        pin_playlist: {"v": 0, "t": "checkbox"}
     };
     var loadSettings = function(cb) {
         var opt_list = [];
@@ -51,14 +51,10 @@ var options = function() {
     };
     var write_language = function(language) {
         if (language === undefined) {
-            chrome.storage.local.get('lang', function(obj) {
-                var def = 'en';
-                if (chrome.i18n.getMessage("lang") === 'ru') {
-                    def = 'ru';
-                }
-                write_language(obj['lang'] || def);
-            });
-            return;
+            language = 'en';
+            if (chrome.i18n.getMessage("lang") === 'ru') {
+                language = 'ru';
+            }
         }
         _lang = get_lang(language);
         var lang = _lang.settings;
@@ -122,7 +118,10 @@ var options = function() {
     };
     return {
         begin: function() {
-            write_language();
+            chrome.storage.local.get('lang', function(obj) {
+                write_language(obj.lang);
+            });
+            //binds
             $('select[name="language"]').on('change', function() {
                 write_language($(this).val());
             });
@@ -154,6 +153,8 @@ var options = function() {
                     scrollTop: 0
                 }, 200);
             });
+            //<<<<<<<<<<
+            set_place_holder(settings);
         }
     };
 }();

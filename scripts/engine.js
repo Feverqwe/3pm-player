@@ -1,5 +1,12 @@
 var _debug = false;
 var engine = function() {
+    //options
+    var def_settings = {
+        next_track_notification: {"v": 0, "t": "checkbox"},
+        extend_voolume_scroll: {"v": 0, "t": "checkbox"},
+        pin_playlist: {"v": 0, "t": "checkbox"}
+    };
+    //<<<<<<<
     //allow_ext - only for files without mime.
     var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
     var playlist = [];
@@ -16,6 +23,7 @@ var engine = function() {
     var _viz_window = undefined;
     var adapter = undefined;
     var var_cache = {};
+    var next_track_notification = false;
     function sendPlaylist(callback) {
         /*
          * Функция отправки действий в плэйлист
@@ -294,6 +302,80 @@ var engine = function() {
             }
             return [title, album];
         };
+        var notification = function() {
+            var timeout = 3000;
+            var timer = undefined;
+            var starTimer = function() {
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    chrome.notifications.clear('current_track', function() {
+                    });
+                }, timeout);
+            };
+            var getOpt = function() {
+                var title = player.getTagBody();
+                var opt = {
+                    type: 'basic',
+                    iconUrl: '/images/no-cover.png',
+                    title: title[0],
+                    message: ''
+                };
+                if (title[1].length !== 0) {
+                    opt.message = title[1];
+                }
+                if (playlist[current_id].tags !== undefined) {
+                    if (playlist[current_id].tags.picture !== undefined) {
+                        opt['iconUrl'] = engine.getCover(playlist[current_id].tags.picture).data;
+                    }
+                }
+                return opt;
+            };
+            var init = function() {
+                chrome.notifications.onButtonClicked.addListener(function(a, b) {
+                    if (a !== 'current_track') {
+                        return;
+                    }
+                    clearTimeout(timer);
+                    chrome.notifications.clear('current_track', function() {
+                    });
+                    if (b === 1) {
+                        player.preview();
+                    } else {
+                        player.next();
+                    }
+                });
+            }();
+            return {
+                show: function() {
+                    var opt = getOpt();
+                    opt.buttons = [
+                        {title: 'Next', iconUrl: '/images/playback_next.png'},
+                        {title: 'Previous', iconUrl: '/images/playback_prev.png'}
+                    ];
+                    //отображаем уведомление о воспроизведении
+                    chrome.notifications.getAll(function(obj) {
+                        if ('current_track' in obj === true) {
+                            starTimer();
+                            notification.update();
+                            return;
+                        }
+                        chrome.notifications.create('current_track', opt, function() {
+                            starTimer();
+                        });
+                    });
+                },
+                update: function() {
+                    chrome.notifications.getAll(function(obj) {
+                        if ('current_track' in obj !== true) {
+                            return;
+                        }
+                        var opt = getOpt();
+                        chrome.notifications.update('current_track', opt, function() {
+                        });
+                    });
+                }
+            };
+        }();
         return {
             getTagBody: function(id) {
                 if (id === undefined) {
@@ -607,6 +689,9 @@ var engine = function() {
                     });
                 });
                 $(audio).on('loadeddata', function(e) {
+                    if (next_track_notification) {
+                        notification.show();
+                    }
                     if (playlist[current_id].tags === undefined) {
                         read_tags(current_id, function(tags, id) {
                             var obj = {};
@@ -624,6 +709,9 @@ var engine = function() {
                             sendViz(function(window) {
                                 window.viz.audio_state('track', getTagBody(current_id));
                             });
+                            if (next_track_notification) {
+                                notification.update();
+                            }
                         });
                     } else {
                         sendViz(function(window) {
@@ -754,6 +842,9 @@ var engine = function() {
     };
     return {
         run: function() {
+            chrome.storage.local.get(['next_track_notification'], function(obj) {
+                next_track_notification = obj['next_track_notification'] || def_settings.next_track_notification.v;
+            });
             $('.engine').remove();
             $('body').append($('<div>', {'class': 'engine'}));
             player.init();

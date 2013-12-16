@@ -13,9 +13,9 @@
             <h1>3pm-player</h1>
         </div>
         <ul class="menu">
-            <li><a class="active" href="#main" data-page="main" data-lang="">Player</a></li>
-            <li><a href="#viz" data-page="viz" data-lang="">Visualization</a></li>
-            <li class="save_btn"><a href="#save" data-lang="">Save</a></li>
+            <li><a class="active" href="#main" data-page="main" data-lang="2">Player</a></li>
+            <li><a href="#viz" data-page="viz" data-lang="3">Visualization</a></li>
+            <li class="save_btn"><a href="#save" data-lang="4">Save</a></li>
         </ul>
         <div class="page main active">
             <fieldset class="lang">
@@ -23,6 +23,14 @@
                 <div>
                     <select name="language"><option value="en">English</option><option value="ru">Русский</option></select>
                 </div>
+            </fieldset>
+            <fieldset class="pleer check_list">
+                <legend data-lang="">Настройки плеера</legend>
+                <ul>
+                    <li><ul class="item"><li><input type="checkbox" name="next_track_notification"/></li><li data-lang="">Показывать уведомление при смене трека</li></ul></li>
+                    <li><ul class="item"><li><input type="checkbox" name="extend_voolume_scroll"/></li><li data-lang="">Расщирить облась изменения громкости скроллом</li></ul></li>
+                    <li><ul class="item"><li><input type="checkbox" name="pin_playlist"/></li><li data-lang="">Привязать список воспроизведения к плееру</li></ul></li>
+                </ul>
             </fieldset>
         </div>
         <div class="bottom">

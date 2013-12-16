@@ -1,45 +1,35 @@
-var get_lang = function(lang, cb) {
+var get_lang = function(language) {
     var lang_arr_en = {
         t: 'en',
+        btn_up: 'Up!',
         settings: {
-            1: "Language"
+            1: "Language",
+            2: 'Pleer',
+            3: 'Visualization',
+            4: 'Save'
         }
     };
     var lang_arr_ru = {
         t: 'ru',
+        btn_up: 'Вверх!',
         settings: {
-            1: "Язык / Language"
+            1: "Язык / Language",
+            2: 'Плеер',
+            3: 'Визуализация',
+            4: 'Сохранить'
         }
     };
-    if (lang !== undefined) {
-        if (lang === 'ru') {
-            return lang_arr_ru;
-        } else {
-            return lang_arr_en;
+    var lang = language;
+    if (lang === undefined) {
+        lang = 'en';
+        if (chrome.i18n.getMessage("lang") === 'ru') {
+            lang = 'ru';
         }
+    }
+    if (lang === 'ru') {
+        return lang_arr_ru;
     } else {
-        chrome.storage.local.get('lang', function(obj) {
-            var lang = obj['lang'];
-            if (lang === undefined) {
-                lang = 'en';
-                if (chrome.i18n.getMessage("lang") === 'ru') {
-                    lang = 'ru';
-                }
-            }
-            if (lang === 'ru') {
-                cb(lang_arr_ru);
-            } else {
-                cb(lang_arr_en);
-            }
-        });
+        return lang_arr_en;
     }
 };
-var _lang = {};
-get_lang(undefined, function(obj) {
-    _lang = obj;
-});
-window.onload = function() {
-    if ("options" in window === false) {
-        get_lang = undefined;
-    }
-};
+var _lang = undefined;

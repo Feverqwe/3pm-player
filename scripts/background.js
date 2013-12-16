@@ -402,7 +402,7 @@ var wm = function() {
                     left: p_l,
                     top: p_t
                 },
-                frame: "none",
+                frame: "chrome",
                 resizable: true
             }, function(win) {
                 windows.option = win;

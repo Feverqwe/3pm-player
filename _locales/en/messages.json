@@ -1,0 +1,11 @@
+{
+    "appName": {
+        "message": "3pm-player"
+    },
+    "appDesc": {
+        "message": "Small mp3-player!"
+    },
+    "lang": {
+    	"message": "en"
+    }
+}

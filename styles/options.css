@@ -1,6 +1,11 @@
+html {
+    height: 100%;
+    overflow: auto;
+}
 body {
     font-family: Verdana, sans-serif;
     font-size: 0.84em;
+    margin: 0;
 }
 div.title {
     width: 720px;
@@ -80,6 +85,12 @@ fieldset.info a {
 }
 ul.item > li {
     display: inline-block;
+}
+.check_list ul.item {
+    margin-bottom: 2px;
+}
+.check_list ul.item > li:first-child {
+    padding: 6px 12px;
 }
 div.author a {
     color: #333333;
