@@ -50,7 +50,6 @@ div.image img {
 .player .box {
     overflow: hidden;
     height: 80px;
-    /* height: calc(100% - 39px);*/
 }
 .player .info {
     position: relative;
@@ -298,4 +297,10 @@ div.loading {
     border-radius: 5px;
     cursor: pointer;
     -webkit-app-region: no-drag;
+}
+div.volume_scroll {
+    -webkit-app-region: no-drag;
+}
+div.volume_scroll > div.image {
+    -webkit-app-region: drag;
 }

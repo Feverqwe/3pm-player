@@ -1,13 +1,16 @@
 var _debug = false;
 var engine = function() {
     //options
-    var def_settings = {
-        next_track_notification: {"v": 0, "t": "checkbox"},
-        extend_voolume_scroll: {"v": 0, "t": "checkbox"},
-        pin_playlist: {"v": 0, "t": "checkbox"}
+    var settings = {
+        next_track_notification: 0,
+        extend_volume_scroll: 0,
+        pin_playlist: 0
     };
-    var updateSettings = function(settings) {
-        next_track_notification = settings['next_track_notification'] || def_settings.next_track_notification.v;
+    var updateSettings = function(obj) {
+        settings.next_track_notification = obj.next_track_notification || settings.next_track_notification;
+        settings.extend_volume_scroll = obj.extend_volume_scroll || settings.extend_volume_scroll;
+        settings.pin_playlist = obj.pin_playlist || settings.pin_playlist;
+        view.updateSettings(obj);
     };
     //<<<<<<<
     //allow_ext - only for files without mime.
@@ -26,7 +29,6 @@ var engine = function() {
     var _viz_window = undefined;
     var adapter = undefined;
     var var_cache = {};
-    var next_track_notification = false;
     function sendPlaylist(callback) {
         /*
          * Функция отправки действий в плэйлист
@@ -328,7 +330,7 @@ var engine = function() {
                 }
                 if (playlist[current_id].tags !== undefined) {
                     if (playlist[current_id].tags.picture !== undefined) {
-                        opt['iconUrl'] = engine.getCover(playlist[current_id].tags.picture).data;
+                        opt.iconUrl = engine.getCover(playlist[current_id].tags.picture).data;
                     }
                 }
                 return opt;
@@ -700,7 +702,7 @@ var engine = function() {
                     });
                 });
                 $(audio).on('loadeddata', function(e) {
-                    if (next_track_notification) {
+                    if (settings.next_track_notification) {
                         notification.show();
                     }
                     if (playlist[current_id].tags === undefined) {
@@ -720,7 +722,7 @@ var engine = function() {
                             sendViz(function(window) {
                                 window.viz.audio_state('track', getTagBody(current_id));
                             });
-                            if (next_track_notification) {
+                            if (settings.next_track_notification) {
                                 notification.update();
                             }
                         });
@@ -1106,6 +1108,9 @@ var engine = function() {
             } else {
                 engine.open(list.tracks, {name: list.name, id: id});
             }
+        },
+        getSettings: function() {
+            return settings;
         },
         vk: cloud.vk,
         db: cloud.db,

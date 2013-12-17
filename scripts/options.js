@@ -2,7 +2,7 @@ var options = function() {
     var _player_window = undefined;
     var def_settings = {
         next_track_notification: {"v": 0, "t": "checkbox"},
-        extend_voolume_scroll: {"v": 0, "t": "checkbox"},
+        extend_volume_scroll: {"v": 0, "t": "checkbox"},
         pin_playlist: {"v": 0, "t": "checkbox"}
     };
     function sendPlayer(callback) {

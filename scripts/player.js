@@ -2,6 +2,7 @@ var view = function() {
     var dom_cache = {};
     var var_cache = {};
     var time_tipe = 0;
+    var settings = {};
     var isPlaying = function() {
         /*
          * Выставляет статус - проигрывается.
@@ -486,6 +487,7 @@ var view = function() {
     }();
     return {
         show: function() {
+            settings = engine.getSettings();
             dom_cache = {
                 body: $('body'),
                 drop: $('div.drop'),
@@ -1063,6 +1065,28 @@ var view = function() {
             if (type === "canplay") {
                 engine.play();
             }
+        },
+        updateSettings: function(obj) {
+            if (obj.extend_volume_scroll || settings.extend_volume_scroll !== obj.extend_volume_scroll) {
+                var box = $('body > .player > .box');
+                if (obj.extend_volume_scroll) {
+                    //enable ext volume
+                    box.unbind('mousewheel').addClass('volume_scroll').on('mousewheel', function(e) {
+                        if (e.target.className === 'image') {
+                            return;
+                        }
+                        if (e.originalEvent.wheelDelta > 0) {
+                            engine.volume("+10");
+                        } else {
+                            engine.volume("-10");
+                        }
+                    });
+                } else {
+                    //disable ext volume
+                    box.unbind('mousewheel').removeClass('volume_scroll');
+                }
+            }
+            settings = obj;
         },
         readPlaylist: readPlaylist,
         getFilesFromFolder: getFilesFromFolder,
