@@ -6,6 +6,7 @@ xcopy .\scripts .\build\scripts\ /E
 xcopy .\images .\build\images\ /E
 xcopy .\styles .\build\styles\ /E
 xcopy .\www .\build\www\ /E
+xcopy .\_locales .\build\_locales\ /E
 copy .\*.html .\build\.
 copy .\*.json .\build\.
 copy .\*.png .\build\.
