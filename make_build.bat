@@ -28,6 +28,10 @@ java -jar compiler.jar --js .\scripts\playlist.js --js_output_file .\build\scrip
 java -jar compiler.jar --js .\scripts\dialog.js --js_output_file .\build\scripts\dialog.js
 :: make viz.js
 java -jar compiler.jar --js .\scripts\viz.js --js_output_file .\build\scripts\viz.js
+:: make lang.js
+java -jar compiler.jar --js .\scripts\lang.js --js_output_file .\build\scripts\lang.js
+:: make options.js
+java -jar compiler.jar --js .\scripts\options.js --js_output_file .\build\scripts\options.js
 ::viz====
 ::java -jar compiler.jar --js .\viz\adapterWebkit.js --js_output_file .\build\viz\adapterWebkit.js
 ::java -jar compiler.jar --js .\viz\boot.js --js_output_file .\build\viz\boot.js
@@ -46,12 +50,15 @@ java -jar yuicompressor-2.4.8.jar .\styles\playlist.css -o .\build\styles\playli
 java -jar yuicompressor-2.4.8.jar .\styles\dialog.css -o .\build\styles\dialog.css
 :: make dialog.css
 java -jar yuicompressor-2.4.8.jar .\styles\viz.css -o .\build\styles\viz.css
+:: make options.css
+java -jar yuicompressor-2.4.8.jar .\styles\options.css -o .\build\styles\options.css
 
 java -jar htmlcompressor-1.5.3.jar -t html .\www\index.html -o .\build\www\index.html
 java -jar htmlcompressor-1.5.3.jar -t html .\playlist.html -o .\build\playlist.html
 java -jar htmlcompressor-1.5.3.jar -t html .\index.html -o .\build\index.html
 java -jar htmlcompressor-1.5.3.jar -t html .\dialog.html -o .\build\dialog.html
 java -jar htmlcompressor-1.5.3.jar -t html .\viz.html -o .\build\viz.html
+java -jar htmlcompressor-1.5.3.jar -t html .\options.html -o .\build\options.html
 
 7za a -tzip .\build.zip .\build\*
 
