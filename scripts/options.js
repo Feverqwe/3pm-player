@@ -2,7 +2,8 @@ var options = function() {
     var _player_window = undefined;
     var def_settings = {
         next_track_notification: {"v": 0, "t": "checkbox"},
-        extend_volume_scroll: {"v": 0, "t": "checkbox"}
+        extend_volume_scroll: {"v": 0, "t": "checkbox"},
+        notifi_buttons: {"v": 1, "t": "checkbox"},
     };
     function sendPlayer(callback) {
         /*
@@ -27,7 +28,10 @@ var options = function() {
         chrome.storage.local.get(opt_list, function(obj) {
             var settings = {};
             $.each(def_settings, function(k, v) {
-                settings[k] = obj[k] || v.v;
+                if (obj[k] === undefined) {
+                    obj[k] = v.v;
+                }
+                settings[k] = obj[k];
             });
             cb(settings);
         });

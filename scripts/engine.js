@@ -3,7 +3,8 @@ var engine = function() {
     //options
     var settings = {
         next_track_notification: 0,
-        extend_volume_scroll: 0
+        extend_volume_scroll: 0,
+        notifi_buttons: 0
     };
     var updateSettings = function(obj, run) {
         $.each(settings, function(k) {
@@ -365,10 +366,12 @@ var engine = function() {
             return {
                 show: function() {
                     var opt = getOpt();
-                    opt.buttons = [
-                        {title: _lang.next, iconUrl: '/images/playback_next.png'},
-                        {title: _lang.prev, iconUrl: '/images/playback_prev.png'}
-                    ];
+                    if (settings.notifi_buttons) {
+                        opt.buttons = [
+                            {title: _lang.next, iconUrl: '/images/playback_next.png'},
+                            {title: _lang.prev, iconUrl: '/images/playback_prev.png'}
+                        ];
+                    }
                     //отображаем уведомление о воспроизведении
                     chrome.notifications.getAll(function(obj) {
                         if ('current_track' in obj === true) {

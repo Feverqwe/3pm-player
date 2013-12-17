@@ -48,7 +48,8 @@ var get_lang = function(language) {
             4: 'Save',
             5: 'Player settings',
             6: 'Display a notification when changing tracks',
-            7: 'Extend the range of the volume scrolls'
+            7: 'Extend the range of the volume scrolls',
+            8: 'Show button next / previous track in the notification'
         }
     };
     var lang_arr_ru = {
@@ -100,7 +101,8 @@ var get_lang = function(language) {
             4: 'Сохранить',
             5: 'Настройки плеера',
             6: 'Показывать уведомление при смене трека',
-            7: 'Расширить область изменения громкости скроллом'
+            7: 'Расширить область изменения громкости скроллом',
+            8: 'Показывать кнопки предыдущий / следующий трек в уведомлении'
         }
     };
     var lang = language;
