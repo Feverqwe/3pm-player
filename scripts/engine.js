@@ -5,12 +5,15 @@ var engine = function() {
         next_track_notification: 0,
         extend_volume_scroll: 0
     };
-    var updateSettings = function(obj) {
+    var updateSettings = function(obj, run) {
         $.each(settings, function(k) {
             if (obj[k] !== undefined) {
                 settings[k] = obj[k];
             }
         });
+        if (run !== undefined) {
+            return;
+        }
         view.updateSettings(settings);
     };
     //<<<<<<<
@@ -857,7 +860,7 @@ var engine = function() {
     return {
         run: function() {
             chrome.storage.local.get(function(obj) {
-                updateSettings(obj);
+                updateSettings(obj, 1);
             });
             $('.engine').remove();
             $('body').append($('<div>', {'class': 'engine'}));

@@ -93,7 +93,7 @@ var options = function() {
     };
     var saveAll = function() {
         var onSave = {};
-        onSave['lang'] = $('select[name="language"]').val();
+        onSave.lang = $('select[name="language"]').val();
         $.each(def_settings, function(key, value) {
             var val = undefined;
             if (value.t === "text") {
@@ -125,6 +125,7 @@ var options = function() {
             loadSettings(function(stgs) {
                 set_place_holder(stgs);
                 sendPlayer(function(window) {
+                    window._lang = get_lang(onSave.lang);
                     window.engine.updateSettings(stgs);
                 });
             });

@@ -485,6 +485,124 @@ var view = function() {
             }
         };
     }();
+    var make_ctx_menu = function() {
+        chrome.contextMenus.removeAll(function() {
+            chrome.contextMenus.create({
+                id: "1",
+                title: _lang.ctx_open_files,
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "3",
+                title: _lang.ctx_open_folder,
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "o_f_sub",
+                title: _lang.ctx_open_folder_sub,
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "2",
+                title: _lang.ctx_open_url,
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                type: "checkbox",
+                id: "ws",
+                title: _lang.ctx_webui + " (0.0.0.0:9898)",
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "viz",
+                title: _lang.ctx_viz,
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "cloud",
+                title: _lang.ctx_cloud,
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "vk",
+                parentId: "cloud",
+                title: "vk.com",
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "sc",
+                parentId: "cloud",
+                title: "soundcloud.com",
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "gd",
+                parentId: "cloud",
+                title: "drive.google.com",
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "db",
+                parentId: "cloud",
+                title: "dropbox.com",
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "box",
+                parentId: "cloud",
+                title: "box.com",
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "sd",
+                parentId: "cloud",
+                title: "skydrive.com",
+                contexts: ['page', 'launcher']
+            });
+            chrome.contextMenus.create({
+                id: "p_play_pause",
+                title: _lang.play_pause,
+                contexts: ['launcher']
+            });
+            chrome.contextMenus.create({
+                id: "p_next",
+                title: _lang.next,
+                contexts: ['launcher']
+            });
+            chrome.contextMenus.create({
+                id: "p_previous",
+                title: _lang.prev,
+                contexts: ['launcher']
+            });
+            chrome.contextMenus.create({
+                id: "options",
+                title: _lang.ctx_options,
+                contexts: ['page', 'launcher']
+            });
+            chrome.runtime.getBackgroundPage(function(bg) {
+                chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
+            });
+        });
+    };
+    var make_extend_volume = function(extend_volume_scroll) {
+        var box = $('body > .player > .box');
+        var boxState = box.hasClass('volume_scroll');
+        if (extend_volume_scroll && !boxState) {
+            box.unbind('mousewheel').addClass('volume_scroll').on('mousewheel', function(e) {
+                if (e.target.className === 'image') {
+                    return;
+                }
+                if (e.originalEvent.wheelDelta > 0) {
+                    engine.volume("+10");
+                } else {
+                    engine.volume("-10");
+                }
+            });
+        } else
+        if (!extend_volume_scroll && boxState) {
+            box.unbind('mousewheel').removeClass('volume_scroll');
+        }
+    }
     var write_language = function() {
         $('body').data('lang', _lang.t);
         $('.t_btn.mini').attr('title', _lang.mini);
@@ -496,6 +614,7 @@ var view = function() {
         $('.btn.playpause').attr('title', _lang.play_pause);
         $('.btn.next').attr('title', _lang.next);
         $('.volume_controll .pic').attr('title', _lang.mute);
+        make_ctx_menu();
     };
     return {
         show: function() {
@@ -625,6 +744,11 @@ var view = function() {
                     time_tipe = storage.time_tipe;
                 }
             });
+            chrome.storage.local.get('extend_volume_scroll', function(obj) {
+                if ('extend_volume_scroll' in obj) {
+                    make_extend_volume(obj.extend_volume_scroll);
+                }
+            });
             chrome.storage.local.get('volume', function(storage) {
                 if ('volume' in storage) {
                     engine.volume(storage.volume);
@@ -650,103 +774,6 @@ var view = function() {
                 engine.mute();
             });
             engine.set_hotkeys(document);
-            chrome.contextMenus.removeAll(function() {
-                chrome.contextMenus.create({
-                    id: "1",
-                    title: _lang.ctx_open_files,
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "3",
-                    title: _lang.ctx_open_folder,
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "o_f_sub",
-                    title: _lang.ctx_open_folder_sub,
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "2",
-                    title: _lang.ctx_open_url,
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    type: "checkbox",
-                    id: "ws",
-                    title: _lang.ctx_webui + " (0.0.0.0:9898)",
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "viz",
-                    title: _lang.ctx_viz,
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "cloud",
-                    title: _lang.ctx_cloud,
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "vk",
-                    parentId: "cloud",
-                    title: "vk.com",
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "sc",
-                    parentId: "cloud",
-                    title: "soundcloud.com",
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "gd",
-                    parentId: "cloud",
-                    title: "drive.google.com",
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "db",
-                    parentId: "cloud",
-                    title: "dropbox.com",
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "box",
-                    parentId: "cloud",
-                    title: "box.com",
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "sd",
-                    parentId: "cloud",
-                    title: "skydrive.com",
-                    contexts: ['page', 'launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "p_play_pause",
-                    title: _lang.play_pause,
-                    contexts: ['launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "p_next",
-                    title: _lang.next,
-                    contexts: ['launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "p_previous",
-                    title: _lang.prev,
-                    contexts: ['launcher']
-                });
-                chrome.contextMenus.create({
-                    id: "options",
-                    title: _lang.ctx_options,
-                    contexts: ['page', 'launcher']
-                });
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
-                });
-            });
             chrome.contextMenus.onClicked.addListener(function(info) {
                 if (info.menuItemId === "options") {
                     chrome.runtime.getBackgroundPage(function(bg) {
@@ -1080,22 +1107,9 @@ var view = function() {
             }
         },
         updateSettings: function(obj) {
-            var box = $('body > .player > .box');
-            var boxState = box.hasClass('volume_scroll');
-            if (settings.extend_volume_scroll && !boxState) {
-                box.unbind('mousewheel').addClass('volume_scroll').on('mousewheel', function(e) {
-                    if (e.target.className === 'image') {
-                        return;
-                    }
-                    if (e.originalEvent.wheelDelta > 0) {
-                        engine.volume("+10");
-                    } else {
-                        engine.volume("-10");
-                    }
-                });
-            } else
-            if (!settings.extend_volume_scroll && boxState) {
-                box.unbind('mousewheel').removeClass('volume_scroll');
+            make_extend_volume(obj.extend_volume_scroll);
+            if (_lang !== undefined && $('body').data('lang') !== _lang.t) {
+                write_language();
             }
         },
         readPlaylist: readPlaylist,
