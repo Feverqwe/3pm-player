@@ -3,14 +3,15 @@ var engine = function() {
     //options
     var settings = {
         next_track_notification: 0,
-        extend_volume_scroll: 0,
-        pin_playlist: 0
+        extend_volume_scroll: 0
     };
     var updateSettings = function(obj) {
-        settings.next_track_notification = obj.next_track_notification || settings.next_track_notification;
-        settings.extend_volume_scroll = obj.extend_volume_scroll || settings.extend_volume_scroll;
-        settings.pin_playlist = obj.pin_playlist || settings.pin_playlist;
-        view.updateSettings(obj);
+        $.each(settings, function(k) {
+            if (obj[k] !== undefined) {
+                settings[k] = obj[k];
+            }
+        });
+        view.updateSettings(settings);
     };
     //<<<<<<<
     //allow_ext - only for files without mime.
@@ -362,8 +363,8 @@ var engine = function() {
                 show: function() {
                     var opt = getOpt();
                     opt.buttons = [
-                        {title: 'Next', iconUrl: '/images/playback_next.png'},
-                        {title: 'Previous', iconUrl: '/images/playback_prev.png'}
+                        {title: _lang.next, iconUrl: '/images/playback_next.png'},
+                        {title: _lang.prev, iconUrl: '/images/playback_prev.png'}
                     ];
                     //отображаем уведомление о воспроизведении
                     chrome.notifications.getAll(function(obj) {
@@ -843,7 +844,7 @@ var engine = function() {
             }
             chrome.contextMenus.create({
                 id: "save_vk",
-                title: "Save current track in VK",
+                title: _lang.ctx_save_vk_track,
                 contexts: ['page', 'launcher']
             });
             var_cache.vk_save_ctx = true;

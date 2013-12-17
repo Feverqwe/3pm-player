@@ -2,8 +2,7 @@ var options = function() {
     var _player_window = undefined;
     var def_settings = {
         next_track_notification: {"v": 0, "t": "checkbox"},
-        extend_volume_scroll: {"v": 0, "t": "checkbox"},
-        pin_playlist: {"v": 0, "t": "checkbox"}
+        extend_volume_scroll: {"v": 0, "t": "checkbox"}
     };
     function sendPlayer(callback) {
         /*
@@ -125,7 +124,7 @@ var options = function() {
         chrome.storage.local.set(onSave, function() {
             loadSettings(function(stgs) {
                 set_place_holder(stgs);
-                sendPlayer(function(window){
+                sendPlayer(function(window) {
                     window.engine.updateSettings(stgs);
                 });
             });
@@ -133,8 +132,9 @@ var options = function() {
     };
     return {
         begin: function() {
-            chrome.storage.local.get('lang', function(obj) {
-                write_language(obj.lang);
+            sendPlayer(function(window) {
+                _lang = window._lang;
+                write_language(_lang.t);
             });
             //binds
             $('select[name="language"]').on('change', function() {

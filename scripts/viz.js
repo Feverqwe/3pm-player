@@ -4,6 +4,7 @@ var viz = function() {
     var dom_cache = {};
     var dancerInited = false;
     var _player_window = undefined;
+    var _lang = undefined;
     function sendPlayer(callback) {
         /*
          * Функция отправки действий в плеер
@@ -25,7 +26,19 @@ var viz = function() {
         }
         dom_cache.track.empty().append($('<span>', {text: value[0]}), $('<br>'), $('<span>', {text: value[1]}));
     };
+    var write_language = function() {
+        $('.t_btn.full').attr('title', _lang.full);
+        $('.t_btn.mini').attr('title', _lang.mini);
+        $('.t_btn.close').attr('title', _lang.close);
+    };
     return {
+        loadlang: function(cb) {
+            sendPlayer(function(window) {
+                _lang = window._lang;
+                write_language();
+                cb();
+            });
+        },
         preload: function() {
             dom_cache.body = $('body');
             dom_cache.track = $('<div>', {'class': 'track'});
@@ -113,35 +126,43 @@ var viz = function() {
         },
         minimize: function() {
             $('.mini').trigger('click');
+        },
+        GetLang: function() {
+            return _lang;
         }
     };
 }();
 $(function() {
-    viz.preload();
-    var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
-    var ext_url = "chrome-extension://" + aid + "/viz/";
-    window.reality = (typeof reality === 'undefined' ? {} : reality);
-    $.extend(true, reality, {timing: {boot: new Date().getTime()}});
-    var add_script = function(path) {
-        var script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.async = false;
-        script.src = ext_url + path;
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(script, s);
-    };
-    $('head').append($('<base>', {href: ext_url}));
-    $.ajax({
-        url: ext_url + 'ping',
-        success: function() {
-            viz.run();
-            var arr = ["dancer.js", "support.js", "kick.js", "adapterWebkit.js", "lib/fft.js", "plugins/dancer.fft.js", "plugins/dancer.waveform.js", "three.min.js", "boot.js"];
-            arr.forEach(function(item) {
-                add_script(item);
-            });
-        },
-        error: function() {
-            $('body').append($('<a>', {'class': 'need_addon', target: '_blank', href: 'https://chrome.google.com/webstore/detail/' + aid, text: 'Need install visualizatitoin extension!'}));
-        }
+    viz.loadlang(function() {
+        viz.preload();
+        var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
+        var ext_url = "chrome-extension://" + aid + "/viz/";
+        window.reality = (typeof reality === 'undefined' ? {} : reality);
+        $.extend(true, reality, {timing: {boot: new Date().getTime()}});
+        var add_script = function(path) {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.async = false;
+            script.src = ext_url + path;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(script, s);
+        };
+        $('head').append($('<base>', {href: ext_url}));
+        $.ajax({
+            url: ext_url + 'ping',
+            success: function() {
+                viz.run();
+                var arr = ["dancer.js", "support.js", "kick.js", "adapterWebkit.js", "lib/fft.js", "plugins/dancer.fft.js", "plugins/dancer.waveform.js", "three.min.js", "boot.js"];
+                arr.forEach(function(item) {
+                    add_script(item);
+                });
+            },
+            error: function() {
+                var msg = 'Need install visualizatitoin extension!';
+                var _lang = viz.GetLang();
+                msg = _lang.no_viz || msg;
+                $('body').append($('<a>', {'class': 'need_addon', target: '_blank', href: 'https://chrome.google.com/webstore/detail/' + aid, text: msg}));
+            }
+        });
     });
 });

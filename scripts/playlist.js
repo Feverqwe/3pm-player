@@ -2,6 +2,7 @@ var playlist = function() {
     var dom_cache = {};
     var var_cache = {};
     var _player_window = undefined;
+    var _lang = undefined;
     function sendPlayer(callback) {
         /*
          * Функция отправки действий в плеер
@@ -81,7 +82,7 @@ var playlist = function() {
             $('<div>', {'class': 'cover pic_' + item.pic}),
             $('<span>', {'class': 'name', title: item.title, text: item.title}),
             $('<span>', {'class': 'info', title: item.info, text: item.info}),
-            $('<div>', {'class': 'move', title: 'Move item'})
+            $('<div>', {'class': 'move', title: _lang.move_item})
                     ));
             n++;
         });
@@ -140,7 +141,7 @@ var playlist = function() {
          * Выставляет заголовок плэйлистуы
          */
         if (info === undefined) {
-            info = {name: "Playlist"};
+            info = {name: _lang.playlist_title};
         }
         dom_cache.title.text(info.name).attr('title', info.name);
         dom_cache.pl_list.children('li.selected').removeClass("selected");
@@ -148,7 +149,23 @@ var playlist = function() {
             dom_cache.pl_list.children('li[data-id=' + info.id + ']').addClass("selected");
         }
     };
+    var write_language = function() {
+        $('.t_btn.mini').attr('title', _lang.mini);
+        $('.t_btn.close').attr('title', _lang.close);
+        $('.t_btn.playlist_select').attr('title', _lang.playlist_select);
+        $('body > div.title').text(_lang.playlist_title);
+        $('.btn.shuffle').attr('title', _lang.shuffle);
+        $('.btn.loop').attr('title', _lang.loop);
+        $('.btn.sort').attr('title', _lang.sort);
+        $('.btn.read_tags').attr('title', _lang.read_tags);
+    };
     return {
+        preload: function() {
+            sendPlayer(function(window) {
+                _lang = window._lang;
+                playlist.show();
+            });
+        },
         show: function() {
             dom_cache = {
                 playlist: $('div.playlist'),
@@ -169,6 +186,7 @@ var playlist = function() {
             sendPlayer(function(window) {
                 write_playlist(window.engine.getPlaylist());
             });
+            write_language();
             dom_cache.playlist_ul.on('click', 'li', function() {
                 var id = $(this).attr('data-id');
                 sendPlayer(function(window) {
@@ -320,5 +338,5 @@ var playlist = function() {
     };
 }();
 $(function() {
-    playlist.show();
+    playlist.preload();
 });

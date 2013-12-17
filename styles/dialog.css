@@ -19,9 +19,6 @@ input {
     display: inline-block;
     width: 300px;
 }
-.url_dialog input[name=open_btn] {
-    width: 50px;
-}
 .url_dialog {
     padding-left: 18px;
 }

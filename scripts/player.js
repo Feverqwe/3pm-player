@@ -485,6 +485,18 @@ var view = function() {
             }
         };
     }();
+    var write_language = function() {
+        $('body').data('lang', _lang.t);
+        $('.t_btn.mini').attr('title', _lang.mini);
+        $('.t_btn.close').attr('title', _lang.close);
+        $('div.drop span').text(_lang.drop_file);
+        $('div.click_for_open span').text(_lang.click_for_open);
+        $('.btn.playlist').attr('title', _lang.playlist);
+        $('.btn.prev').attr('title', _lang.prev);
+        $('.btn.playpause').attr('title', _lang.play_pause);
+        $('.btn.next').attr('title', _lang.next);
+        $('.volume_controll .pic').attr('title', _lang.mute);
+    };
     return {
         show: function() {
             settings = engine.getSettings();
@@ -505,6 +517,7 @@ var view = function() {
                 click_for_open: $('.click_for_open'),
                 btnPlaylist: $('.playlist.btn')
             };
+            write_language();
             dom_cache.progress.slider({
                 range: "min",
                 min: 0,
@@ -640,38 +653,38 @@ var view = function() {
             chrome.contextMenus.removeAll(function() {
                 chrome.contextMenus.create({
                     id: "1",
-                    title: "Open files",
+                    title: _lang.ctx_open_files,
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "3",
-                    title: "Open folder",
+                    title: _lang.ctx_open_folder,
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "o_f_sub",
-                    title: "Open folder with subfolders",
+                    title: _lang.ctx_open_folder_sub,
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "2",
-                    title: "Open URL",
+                    title: _lang.ctx_open_url,
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     type: "checkbox",
                     id: "ws",
-                    title: "Enable webUI (0.0.0.0:9898)",
+                    title: _lang.ctx_webui + " (0.0.0.0:9898)",
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "viz",
-                    title: "Visualization",
+                    title: _lang.ctx_viz,
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
                     id: "cloud",
-                    title: "Cloud",
+                    title: _lang.ctx_cloud,
                     contexts: ['page', 'launcher']
                 });
                 chrome.contextMenus.create({
@@ -712,160 +725,160 @@ var view = function() {
                 });
                 chrome.contextMenus.create({
                     id: "p_play_pause",
-                    title: "Play/Pause",
+                    title: _lang.play_pause,
                     contexts: ['launcher']
                 });
                 chrome.contextMenus.create({
                     id: "p_next",
-                    title: "Next",
+                    title: _lang.next,
                     contexts: ['launcher']
                 });
                 chrome.contextMenus.create({
                     id: "p_previous",
-                    title: "Previous",
+                    title: _lang.prev,
                     contexts: ['launcher']
                 });
                 chrome.contextMenus.create({
                     id: "options",
-                    title: "Setup",
+                    title: _lang.ctx_options,
                     contexts: ['page', 'launcher']
                 });
                 chrome.runtime.getBackgroundPage(function(bg) {
                     chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
                 });
-                chrome.contextMenus.onClicked.addListener(function(info) {
-                    if (info.menuItemId === "options") {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showOptions();
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === "1") {
-                        $('.click_for_open').trigger('click');
-                        return;
-                    }
-                    if (info.menuItemId === "2") {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "url", h: 60});
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === "vk") {
-                        cloud.vk.makeAlbums(function(list) {
-                            engine.setM3UPlaylists({list: list});
-                            if (list.length === 1) {
-                                engine.select_playlist(list[0].id);
-                            } else
-                            if (list.length > 0) {
-                                chrome.runtime.getBackgroundPage(function(bg) {
-                                    bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
-                                });
-                            }
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === 'sc') {
-                        cloud.sc.makeAlbums(function(list) {
-                            engine.setM3UPlaylists({list: list});
-                            if (list.length === 1) {
-                                engine.select_playlist(list[0].id);
-                            } else
-                            if (list.length > 0) {
-                                chrome.runtime.getBackgroundPage(function(bg) {
-                                    bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
-                                });
-                            }
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === "save_vk") {
-                        var track = engine.getCurrentTrack();
-                        if (track !== undefined && track.track_id !== undefined) {
-                            engine.vk.addInLibrarty(track.track_id, track.owner_id);
-                        }
-                        return;
-                    }
-                    if (info.menuItemId === "db") {
-                        cloud.db.getFilelist(function(list) {
+            });
+            chrome.contextMenus.onClicked.addListener(function(info) {
+                if (info.menuItemId === "options") {
+                    chrome.runtime.getBackgroundPage(function(bg) {
+                        bg.wm.showOptions();
+                    });
+                    return;
+                }
+                if (info.menuItemId === "1") {
+                    $('.click_for_open').trigger('click');
+                    return;
+                }
+                if (info.menuItemId === "2") {
+                    chrome.runtime.getBackgroundPage(function(bg) {
+                        bg.wm.showDialog({type: "url", h: 60});
+                    });
+                    return;
+                }
+                if (info.menuItemId === "vk") {
+                    cloud.vk.makeAlbums(function(list) {
+                        engine.setM3UPlaylists({list: list});
+                        if (list.length === 1) {
+                            engine.select_playlist(list[0].id);
+                        } else
+                        if (list.length > 0) {
                             chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.showDialog({type: "db", h: 315, w: 350, r: true, filelist: list});
-                            });
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === "gd") {
-                        cloud.gd.getFilelist(undefined, function(list) {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.showDialog({type: "gd", h: 315, w: 350, r: true, filelist: list});
-                            });
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === "box") {
-                        cloud.box.getFilelist(function(list) {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.showDialog({type: "box", h: 315, w: 350, r: true, filelist: list});
-                            });
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === "sd") {
-                        cloud.sd.getFilelist(undefined, function(list) {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.showDialog({type: "sd", h: 315, w: 350, r: true, filelist: list});
-                            });
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === "viz") {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showViz();
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === "3") {
-                        chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
-                            if (!entry) {
-                                return;
-                            }
-                            readDirectory(entry);
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === 'o_f_sub') {
-                        chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
-                            if (!entry) {
-                                return;
-                            }
-                            readDirectoryWithSub(entry);
-                        });
-                        return;
-                    }
-                    if (info.menuItemId === "ws") {
-                        if (info.checked) {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.ws.start();
-                            });
-                        } else {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.ws.stop();
+                                bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
                             });
                         }
-                        return;
+                    });
+                    return;
+                }
+                if (info.menuItemId === 'sc') {
+                    cloud.sc.makeAlbums(function(list) {
+                        engine.setM3UPlaylists({list: list});
+                        if (list.length === 1) {
+                            engine.select_playlist(list[0].id);
+                        } else
+                        if (list.length > 0) {
+                            chrome.runtime.getBackgroundPage(function(bg) {
+                                bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
+                            });
+                        }
+                    });
+                    return;
+                }
+                if (info.menuItemId === "save_vk") {
+                    var track = engine.getCurrentTrack();
+                    if (track !== undefined && track.track_id !== undefined) {
+                        engine.vk.addInLibrarty(track.track_id, track.owner_id);
                     }
-                    if (info.menuItemId === "p_play_pause") {
-                        engine.playToggle();
-                        return;
+                    return;
+                }
+                if (info.menuItemId === "db") {
+                    cloud.db.getFilelist(function(list) {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.showDialog({type: "db", h: 315, w: 350, r: true, filelist: list});
+                        });
+                    });
+                    return;
+                }
+                if (info.menuItemId === "gd") {
+                    cloud.gd.getFilelist(undefined, function(list) {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.showDialog({type: "gd", h: 315, w: 350, r: true, filelist: list});
+                        });
+                    });
+                    return;
+                }
+                if (info.menuItemId === "box") {
+                    cloud.box.getFilelist(function(list) {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.showDialog({type: "box", h: 315, w: 350, r: true, filelist: list});
+                        });
+                    });
+                    return;
+                }
+                if (info.menuItemId === "sd") {
+                    cloud.sd.getFilelist(undefined, function(list) {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.showDialog({type: "sd", h: 315, w: 350, r: true, filelist: list});
+                        });
+                    });
+                    return;
+                }
+                if (info.menuItemId === "viz") {
+                    chrome.runtime.getBackgroundPage(function(bg) {
+                        bg.wm.showViz();
+                    });
+                    return;
+                }
+                if (info.menuItemId === "3") {
+                    chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
+                        if (!entry) {
+                            return;
+                        }
+                        readDirectory(entry);
+                    });
+                    return;
+                }
+                if (info.menuItemId === 'o_f_sub') {
+                    chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
+                        if (!entry) {
+                            return;
+                        }
+                        readDirectoryWithSub(entry);
+                    });
+                    return;
+                }
+                if (info.menuItemId === "ws") {
+                    if (info.checked) {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.ws.start();
+                        });
+                    } else {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.ws.stop();
+                        });
                     }
-                    if (info.menuItemId === "p_next") {
-                        engine.next();
-                        return;
-                    }
-                    if (info.menuItemId === "p_previous") {
-                        engine.preview();
-                        return;
-                    }
-                });
+                    return;
+                }
+                if (info.menuItemId === "p_play_pause") {
+                    engine.playToggle();
+                    return;
+                }
+                if (info.menuItemId === "p_next") {
+                    engine.next();
+                    return;
+                }
+                if (info.menuItemId === "p_previous") {
+                    engine.preview();
+                    return;
+                }
             });
             chrome.storage.local.get('shuffle', function(storage) {
                 if ('shuffle' in storage && storage.shuffle) {
@@ -1067,26 +1080,23 @@ var view = function() {
             }
         },
         updateSettings: function(obj) {
-            if (obj.extend_volume_scroll || settings.extend_volume_scroll !== obj.extend_volume_scroll) {
-                var box = $('body > .player > .box');
-                if (obj.extend_volume_scroll) {
-                    //enable ext volume
-                    box.unbind('mousewheel').addClass('volume_scroll').on('mousewheel', function(e) {
-                        if (e.target.className === 'image') {
-                            return;
-                        }
-                        if (e.originalEvent.wheelDelta > 0) {
-                            engine.volume("+10");
-                        } else {
-                            engine.volume("-10");
-                        }
-                    });
-                } else {
-                    //disable ext volume
-                    box.unbind('mousewheel').removeClass('volume_scroll');
-                }
+            var box = $('body > .player > .box');
+            var boxState = box.hasClass('volume_scroll');
+            if (settings.extend_volume_scroll && !boxState) {
+                box.unbind('mousewheel').addClass('volume_scroll').on('mousewheel', function(e) {
+                    if (e.target.className === 'image') {
+                        return;
+                    }
+                    if (e.originalEvent.wheelDelta > 0) {
+                        engine.volume("+10");
+                    } else {
+                        engine.volume("-10");
+                    }
+                });
+            } else
+            if (!settings.extend_volume_scroll && boxState) {
+                box.unbind('mousewheel').removeClass('volume_scroll');
             }
-            settings = obj;
         },
         readPlaylist: readPlaylist,
         getFilesFromFolder: getFilesFromFolder,
@@ -1094,5 +1104,9 @@ var view = function() {
     };
 }();
 $(function() {
-    view.show();
+    chrome.storage.local.get('lang', function(obj) {
+        _lang = get_lang(obj.lang);
+        delete window.get_lang;
+        view.show();
+    });
 });

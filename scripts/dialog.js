@@ -2,6 +2,7 @@ var dialog = function() {
     var allow_ext = undefined;
     var var_cache = {};
     var dom_cache = {};
+    var _lang = undefined;
     var _player_window = undefined;
     function sendPlayer(callback) {
         /*
@@ -62,7 +63,7 @@ var dialog = function() {
         var fl = dom_cache.dropbox_ul;
         fl.empty();
         if (list.path.length > 1) {
-            fl.append($('<li>', {'class': 'db_file', 'data-id': -1}).append($('<span>', {title: "Go Back", text: "Go Back"})));
+            fl.append($('<li>', {'class': 'db_file', 'data-id': -1}).append($('<span>', {title: _lang.dialog.back, text: _lang.dialog.back})));
         }
         var n = -1;
         list.contents.forEach(function(item) {
@@ -70,7 +71,7 @@ var dialog = function() {
             var filename = item.path.split('/').slice(-1)[0];
             var action = '';
             if (item.is_dir) {
-                action = $('<div>', {'class': 'play', title: 'Play folder'});
+                action = $('<div>', {'class': 'play', title: _lang.dialog.play_folder});
             } else {
                 action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
@@ -199,7 +200,7 @@ var dialog = function() {
         var fl = dom_cache.drive_ul;
         fl.empty();
         if (var_cache.gd_path.length > 1) {
-            fl.append($('<li>', {'class': 'gd_file', 'data-id': -1}).append($('<span>', {title: "Go Back", text: "Go Back"})));
+            fl.append($('<li>', {'class': 'gd_file', 'data-id': -1}).append($('<span>', {title: _lang.dialog.back, text: _lang.dialog.back})));
         }
         var n = -1;
         list.items.forEach(function(item) {
@@ -211,7 +212,7 @@ var dialog = function() {
             }
             var action = '';
             if (is_dir) {
-                action = $('<div>', {'class': 'play', title: 'Play folder'});
+                action = $('<div>', {'class': 'play', title: _lang.dialog.play_folder});
             } else {
                 action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
@@ -337,7 +338,7 @@ var dialog = function() {
         if (var_cache.box_parent !== undefined && var_cache.box_parent.length > 0) {
             var prew_folder = var_cache.box_parent.slice(-1)[0].id;
             if (prew_folder !== 0) {
-                fl.append($('<li>', {'class': 'box_file', 'data-id': -1, 'data-parent': prew_folder}).append($('<span>', {title: "Go Back", text: "Go Back"})));
+                fl.append($('<li>', {'class': 'box_file', 'data-id': -1, 'data-parent': prew_folder}).append($('<span>', {title: _lang.dialog.back, text: _lang.dialog.back})));
             }
         }
         var n = -1;
@@ -345,7 +346,7 @@ var dialog = function() {
             n++;
             var action = '';
             if (item.type === "folder") {
-                action = $('<div>', {'class': 'play', title: 'Play folder'});
+                action = $('<div>', {'class': 'play', title: _lang.dialog.play_folder});
             } else {
                 action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
@@ -471,7 +472,7 @@ var dialog = function() {
         var fl = dom_cache.skydrive_ul;
         fl.empty();
         if (var_cache.sd_path.length > 1) {
-            fl.append($('<li>', {'class': 'sd_file', 'data-id': -1}).append($('<span>', {title: "Go Back", text: "Go Back"})));
+            fl.append($('<li>', {'class': 'sd_file', 'data-id': -1}).append($('<span>', {title: _lang.dialog.back, text: _lang.dialog.back})));
         }
         var n = -1;
         list.data.forEach(function(item) {
@@ -483,7 +484,7 @@ var dialog = function() {
             }
             var action = '';
             if (is_dir) {
-                action = $('<div>', {'class': 'play', title: 'Play folder'});
+                action = $('<div>', {'class': 'play', title: _lang.dialog.play_folder});
             } else {
                 action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
@@ -618,11 +619,26 @@ var dialog = function() {
             window.close();
         });
     };
+    var write_language = function() {
+        $('.t_btn.close').attr('title', _lang.close);
+        $('div[data-lang=e_url]').text(_lang.dialog.e_url);
+        $('div[data-lang=e_pl]').text(_lang.dialog.e_pl);
+        $('div[data-lang=e_folder]').text(_lang.dialog.e_folder);
+        $('input[data-lang=e_ps]').val(_lang.dialog.e_ps);
+        $('input[data-lang=open]').val(_lang.dialog.open);
+    };
     return {
+        preload: function() {
+            sendPlayer(function(window) {
+                _lang = window._lang;
+                dialog.run();
+            });
+        },
         run: function() {
             $('.close').on('click', function() {
                 window.close();
             });
+            write_language();
             sendPlayer(function(window) {
                 window.engine.set_hotkeys(document);
                 allow_ext = window.engine.get_allow_ext();
@@ -651,7 +667,6 @@ var dialog = function() {
         }
     };
 }();
-
 $(function() {
-    dialog.run();
+    dialog.preload();
 });
