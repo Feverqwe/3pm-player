@@ -15,5 +15,5 @@
         }
     },
     "offline_enabled": true,
-    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}, {"fileSystem": ["retainEntries", "directory"]}, "fullscreen", "identity", "notifications", "https://api.vk.com/*", "app.window", "https://*.box.com/*", "https://dl.boxcloud.com/*", "https://*.livefilestore.com/*", "http://api.soundcloud.com/*"]
+    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}, {"fileSystem": ["retainEntries", "directory"]}, "fullscreen", "identity", "notifications", "app.window", "https://api.vk.com/*", "https://*.box.com/*", "https://dl.boxcloud.com/*", "https://*.livefilestore.com/*", "http://api.soundcloud.com/*"]
 }
