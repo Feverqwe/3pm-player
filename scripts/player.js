@@ -732,12 +732,14 @@ var view = function() {
                 }));
                 dom_cache.time = function() {
                     var obj = $('.info > .time');
+                    var back = false;
                     obj.empty();
+                    var mm = $('<div>', {'class': 'wmp mm', 'style': 'visibility: hidden; background-position-x: -99px;'});
                     var m_10 = $('<div>', {'class': 'wmp m_10'});
                     var m_0 = $('<div>', {'class': 'wmp m_0'});
                     var s_10 = $('<div>', {'class': 'wmp s_10'});
                     var s_0 = $('<div>', {'class': 'wmp s_0'});
-                    obj.append(m_10, m_0, s_10, s_0);
+                    obj.append(mm, m_10, m_0, s_10, s_0);
                     var setVal = function(num, obj) {
                         num = parseInt(num);
                         var val = 9 * num;
@@ -750,9 +752,17 @@ var view = function() {
                         text: function(value) {
                             var val = value.split(':');
                             if (val[0].length === 2) {
+                                if (back) {
+                                    mm.css('visibility', 'hidden');
+                                    back = false;
+                                }
                                 setVal(val[0][0], m_10);
                                 setVal(val[0][1], m_0);
                             } else {
+                                if (back === false) {
+                                    mm.css('visibility', 'visible');
+                                    back = true;
+                                }
                                 setVal(val[0][1], m_10);
                                 setVal(val[0][2], m_0);
                             }

@@ -319,7 +319,7 @@ body.winamp {
 .winamp .info {
     position: absolute;
     top: 31px;
-    left: 101px;
+    left: 92px;
     font-size: 20px;
 }
 .winamp .player > div.controls li {
@@ -423,6 +423,9 @@ body.winamp {
 .winamp .controls div.loading {
     display: none !important;
 }
+.winamp .controls .btn:active {
+    -webkit-filter: brightness(0.7);
+}
 .winamp .shuffle {
     background-image: url(../images/winamp/shuffle.png);
     position: absolute;
@@ -448,6 +451,11 @@ body.winamp {
 }
 .winamp .loop.on {
     background-position-y: 13px;
+}
+.winamp .w_playlist:active,
+.winamp .shuffle:active,
+.winamp .loop:active {
+    -webkit-filter: brightness(0.7);
 }
 .winamp .w_playlist {
     background-image: url(../images/winamp/pl.png);
@@ -478,6 +486,9 @@ body.winamp {
     top: -1px;
     margin-left: -15px;
     outline-width: 0px;
+}
+.winamp .progress a:active {
+    background-position-y: 10px;
 }
 .winamp .drop span {
     margin-left: 6%;
@@ -533,7 +544,7 @@ body.winamp {
     border: 0;
 }
 .winamp span.time {
-    width: 55px;
+    width: 56px;
     right: -4px !important;
 }
 .winamp span.time > div.wmp {
@@ -555,4 +566,12 @@ body.winamp {
 }
 .winamp div.progress.stream > div.loaded {
     background-color: initial;
+}
+@-webkit-keyframes onpausetime {
+    0% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 1;}
+}
+.winamp[data-state="pause"] span.time {
+    -webkit-animation: onpausetime 2s infinite;
 }
