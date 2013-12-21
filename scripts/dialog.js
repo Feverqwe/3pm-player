@@ -3,20 +3,19 @@ var dialog = function() {
     var var_cache = {};
     var dom_cache = {};
     var _lang = undefined;
-    var _player_window = undefined;
     function sendPlayer(callback) {
         /*
          * Функция отправки действий в плеер
          */
-        if (_player_window === undefined || _player_window.window === null) {
+        if (window._player === undefined || window._player.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
-                _player_window = bg.wm.getPlayer();
-                if (_player_window !== undefined) {
-                    callback(_player_window);
+                window._player = bg.wm.getPlayer();
+                if (window._player !== undefined) {
+                    callback(window._player);
                 }
             });
         } else {
-            callback(_player_window);
+            callback(window._player);
         }
     }
     var createURLform = function() {

@@ -1,21 +1,20 @@
 var playlist = function() {
     var dom_cache = {};
     var var_cache = {};
-    var _player_window = undefined;
     var _lang = undefined;
     function sendPlayer(callback) {
         /*
          * Функция отправки действий в плеер
          */
-        if (_player_window === undefined || _player_window.window === null) {
+        if (window._player === undefined || window._player.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
-                _player_window = bg.wm.getPlayer();
-                if (_player_window !== undefined) {
-                    callback(_player_window);
+                window._player = bg.wm.getPlayer();
+                if (window._player !== undefined) {
+                    callback(window._player);
                 }
             });
         } else {
-            callback(_player_window);
+            callback(window._player);
         }
     }
     var item_read = function(item) {

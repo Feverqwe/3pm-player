@@ -3,21 +3,20 @@ var viz = function() {
     var var_cache = {};
     var dom_cache = {};
     var dancerInited = false;
-    var _player_window = undefined;
     var _lang = undefined;
     function sendPlayer(callback) {
         /*
          * Функция отправки действий в плеер
          */
-        if (_player_window === undefined || _player_window.window === null) {
+        if (window._player === undefined || window._player.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
-                _player_window = bg.wm.getPlayer();
-                if (_player_window !== undefined) {
-                    callback(_player_window);
+                window._player = bg.wm.getPlayer();
+                if (window._player !== undefined) {
+                    callback(window._player);
                 }
             });
         } else {
-            callback(_player_window);
+            callback(window._player);
         }
     }
     var setTags = function(value) {
@@ -129,24 +128,20 @@ var viz = function() {
         },
         GetLang: function() {
             return _lang;
+        },
+        noViz: function(aid) {
+            var msg = _lang.no_viz;
+            $('body').append($('<a>', {'class': 'need_addon', target: '_blank', href: 'https://chrome.google.com/webstore/detail/' + aid, text: msg}));
         }
     };
 }();
 $(function() {
+    window.reality = (typeof reality === 'undefined' ? {} : reality);
+    $.extend(true, reality, {timing: {boot: new Date().getTime()}});
     viz.loadlang(function() {
         viz.preload();
         var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
         var ext_url = "chrome-extension://" + aid + "/viz/";
-        window.reality = (typeof reality === 'undefined' ? {} : reality);
-        $.extend(true, reality, {timing: {boot: new Date().getTime()}});
-        var add_script = function(path) {
-            var script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.async = false;
-            script.src = ext_url + path;
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(script, s);
-        };
         $('head').append($('<base>', {href: ext_url}));
         $.ajax({
             url: ext_url + 'ping',
@@ -154,14 +149,11 @@ $(function() {
                 viz.run();
                 var arr = ["dancer.js", "support.js", "kick.js", "adapterWebkit.js", "lib/fft.js", "plugins/dancer.fft.js", "plugins/dancer.waveform.js", "three.min.js", "boot.js"];
                 arr.forEach(function(item) {
-                    add_script(item);
+                    $('head').append($('<script>', {src: ext_url + item}));
                 });
             },
             error: function() {
-                var msg = 'Need install visualizatitoin extension!';
-                var _lang = viz.GetLang();
-                msg = _lang.no_viz || msg;
-                $('body').append($('<a>', {'class': 'need_addon', target: '_blank', href: 'https://chrome.google.com/webstore/detail/' + aid, text: msg}));
+                viz.noViz(aid);
             }
         });
     });

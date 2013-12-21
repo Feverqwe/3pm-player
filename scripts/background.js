@@ -289,7 +289,7 @@ var wm = function() {
         return [w, h];
     };
     var create_player_window = function() {
-        var create_window = function(p_l, p_t) {
+        var create_window = function(p_l, p_t, lang) {
             chrome.app.window.create('index.html', {
                 bounds: {
                     width: parseInt(335 * dpr),
@@ -301,11 +301,12 @@ var wm = function() {
                 resizable: false
             }, function(win) {
                 windows.player = win;
+                win.contentWindow.language = lang;
             });
         };
-        chrome.storage.local.get(['pos_left', 'pos_top'], function(storage) {
+        chrome.storage.local.get(['pos_left', 'pos_top', 'lang'], function(storage) {
             var lt = win_top_left_pos(storage.pos_left, storage.pos_top);
-            create_window(lt[0], lt[1]);
+            create_window(lt[0], lt[1], storage.lang);
         });
     };
     var create_playlist_window = function() {
@@ -319,6 +320,7 @@ var wm = function() {
                 },
                 frame: "none"
             }, function(win) {
+                win.contentWindow._player = windows.player.contentWindow.window || undefined;
                 windows.playlist = win;
             });
         };
@@ -339,6 +341,7 @@ var wm = function() {
                 },
                 frame: "none"
             }, function(win) {
+                win.contentWindow._player = windows.player.contentWindow.window || undefined;
                 windows.viz = win;
             });
         };
@@ -373,6 +376,7 @@ var wm = function() {
                 frame: "none",
                 resizable: options.r || false
             }, function(win) {
+                win.contentWindow._player = windows.player.contentWindow.window || undefined;
                 win.contentWindow.options = options;
                 windows.dialog = win;
             });
@@ -405,6 +409,7 @@ var wm = function() {
                 frame: "chrome",
                 resizable: true
             }, function(win) {
+                win.contentWindow._player = windows.player.contentWindow.window || undefined;
                 windows.option = win;
             });
         };

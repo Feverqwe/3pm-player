@@ -1,5 +1,4 @@
 var options = function() {
-    var _player_window = undefined;
     var def_settings = {
         next_track_notification: {"v": 0, "t": "checkbox"},
         extend_volume_scroll: {"v": 0, "t": "checkbox"},
@@ -9,15 +8,15 @@ var options = function() {
         /*
          * Функция отправки действий в плеер
          */
-        if (_player_window === undefined || _player_window.window === null) {
+        if (window._player === undefined || window._player.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
-                _player_window = bg.wm.getPlayer();
-                if (_player_window !== undefined) {
-                    callback(_player_window);
+                window._player = bg.wm.getPlayer();
+                if (window._player !== undefined) {
+                    callback(window._player);
                 }
             });
         } else {
-            callback(_player_window);
+            callback(window._player);
         }
     }
     var loadSettings = function(cb) {

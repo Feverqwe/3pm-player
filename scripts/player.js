@@ -1118,9 +1118,7 @@ var view = function() {
     };
 }();
 $(function() {
-    chrome.storage.local.get('lang', function(obj) {
-        _lang = get_lang(obj.lang);
-        delete window.get_lang;
-        view.show();
-    });
+    _lang = get_lang(window.language);
+    delete window.get_lang;
+    view.show();
 });
