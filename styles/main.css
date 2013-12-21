@@ -572,6 +572,6 @@ body.winamp {
     50% {opacity: 0;}
     100% {opacity: 1;}
 }
-.winamp[data-state="pause"] span.time {
+.winamp[data-state="pause"] span.time .wmp {
     -webkit-animation: onpausetime 2s infinite;
 }
