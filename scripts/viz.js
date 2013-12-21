@@ -8,6 +8,9 @@ var viz = function() {
         /*
          * Функция отправки действий в плеер
          */
+        if (window === null) {
+            return;
+        }
         if (window._player === undefined || window._player.window === null) {
             chrome.runtime.getBackgroundPage(function(bg) {
                 window._player = bg.wm.getPlayer();
