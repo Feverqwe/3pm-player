@@ -370,16 +370,21 @@ body.winamp {
     height: 7px;
 }
 .winamp .close {
+    background-image: url(../images/winamp/close.png) !important;
+    width: 7px;
+    height: 7px;
     border-radius: 0;
     border: 0;
     background-color: inherit;
-    background-position-y: 0px;
-    background-position-x: 4px;
-    opacity: 0;
-    background-size: 11px;
+    background-size: 7px 7px;
+    top: 4px;
+    right: 3px;
+    opacity: 1;
+    -webkit-filter: inherit;
 }
 .winamp .close:hover {
     opacity: 1;
+    -webkit-filter: brightness(1.5);
 }
 .winamp .mini {
     background-image: url(../images/winamp/mini.png) !important;
@@ -396,7 +401,7 @@ body.winamp {
 }
 .winamp .mini:hover {
     opacity: 1;
-    -webkit-filter: brightness(1.8);
+    -webkit-filter: brightness(1.5);
 }
 .winamp .controls .btn {
     background-image: url(../images/winamp/btns.png) !important;
