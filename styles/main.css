@@ -359,9 +359,9 @@ body.winamp {
 }
 .winamp .player .progress {
     position: absolute;
-    left: 32px;
+    left: 18px;
     top: 73px;
-    width: 219px;
+    width: 246px;
     height: 8px;
     background: none;
     border: 0;
@@ -549,4 +549,10 @@ body.winamp {
 .winamp .box.volume_scroll {
     margin-top: 14px;
     height: 66px;
+}
+.winamp div.progress > div.loaded {
+    background-color: rgb(46, 46, 46);
+}
+.winamp div.progress.stream > div.loaded {
+    background-color: initial;
 }

@@ -635,10 +635,7 @@ var view = function() {
             a = max;
             b = max - parseInt((value - 50) / 50 * max);
         }
-        //b = max - parseInt(value / 100 * max);
-        //a = parseInt(value / 100 * max);
-
-        return '-webkit-linear-gradient(top, rgba(' + a + ', ' + b + ', ' + c + ', 1) 0%,rgba(' + a + ', ' + b + ', ' + c + ', 1) 100%)';
+        return 'rgba(' + a + ', ' + b + ', ' + c + ', 1)';
     };
     var calculate_moveble = function(selectors, size) {
         var titles = selectors;
@@ -646,8 +643,10 @@ var view = function() {
 
         for (var i = 0; i < titles_l; i++) {
             var str_w = titles.eq(i).width();
-            if (str_w <= size)
+            if (str_w <= size) {
+                titles.eq(i).parent().attr('class', 'name');
                 continue;
+            }
             str_w = Math.ceil(str_w / 10);
             if (str_w > 10) {
                 if (str_w < 100) {
@@ -779,17 +778,26 @@ var view = function() {
                         return;
                     }
                     engine.position(ui.value / 10);
+                    if (is_winamp) {
+                        var lp = parseInt(ui.value / 1000 * -29) || 0;
+                        dom_cache.progress_ui_a.css('margin-left', lp + 'px');
+                    }
                 },
                 slide: function(event, ui) {
                     if ('which' in event === false) {
                         return;
                     }
                     engine.position(ui.value / 10);
+                    if (is_winamp) {
+                        var lp = parseInt(ui.value / 1000 * -29) || 0;
+                        dom_cache.progress_ui_a.css('margin-left', lp + 'px');
+                    }
                 },
                 create: function() {
                     var div_loaded = $('<div>', {'class': 'loaded'});
                     dom_cache.progress.append(div_loaded);
                     pre_buffering_controller.setObj(div_loaded);
+                    dom_cache.progress_ui_a = dom_cache.progress.find('a').eq(0);
                 }
             });
             dom_cache.volume.slider({
@@ -1140,6 +1148,10 @@ var view = function() {
         setProgress: function(max, pos) {
             var width_persent = pos / max * 100;
             dom_cache.progress.slider("value", width_persent * 10);
+            if (is_winamp) {
+                var lp = parseInt(width_persent / 100 * -29) || 0;
+                dom_cache.progress_ui_a.css('margin-left', lp + 'px');
+            }
             var time = undefined;
             if (time_tipe) {
                 time = "-" + toHHMMSS(max - pos);
