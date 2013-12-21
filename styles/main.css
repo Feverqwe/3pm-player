@@ -426,7 +426,9 @@ body.winamp {
     margin-bottom: 1px;
 }
 .winamp .controls div.loading {
-    display: none !important;
+    position: absolute;
+    top: 89px;
+    left: 251px;
 }
 .winamp .controls .btn:active {
     -webkit-filter: brightness(0.7);
