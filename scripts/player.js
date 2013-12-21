@@ -713,7 +713,6 @@ var view = function() {
             } else {
                 spectr_cache.winamp_dancer.load(engine.getAudio(), 'winamp');
             }
-            winamp_dancer = spectr_cache.winamp_dancer;
         }
     };
     return {

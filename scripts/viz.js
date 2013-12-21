@@ -152,7 +152,7 @@ $(function() {
     $.extend(true, reality, {timing: {boot: new Date().getTime()}});
     viz.loadlang(function() {
         viz.preload();
-        var aid = "fchnmfjehbokhhleklblkkonihjbhhlh";
+        var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
         var ext_url = "chrome-extension://" + aid + "/viz/";
         $('head').append($('<base>', {href: ext_url}));
         $.ajax({
