@@ -5,5 +5,5 @@
     },
     "name": "3pm-addon visualization",
     "web_accessible_resources": ["viz/*"],
-    "version": "0.0.4"
+    "version": "0.0.5"
 }

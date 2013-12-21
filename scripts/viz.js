@@ -140,14 +140,14 @@ $(function() {
     $.extend(true, reality, {timing: {boot: new Date().getTime()}});
     viz.loadlang(function() {
         viz.preload();
-        var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
+        var aid = "fchnmfjehbokhhleklblkkonihjbhhlh";
         var ext_url = "chrome-extension://" + aid + "/viz/";
         $('head').append($('<base>', {href: ext_url}));
         $.ajax({
             url: ext_url + 'ping',
             success: function() {
                 viz.run();
-                var arr = ["storage.js","dancer.js", "support.js", "kick.js", "adapterWebkit.js", "lib/fft.js", "plugins/dancer.fft.js", "plugins/dancer.waveform.js", "three.min.js", "boot.js"];
+                var arr = ["storage.js", "three.min.js", "dancer.js", "support.js", "kick.js", "adapterWebkit.js", "lib/fft.js", "plugins/dancer.fft.js", "plugins/dancer.waveform.js", "boot.js"];
                 arr.forEach(function(item) {
                     $('head').append($('<script>', {src: ext_url + item}));
                 });
