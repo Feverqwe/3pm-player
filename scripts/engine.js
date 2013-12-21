@@ -32,7 +32,7 @@ var engine = function() {
     var M3UPlaylists = undefined;
     var _playlist_window = undefined;
     var _viz_window = undefined;
-    var adapter = undefined;
+    var adapter = {};
     var var_cache = {};
     function sendPlaylist(callback) {
         /*
@@ -220,7 +220,7 @@ var engine = function() {
         return index;
     };
     var discAdapter = function() {
-        if (adapter !== undefined && adapter.adapter !== undefined) {
+        if (adapter.adapter !== undefined) {
             adapter.adapter.proc.disconnect();
             adapter.adapter = undefined;
         }
@@ -666,6 +666,14 @@ var engine = function() {
             init: function() {
                 $('.engine').append('<audio/>');
                 audio = $('.engine > audio').get(0);
+
+                adapter.context = new window.webkitAudioContext();
+                adapter.audio = audio;
+                adapter.source = adapter.context.createMediaElementSource(adapter.audio);
+                adapter.gain = adapter.context.createGainNode();
+                adapter.source.connect(adapter.gain);
+                adapter.gain.connect(adapter.context.destination);
+
                 $(audio).on('loadstart', function(e) {
                     view.setTags(playlist[current_id].tags || {});
                     view.state("loadstart");
@@ -1000,12 +1008,6 @@ var engine = function() {
         },
         readAllTags: player.readAllTags,
         getAdapter: function() {
-            if (adapter === undefined) {
-                adapter = {};
-                adapter.context = new window.webkitAudioContext();
-                adapter.audio = player.getAudio();
-                adapter.source = adapter.context.createMediaElementSource(adapter.audio);
-            }
             return adapter;
         },
         discAdapter: function() {

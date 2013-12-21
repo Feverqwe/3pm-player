@@ -24,7 +24,7 @@
             this.proc.onaudioprocess = function(e) {
                 _this.update.call(_this, e);
             };
-            this.gain = this.context.createGainNode();
+            //this.gain = this.context.createGainNode();
 
             this.fft = new FFT(SAMPLE_SIZE / 2, SAMPLE_RATE);
             this.signal = new Float32Array(SAMPLE_SIZE / 2);
@@ -104,6 +104,10 @@
             _this.audio = ad.audio;
             //_this.context = ad.context;
             _this.source = ad.source;//this.context.createMediaElementSource(this.audio);
+            if (ad.gain === undefined) {
+                ad.gain = ad.context.createGainNode();
+            }
+            _this.gain = ad.gain;
             ad.adapter = _this;
             _this.source.disconnect();
             _this.source.connect(_this.proc);

@@ -602,7 +602,7 @@ var view = function() {
         if (!extend_volume_scroll && boxState) {
             box.unbind('mousewheel').removeClass('volume_scroll');
         }
-    }
+    };
     var write_language = function() {
         $('body').data('lang', _lang.t);
         $('.t_btn.mini').attr('title', _lang.mini);
