@@ -11,11 +11,11 @@
     Dancer.adapters = {};
 
     Dancer.prototype = {
-        load: function(source) {
+        load: function(source, type) {
             var path;
 
             this.source = source;
-            this.audio = this.audioAdapter.load(this.source);
+            this.audio = this.audioAdapter.load(this.source, type);
             return this;
         },
         /* Controls */

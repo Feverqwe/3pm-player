@@ -7,14 +7,21 @@
         this.dancer = dancer;
         this.audio = new Audio();
         var _this = this;
-        viz.getAdapter(function(ad) {
+        var _viz = undefined;
+        if ('viz' in window === false && 'engine' in window) {
+            _viz = engine;
+        } else {
+            _viz = viz;
+        }
+        _viz.getAdapter(function(ad) {
             _this.context = ad.context;
         });
     };
 
     adapter.prototype = {
-        load: function(_source) {
+        load: function(_source, type) {
             var _this = this;
+            _this.type = type || "viz";
             this.audio = _source;
 
             this.isLoaded = false;
@@ -99,8 +106,14 @@
     };
 
     function connectContext() {
+        var _viz = undefined;
+        if ('viz' in window === false && 'engine' in window) {
+            _viz = engine;
+        } else {
+            _viz = viz;
+        }
         var _this = this;
-        viz.getAdapter(function(ad) {
+        _viz.getAdapter(function(ad) {
             _this.audio = ad.audio;
             //_this.context = ad.context;
             _this.source = ad.source;//this.context.createMediaElementSource(this.audio);
@@ -113,14 +126,16 @@
                 ad.adapter = undefined;
             }
             ad.adapter = _this;
-            tmp = _this;
+            _this.source.disconnect();
             _this.source.connect(_this.proc);
+            _this.source.connect(_this.gain);
             _this.proc.connect(_this.context.destination);
+            _this.gain.connect(_this.context.destination);
 
             _this.isLoaded = true;
             _this.progress = 1;
             _this.dancer.trigger('loaded');
-        });
+        }, _this.type);
     }
 
     Dancer.adapters.webkit = adapter;

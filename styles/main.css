@@ -580,3 +580,8 @@ body.winamp {
 .winamp[data-state="pause"] span.time .wmp {
     -webkit-animation: onpausetime 2s infinite;
 }
+.winamp #winamp_fft {
+    position: absolute;
+    top: 30px;
+    left: 22px;
+}

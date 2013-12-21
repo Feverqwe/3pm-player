@@ -4,6 +4,7 @@ var view = function() {
     var time_tipe = 0;
     var settings = {};
     var is_winamp = true;
+    var spectr_cache = {};
     var isPlaying = function() {
         /*
          * Выставляет статус - проигрывается.
@@ -687,6 +688,34 @@ var view = function() {
             titles.eq(i).parent().attr('class', 'name ' + move_name);
         }
     };
+    var onClearAdapter = function() {
+        if (is_winamp) {
+            if ('winamp_dancer' in spectr_cache === false) {
+                spectr_cache.winamp_dancer = new Dancer();
+                var fft = document.getElementById('winamp_fft');
+                var ctx = fft.getContext('2d');
+                fft.height = 30;
+                fft.width = 80;
+                spectr_cache.winamp_dancer.createKick({
+                    onKick: function() {
+                        ctx.fillStyle = '#ff0077';
+                    },
+                    offKick: function() {
+                        ctx.fillStyle = '#54D100';
+                    }
+                }).on();
+                spectr_cache.winamp_dancer.fft(fft,
+                        {fillStyle: '#666', count: 20, width: 3, spacing: 1}
+                );
+                spectr_cache.winamp_dancer.load(engine.getAudio(), 'winamp').bind('loaded', function() {
+                    spectr_cache.winamp_dancer.play();
+                });
+            } else {
+                spectr_cache.winamp_dancer.load(engine.getAudio(), 'winamp');
+            }
+            winamp_dancer = spectr_cache.winamp_dancer;
+        }
+    };
     return {
         show: function() {
             settings = engine.getSettings();
@@ -725,6 +754,7 @@ var view = function() {
                 $('<div>', {'class': "w_kbps", text: 320}),
                 $('<div>', {'class': "w_kHz", text: 44}),
                 $('<div>', {'class': "stereo"}),
+                $('<canvas>', {id: 'winamp_fft'}),
                 $('<div>', {'class': "w_playlist"}).on('click', function() {
                     chrome.runtime.getBackgroundPage(function(bg) {
                         bg.wm.toggle_playlist();
@@ -777,6 +807,7 @@ var view = function() {
                         }
                     };
                 }();
+                onClearAdapter();
             }
             write_language();
             dom_cache.progress.slider({
@@ -1304,7 +1335,8 @@ var view = function() {
                     $('div.loop').removeClass('on');
                 }
             }
-        }
+        },
+        onClearAdapter: onClearAdapter
     };
 }();
 $(document).on('settings_loaded', function() {

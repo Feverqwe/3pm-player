@@ -228,6 +228,7 @@ var engine = function() {
             adapter.adapter.proc.disconnect();
             adapter.adapter = undefined;
         }
+        view.onClearAdapter();
     };
     var player = function() {
         var type_list = {};
@@ -1013,7 +1014,17 @@ var engine = function() {
             return [sort_type, list];
         },
         readAllTags: player.readAllTags,
-        getAdapter: function() {
+        getAdapter: function(cb, type) {
+            if (!cb) {
+                return adapter;
+            }
+            if (type === "winamp") {
+                if (_viz_window === undefined || _viz_window.window === null) {
+                    cb(adapter);
+                }
+            } else {
+                cb(adapter);
+            }
             return adapter;
         },
         discAdapter: function() {
