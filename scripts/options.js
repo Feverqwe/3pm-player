@@ -3,7 +3,7 @@ var options = function() {
         next_track_notification: {"v": 0, "t": "checkbox"},
         extend_volume_scroll: {"v": 0, "t": "checkbox"},
         notifi_buttons: {"v": 1, "t": "checkbox"},
-        is_winamp: {"v": 1, "t": "checkbox"}
+        is_winamp: {"v": 0, "t": "checkbox"}
     };
     function sendPlayer(callback) {
         /*

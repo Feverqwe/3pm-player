@@ -6,7 +6,7 @@ var engine = function() {
         next_track_notification: 0,
         extend_volume_scroll: 0,
         notifi_buttons: 0,
-        is_winamp: 1
+        is_winamp: 0
     };
     var updateSettings = function(obj) {
         $.each(settings, function(k) {
