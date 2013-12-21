@@ -46,11 +46,11 @@
             return this.audio;
         },
         play: function() {
-            this.audio.play();
+            //this.audio.play();
             this.isPlaying = true;
         },
         pause: function() {
-            this.audio.pause();
+            //this.audio.pause();
             this.isPlaying = false;
         },
         setVolume: function(volume) {

@@ -147,7 +147,7 @@ $(function() {
             url: ext_url + 'ping',
             success: function() {
                 viz.run();
-                var arr = ["dancer.js", "support.js", "kick.js", "adapterWebkit.js", "lib/fft.js", "plugins/dancer.fft.js", "plugins/dancer.waveform.js", "three.min.js", "boot.js"];
+                var arr = ["storage.js","dancer.js", "support.js", "kick.js", "adapterWebkit.js", "lib/fft.js", "plugins/dancer.fft.js", "plugins/dancer.waveform.js", "three.min.js", "boot.js"];
                 arr.forEach(function(item) {
                     $('head').append($('<script>', {src: ext_url + item}));
                 });
