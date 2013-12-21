@@ -734,10 +734,10 @@ var view = function() {
                 dom_cache.time = function() {
                     var obj = $('.info > .time');
                     obj.empty();
-                    var m_10 = $('<div>', {class: 'wmp m_10'});
-                    var m_0 = $('<div>', {class: 'wmp m_0'});
-                    var s_10 = $('<div>', {class: 'wmp s_10'});
-                    var s_0 = $('<div>', {class: 'wmp s_0'});
+                    var m_10 = $('<div>', {'class': 'wmp m_10'});
+                    var m_0 = $('<div>', {'class': 'wmp m_0'});
+                    var s_10 = $('<div>', {'class': 'wmp s_10'});
+                    var s_0 = $('<div>', {'class': 'wmp s_0'});
                     obj.append(m_10, m_0, s_10, s_0);
                     var setVal = function(num, obj) {
                         num = parseInt(num);
