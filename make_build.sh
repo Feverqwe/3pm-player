@@ -34,6 +34,21 @@ java -jar compiler.jar --js ./scripts/lang.js --js_output_file ./build/scripts/l
 #make options.js
 java -jar compiler.jar --js ./scripts/options.js --js_output_file ./build/scripts/options.js
 
+#make dancer.js
+java -jar compiler.jar --js ./scripts/dancer/dancer.js --js_output_file ./build/scripts/dancer/dancer.js
+#make adapterWebkit.js
+java -jar compiler.jar --js ./scripts/dancer/adapterWebkit.js --js_output_file ./build/scripts/dancer/adapterWebkit.js
+#make kick.js
+java -jar compiler.jar --js ./scripts/dancer/kick.js --js_output_file ./build/scripts/dancer/kick.js
+#make support.js
+java -jar compiler.jar --js ./scripts/dancer/support.js --js_output_file ./build/scripts/dancer/support.js
+#make dancer.fft.js
+java -jar compiler.jar --js ./scripts/dancer/plugins/dancer.fft.js --js_output_file ./build/scripts/dancer/plugins/dancer.fft.js
+#make dancer.waveform.js
+java -jar compiler.jar --js ./scripts/dancer/plugins/dancer.waveform.js --js_output_file ./build/scripts/dancer/plugins/dancer.waveform.js
+#make fft.js
+java -jar compiler.jar --js ./scripts/dancer/lib/fft.js --js_output_file ./build/scripts/dancer/lib/fft.js
+
 #make www/style.css
 java -jar yuicompressor-2.4.8.jar ./www/css/style.css -o ./build/www/css/style.css
 #make main.css

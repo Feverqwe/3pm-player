@@ -108,11 +108,13 @@
                 ad.gain = ad.context.createGainNode();
             }
             _this.gain = ad.gain;
+            if (ad.adapter !== undefined) {
+                ad.adapter.proc.disconnect();
+                ad.adapter = undefined;
+            }
             ad.adapter = _this;
-            _this.source.disconnect();
+            tmp = _this;
             _this.source.connect(_this.proc);
-            _this.source.connect(_this.gain);
-            _this.gain.connect(_this.context.destination);
             _this.proc.connect(_this.context.destination);
 
             _this.isLoaded = true;

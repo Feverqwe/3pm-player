@@ -135,6 +135,15 @@ var viz = function() {
         noViz: function(aid) {
             var msg = _lang.no_viz;
             $('body').append($('<a>', {'class': 'need_addon', target: '_blank', href: 'https://chrome.google.com/webstore/detail/' + aid, text: msg}));
+        },
+        waitThree: function(url) {
+            if ('THREE' in window === false) {
+                setTimeout(function() {
+                    viz.waitThree(url);
+                }, 100);
+            } else {
+                $('head').append($('<script>', {src: url}));
+            }
         }
     };
 }();
@@ -143,17 +152,18 @@ $(function() {
     $.extend(true, reality, {timing: {boot: new Date().getTime()}});
     viz.loadlang(function() {
         viz.preload();
-        var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
+        var aid = "fchnmfjehbokhhleklblkkonihjbhhlh";
         var ext_url = "chrome-extension://" + aid + "/viz/";
         $('head').append($('<base>', {href: ext_url}));
         $.ajax({
             url: ext_url + 'ping',
             success: function() {
                 viz.run();
-                var arr = ["storage.js", "three.min.js", "dancer.js", "support.js", "kick.js", "adapterWebkit.js", "lib/fft.js", "plugins/dancer.fft.js", "plugins/dancer.waveform.js", "boot.js"];
+                var arr = ["storage.js", "three.min.js"];
                 arr.forEach(function(item) {
                     $('head').append($('<script>', {src: ext_url + item}));
                 });
+                viz.waitThree(ext_url + "boot.js");
             },
             error: function() {
                 viz.noViz(aid);
