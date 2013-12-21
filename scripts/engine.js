@@ -1,21 +1,25 @@
 var _debug = false;
 var engine = function() {
+    var setings_loaded = false;
     //options
     var settings = {
         next_track_notification: 0,
         extend_volume_scroll: 0,
-        notifi_buttons: 0
+        notifi_buttons: 0,
+        is_winamp: 1
     };
-    var updateSettings = function(obj, run) {
+    var updateSettings = function(obj) {
         $.each(settings, function(k) {
             if (obj[k] !== undefined) {
                 settings[k] = obj[k];
             }
         });
-        if (run !== undefined) {
-            return;
+        if (!setings_loaded) {
+            setings_loaded = true;
+            $(document).trigger('settings_loaded');
+        } else {
+            view.updateSettings(settings);
         }
-        view.updateSettings(settings);
     };
     //<<<<<<<
     //allow_ext - only for files without mime.
@@ -871,7 +875,7 @@ var engine = function() {
     return {
         run: function() {
             chrome.storage.local.get(function(obj) {
-                updateSettings(obj, 1);
+                updateSettings(obj);
             });
             $('.engine').remove();
             $('body').append($('<div>', {'class': 'engine'}));
@@ -943,6 +947,7 @@ var engine = function() {
             sendPlaylist(function(window) {
                 window.playlist.setShuffle(shuffle);
             });
+            view.setShuffle(shuffle);
         },
         loop: function(c) {
             if (c === undefined) {
@@ -952,6 +957,7 @@ var engine = function() {
             sendPlaylist(function(window) {
                 window.playlist.setLoop(loop);
             });
+            view.setLoop(loop);
         },
         getPlaylist: function() {
             return sorted_playlist || playlist;

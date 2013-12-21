@@ -304,3 +304,249 @@ div.volume_scroll {
 div.volume_scroll > div.image {
     -webkit-app-region: drag;
 }
+
+body.winamp {
+    /*background: -webkit-linear-gradient(left, #1a1a29 0%,#39395a 48%,#1a1a29 100%);
+    border: 1px solid #000;
+    box-shadow: inset 0 0 1px 0 #000;*/
+    background: url(../images/winamp/w1.png) center center no-repeat;
+}
+.winamp .image, 
+.winamp .click_for_open,
+.winamp .image_box{
+    display: none !important;
+}
+.winamp .info {
+    position: absolute;
+    top: 31px;
+    left: 101px;
+    font-size: 20px;
+}
+.winamp .player > div.controls li {
+    width: 23px;
+    height: 12px;
+    background-position-y: 0;
+}
+.winamp .controls {
+    margin-left: 20px;
+}
+.winamp .volume_controll {
+    position: absolute !important;
+    left: 92px;
+    top: 50px;
+    width: 80px !important;
+}
+.winamp .volume_controll .pic {
+    display: none;
+}
+.winamp .track {
+    position: absolute;
+    margin-left: 0;
+    left: 111px;
+    top: 23px;
+    width: 153px;
+    overflow: hidden;
+}
+.winamp .track div.name {
+    white-space: nowrap;
+    font-size: 10px !important;
+    color: rgb(0, 218, 0) !important;
+    overflow: hidden;
+    -webkit-app-region: no-drag;
+}
+.winamp .track div.album {
+    display: none;
+}
+.winamp .player .progress {
+    position: absolute;
+    left: 32px;
+    top: 73px;
+    width: 219px;
+    height: 8px;
+    background: none;
+    border: 0;
+}
+.winamp .player .progress > * {
+    height: 7px;
+}
+.winamp .close {
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    background-position-y: 0px;
+    background-position-x: 4px;
+    opacity: 0;
+    background-size: 11px;
+}
+.winamp .close:hover {
+    opacity: 1;
+}
+.winamp .mini {
+    background-image: url(../images/winamp/mini.png) !important;
+    width: 7px;
+    height: 7px;
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    background-size: 7px 7px;
+    right: 14px;
+    top: 3px;
+    opacity: 1;
+    -webkit-filter: inherit;
+}
+.winamp .mini:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.8);
+}
+.winamp .controls .btn {
+    background-image: url(../images/winamp/btns.png) !important;
+    background-position: 0;
+    margin-top: 6px;
+}
+.winamp .controls .play{
+    background-position-x: -22px;
+}
+.winamp .controls .pause{
+    background-position-x: -45px;
+}
+.winamp .controls .next {
+    background-position-x: -91px;
+}
+.winamp .controls .prev {
+    background-position-x: 1px;
+}
+.winamp .controls .playlist {
+    background-position-x: -113px;
+    height: 10px !important;
+    margin-bottom: 1px;
+}
+.winamp .controls div.loading {
+    display: none !important;
+}
+.winamp .shuffle {
+    background-image: url(../images/winamp/shuffle.png);
+    position: absolute;
+    width: 47px;
+    height: 16px;
+    left: 93px;
+    top: 88px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+.winamp .shuffle.on {
+    background-position-y: 15px;
+}
+.winamp .loop {
+    background-image: url(../images/winamp/loop.png);
+    position: absolute;
+    width: 27px;
+    height: 13px;
+    left: 146px;
+    top: 89px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+.winamp .loop.on {
+    background-position-y: 13px;
+}
+.winamp .w_playlist {
+    background-image: url(../images/winamp/pl.png);
+    position: absolute;
+    width: 22px;
+    height: 11px;
+    left: 242px;
+    top: 57px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+.winamp .volume_controll a {
+    background-image: url(../images/winamp/vol.png);
+    width: 12px !important;
+    height: 9px !important;
+    top: -2px;
+    margin-left: -5px;
+    outline-width: 0px;
+}
+.winamp .progress div.ui-slider-range {
+    background: initial;
+    box-shadow: none;
+}
+.winamp .progress a {
+    background-image: url(../images/winamp/progress.png);
+    width: 29px !important;
+    height: 10px !important;
+    top: -1px;
+    margin-left: -15px;
+    outline-width: 0px;
+}
+.winamp .drop span {
+    margin-left: 6%;
+}
+.winamp div.state {
+    background-image: url(../images/winamp/state.png);
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    top: 28px;
+    left: 25px;
+}
+.winamp[data-state="pause"] div.state {
+    background-position-y: 9px;
+}
+.winamp div.stereo {
+    background-image: url(../images/winamp/stereo.png);
+    position: absolute;
+    width: 58px;
+    height: 12px;
+    top: 41px;
+    left: 207px;
+}
+.winamp[data-state="pause"] div.stereo {
+    background-position-y: 12px;
+}
+.winamp div.w_kbps {
+    position: absolute;
+    top: 40px;
+    left: 110px;
+    font-size: 10px;
+    color: rgb(110, 248, 110) !important;
+}
+.winamp div.w_kHz {
+    position: absolute;
+    top: 40px;
+    left: 155px;
+    font-size: 10px;
+    color: rgb(110, 248, 110) !important;
+}
+.winamp[data-state="pause"] div.w_kbps,
+.winamp[data-state="pause"] div.w_kHz {
+    display: none;
+}
+.winamp .volume div.ui-slider-range {
+    background: initial !important;
+    box-shadow: none !important;
+}
+.winamp .volume {
+    box-shadow: inset 1px 1px 2px 0.3px #1A1A1A;
+}
+.winamp .player > div.controls li.btn {
+    border: 0;
+}
+.winamp span.time {
+    width: 55px;
+    right: -4px !important;
+}
+.winamp span.time > div.wmp {
+    display: inline-block;
+    width: 9px;
+    height: 13px;
+    background-image: url(../images/winamp/num.png);
+    margin-left: 1px;
+}
+.winamp span.time > .s_10 {
+    margin-left: 7px !important;
+}
+.winamp .box.volume_scroll {
+    margin-top: 14px;
+    height: 66px;
+}

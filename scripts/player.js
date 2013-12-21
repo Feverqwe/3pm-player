@@ -3,16 +3,23 @@ var view = function() {
     var var_cache = {};
     var time_tipe = 0;
     var settings = {};
+    var is_winamp = true;
     var isPlaying = function() {
         /*
          * Выставляет статус - проигрывается.
          */
+        if (is_winamp) {
+            dom_cache.body.attr('data-state', 'play');
+        }
         dom_cache.btnPlayPause.removeClass('play').addClass('pause');
     };
     var isPause = function() {
         /*
          * Выставляет статус - пауза.
          */
+        if (is_winamp) {
+            dom_cache.body.attr('data-state', 'pause');
+        }
         dom_cache.btnPlayPause.removeClass('pause').addClass('play');
     };
     var showImage = function(id) {
@@ -616,6 +623,71 @@ var view = function() {
         $('.volume_controll .pic').attr('title', _lang.mute);
         make_ctx_menu();
     };
+    var getVolumeColor = function(value) {
+        var a = 0;
+        var b = 0;
+        var c = 0;
+        var max = 222;
+        if (value < 50) {
+            b = max;
+            a = parseInt(value / 50 * max);
+        } else {
+            a = max;
+            b = max - parseInt((value - 50) / 50 * max);
+        }
+        //b = max - parseInt(value / 100 * max);
+        //a = parseInt(value / 100 * max);
+
+        return '-webkit-linear-gradient(top, rgba(' + a + ', ' + b + ', ' + c + ', 1) 0%,rgba(' + a + ', ' + b + ', ' + c + ', 1) 100%)';
+    };
+    var calculate_moveble = function(selectors, size) {
+        var titles = selectors;
+        var titles_l = titles.length;
+
+        for (var i = 0; i < titles_l; i++) {
+            var str_w = titles.eq(i).width();
+            if (str_w <= size)
+                continue;
+            str_w = Math.ceil(str_w / 10);
+            if (str_w > 10) {
+                if (str_w < 100) {
+                    var t1 = Math.round(str_w / 10);
+                    if (t1 > str_w / 10)
+                        str_w = t1 * 10 * 10;
+                    else
+                        str_w = (t1 * 10 + 5) * 10;
+                } else
+                    str_w = str_w * 10;
+            } else
+                str_w = str_w * 10;
+            var str_s = size;
+            var time_calc = Math.round(parseInt(str_w) / parseInt(str_s) * 3.5);
+            var move_name = 'moveble' + '_' + str_s + '_' + str_w;
+            if ($('body').find('.' + move_name).length === 0) {
+                $('body').append('<style class="' + move_name + '">'
+                        + '@-webkit-keyframes a_' + move_name
+                        + '{'
+                        + '0%{margin-left:2px;}'
+                        + '50%{margin-left:-' + (str_w - str_s) + 'px;}'
+                        + '90%{margin-left:6px;}'
+                        + '100%{margin-left:2px;}'
+                        + '}'
+                        + '@keyframes a_' + move_name
+                        + '{'
+                        + '0%{margin-left:2px;}'
+                        + '50%{margin-left:-' + (str_w - str_s) + 'px;}'
+                        + '90%{margin-left:6px;}'
+                        + '100%{margin-left:2px;}'
+                        + '}'
+                        + 'div.' + move_name + ':hover > span {'
+                        + 'overflow: visible;'
+                        + '-webkit-animation:a_' + move_name + ' ' + time_calc + 's;'
+                        + '}'
+                        + '</style>');
+            }
+            titles.eq(i).parent().attr('class', 'name ' + move_name);
+        }
+    };
     return {
         show: function() {
             settings = engine.getSettings();
@@ -636,6 +708,67 @@ var view = function() {
                 click_for_open: $('.click_for_open'),
                 btnPlaylist: $('.playlist.btn')
             };
+            is_winamp = settings.is_winamp;
+            if (is_winamp) {
+                $('body').addClass('winamp');
+                $('li.btn.playlist').hide();
+                var win = chrome.app.window.current();
+                win.resizeTo(275, 116);
+                chrome.storage.local.set({extend_volume_scroll: 0});
+                $('.player').append(
+                        $('<div>', {'class': "shuffle"}).on('click', function() {
+                    engine.shuffle();
+                }),
+                        $('<div>', {'class': "loop"}).on('click', function() {
+                    engine.loop();
+                }),
+                        $('<div>', {'class': "state"}),
+                $('<div>', {'class': "w_kbps", text: 320}),
+                $('<div>', {'class': "w_kHz", text: 44}),
+                $('<div>', {'class': "stereo"}),
+                $('<div>', {'class': "w_playlist"}).on('click', function() {
+                    chrome.runtime.getBackgroundPage(function(bg) {
+                        bg.wm.toggle_playlist();
+                    });
+                }));
+                dom_cache.time = function() {
+                    var obj = $('.info > .time');
+                    obj.empty();
+                    var m_10 = $('<div>', {class: 'wmp m_10'});
+                    var m_0 = $('<div>', {class: 'wmp m_0'});
+                    var s_10 = $('<div>', {class: 'wmp s_10'});
+                    var s_0 = $('<div>', {class: 'wmp s_0'});
+                    obj.append(m_10, m_0, s_10, s_0);
+                    var setVal = function(num, obj) {
+                        num = parseInt(num);
+                        var val = 9 * num;
+                        obj.css('background-position-x', '-' + val + 'px');
+                    };
+                    return {
+                        on: function(a, b) {
+                            obj.on(a, b);
+                        },
+                        text: function(value) {
+                            var val = value.split(':');
+                            if (val[0].length === 2) {
+                                setVal(val[0][0], m_10);
+                                setVal(val[0][1], m_0);
+                            } else {
+                                setVal(val[0][1], m_10);
+                                setVal(val[0][2], m_0);
+                            }
+                            setVal(val[1][0], s_10);
+                            setVal(val[1][1], s_0);
+                        },
+                        empty: function() {
+                            setVal(0, m_10);
+                            setVal(0, m_0);
+                            setVal(0, s_10);
+                            setVal(0, s_0);
+                        }
+                    };
+                }();
+            }
             write_language();
             dom_cache.progress.slider({
                 range: "min",
@@ -668,12 +801,18 @@ var view = function() {
                         return;
                     }
                     engine.volume(ui.value);
+                    if (is_winamp) {
+                        dom_cache.volume.css('background', getVolumeColor(ui.value));
+                    }
                 },
                 slide: function(event, ui) {
                     if ('which' in event === false) {
                         return;
                     }
                     engine.volume(ui.value);
+                    if (is_winamp) {
+                        dom_cache.volume.css('background', getVolumeColor(ui.value));
+                    }
                 }
             });
             view.state('emptied');
@@ -981,8 +1120,16 @@ var view = function() {
             if ("album" in tags && tags.album.length > 0) {
                 trackalbum = tags.album;
             }
-            dom_cache.trackname.text(title).parent().attr("title", title);
-            dom_cache.trackalbum.text(trackalbum).parent().attr("title", trackalbum);
+            if (is_winamp) {
+                if (trackalbum.length > 0) {
+                    trackalbum = ' — ' + trackalbum;
+                }
+                dom_cache.trackname.text(title + trackalbum).parent().attr("title", title + trackalbum);
+                calculate_moveble(dom_cache.trackname, 153);
+            } else {
+                dom_cache.trackname.text(title).parent().attr("title", title);
+                dom_cache.trackalbum.text(trackalbum).parent().attr("title", trackalbum);
+            }
             if ("picture" in tags) {
                 showImage(tags.picture);
             } else {
@@ -1013,6 +1160,9 @@ var view = function() {
             var max = 1.0;
             var width_persent = pos / max * 100;
             dom_cache.volume.slider("value", width_persent);
+            if (is_winamp) {
+                dom_cache.volume.css('background', getVolumeColor(width_persent));
+            }
             if (width_persent > 70) {
                 if (var_cache['volume_image'] === 1) {
                     return;
@@ -1114,10 +1264,28 @@ var view = function() {
         },
         readPlaylist: readPlaylist,
         getFilesFromFolder: getFilesFromFolder,
-        pre_buffering_controller: pre_buffering_controller
+        pre_buffering_controller: pre_buffering_controller,
+        setShuffle: function(shuffle) {
+            if (is_winamp) {
+                if (shuffle) {
+                    $('div.shuffle').addClass('on');
+                } else {
+                    $('div.shuffle').removeClass('on');
+                }
+            }
+        },
+        setLoop: function(loop) {
+            if (is_winamp) {
+                if (loop) {
+                    $('div.loop').addClass('on');
+                } else {
+                    $('div.loop').removeClass('on');
+                }
+            }
+        }
     };
 }();
-$(function() {
+$(document).on('settings_loaded', function() {
     _lang = get_lang(window.language);
     delete window.get_lang;
     view.show();
