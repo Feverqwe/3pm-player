@@ -741,7 +741,10 @@ var view = function() {
                 $('body').addClass('winamp');
                 $('li.btn.playlist').hide();
                 var win = chrome.app.window.current();
-                win.resizeTo(275, 116);
+                var coef = window.devicePixelRatio;
+                var win_w = parseInt(275 * coef);
+                var win_h = parseInt(116 * coef);
+                win.resizeTo(win_w, win_h);
                 $('.player').append(
                         $('<div>', {'class': "shuffle"}).on('click', function() {
                     engine.shuffle();

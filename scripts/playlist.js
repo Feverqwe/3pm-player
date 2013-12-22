@@ -283,7 +283,10 @@ var playlist = function() {
             window.onresize = function() {
                 clearTimeout(var_cache.resize_timer);
                 var_cache.resize_timer = setTimeout(function() {
-                    chrome.storage.local.set({pl_w: window.innerWidth, pl_h: window.innerHeight});
+                    var coef = window.devicePixelRatio;
+                    var win_w = parseInt(window.innerWidth * coef);
+                    var win_h = parseInt(window.innerHeight * coef);
+                    chrome.storage.local.set({pl_w: win_w, pl_h: win_h});
                 }, 500);
             };
             $(window).trigger('resize');

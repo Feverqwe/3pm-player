@@ -51,7 +51,10 @@ var viz = function() {
                     if (document.webkitIsFullScreen) {
                         return;
                     }
-                    chrome.storage.local.set({viz_w: window.innerWidth, viz_h: window.innerHeight});
+                    var coef = window.devicePixelRatio;
+                    var win_w = parseInt(window.innerWidth * coef);
+                    var win_h = parseInt(window.innerHeight * coef);
+                    chrome.storage.local.set({viz_w: win_w, viz_h: win_h});
                 }, 500);
             };
             $(window).trigger('resize');
