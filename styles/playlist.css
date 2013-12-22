@@ -412,3 +412,14 @@ body.winamp {
     background-color: #0016B8;
     border-radius: 0;
 }
+.winamp div.playlist::-webkit-scrollbar-thumb:vertical {
+    background: url(../images/winamp/scroll.png) no-repeat center center;
+    min-height: 8px;
+    min-width: 18px;
+    max-height: 8px;
+    max-width: 18px;
+    height: 8px;
+    width: 18px;
+    border: 0;
+    border-radius: 0;
+}
