@@ -343,7 +343,7 @@ body.winamp {
     position: absolute;
     margin-left: 0;
     left: 111px;
-    top: 23px;
+    top: 2em;
     width: 153px;
     overflow: hidden;
 }
@@ -524,16 +524,16 @@ body.winamp {
 }
 .winamp div.w_kbps {
     position: absolute;
-    top: 40px;
+    top: 4.9em;
     left: 110px;
-    font-size: 10px;
+    font-size: 0.7em;
     color: rgb(110, 248, 110) !important;
 }
 .winamp div.w_kHz {
     position: absolute;
-    top: 40px;
+    top: 4.9em;
     left: 155px;
-    font-size: 10px;
+    font-size: 0.7em;
     color: rgb(110, 248, 110) !important;
 }
 .winamp[data-state="pause"] div.w_kbps,
