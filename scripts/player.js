@@ -1147,7 +1147,6 @@ var view = function() {
                     bg.wm.hi("player", chrome.app.window.current());
                 });
             }, 5000);
-            make_extend_volume(settings.extend_volume_scroll);
         },
         setTags: function(tags) {
             if (tags === null) {
