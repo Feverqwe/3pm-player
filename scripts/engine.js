@@ -263,7 +263,11 @@ var engine = function() {
             /*
              var startDate = new Date().getTime();
              */
-            var params = {tags: ["artist", "title", "album", "picture"], file: file};
+            var opt = ["artist", "title", "album", "picture"];
+            if (settings.is_winamp) {
+                opt.splice(opt.length - 1);
+            }
+            var params = {tags: opt, file: file};
             ID3.loadTags(file.name, function() {
                 /*
                  var endDate = new Date().getTime();

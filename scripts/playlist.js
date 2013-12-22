@@ -81,6 +81,7 @@ var playlist = function() {
                 if (item.info.length > 0) {
                     item.title = item.title + ' - ' + item.info;
                 }
+                item.info = '';
             }
             dom_cache.playlist_ul.append($('<li>', {'data-id': obj.id}).append(
                     $('<div>', {'class': 'gr_line'}),
@@ -110,6 +111,7 @@ var playlist = function() {
             if (item.info.length > 0) {
                 item.title = item.title + ' - ' + item.info;
             }
+            item.info = '';
         }
         add_image(item.pic);
         itm.children('.cover').attr('class', 'cover pic_' + item.pic);
