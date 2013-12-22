@@ -318,8 +318,8 @@ body.winamp {
 }
 .winamp .info {
     position: absolute;
-    top: 31px;
-    left: 92px;
+    top: 16px;
+    left: 40px;
     font-size: 20px;
 }
 .winamp .player > div.controls li {
@@ -552,7 +552,8 @@ body.winamp {
 }
 .winamp span.time {
     width: 56px;
-    right: -4px !important;
+    position: initial !important;
+    top: auto !important;
 }
 .winamp span.time > div.wmp {
     display: inline-block;
