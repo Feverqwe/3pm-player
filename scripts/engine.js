@@ -1018,12 +1018,12 @@ var engine = function() {
             if (!cb) {
                 return adapter;
             }
-            if (type === "winamp") {
+            if (type !== "winamp") {
+                cb(adapter);
+            } else {
                 if (_viz_window === undefined || _viz_window.window === null) {
                     cb(adapter);
                 }
-            } else {
-                cb(adapter);
             }
             return adapter;
         },

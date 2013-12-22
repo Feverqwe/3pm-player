@@ -249,3 +249,166 @@ ul.pl_list_select > li.selected {
     color: #fff;
     cursor: pointer;
 }
+body.winamp {
+    background: -webkit-linear-gradient(left, #1c1c2c 0%,#383758 50%,#1d1d2d 100%);
+    font-size: 10px;
+    color: rgb(33, 248, 33);
+}
+.winamp div.title {
+    visibility: hidden;
+    margin-bottom: 6px;
+}
+.winamp .w_head {
+    background-image: url(../images/winamp/w_head.png);
+    height: 20px;
+    width: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.winamp .w_bottom {
+    background-image: url(../images/winamp/w_bottom.png);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 7px;
+}
+.winamp .w_b_l {
+    background-image: url(../images/winamp/w_b_l.png);
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 7px;
+    width: 11px;
+}
+.winamp .w_b_r {
+    background-image: url(../images/winamp/w_b_r.png);
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 7px;
+    width: 8px;
+}
+.winamp .w_l_t {
+    background-image: url(../images/winamp/w_l_t.png);
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 19px;
+    width: 11px;
+}
+.winamp .w_r_t {
+    background-image: url(../images/winamp/w_r_t.png);
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 20px;
+    width: 33px;
+}
+.winamp .w_left {
+    background-image: url(../images/winamp/w_left.png);
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 11px;
+}
+.winamp .w_right {
+    background-image: url(../images/winamp/w_right_c.png);
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+}
+.winamp div.playlist {
+    background-color: #000;
+    width: calc(100% - 15px);
+    margin-left: 11px;
+    background-image: url(../images/winamp/w_right.png);
+    background-repeat: repeat-y;
+    background-position-x: 100%;
+}
+.winamp .close {
+    background-image: url(../images/winamp/close.png) !important;
+    width: 7px;
+    height: 7px;
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    background-size: 7px 7px;
+    top: 4px;
+    right: 3px;
+    opacity: 1;
+    -webkit-filter: inherit;
+}
+.winamp .close:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.5);
+}
+.winamp .mini {
+    background-image: url(../images/winamp/mini.png) !important;
+    width: 7px;
+    height: 7px;
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    background-size: 7px 7px;
+    right: 14px;
+    top: 4px;
+    opacity: 1;
+    -webkit-filter: inherit;
+}
+.winamp .mini:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.5);
+}
+.winamp div.navigation {
+    margin-left: 11px;
+}
+.winamp div.playlist_select {
+    display: block;
+    right: 21px;
+    border: 0;
+    background-color: initial;
+    -webkit-filter: brightness(1.7);
+    border-radius: 0;
+    top: 1px;
+}
+.winamp div.playlist {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.winamp div.playlist_select:hover {
+    -webkit-filter: brightness(5);
+}
+.winamp div.playlist > ul > li .cover {
+    display: none;
+}
+.winamp div.playlist > ul > li > span {
+    margin-top: 0;
+    margin-left: 3px;
+}
+.winamp div.playlist > ul > li > span.info {
+    display: none;
+}
+.winamp div.playlist > ul > li {
+    height: auto;
+}
+.winamp div.playlist > ul > li > .gr_line {
+    display: none;
+}
+.winamp div.playlist > ul > li .move {
+    top: -1px;
+}
+.winamp div.playlist > ul > li {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 1px;
+}
+.winamp div.playlist > ul > li.selected {
+    background-color: #0016B8;
+    border-radius: 0;
+}

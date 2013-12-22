@@ -702,7 +702,8 @@ var view = function() {
                     },
                     offKick: function() {
                         ctx.fillStyle = '#54D100';
-                    }
+                    },
+                    threshold: 0.2
                 }).on();
                 spectr_cache.winamp_dancer.fft(fft,
                         {fillStyle: '#666', count: 20, width: 3, spacing: 1}

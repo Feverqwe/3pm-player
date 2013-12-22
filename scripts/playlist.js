@@ -2,6 +2,7 @@ var playlist = function() {
     var dom_cache = {};
     var var_cache = {};
     var _lang = undefined;
+    var settings = undefined;
     function sendPlayer(callback) {
         /*
          * Функция отправки действий в плеер
@@ -76,6 +77,11 @@ var playlist = function() {
         items.forEach(function(obj) {
             var item = item_read(obj);
             add_image(item.pic);
+            if (settings.is_winamp) {
+                if (item.info.length > 0) {
+                    item.title = item.title + ' - ' + item.info;
+                }
+            }
             dom_cache.playlist_ul.append($('<li>', {'data-id': obj.id}).append(
                     $('<div>', {'class': 'gr_line'}),
             $('<div>', {'class': 'cover pic_' + item.pic}),
@@ -100,6 +106,11 @@ var playlist = function() {
             itm.removeClass("loading");
         }
         item = item_read(item);
+        if (settings.is_winamp) {
+            if (item.info.length > 0) {
+                item.title = item.title + ' - ' + item.info;
+            }
+        }
         add_image(item.pic);
         itm.children('.cover').attr('class', 'cover pic_' + item.pic);
         itm.children('.name').attr('title', item.title).text(item.title);
@@ -162,6 +173,7 @@ var playlist = function() {
         preload: function() {
             sendPlayer(function(window) {
                 _lang = window._lang;
+                settings = window.engine.getSettings();
                 playlist.show();
             });
         },
@@ -175,6 +187,19 @@ var playlist = function() {
                 pl_list: $('.pl_list_select'),
                 title: $('body').children('div.title')
             };
+            if (settings.is_winamp) {
+                $('body').addClass('winamp');
+                $('body').append(
+                        $('<div>', {'class': 'w_head'}),
+                $('<div>', {'class': 'w_left'}),
+                $('<div>', {'class': 'w_right'}),
+                $('<div>', {'class': 'w_bottom'}),
+                $('<div>', {'class': 'w_l_t'}),
+                $('<div>', {'class': 'w_r_t'}),
+                $('<div>', {'class': 'w_b_l'}),
+                $('<div>', {'class': 'w_b_r'})
+                        );
+            }
             $('.close').on('click', function() {
                 save_pos();
                 window.close();
