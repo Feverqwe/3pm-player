@@ -1056,9 +1056,13 @@ var engine = function() {
         canPlay: player.canPlay,
         set_hotkeys: function(_document) {
             $(_document).keydown(function(event) {
-                if (event.keyCode === 32) {
+                if (event.keyCode === 32 || event.keyCode === 179) {
                     event.preventDefault();
                     engine.playToggle();
+                } else
+                if (event.keyCode === 178) {
+                    event.preventDefault();
+                    engine.pause();
                 } else
                 if (event.keyCode === 86) {
                     event.preventDefault();
@@ -1072,11 +1076,11 @@ var engine = function() {
                     event.preventDefault();
                     engine.loop();
                 } else
-                if (event.keyCode === 113) {
+                if (event.keyCode === 113 || event.keyCode === 176) {
                     event.preventDefault();
                     engine.next();
                 } else
-                if (event.keyCode === 112) {
+                if (event.keyCode === 112 || event.keyCode === 177) {
                     event.preventDefault();
                     engine.preview();
                 } else
