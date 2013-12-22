@@ -524,14 +524,14 @@ body.winamp {
 }
 .winamp div.w_kbps {
     position: absolute;
-    top: 4.3em;
+    top: 4.39em;
     left: 110px;
     font-size: 0.75em;
     color: rgb(110, 248, 110) !important;
 }
 .winamp div.w_kHz {
     position: absolute;
-    top: 4.3em;
+    top: 4.39em;
     left: 155px;
     font-size: 0.75em;
     color: rgb(110, 248, 110) !important;
