@@ -409,7 +409,7 @@ body.winamp {
     margin-bottom: 1px;
 }
 .winamp div.playlist > ul > li.selected {
-    background-color: #0016B8;
+    background-color: #0000C6;
     border-radius: 0;
 }
 .winamp div.playlist::-webkit-scrollbar-thumb:vertical {
