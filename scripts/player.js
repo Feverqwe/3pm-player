@@ -742,7 +742,6 @@ var view = function() {
                 $('li.btn.playlist').hide();
                 var win = chrome.app.window.current();
                 win.resizeTo(275, 116);
-                chrome.storage.local.set({extend_volume_scroll: 0});
                 $('.player').append(
                         $('<div>', {'class': "shuffle"}).on('click', function() {
                     engine.shuffle();
@@ -1148,6 +1147,7 @@ var view = function() {
                     bg.wm.hi("player", chrome.app.window.current());
                 });
             }, 5000);
+            make_extend_volume(settings.extend_volume_scroll);
         },
         setTags: function(tags) {
             if (tags === null) {
