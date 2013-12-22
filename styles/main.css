@@ -320,6 +320,7 @@ body.winamp {
     position: absolute;
     top: 2.2em;
     left: 40px;
+    z-index: 1;
 }
 .winamp .player > div.controls li {
     width: 23px;
