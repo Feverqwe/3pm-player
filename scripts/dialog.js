@@ -3,6 +3,7 @@ var dialog = function() {
     var var_cache = {};
     var dom_cache = {};
     var _lang = undefined;
+    var settings = undefined;
     function sendPlayer(callback) {
         /*
          * Функция отправки действий в плеер
@@ -630,10 +631,24 @@ var dialog = function() {
         preload: function() {
             sendPlayer(function(window) {
                 _lang = window._lang;
+                settings = window.engine.getSettings();
                 dialog.run();
             });
         },
         run: function() {
+            if (settings.is_winamp) {
+                $('body').addClass('winamp');
+                $('body').append(
+                        $('<div>', {'class': 'w_head'}),
+                $('<div>', {'class': 'w_left'}),
+                $('<div>', {'class': 'w_right'}),
+                $('<div>', {'class': 'w_bottom'}),
+                $('<div>', {'class': 'w_l_t'}),
+                $('<div>', {'class': 'w_r_t'}),
+                $('<div>', {'class': 'w_b_l'}),
+                $('<div>', {'class': 'w_b_r'})
+                        );
+            }
             $('.close').on('click', function() {
                 window.close();
             });

@@ -407,13 +407,13 @@ body.winamp {
     margin: 0;
     padding: 0;
     margin-bottom: 1px;
+    border-radius: 0;
 }
 .winamp div.playlist > ul > li.selected {
     background-color: #0000C6;
-    border-radius: 0;
 }
 .winamp div.playlist::-webkit-scrollbar-thumb:vertical {
-    background: url(../images/winamp/scroll.png) no-repeat center center;
+    background: url(../images/winamp/scroll.png) no-repeat top center;
     min-height: 8px;
     min-width: 18px;
     max-height: 8px;
