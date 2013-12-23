@@ -1,0 +1,37 @@
+{
+    "manifest_version": 2,
+    "icons": {
+        "128": "images/icon_128.png"
+    },
+    "background": {
+        "scripts": ["js/background.js"]
+    },
+    "name": "3pm-addon MM Hotkeys",
+    "commands": {
+        "next": {
+            "suggested_key": {
+                "default": "MediaNextTrack"
+            },
+            "description": "Next track"
+        },
+        "prev": {
+            "suggested_key": {
+                "default": "MediaPrevTrack"
+            },
+            "description": "Previous track"
+        },
+        "pp": {
+            "suggested_key": {
+                "default": "MediaPlayPause"
+            },
+            "description": "Play / Pause"
+        },
+        "stop": {
+            "suggested_key": {
+                "default": "MediaStop"
+            },
+            "description": "Start player"
+        }
+    },
+    "version": "0.0.2"
+}
