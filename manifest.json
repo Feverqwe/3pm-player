@@ -3,7 +3,7 @@
     "name": "__MSG_appName__",
     "description": "__MSG_appDesc__",
     "default_locale": "en",
-    "version": "0.6.53",
+    "version": "0.6.54",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "icon_16.png",
@@ -15,5 +15,5 @@
         }
     },
     "offline_enabled": true,
-    "permissions": ["storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}, {"fileSystem": ["retainEntries", "directory"]}, "fullscreen", "identity", "notifications", "app.window", "https://api.vk.com/*", "https://*.box.com/*", "https://dl.boxcloud.com/*", "https://*.livefilestore.com/*", "http://api.soundcloud.com/*"]
+    "permissions": ["app.runtime", "storage", "contextMenus", {"socket": ["tcp-listen:*:*"]}, {"fileSystem": ["retainEntries", "directory"]}, "fullscreen", "identity", "notifications", "app.window", "https://api.vk.com/*", "https://*.box.com/*", "https://dl.boxcloud.com/*", "https://*.livefilestore.com/*", "http://api.soundcloud.com/*"]
 }

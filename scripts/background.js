@@ -510,3 +510,8 @@ var wm = function() {
 chrome.app.runtime.onLaunched.addListener(function() {
     wm.run_player();
 });
+chrome.runtime.onMessageExternal.addListener(function(msg, sender, resp) {
+    if (msg === 'stop') {
+        wm.run_player();
+    }
+});

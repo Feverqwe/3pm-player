@@ -716,6 +716,19 @@ var view = function() {
             }
         }
     };
+    var hotKeyListener = function() {
+        chrome.runtime.onMessageExternal.addListener(function(msg, sender, resp) {
+            if (msg === 'prev') {
+                engine.preview();
+            } else 
+            if (msg === 'next') {
+                engine.next();
+            } else 
+            if (msg === 'pp') {
+                engine.playToggle();
+            }
+        });
+    };
     return {
         show: function() {
             settings = engine.getSettings();
@@ -736,6 +749,7 @@ var view = function() {
                 click_for_open: $('.click_for_open'),
                 btnPlaylist: $('.playlist.btn')
             };
+            hotKeyListener();
             is_winamp = settings.is_winamp;
             if (is_winamp) {
                 $('body').addClass('winamp');
