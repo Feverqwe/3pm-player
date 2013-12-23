@@ -1056,38 +1056,6 @@ var engine = function() {
         canPlay: player.canPlay,
         set_hotkeys: function(_document) {
             $(_document).keydown(function(event) {
-                if (event.keyCode === 32 || event.keyCode === 179) {
-                    event.preventDefault();
-                    engine.playToggle();
-                } else
-                if (event.keyCode === 178) {
-                    event.preventDefault();
-                    engine.pause();
-                } else
-                if (event.keyCode === 86) {
-                    event.preventDefault();
-                    engine.mute();
-                } else
-                if (event.keyCode === 83) {
-                    event.preventDefault();
-                    engine.shuffle();
-                } else
-                if (event.keyCode === 82) {
-                    event.preventDefault();
-                    engine.loop();
-                } else
-                if (event.keyCode === 113 || event.keyCode === 176) {
-                    event.preventDefault();
-                    engine.next();
-                } else
-                if (event.keyCode === 112 || event.keyCode === 177) {
-                    event.preventDefault();
-                    engine.preview();
-                } else
-                if (event.keyCode === 78) {
-                    event.preventDefault();
-                    engine.vizRandomPreset();
-                } else
                 if (event.ctrlKey || event.metaKey) {
                     if (event.keyCode === 38) {
                         event.preventDefault();
@@ -1110,6 +1078,39 @@ var engine = function() {
                         var_cache.progress_keydown_timer = setTimeout(function() {
                             engine.position("-10");
                         }, 25);
+                    }
+                } else {
+                    if (event.keyCode === 32 || event.keyCode === 179) {
+                        event.preventDefault();
+                        engine.playToggle();
+                    } else
+                    if (event.keyCode === 178) {
+                        event.preventDefault();
+                        engine.pause();
+                    } else
+                    if (event.keyCode === 86) {
+                        event.preventDefault();
+                        engine.mute();
+                    } else
+                    if (event.keyCode === 83) {
+                        event.preventDefault();
+                        engine.shuffle();
+                    } else
+                    if (event.keyCode === 82) {
+                        event.preventDefault();
+                        engine.loop();
+                    } else
+                    if (event.keyCode === 113 || event.keyCode === 176) {
+                        event.preventDefault();
+                        engine.next();
+                    } else
+                    if (event.keyCode === 112 || event.keyCode === 177) {
+                        event.preventDefault();
+                        engine.preview();
+                    } else
+                    if (event.keyCode === 78) {
+                        event.preventDefault();
+                        engine.vizRandomPreset();
                     }
                 }
             });
