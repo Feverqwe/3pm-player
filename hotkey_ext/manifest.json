@@ -39,7 +39,7 @@
             "description": "Volume up"
         },
         "vold": {
-            "description": "Volume up"
+            "description": "Volume down"
         },
         "scru": {
             "description": "Scroll up"
@@ -57,5 +57,5 @@
             "description": "Mute"
         }
     },
-    "version": "0.0.3"
+    "version": "0.0.4"
 }
