@@ -264,11 +264,7 @@ var engine = function() {
             /*
              var startDate = new Date().getTime();
              */
-            var opt = ["artist", "title", "album", "picture"];
-            if (settings.is_winamp) {
-                opt.splice(opt.length - 1);
-            }
-            var params = {tags: opt, file: file};
+            var params = {tags: ["artist", "title", "album", "picture"], file: file};
             ID3.loadTags(file.name, function() {
                 /*
                  var endDate = new Date().getTime();

@@ -76,13 +76,14 @@ var playlist = function() {
         var n = 0;
         items.forEach(function(obj) {
             var item = item_read(obj);
-            add_image(item.pic);
             if (settings.is_winamp) {
                 if (item.info.length > 0) {
                     item.title = item.title + ' - ' + item.info;
                 }
                 item.info = '';
+                item.pic = 'none';
             }
+            add_image(item.pic);
             dom_cache.playlist_ul.append($('<li>', {'data-id': obj.id}).append(
                     $('<div>', {'class': 'gr_line'}),
             $('<div>', {'class': 'cover pic_' + item.pic}),
@@ -112,6 +113,7 @@ var playlist = function() {
                 item.title = item.title + ' - ' + item.info;
             }
             item.info = '';
+            item.pic = 'none';
         }
         add_image(item.pic);
         itm.children('.cover').attr('class', 'cover pic_' + item.pic);
