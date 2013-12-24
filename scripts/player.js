@@ -709,7 +709,7 @@ var view = function() {
         };
         chrome.contextMenus.removeAll(function() {
             $.each(context_menu, function(k, v) {
-                if (v.hide === 1 || v.private === 1) {
+                if (v.hide === 1) {
                     return 1;
                 }
                 var item = {
