@@ -351,6 +351,7 @@ body.winamp {
 .winamp .filelist_body ul > li:nth-of-type(odd) {
     background-color: #2C2C2C;
 }
+.winamp .menu_choice div.menu ul > li:hover,
 .winamp .filelist_body ul > li:hover,
 .winamp div.playlists > ul > li.selected {
     background-color: #0000C6;
@@ -370,6 +371,25 @@ body.winamp {
     background-color: #000;
     height: calc(100% - 83px);
 }
+.winamp .menu_choice div.menu ul > li {
+    background-image: none;
+}
+.winamp .menu_choice div.menu {
+    background-color: #000;
+}
 .winamp .filelist_body ul > li .play {
     top: -2px;
+}
+.winamp .dialog {
+    padding-left: 11px;
+    padding-right: 8px;
+}
+.winamp .dialog {
+    padding-left: 11px;
+    padding-right: 8px;
+}
+.winamp .dialog.filelist_body,
+.winamp .dialog.playlist_chiser {
+    padding-left: 11px;
+    padding-right: 4px;
 }
