@@ -619,6 +619,33 @@ var dialog = function() {
             window.close();
         });
     };
+    var menuChiser = function() {
+        /*
+         * Создает форму выбора m3u файла
+         */
+        var context_menu = window.options.list;
+        $('.menu_choice').show();
+        var pl = $('.menu').children("ul");
+        $.each(context_menu, function(key, item) {
+            if (item.hide) {
+                return 1;
+            }
+            if (item.action === undefined) {
+                return 1;
+            }
+            if (item.contexts.indexOf('page') === -1) {
+                return 1;
+            }
+            pl.append($('<li>', {'class': 'item', 'data-id': key, text: item.title}));
+        });
+        $('body').on('click', 'li.item', function() {
+            var id = $(this).data("id");
+            sendPlayer(function(window) {
+                context_menu[id].action();
+            });
+            window.close();
+        });
+    };
     var write_language = function() {
         $('.t_btn.close').attr('title', _lang.close);
         $('div[data-lang=e_url]').text(_lang.dialog.e_url);
@@ -677,6 +704,9 @@ var dialog = function() {
             } else
             if (window.options.type === "sd") {
                 skydriveChoice();
+            } else
+            if (window.options.type === "menu") {
+                menuChiser();
             }
         }
     };

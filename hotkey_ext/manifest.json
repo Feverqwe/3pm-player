@@ -8,17 +8,11 @@
     },
     "name": "3pm-addon MM Hotkeys",
     "commands": {
-        "next": {
+        "stop": {
             "suggested_key": {
-                "default": "MediaNextTrack"
+                "default": "MediaStop"
             },
-            "description": "Next track"
-        },
-        "prev": {
-            "suggested_key": {
-                "default": "MediaPrevTrack"
-            },
-            "description": "Previous track"
+            "description": "Start player / focus"
         },
         "pp": {
             "suggested_key": {
@@ -26,12 +20,42 @@
             },
             "description": "Play / Pause"
         },
-        "stop": {
+        "prev": {
             "suggested_key": {
-                "default": "MediaStop"
+                "default": "MediaPrevTrack"
             },
-            "description": "Start player"
+            "description": "Previous track"
+        },
+        "next": {
+            "suggested_key": {
+                "default": "MediaNextTrack"
+            },
+            "description": "Next track"
+        },
+        "menu": {
+            "description": "Menu"
+        },
+        "volu": {
+            "description": "Volume up"
+        },
+        "vold": {
+            "description": "Volume up"
+        },
+        "scru": {
+            "description": "Scroll up"
+        },
+        "scrd": {
+            "description": "Scroll back"
+        },
+        "shuffle": {
+            "description": "Shuffle"
+        },
+        "loop": {
+            "description": "Loop"
+        },
+        "mute": {
+            "description": "Mute"
         }
     },
-    "version": "0.0.2"
+    "version": "0.0.3"
 }

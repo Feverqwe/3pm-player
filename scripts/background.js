@@ -493,6 +493,32 @@ var wm = function() {
                     len = 8;
                 }
                 options.h = len * 52 + 43;
+            } else
+            if (options.type === 'menu') {
+                var len = 14;
+                if (options.list !== undefined) {
+                    len = 0;
+                    for (var index in options.list) {
+                        var item = options.list[index];
+                        if (item.hide) {
+                            continue;
+                        }
+                        if (item.action === undefined) {
+                            continue;
+                        }
+                        if (item.contexts.indexOf('page') === -1) {
+                            continue;
+                        }
+                        len++;
+                    }
+                }
+                if (len === 0) {
+                    len = 1;
+                }
+                if (len > 20) {
+                    len = 14;
+                }
+                options.h = len * 19 + 40;
             }
             create_dialog_window(options);
         },

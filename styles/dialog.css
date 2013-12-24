@@ -74,16 +74,19 @@ input {
     margin-top: 12px;
     font-size: 120%;
 }
+.menu_choice .menu::-webkit-scrollbar,
 div.filelist::-webkit-scrollbar,
 .playlist_chiser > div.playlists::-webkit-scrollbar {
     height: 15px;
     width: 15px;
 }
+.menu_choice .menu::-webkit-scrollbar-button,
 div.filelist::-webkit-scrollbar-button,
 .playlist_chiser > div.playlists::-webkit-scrollbar-button {
     height: 0;
     width: 0;
 }
+.menu_choice .menu::-webkit-scrollbar-thumb:vertical,
 div.filelist::-webkit-scrollbar-thumb:vertical,
 .playlist_chiser > div.playlists::-webkit-scrollbar-thumb:vertical {
     background-clip: padding-box;
@@ -198,6 +201,36 @@ div.filelist::-webkit-scrollbar-thumb:vertical,
 }
 .filelist_body ul > li.selected {
     background-color: #0E4E72;
+}
+.menu_choice {
+    padding-left: 18px;
+    padding-right: 15px;
+    height: 100%;
+}
+.menu_choice div.menu {
+    -webkit-app-region: no-drag;
+    height: calc(100% - 29px);
+    overflow: auto;
+    margin-top: 20px;
+}
+.menu_choice .menu > ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+.menu_choice .menu ul > li {
+    padding: 2px;
+    cursor: pointer;
+    position: relative;
+    padding-right: 24px;
+    background-image: -webkit-linear-gradient(left, transparent 0%, rgba(109, 109, 109, 1) 50%, transparent 100%);
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+}
+.menu_choice .menu ul > li:hover {
+    background-color: rgba(0, 0, 0, 0.41);
+    color: #fff;
+    border-radius: 3px;
 }
 body.winamp {
     background: -webkit-linear-gradient(left, #1c1c2c 0%,#383758 50%,#1d1d2d 100%);

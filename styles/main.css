@@ -403,6 +403,23 @@ body.winamp {
     opacity: 1;
     -webkit-filter: brightness(1.5);
 }
+.winamp .t_btn.menu {
+    left: 4px;
+    top: 4px;
+    background-image: url('../images/winamp/menu.png');
+    background-size: 9px 7px;
+    width: 9px;
+    height: 7px;
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    opacity: 1;
+    -webkit-filter: inherit;
+}
+.winamp .t_btn.menu:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.5);
+}
 .winamp .controls .btn {
     background-image: url(../images/winamp/btns.png) !important;
     background-position: 0;

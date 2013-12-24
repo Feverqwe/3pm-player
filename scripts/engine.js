@@ -858,20 +858,21 @@ var engine = function() {
         };
     }();
     var add_in_ctx_menu = function(playlist_info) {
+        var context_menu = view.getContextMenu();
         if (playlist_info !== undefined && playlist_info.vk_save === true) {
-            if (var_cache.vk_save_ctx) {
+            if (context_menu.save_vk.hide === 0) {
                 return;
             }
-            chrome.contextMenus.create({
-                id: "save_vk",
-                title: _lang.ctx_save_vk_track,
-                contexts: ['page', 'launcher']
-            });
-            var_cache.vk_save_ctx = true;
+            var item = {};
+            item.id = context_menu.save_vk.id;
+            item.title = context_menu.save_vk.title;
+            item.contexts = context_menu.save_vk.contexts;
+            chrome.contextMenus.create(item);
+            context_menu.save_vk.hide = 0;
         } else
-        if (var_cache.vk_save_ctx) {
+        if (context_menu.save_vk.hide === 0) {
             chrome.contextMenus.remove('save_vk');
-            var_cache.vk_save_ctx = false;
+            context_menu.save_vk.hide = 1;
         }
     };
     return {
@@ -1108,6 +1109,12 @@ var engine = function() {
                     if (event.keyCode === 78) {
                         event.preventDefault();
                         engine.vizRandomPreset();
+                    } else
+                    if (event.keyCode === 9) {
+                        event.preventDefault();
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.showDialog({type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu()});
+                        });
                     }
                 }
             });
