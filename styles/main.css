@@ -404,7 +404,7 @@ body.winamp {
     -webkit-filter: brightness(1.5);
 }
 .winamp .t_btn.menu {
-    left: 4px;
+    left: 6px;
     top: 4px;
     background-image: url('../images/winamp/menu.png');
     background-size: 9px 7px;
