@@ -43,7 +43,7 @@ var get_lang = function(language) {
         },
         settings: {
             1: "Language",
-            2: 'Pleer',
+            2: 'Player',
             3: 'Visualization',
             4: 'Save',
             5: 'Player settings',
