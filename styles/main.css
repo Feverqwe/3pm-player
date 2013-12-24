@@ -586,6 +586,6 @@ body.winamp {
 }
 .winamp #winamp_fft {
     position: absolute;
-    top: 30px;
+    bottom: 56px;
     left: 22px;
 }

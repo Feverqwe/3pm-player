@@ -689,13 +689,12 @@ var view = function() {
         }
     };
     var onClearAdapter = function() {
-        if (is_winamp && settings.spectogramma) {
+        if (is_winamp && settings.visual_type !== '0') {
             if ('winamp_dancer' in spectr_cache === false) {
                 spectr_cache.winamp_dancer = new Dancer();
-                var fft = document.getElementById('winamp_fft');
-                var ctx = fft.getContext('2d');
-                fft.height = 30;
-                fft.width = 80;
+                var convas = document.getElementById('winamp_fft');
+                var ctx = convas.getContext('2d');
+                convas.width = 80;
                 spectr_cache.winamp_dancer.createKick({
                     onKick: function() {
                         ctx.fillStyle = '#ff0077';
@@ -705,9 +704,17 @@ var view = function() {
                     },
                     threshold: 0.2
                 }).on();
-                spectr_cache.winamp_dancer.fft(fft,
-                        {fillStyle: '#666', count: 20, width: 3, spacing: 1}
-                );
+                if (settings.visual_type === '2') {
+                    convas.height = 20;
+                    spectr_cache.winamp_dancer.waveform(convas,
+                            {strokeStyle: '#fff', strokeWidth: 1, count: 40}
+                    );
+                } else {
+                    convas.height = 37;
+                    spectr_cache.winamp_dancer.fft(convas,
+                            {fillStyle: '#666', count: 20, width: 3, spacing: 1}
+                    );
+                }
                 spectr_cache.winamp_dancer.load(engine.getAudio(), 'winamp').bind('loaded', function() {
                     spectr_cache.winamp_dancer.play();
                 });
@@ -720,10 +727,10 @@ var view = function() {
         chrome.runtime.onMessageExternal.addListener(function(msg, sender, resp) {
             if (msg === 'prev') {
                 engine.preview();
-            } else 
+            } else
             if (msg === 'next') {
                 engine.next();
-            } else 
+            } else
             if (msg === 'pp') {
                 engine.playToggle();
             }
@@ -760,7 +767,7 @@ var view = function() {
                 var win_h = parseInt(116 * coef);
                 win.resizeTo(win_w, win_h);
                 var spec = '';
-                if (settings.spectogramma) {
+                if (settings.visual_type !== '0') {
                     spec = $('<canvas>', {id: 'winamp_fft'});
                 }
                 $('.player').append(
@@ -774,8 +781,8 @@ var view = function() {
                 $('<div>', {'class': "w_kbps", text: 320}),
                 $('<div>', {'class': "w_kHz", text: 44}),
                 $('<div>', {'class': "stereo"}),
-               spec,
-                $('<div>', {'class': "w_playlist"}).on('click', function() {
+                spec,
+                        $('<div>', {'class': "w_playlist"}).on('click', function() {
                     chrome.runtime.getBackgroundPage(function(bg) {
                         bg.wm.toggle_playlist();
                     });

@@ -4,7 +4,7 @@ var options = function() {
         extend_volume_scroll: {"v": 0, "t": "checkbox"},
         notifi_buttons: {"v": 1, "t": "checkbox"},
         is_winamp: {"v": 0, "t": "checkbox"},
-        spectogramma: {"v": 1, "t": "checkbox"}
+        visual_type: {"v": 1, "t": "radio"}
     };
     function sendPlayer(callback) {
         /*
