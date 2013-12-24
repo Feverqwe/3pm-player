@@ -50,9 +50,10 @@ var get_lang = function(language) {
             6: 'Display a notification when changing tracks',
             7: 'Extend the range of the volume scrolls',
             8: 'Show button next / previous track in the notification',
-            9: 'Winamp skin',
+            9: 'Winamp skin (requires restart)',
             10: 'To enable global multimedia keys need to',
-            11: 'download the extension'
+            11: 'download the extension',
+            12: 'Show spectrogram (requires restart)'
         }
     };
     var lang_arr_ru = {
@@ -106,9 +107,10 @@ var get_lang = function(language) {
             6: 'Показывать уведомление при смене трека',
             7: 'Расширить область изменения громкости скроллом',
             8: 'Показывать кнопки предыдущий / следующий трек в уведомлении',
-            9: 'Winamp скин',
+            9: 'Winamp скин (требует перезапуск)',
             10: 'Чтобы включить глобальные мультимедиа клавиши нужно',
-            11: 'загрузить расширение'
+            11: 'загрузить расширение',
+            12: 'Позывать спектограмму (требует перезапуск)'
         }
     };
     var lang = language;

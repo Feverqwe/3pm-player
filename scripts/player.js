@@ -689,7 +689,7 @@ var view = function() {
         }
     };
     var onClearAdapter = function() {
-        if (is_winamp) {
+        if (is_winamp && settings.spectogramma) {
             if ('winamp_dancer' in spectr_cache === false) {
                 spectr_cache.winamp_dancer = new Dancer();
                 var fft = document.getElementById('winamp_fft');
@@ -759,6 +759,10 @@ var view = function() {
                 var win_w = parseInt(275 * coef);
                 var win_h = parseInt(116 * coef);
                 win.resizeTo(win_w, win_h);
+                var spec = '';
+                if (settings.spectogramma) {
+                    spec = $('<canvas>', {id: 'winamp_fft'});
+                }
                 $('.player').append(
                         $('<div>', {'class': "shuffle"}).on('click', function() {
                     engine.shuffle();
@@ -770,7 +774,7 @@ var view = function() {
                 $('<div>', {'class': "w_kbps", text: 320}),
                 $('<div>', {'class': "w_kHz", text: 44}),
                 $('<div>', {'class': "stereo"}),
-                $('<canvas>', {id: 'winamp_fft'}),
+               spec,
                 $('<div>', {'class': "w_playlist"}).on('click', function() {
                     chrome.runtime.getBackgroundPage(function(bg) {
                         bg.wm.toggle_playlist();
