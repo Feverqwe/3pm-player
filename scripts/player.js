@@ -4,7 +4,7 @@ var view = function() {
     var time_tipe = 0;
     var settings = {};
     var is_winamp = true;
-    var spectr_cache = {};
+    var visual_cache = {};
     var isPlaying = function() {
         /*
          * Выставляет статус - проигрывается.
@@ -690,12 +690,12 @@ var view = function() {
     };
     var onClearAdapter = function() {
         if (is_winamp && settings.visual_type !== '0') {
-            if ('winamp_dancer' in spectr_cache === false) {
-                spectr_cache.winamp_dancer = new Dancer();
+            if ('winamp_dancer' in visual_cache === false) {
+                visual_cache.winamp_dancer = new Dancer();
                 var convas = document.getElementById('winamp_fft');
                 var ctx = convas.getContext('2d');
                 convas.width = 80;
-                spectr_cache.winamp_dancer.createKick({
+                visual_cache.winamp_dancer.createKick({
                     onKick: function() {
                         ctx.fillStyle = '#ff0077';
                     },
@@ -706,20 +706,20 @@ var view = function() {
                 }).on();
                 if (settings.visual_type === '2') {
                     convas.height = 20;
-                    spectr_cache.winamp_dancer.waveform(convas,
+                    visual_cache.winamp_dancer.waveform(convas,
                             {strokeStyle: '#fff', strokeWidth: 1, count: 40}
                     );
                 } else {
                     convas.height = 37;
-                    spectr_cache.winamp_dancer.fft(convas,
+                    visual_cache.winamp_dancer.fft(convas,
                             {fillStyle: '#666', count: 20, width: 3, spacing: 1}
                     );
                 }
-                spectr_cache.winamp_dancer.load(engine.getAudio(), 'winamp').bind('loaded', function() {
-                    spectr_cache.winamp_dancer.play();
+                visual_cache.winamp_dancer.load(engine.getAudio(), 'winamp').bind('loaded', function() {
+                    visual_cache.winamp_dancer.play();
                 });
             } else {
-                spectr_cache.winamp_dancer.load(engine.getAudio(), 'winamp');
+                visual_cache.winamp_dancer.load(engine.getAudio(), 'winamp');
             }
         }
     };
