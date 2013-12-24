@@ -100,7 +100,12 @@ var cloud = function() {
                     200: function(data) {
                         if ('error' in data) {
                             clear_data();
-                            console.log("VK", "getAlbums", "API error", data);
+                            if (data.error['error code'] === 5) {
+                                vkAuth(function() {
+                                    getPopular(cb, genre_id);
+                                });
+                            }
+                            console.log("VK", "getPopular", "API error", data);
                             return;
                         }
                         if ('response' in data === false) {
@@ -135,7 +140,12 @@ var cloud = function() {
                     200: function(data) {
                         if ('error' in data) {
                             clear_data();
-                            console.log("VK", "getAlbums", "API error", data);
+                            if (data.error['error code'] === 5) {
+                                vkAuth(function() {
+                                    getRecommendations(cb);
+                                });
+                            }
+                            console.log("VK", "getRecommendations", "API error", data);
                             return;
                         }
                         if ('response' in data === false) {
@@ -172,7 +182,12 @@ var cloud = function() {
                         200: function(data) {
                             if ('error' in data) {
                                 clear_data();
-                                console.log("VK", "getAlbums", "API error", data);
+                                if (data.error['error code'] === 5) {
+                                    vkAuth(function() {
+                                        getTracks(cb, album_id);
+                                    });
+                                }
+                                console.log("VK", "getTracks", "API error", data);
                                 return;
                             }
                             if ('response' in data === false || 'items' in data.response === false || 'count' in data.response === false) {
@@ -229,6 +244,11 @@ var cloud = function() {
                         200: function(data) {
                             if ('error' in data) {
                                 clear_data();
+                                if (data.error['error code'] === 5) {
+                                    vkAuth(function() {
+                                        getAlbums(cb);
+                                    });
+                                }
                                 console.log("VK", "getAlbums", "API error", data);
                                 return;
                             }
@@ -283,7 +303,12 @@ var cloud = function() {
                     200: function(data) {
                         if ('error' in data) {
                             clear_data();
-                            console.log("VK", "getAlbums", "API error", data);
+                            if (data.error['error code'] === 5) {
+                                vkAuth(function() {
+                                    addInLibrarty(id, oid, cb);
+                                });
+                            }
+                            console.log("VK", "addInLibrarty", "API error", data);
                             return;
                         }
                         if ('response' in data === false) {
