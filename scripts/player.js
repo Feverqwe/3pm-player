@@ -146,6 +146,9 @@ var view = function() {
                     playlist.push({name: name, entrys: item, id: playlist.length, type: "m3u"});
                 }
             });
+            playlist.sort(function(a, b) {
+                return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+            });
             engine.setM3UPlaylists({list: playlist});
             if (playlist.length === 1) {
                 engine.select_playlist(playlist[0].id);
