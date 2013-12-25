@@ -684,6 +684,15 @@ var dialog = function() {
                 window.engine.set_hotkeys(document);
                 allow_ext = window.engine.get_allow_ext();
             });
+            $(document).keydown(function(event) {
+                if (event.ctrlKey || event.metaKey) {
+                    return;
+                } else {
+                    if (event.keyCode === 27) {
+                        window.close();
+                    }
+                }
+            });
             if (window.options === undefined) {
                 return;
             } else
