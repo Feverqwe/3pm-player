@@ -114,6 +114,10 @@ var view = function() {
         var playlist_dune_count = 0;
         var fileMede = false;
         var dune = function() {
+            /*
+             * Получает команду готово как только один из плэйлистов будет заполнен.
+             * Когла получит все плэйлисты - отдает диалог выбора их.
+             */
             playlist_dune_count++;
             if (playlist_count !== playlist_dune_count) {
                 return;
@@ -168,6 +172,9 @@ var view = function() {
             var stream_got = 0;
             var file_list = [];
             var file_getter = function(files) {
+                /*
+                 * Получает файлы в плэйлисте, как только находит все - говорит что готово
+                 */
                 stream_got++;
                 file_list = file_list.concat(files);
                 if (stream_count !== stream_got) {
@@ -213,6 +220,9 @@ var view = function() {
                     file_getter(files);
                 });
             };
+            /*
+             * Читает содерживое m3u
+             */
             var file_tree = {};
             var lines = content.split("\n");
             var len = lines.length;
@@ -255,6 +265,9 @@ var view = function() {
             }
         };
         var openM3U = function(file) {
+            /*
+             * Получает контент m3u
+             */
             var r = new FileReader();
             r.onload = function() {
                 var playlist_name = file.name.substr(0, file.name.length - 1 - 3);
@@ -277,6 +290,13 @@ var view = function() {
         }
     };
     var readFileArray = function(files, entry) {
+        /*
+         * Читает массив файлов
+         * Если есть entry - использут его, если нету - то files.
+         * Если найдет хоть одну дирректорию - открывает как категорию.
+         * Есди найдет зоть один m3u открывает как плэйлист
+         * Остальное - читает как массив файлов
+         */
         if (!entry) {
             entry = [];
         }
@@ -433,6 +453,9 @@ var view = function() {
         });
     };
     var pre_buffering_controller = function() {
+        /*
+         * Управляет полоской буферизации
+         */
         var cache = {};
         var interval = undefined;
         var state = "";
@@ -582,6 +605,9 @@ var view = function() {
         };
     }();
     var make_ctx_menu = function() {
+        /*
+         * Формирует контекстное меню
+         */
         context_menu = {'1': {
                 id: "1",
                 title: _lang.ctx_open_files,
@@ -818,6 +844,9 @@ var view = function() {
         });
     };
     var make_extend_volume = function(extend_volume_scroll) {
+        /*
+         * Расширяет область изменения громкости колесиком мыши.
+         */
         var box = $('body > .player > .box');
         var boxState = box.hasClass('volume_scroll');
         if (extend_volume_scroll && !boxState) {
@@ -837,6 +866,9 @@ var view = function() {
         }
     };
     var write_language = function() {
+        /*
+         * Локализация
+         */
         $('body').data('lang', _lang.t);
         $('.t_btn.mini').attr('title', _lang.mini);
         $('.t_btn.close').attr('title', _lang.close);
@@ -850,6 +882,9 @@ var view = function() {
         make_ctx_menu();
     };
     var getVolumeColor = function(value) {
+        /*
+         * Генерирует цвет прогресс бара Winamp
+         */
         var a = 0;
         var b = 0;
         var c = 0;
@@ -864,6 +899,9 @@ var view = function() {
         return 'rgba(' + a + ', ' + b + ', ' + c + ', 1)';
     };
     var calculate_moveble = function(selectors, size) {
+        /*
+         * Расчитывает стиль прокрутки длиных имен. для Winmap.
+         */
         var titles = selectors;
         var titles_l = titles.length;
 
@@ -914,6 +952,9 @@ var view = function() {
         }
     };
     var onClearAdapter = function() {
+        /*
+         * Действие при отключении engine адаптера Dance (происходит когда закрывается визуализация).
+         */
         if (is_winamp && settings.visual_type !== '0') {
             if ('winamp_dancer' in visual_cache === false) {
                 visual_cache.winamp_dancer = new Dancer();
@@ -949,6 +990,9 @@ var view = function() {
         }
     };
     var hotKeyListener = function() {
+        /*
+         * Слушает сообщения от расширения для гор. кнопок.
+         */
         chrome.runtime.onMessageExternal.addListener(function(msg, sender, resp) {
             if (msg === 'prev') {
                 engine.preview();
