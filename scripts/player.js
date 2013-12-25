@@ -71,7 +71,7 @@ var view = function() {
         /*
          * Получает массив файлов - Entry из Entry дирректории.
          */
-        if ("isDirectory" in entry === false || entry.isDirectory === false) {
+        if (!entry.isDirectory) {
             cb([]);
             return;
         }
@@ -108,73 +108,112 @@ var view = function() {
             });
         });
     };
-    var readPlaylist = function(entry, file, cb) {
-        /*
-         * Читает m3u файл
-         */
-        var stream_count = 0;
-        var stream_got = 0;
-        var file_list = [];
-        var ordered_name_list = [];
-        var url_list = [];
-        var file_getter = function(files) {
-            stream_got++;
-            file_list = file_list.concat(files);
-            if (stream_count !== stream_got) {
+    var readDirectoryWithM3U = function(entrys, entry) {
+        var playlists = {};
+        var playlist_count = entrys.length;
+        var playlist_dune_count = 0;
+        var fileMede = false;
+        var dune = function() {
+            playlist_dune_count++;
+            if (playlist_count !== playlist_dune_count) {
                 return;
             }
-            var arr = [];
-            var oa = ordered_name_list.length;
-            var fl = file_list.length;
-            for (var n = 0; n < oa; n++) {
-                for (var i = 0; i < fl; i++) {
-                    if (file_list[i].name === ordered_name_list[n]) {
-                        arr.push(file_list[i]);
-                    }
+            var playlist = [];
+            $.each(playlists, function(key, item) {
+                if (item.length === 0) {
+                    return 1;
                 }
-            }
-            entry2files(arr, function(files) {
-                var url_list_len = url_list.length;
-                for (var i = 0; i < url_list_len; i++) {
-                    files.push({url: url_list[i]});
-                }
-                cb(files);
-            });
-        };
-        var readEntry = function(entry, file_tree, file_arr) {
-            /*
-             * ищет внутри всех папок, в соответствие с {} file_tree, и если внутри есть файлы из [] file_arr добавляет из в массив.
-             */
-            if (file_arr === undefined) {
-                file_arr = [];
-            }
-            stream_count++;
-            getEntryFromDir(entry, function(sub_entry) {
-                var len = sub_entry.length;
-                var files = [];
-                for (var n = 0; n < len; n++) {
-                    if (sub_entry[n].isDirectory) {
-                        $.each(file_tree, function(item) {
-                            if (sub_entry[n].fullPath === item) {
-                                readEntry(sub_entry[n], file_tree, file_tree[item].files);
-                            }
-                        });
+                var urls = [];
+                var ent = [];
+                item.forEach(function(itm) {
+                    if (typeof (itm) === 'string') {
+                        urls.push({url: itm});
                     } else {
-                        if (file_arr.indexOf(sub_entry[n].name) !== -1) {
-                            files.push(sub_entry[n]);
+                        ent.push(itm);
+                    }
+                });
+                var name = key;
+                if (urls.length > 0) {
+                    if (ent.length > 0) {
+                        name = key + ' urls';
+                    }
+                    playlist.push({name: name, tracks: urls, id: playlist.length});
+                }
+                if (ent.length > 0) {
+                    if (urls.length > 0) {
+                        name = key + ' files';
+                    }
+                    playlist.push({name: name, entrys: item, id: playlist.length, type: "m3u"});
+                }
+            });
+            engine.setM3UPlaylists({list: playlist});
+            if (playlist.length === 1) {
+                engine.select_playlist(playlist[0].id);
+            } else
+            if (playlist.length > 0) {
+                chrome.runtime.getBackgroundPage(function(bg) {
+                    bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: playlist});
+                });
+            }
+        };
+        var readM3U = function(content, name) {
+            /*
+             * Читает m3u файл и строит дерево каталогов
+             */
+            var ordered_name_list = [];
+            var stream_count = 0;
+            var stream_got = 0;
+            var file_list = [];
+            var file_getter = function(files) {
+                stream_got++;
+                file_list = file_list.concat(files);
+                if (stream_count !== stream_got) {
+                    return;
+                }
+                var arr = [];
+                var oa = ordered_name_list.length;
+                var fl = file_list.length;
+                for (var n = 0; n < oa; n++) {
+                    for (var i = 0; i < fl; i++) {
+                        if (file_list[i].name === ordered_name_list[n]) {
+                            arr.push(file_list[i]);
                         }
                     }
                 }
-                file_getter(files);
-            });
-        };
-        var readM3U = function(content) {
-            /*
-             * Читает m3u файл и строит дерево
-             */
+                playlists[name] = arr;
+                dune();
+            };
+            var readEntry = function(entry, file_tree, file_arr) {
+                /*
+                 * ищет внутри всех папок, в соответствие с {} file_tree, и если внутри есть файлы из [] file_arr добавляет из в массив.
+                 */
+                if (file_arr === undefined) {
+                    file_arr = [];
+                }
+                stream_count++;
+                getEntryFromDir(entry, function(sub_entry) {
+                    var len = sub_entry.length;
+                    var files = [];
+                    for (var n = 0; n < len; n++) {
+                        if (sub_entry[n].isDirectory) {
+                            $.each(file_tree, function(item) {
+                                if (sub_entry[n].fullPath === item) {
+                                    readEntry(sub_entry[n], file_tree, file_tree[item].files);
+                                }
+                            });
+                        } else {
+                            if (file_arr.indexOf(sub_entry[n].name) !== -1) {
+                                files.push(sub_entry[n]);
+                            }
+                        }
+                    }
+                    file_getter(files);
+                });
+            };
             var file_tree = {};
             var lines = content.split("\n");
             var len = lines.length;
+            var url_list = false;
             for (var i = 0; i < len; i++) {
                 var line = lines[i].trim();
                 if (line.length < 1 || line.substr(0, 1) === "#") {
@@ -182,7 +221,14 @@ var view = function() {
                 }
                 var proto_url = line.substr(0, 7).toLowerCase();
                 if (proto_url === "http://" || proto_url === "https:/") {
-                    url_list.push(line);
+                    if (name in playlists === false) {
+                        playlists[name] = [];
+                    }
+                    playlists[name].push(line);
+                    url_list = true;
+                    continue;
+                }
+                if (fileMede) {
                     continue;
                 }
                 var path_arr = line.split('/');
@@ -199,53 +245,83 @@ var view = function() {
                     path += "/" + path_arr[n];
                 }
             }
-            readEntry(entry, file_tree);
+            if (url_list || fileMede) {
+                dune();
+            } else {
+                readEntry(entry, file_tree);
+            }
         };
-        var r = new FileReader();
-        r.onload = function(e) {
-            readM3U("" + r.result);
+        var openM3U = function(file) {
+            var r = new FileReader();
+            r.onload = function() {
+                var playlist_name = file.name.substr(0, file.name.length - 1 - 3);
+                readM3U(r.result, playlist_name);
+            };
+            r.readAsText(file);
         };
-        r.readAsText(file);
+        if ('file' in entrys) {
+            fileMede = true;
+            playlist_count = 1;
+            entrys.file(function(file) {
+                openM3U(file);
+            });
+        } else {
+            entry2files(entrys, function(files) {
+                files.forEach(function(file) {
+                    openM3U(file);
+                });
+            });
+        }
     };
     var readFileArray = function(files, entry) {
-        var m3u = undefined;
-        var fl = files.length;
-        var pl_name = ("isDirectory" in entry && entry.isDirectory) ? entry.name : undefined;
-        for (var n = 0; n < fl; n++) {
-            var filename = files[n].name;
-            var ext = filename.split('.').slice(-1)[0].toLowerCase();
-            if (ext !== "m3u") {
-                continue;
-            }
-            var sname = filename.substr(0, filename.length - 1 - ext.length);
-            if (m3u === undefined) {
-                m3u = {entry: entry, data: [files[n]], list: [{name: sname, id: 0}]};
-            } else {
-                m3u.data.push(files[n]);
-                var id = m3u.list.length;
-                m3u.list.push({name: sname, id: id});
-            }
+        if (!entry) {
+            entry = [];
         }
-        engine.open(files, {name: pl_name});
-        if (m3u !== undefined) {
-            m3u.list.sort(function(a, b) {
-                return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+        var entry_length = entry.length;
+        var entrys = [];
+        if (entry_length !== 0) {
+            for (var i = 0; i < entry_length; i++) {
+                var item = entry[i].webkitGetAsEntry();
+                if (!item) {
+                    continue;
+                }
+                if (item.isDirectory) {
+                    readDirectory(item);
+                    return;
+                } else {
+                    var ext = item.name.split('.').slice(-1)[0].toLowerCase();
+                    if (ext === 'm3u') {
+                        readDirectoryWithM3U(item);
+                        return;
+                    }
+                    entrys.push(item);
+                }
+            }
+            entry2files(entrys, function(files) {
+                engine.open(files, {name: undefined});
             });
-            engine.setM3UPlaylists(m3u);
-            chrome.runtime.getBackgroundPage(function(bg) {
-                bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: m3u.list});
-            });
+        } else {
+            var files_length = files.length;
+            for (var i = 0; i < files_length; i++) {
+                var item = files[i];
+                var ext = item.name.split('.').slice(-1)[0].toLowerCase();
+                if (ext === 'm3u') {
+                    readDirectoryWithM3U(item);
+                    return;
+                }
+            }
+            engine.open(files, {name: undefined});
         }
     };
     var readDirectory = function(entry) {
         /*
-         * Читает открытую дирректорию, получает массив m3u файлов, и воспроизводит файлы внутри.
+         * Читает открытую дирректорию, аналиpирует куда направить работу с дирректорией - в m3u или в чтение подкаталогов
          */
         getEntryFromDir(entry, function(sub_entry) {
             var sub_entry_len = sub_entry.length;
             var dir_count = 0;
             var file_count = 0;
-            var m3u_count = 0;
+            var m3u = [];
             for (var i = 0; i < sub_entry_len; i++) {
                 var item = sub_entry[i];
                 if ("isDirectory" in item && item.isDirectory) {
@@ -253,19 +329,17 @@ var view = function() {
                 } else {
                     var ext = item.name.split('.').slice(-1)[0].toLowerCase();
                     if (ext === 'm3u') {
-                        m3u_count++;
+                        m3u.push(item);
                     } else {
                         file_count++;
                     }
                 }
             }
-            if (file_count === 0 && dir_count === 0 && m3u_count === 0) {
+            if (file_count === 0 && dir_count === 0 && m3u.length === 0) {
                 return;
             } else
-            if (m3u_count > 0) {
-                entry2files(sub_entry, function(files) {
-                    readFileArray(files, entry);
-                });
+            if (m3u.length > 0) {
+                readDirectoryWithM3U(m3u, entry);
             } else {
                 readDirectoryWithSub(entry);
             }
@@ -1078,13 +1152,6 @@ var view = function() {
                 event.preventDefault();
                 var files = event.originalEvent.dataTransfer.files;
                 var entrys = event.originalEvent.dataTransfer.items;
-                if (files.length === 1) {
-                    var entry = entrys[0].webkitGetAsEntry();
-                    if ("isDirectory" in entry && entry.isDirectory) {
-                        readDirectory(entry);
-                        return;
-                    }
-                }
                 readFileArray(files, entrys);
             });
             var drag_timeout = null;
@@ -1161,9 +1228,7 @@ var view = function() {
                     if (!entry) {
                         return;
                     }
-                    entry2files(entry, function(files) {
-                        readFileArray(files, entry);
-                    });
+                    readFileArray(undefined, entry);
                 });
             });
             dom_cache.mute.on('click', function() {
@@ -1395,8 +1460,8 @@ var view = function() {
                 write_language();
             }
         },
-        readPlaylist: readPlaylist,
         getFilesFromFolder: getFilesFromFolder,
+        entry2files: entry2files,
         pre_buffering_controller: pre_buffering_controller,
         setShuffle: function(shuffle) {
             if (is_winamp) {

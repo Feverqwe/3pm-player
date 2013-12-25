@@ -1130,13 +1130,13 @@ var engine = function() {
                     list = item;
                 }
             });
-            if ("entry" in filePlaylists) {
-                view.readPlaylist(filePlaylists.entry, filePlaylists.data[id], function(files) {
+            if (list.type === 'subfiles') {
+                view.getFilesFromFolder(list.entry, function(files) {
                     engine.open(files, {name: list.name, id: id});
                 });
             } else
-            if (list.type === 'subfiles') {
-                view.getFilesFromFolder(list.entry, function(files) {
+            if (list.type === 'm3u') {
+                view.entry2files(list.entrys, function(files) {
                     engine.open(files, {name: list.name, id: id});
                 });
             } else

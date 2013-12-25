@@ -35,21 +35,22 @@
 
             this.fft = new FFT(SAMPLE_SIZE / 2, SAMPLE_RATE);
             this.signal = new Float32Array(SAMPLE_SIZE / 2);
-
-            if (this.audio.readyState < 3) {
-                this.audio.addEventListener('canplay', function() {
-                    connectContext.call(_this);
-                });
-            } else {
-                connectContext.call(_this);
-            }
-
-            this.audio.addEventListener('progress', function(e) {
-                if (e.currentTarget.duration) {
-                    _this.progress = e.currentTarget.seekable.end(0) / e.currentTarget.duration;
-                }
-            });
-
+            /*
+             if (this.audio.readyState < 3) {
+             this.audio.addEventListener('canplay', function() {
+             connectContext.call(_this);
+             });
+             } else {
+             connectContext.call(_this);
+             }*/
+            connectContext.call(_this);
+            /*
+             this.audio.addEventListener('progress', function(e) {
+             if (e.currentTarget.duration && e.currentTarget.duration !== Infinity) {
+             _this.progress = e.currentTarget.seekable.end(0) / e.currentTarget.duration;
+             }
+             });
+             */
             return this.audio;
         },
         play: function() {
