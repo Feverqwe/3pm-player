@@ -245,23 +245,29 @@ var view = function() {
             var sub_entry_len = sub_entry.length;
             var dir_count = 0;
             var file_count = 0;
+            var m3u_count = 0;
             for (var i = 0; i < sub_entry_len; i++) {
                 var item = sub_entry[i];
                 if ("isDirectory" in item && item.isDirectory) {
                     dir_count++;
                 } else {
-                    file_count++;
+                    var ext = item.name.split('.').slice(-1)[0].toLowerCase();
+                    if (ext === 'm3u') {
+                        m3u_count++;
+                    } else {
+                        file_count++;
+                    }
                 }
             }
-            if (file_count === 0 && dir_count === 0) {
+            if (file_count === 0 && dir_count === 0 && m3u_count === 0) {
                 return;
             } else
-            if (file_count === 0 && dir_count > 0) {
-                readDirectoryWithSub(entry);
-            } else {
+            if (m3u_count > 0) {
                 entry2files(sub_entry, function(files) {
                     readFileArray(files, entry);
                 });
+            } else {
+                readDirectoryWithSub(entry);
             }
         });
     };
@@ -328,11 +334,15 @@ var view = function() {
             var dune = function() {
                 dune_count++;
                 if (dune_count === list_dir_len && playlist.length > 0) {
-                    var lists = {list: playlist};
-                    engine.setM3UPlaylists(lists);
-                    chrome.runtime.getBackgroundPage(function(bg) {
-                        bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: lists.list});
-                    });
+                    engine.setM3UPlaylists({list: playlist});
+                    if (playlist.length === 1) {
+                        engine.select_playlist(playlist[0].id);
+                    } else
+                    if (playlist.length > 0) {
+                        chrome.runtime.getBackgroundPage(function(bg) {
+                            bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: playlist});
+                        });
+                    }
                 }
             };
             list_dir.forEach(function(item) {
