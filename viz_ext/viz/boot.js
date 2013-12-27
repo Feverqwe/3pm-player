@@ -2,7 +2,7 @@
  follow me on twitter : https://twitter.com/_vor
  */
 
-if (typeof reality == 'undefined') {
+if (typeof reality === 'undefined') {
     reality = {};
 }
 (function($) {
