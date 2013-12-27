@@ -1,7 +1,8 @@
 /**
  follow me on twitter : https://twitter.com/_vor
  */
-if (reality === undefined) {
+
+if (typeof reality == 'undefined') {
     reality = {};
 }
 (function($) {
