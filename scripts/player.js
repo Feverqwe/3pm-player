@@ -304,7 +304,10 @@ var view = function() {
         var entrys = [];
         if (entry_length !== 0) {
             for (var i = 0; i < entry_length; i++) {
-                var item = entry[i].webkitGetAsEntry();
+                var item = entry[i];
+                if ('webkitGetAsEntry' in entry[i]) {
+                    item = item.webkitGetAsEntry();
+                }
                 if (!item) {
                     continue;
                 }
