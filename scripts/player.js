@@ -951,42 +951,40 @@ var view = function() {
             titles.eq(i).parent().attr('class', 'name ' + move_name);
         }
     };
-    var onClearAdapter = function() {
+    var writeWinampFFT = function() {
         /*
          * Действие при отключении engine адаптера Dance (происходит когда закрывается визуализация).
          */
         if (is_winamp && settings.visual_type !== '0') {
-            if ('winamp_dancer' in visual_cache === false) {
-                visual_cache.winamp_dancer = new Dancer();
-                var convas = document.getElementById('winamp_fft');
-                var ctx = convas.getContext('2d');
-                convas.width = 80;
-                visual_cache.winamp_dancer.createKick({
-                    onKick: function() {
-                        ctx.fillStyle = '#ff0077';
-                    },
-                    offKick: function() {
-                        ctx.fillStyle = '#54D100';
-                    },
-                    threshold: 0.2
-                }).on();
-                if (settings.visual_type === '2') {
-                    convas.height = 20;
-                    visual_cache.winamp_dancer.waveform(convas,
-                            {strokeStyle: '#fff', strokeWidth: 1, count: 40}
-                    );
-                } else {
-                    convas.height = 37;
-                    visual_cache.winamp_dancer.fft(convas,
-                            {fillStyle: '#666', count: 20, width: 3, spacing: 1}
-                    );
-                }
-                visual_cache.winamp_dancer.load(engine.getAudio(), 'winamp').bind('loaded', function() {
-                    visual_cache.winamp_dancer.play();
-                });
+            var convas = $('<canvas>', {id: 'winamp_fft'});
+            convas.appendTo($('.player'));
+            convas = convas[0];
+            visual_cache.winamp_dancer = new Dancer();
+            var ctx = convas.getContext('2d');
+            convas.width = 80;
+            visual_cache.winamp_dancer.createKick({
+                onKick: function() {
+                    ctx.fillStyle = '#ff0077';
+                },
+                offKick: function() {
+                    ctx.fillStyle = '#54D100';
+                },
+                threshold: 0.2
+            }).on();
+            if (settings.visual_type === '2') {
+                convas.height = 20;
+                visual_cache.winamp_dancer.waveform(convas,
+                        {strokeStyle: '#fff', strokeWidth: 1, count: 40}
+                );
             } else {
-                visual_cache.winamp_dancer.load(engine.getAudio(), 'winamp');
+                convas.height = 37;
+                visual_cache.winamp_dancer.fft(convas,
+                        {fillStyle: '#666', count: 20, width: 3, spacing: 1}
+                );
             }
+            visual_cache.winamp_dancer.bind('loaded', function() {
+                visual_cache.winamp_dancer.play();
+            }).load(engine.getAudio(), 'winamp');
         }
     };
     var hotKeyListener = function() {
@@ -1061,10 +1059,6 @@ var view = function() {
                 var win_w = parseInt(275 * coef);
                 var win_h = parseInt(116 * coef);
                 win.resizeTo(win_w, win_h);
-                var spec = '';
-                if (settings.visual_type !== '0') {
-                    spec = $('<canvas>', {id: 'winamp_fft'});
-                }
                 $('body').append(
                         $('<div>', {'class': "menu t_btn"}).on('click', function() {
                     chrome.runtime.getBackgroundPage(function(bg) {
@@ -1083,8 +1077,7 @@ var view = function() {
                 $('<div>', {'class': "w_kbps", text: 320}),
                 $('<div>', {'class': "w_kHz", text: 44}),
                 $('<div>', {'class': "stereo"}),
-                spec,
-                        $('<div>', {'class': "w_playlist"}).on('click', function() {
+                $('<div>', {'class': "w_playlist"}).on('click', function() {
                     chrome.runtime.getBackgroundPage(function(bg) {
                         bg.wm.toggle_playlist();
                     });
@@ -1136,7 +1129,7 @@ var view = function() {
                         }
                     };
                 }();
-                onClearAdapter();
+                writeWinampFFT();
             }
             write_language();
             dom_cache.progress.slider({
@@ -1528,7 +1521,6 @@ var view = function() {
                 }
             }
         },
-        onClearAdapter: onClearAdapter,
         getContextMenu: function() {
             return context_menu;
         }

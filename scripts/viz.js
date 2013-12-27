@@ -72,9 +72,7 @@ var viz = function() {
             };
             $('.close').on('click', function() {
                 save_pos();
-                sendPlayer(function(window) {
-                    window.engine.discAdapter();
-                });
+                reality.music.audioAdapter.die();
                 window.close();
             });
             $('.mini').on('click', function() {

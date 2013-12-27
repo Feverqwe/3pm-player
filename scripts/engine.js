@@ -62,7 +62,9 @@ var engine = function() {
             chrome.runtime.getBackgroundPage(function(bg) {
                 _viz_window = bg.wm.getViz();
                 if (_viz_window !== undefined) {
-                    callback(_viz_window);
+                    if (callback !== undefined) {
+                        callback(_viz_window);
+                    }
                 } else {
                     if (fail !== undefined) {
                         fail();
@@ -70,7 +72,9 @@ var engine = function() {
                 }
             });
         } else {
-            callback(_viz_window);
+            if (callback !== undefined) {
+                callback(_viz_window);
+            }
         }
     }
     var reset_player = function() {
@@ -224,12 +228,21 @@ var engine = function() {
         });
         return index;
     };
-    var discAdapter = function() {
-        if (adapter.adapter !== undefined) {
-            adapter.adapter.proc.disconnect();
-            adapter.adapter = undefined;
+    var discAdapters = function(name) {
+        var rmlist = [];
+        if (name !== undefined && name in adapter.proc_list) {
+            adapter.proc_list[name].disconnect();
+            rmlist.push(name);
         }
-        view.onClearAdapter();
+        $.each(adapter.proc_list, function(key, proc) {
+            if (proc._window.window === null) {
+                proc.disconnect();
+                rmlist.push(key);
+            }
+        });
+        rmlist.forEach(function(name) {
+            delete adapter.proc_list[name];
+        });
     };
     var player = function() {
         var type_list = {};
@@ -676,9 +689,8 @@ var engine = function() {
                 adapter.context = new window.webkitAudioContext();
                 adapter.audio = audio;
                 adapter.source = adapter.context.createMediaElementSource(adapter.audio);
-                adapter.gain = adapter.context.createGainNode();
-                adapter.source.connect(adapter.gain);
-                adapter.gain.connect(adapter.context.destination);
+                adapter.source.connect(adapter.context.destination);
+                adapter.proc_list = {};
 
                 $(audio).on('loadstart', function(e) {
                     view.setTags(playlist[current_id].tags || {});
@@ -710,6 +722,7 @@ var engine = function() {
                 });
                 $(audio).on('pause', function(e) {
                     view.state("pause");
+                    discAdapters();
                 });
                 $(audio).on('loadedmetadata', function(e) {
                     if (playlist[current_id].duration === undefined) {
@@ -718,9 +731,8 @@ var engine = function() {
                     view.state("loadedmetadata");
                     sendViz(function(window) {
                         window.viz.audio_state('loadedmetadata');
-                    }, function() {
-                        discAdapter();
                     });
+                    discAdapters();
                 });
                 $(audio).on('loadeddata', function(e) {
                     if (settings.next_track_notification) {
@@ -1016,21 +1028,15 @@ var engine = function() {
             return [sort_type, list];
         },
         readAllTags: player.readAllTags,
-        getAdapter: function(cb, type) {
+        getAdapter: function(cb) {
             if (!cb) {
                 return adapter;
-            }
-            if (type !== "winamp") {
-                cb(adapter);
             } else {
-                if (_viz_window === undefined || _viz_window.window === null) {
-                    cb(adapter);
-                }
+                cb(adapter);
             }
-            return adapter;
         },
-        discAdapter: function() {
-            discAdapter();
+        discAdapters: function() {
+            discAdapters();
         },
         getTagBody: player.getTagBody,
         vizRandomPreset: function() {

@@ -43,6 +43,7 @@
              } else {
              connectContext.call(_this);
              }*/
+            
             connectContext.call(_this);
             /*
              this.audio.addEventListener('progress', function(e) {
@@ -62,10 +63,10 @@
             this.isPlaying = false;
         },
         setVolume: function(volume) {
-            this.gain.gain.value = volume;
+            //this.gain.gain.value = volume;
         },
         getVolume: function() {
-            return this.gain.gain.value;
+            //return this.gain.gain.value;
         },
         getProgress: function() {
             return this.progress;
@@ -103,6 +104,9 @@
 
             this.fft.forward(this.signal);
             this.dancer.trigger('update');
+        },
+        die: function(e) {
+            this.proc.disconnect();
         }
     };
 
@@ -116,27 +120,20 @@
         var _this = this;
         _viz.getAdapter(function(ad) {
             _this.audio = ad.audio;
-            //_this.context = ad.context;
-            _this.source = ad.source;//this.context.createMediaElementSource(this.audio);
-            if (ad.gain === undefined) {
-                ad.gain = ad.context.createGainNode();
+            _this.source = ad.source;
+            if (ad.proc_list[_this.type] !== undefined) {
+                ad.proc_list[_this.type].disconnect();
+                delete ad.proc_list[_this.type];
             }
-            _this.gain = ad.gain;
-            if (ad.adapter !== undefined) {
-                ad.adapter.proc.disconnect();
-                ad.adapter = undefined;
-            }
-            ad.adapter = _this;
-            _this.source.disconnect();
-            _this.source.connect(_this.proc);
-            _this.source.connect(_this.gain);
+            _this.proc._window = window.window;
+            _this.ad = ad;
+            ad.proc_list[_this.type] = _this.proc;
             _this.proc.connect(_this.context.destination);
-            _this.gain.connect(_this.context.destination);
-
+            _this.source.connect(_this.proc);
             _this.isLoaded = true;
             _this.progress = 1;
             _this.dancer.trigger('loaded');
-        }, _this.type);
+        });
     }
 
     Dancer.adapters.webkit = adapter;
