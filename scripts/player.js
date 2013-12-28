@@ -672,16 +672,19 @@ var view = function() {
                 id: "ws",
                 title: _lang.ctx_webui + " (0.0.0.0:9898)",
                 contexts: ['page', 'launcher'],
-                action: function() {
-                    if (info.checked) {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.ws.start();
-                        });
-                    } else {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.ws.stop();
-                        });
-                    }
+                action: function(info) {
+                    chrome.runtime.getBackgroundPage(function(bg) {
+                        var state = !bg.wm.ws.active();
+                        if (state) {
+                            chrome.runtime.getBackgroundPage(function(bg) {
+                                bg.wm.ws.start();
+                            });
+                        } else {
+                            chrome.runtime.getBackgroundPage(function(bg) {
+                                bg.wm.ws.stop();
+                            });
+                        }
+                    });
                 }
             }, 'viz': {
                 id: "viz",
@@ -1328,7 +1331,7 @@ var view = function() {
             engine.set_hotkeys(document);
             chrome.contextMenus.onClicked.addListener(function(info) {
                 if (info.menuItemId in context_menu && context_menu[info.menuItemId].action !== undefined) {
-                    context_menu[info.menuItemId].action();
+                    context_menu[info.menuItemId].action(info);
                 }
             });
             chrome.storage.local.get('shuffle', function(storage) {
