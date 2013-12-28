@@ -1048,7 +1048,6 @@ var view = function() {
         tmp_node = $('<div>', {style: 'line-height: normal; font-size: 110%; width: 247px; overflow: hidden; display: none;', text: album}).appendTo($('body'));
         var album_line = parseInt(tmp_node.height() / 13);
         tmp_node.remove();
-        console.log(title_line, album_line);
         if (album.length === 0) {
             max_title_line = 3;
             album_line = 0;
