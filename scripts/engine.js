@@ -1035,8 +1035,8 @@ var engine = function() {
                 cb(adapter);
             }
         },
-        discAdapters: function() {
-            discAdapters();
+        discAdapters: function(a) {
+            discAdapters(a);
         },
         getTagBody: player.getTagBody,
         vizRandomPreset: function() {

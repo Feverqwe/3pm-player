@@ -960,10 +960,35 @@ var view = function() {
         /*
          * Действие при отключении engine адаптера Dance (происходит когда закрывается визуализация).
          */
-        if (is_winamp && settings.visual_type !== '0') {
-            var convas = $('<canvas>', {id: 'winamp_fft'});
-            convas.appendTo($('.player'));
+        if (is_winamp) {
+            var convas = $('canvas.winamp_fft');
+            if (convas.data('type') === settings.visual_type) {
+                return;
+            }
+            if (convas.length === 0) {
+                convas = $('<canvas>', {'class': 'winamp_fft'}).on('click', function() {
+                    if (settings.visual_type === '0') {
+                        settings.visual_type = '1';
+                    } else
+                    if (settings.visual_type === '1') {
+                        settings.visual_type = '2';
+                    } else
+                    if (settings.visual_type === '2') {
+                        settings.visual_type = '0';
+                    }
+                    chrome.storage.local.set({'visual_type': settings.visual_type});
+                    writeWinampFFT();
+                }).appendTo($('.player'));
+            } else {
+                engine.discAdapters('winamp');
+                visual_cache.winamp_dancer = undefined;
+            }
+            convas.data('type', settings.visual_type);
             convas = convas[0];
+            if (settings.visual_type === '0') {
+                convas.width = convas.width;
+                return;
+            }
             visual_cache.winamp_dancer = new Dancer();
             var ctx = convas.getContext('2d');
             convas.width = 80;
@@ -1554,6 +1579,7 @@ var view = function() {
         },
         updateSettings: function(obj) {
             make_extend_volume(obj.extend_volume_scroll);
+            writeWinampFFT(obj.visual_type);
             if (_lang !== undefined && $('body').data('lang') !== _lang.t) {
                 write_language();
             }

@@ -53,7 +53,7 @@ var get_lang = function(language) {
             9: 'Winamp skin (requires restart)',
             10: 'To enable global multimedia keys need to',
             11: 'download the extension',
-            12: 'Configure integrated visualization, Winamp (requires restart)',
+            12: 'Configure integrated visualization, Winamp',
             13: 'Disable',
             14: 'Spectrogram',
             15: 'Oscillogram'
@@ -113,7 +113,7 @@ var get_lang = function(language) {
             9: 'Winamp скин (требует перезапуск)',
             10: 'Чтобы включить глобальные мультимедиа клавиши нужно',
             11: 'загрузить расширение',
-            12: 'Настройки встроенной визуализации Winamp (требует перезапуск)',
+            12: 'Настройки встроенной визуализации Winamp',
             13: 'Отключить',
             14: 'Спектрограмма',
             15: 'Осциллограмма'
