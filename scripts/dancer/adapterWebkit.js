@@ -1,19 +1,21 @@
 (function() {
-    var
-            SAMPLE_SIZE = 2048,
-            SAMPLE_RATE = 44100;
+    var fps_time = 1000 / 24;
+    var SAMPLE_SIZE = 2048;
+    var SAMPLE_RATE = 44100;
 
     var adapter = function(dancer) {
+        this.fps_timer = undefined;
+        this.frame_trigger = true;
         this.dancer = dancer;
         this.audio = new Audio();
-        var _this = this;
-        var _viz = undefined;
+        this._viz = undefined;
         if ('viz' in window === false && 'engine' in window) {
-            _viz = engine;
+            this._viz = engine;
         } else {
-            _viz = viz;
+            this._viz = viz;
         }
-        _viz.getAdapter(function(ad) {
+        var _this = this;
+        this._viz.getAdapter(function(ad) {
             _this.context = ad.context;
         });
     };
@@ -29,7 +31,15 @@
 
             this.proc = this.context.createJavaScriptNode(SAMPLE_SIZE / 2, 1, 1);
             this.proc.onaudioprocess = function(e) {
+                if (_this.frame_trigger === false) {
+                    return;
+                }
                 _this.update.call(_this, e);
+                _this.frame_trigger = false;
+                clearTimeout(_this.fps_timer);
+                _this.fps_timer = setTimeout(function() {
+                    _this.frame_trigger = true;
+                }, fps_time);
             };
             //this.gain = this.context.createGainNode();
 
@@ -43,7 +53,7 @@
              } else {
              connectContext.call(_this);
              }*/
-            
+
             connectContext.call(_this);
             /*
              this.audio.addEventListener('progress', function(e) {

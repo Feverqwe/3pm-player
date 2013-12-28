@@ -234,7 +234,6 @@ div.filelist::-webkit-scrollbar-thumb:vertical,
 }
 body.winamp {
     background: -webkit-linear-gradient(left, #1c1c2c 0%,#383758 50%,#1d1d2d 100%);
-    font-size: 10px;
     color: rgb(33, 248, 33);
 }
 .winamp .close {
@@ -377,9 +376,6 @@ body.winamp {
 .winamp .menu_choice div.menu {
     background-color: #000;
 }
-.winamp .filelist_body ul > li .play {
-    top: -2px;
-}
 .winamp .dialog {
     padding-left: 11px;
     padding-right: 8px;
@@ -392,4 +388,10 @@ body.winamp {
 .winamp .dialog.playlist_chiser {
     padding-left: 11px;
     padding-right: 4px;
+}
+.winamp .dialog.playlist_chiser {
+    font-size: 10px;
+}
+.winamp .dialog.url_dialog > div {
+    margin-bottom: -3px;
 }
