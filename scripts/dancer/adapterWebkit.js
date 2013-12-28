@@ -115,14 +115,8 @@
     };
 
     function connectContext() {
-        var _viz = undefined;
-        if ('viz' in window === false && 'engine' in window) {
-            _viz = engine;
-        } else {
-            _viz = viz;
-        }
         var _this = this;
-        _viz.getAdapter(function(ad) {
+        this._viz.getAdapter(function(ad) {
             _this.audio = ad.audio;
             _this.source = ad.source;
             if (ad.proc_list[_this.type] !== undefined) {
