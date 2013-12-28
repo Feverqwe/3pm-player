@@ -882,6 +882,8 @@ var view = function() {
         $('.btn.playpause').attr('title', _lang.play_pause);
         $('.btn.next').attr('title', _lang.next);
         $('.volume_controll .pic').attr('title', _lang.mute);
+        $('div.shuffle').attr('title', _lang.shuffle);
+        $('div.loop').attr('title', _lang.loop);
         make_ctx_menu();
     };
     var getVolumeColor = function(value) {
@@ -1057,6 +1059,7 @@ var view = function() {
             if (is_winamp) {
                 $('body').addClass('winamp');
                 $('li.btn.playlist').hide();
+                $('div.pl_state').hide();
                 var win = chrome.app.window.current();
                 var coef = window.devicePixelRatio;
                 var win_w = parseInt(275 * coef);
@@ -1070,13 +1073,9 @@ var view = function() {
                 })
                         );
                 $('.player').append(
-                        $('<div>', {'class': "shuffle"}).on('click', function() {
-                    engine.shuffle();
-                }),
-                        $('<div>', {'class': "loop"}).on('click', function() {
-                    engine.loop();
-                }),
-                        $('<div>', {'class': "state"}),
+                        $('<div>', {'class': "shuffle"}),
+                $('<div>', {'class': "loop"}),
+                $('<div>', {'class': "state"}),
                 $('<div>', {'class': "w_kbps", text: 320}),
                 $('<div>', {'class': "w_kHz", text: 44}),
                 $('<div>', {'class': "stereo"}),
@@ -1318,6 +1317,12 @@ var view = function() {
                     bg.wm.toggle_playlist();
                 });
             });
+            $('div.loop').on('click', function() {
+                engine.loop();
+            });
+            $('div.shuffle').on('click', function() {
+                engine.shuffle();
+            });
             var save_pos = function() {
                 if (document.webkitHidden) {
                     return;
@@ -1507,21 +1512,17 @@ var view = function() {
         entry2files: entry2files,
         pre_buffering_controller: pre_buffering_controller,
         setShuffle: function(shuffle) {
-            if (is_winamp) {
-                if (shuffle) {
-                    $('div.shuffle').addClass('on');
-                } else {
-                    $('div.shuffle').removeClass('on');
-                }
+            if (shuffle) {
+                $('div.shuffle').addClass('on');
+            } else {
+                $('div.shuffle').removeClass('on');
             }
         },
         setLoop: function(loop) {
-            if (is_winamp) {
-                if (loop) {
-                    $('div.loop').addClass('on');
-                } else {
-                    $('div.loop').removeClass('on');
-                }
+            if (loop) {
+                $('div.loop').addClass('on');
+            } else {
+                $('div.loop').removeClass('on');
             }
         },
         getContextMenu: function() {
