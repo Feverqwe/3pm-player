@@ -1042,10 +1042,10 @@ var view = function() {
         var album_scroller = false;
         var max_title_line = 2;
         var max_album_line = 2;
-        var tmp_node = $('<div>', {style: 'line-height: normal; font-size: 130%; width: 214px; overflow: hidden; display: none;', text: title}).appendTo($('body'));
+        var tmp_node = $('<div>', {style: 'line-height: normal; font-size: 130%; width: 214px; word-wrap: break-word; overflow: hidden; display: none;', text: title}).appendTo($('body'));
         var title_line = parseInt(tmp_node.height() / 15.5);
         tmp_node.remove();
-        tmp_node = $('<div>', {style: 'line-height: normal; font-size: 110%; width: 247px; overflow: hidden; display: none;', text: album}).appendTo($('body'));
+        tmp_node = $('<div>', {style: 'line-height: normal; font-size: 110%; width: 247px; word-wrap: break-word; overflow: hidden; display: none;', text: album}).appendTo($('body'));
         var album_line = parseInt(tmp_node.height() / 13);
         tmp_node.remove();
         if (album.length === 0) {
