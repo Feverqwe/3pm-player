@@ -326,7 +326,7 @@ div.volume_scroll > div.image {
 div.pl_state {
     -webkit-app-region: no-drag;
     position: absolute;
-    top: -12px;
+    top: -13px;
     left: 84px;
 }
 div.s_btn {
