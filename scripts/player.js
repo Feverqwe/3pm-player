@@ -674,16 +674,13 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function(info) {
                     chrome.runtime.getBackgroundPage(function(bg) {
-                        var state = !bg.wm.ws.active();
-                        if (state) {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.ws.start();
-                            });
+                        var state = bg.wm.ws.active();
+                        if (state === false) {
+                            bg.wm.ws.start();
                         } else {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.ws.stop();
-                            });
+                            bg.wm.ws.stop();
                         }
+                        chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
                     });
                 }
             }, 'viz': {
