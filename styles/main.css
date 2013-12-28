@@ -327,13 +327,12 @@ div.pl_state {
     -webkit-app-region: no-drag;
     position: absolute;
     top: -12px;
-    left: 82px;
+    left: 84px;
 }
 div.s_btn {
     display: inline-block;
     background-repeat: no-repeat;
     background-size: 13px;
-    margin-right: 4px;
     cursor: pointer;
     background-position-x: 3px;
     height: 12px;
