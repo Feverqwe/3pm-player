@@ -1,13 +1,12 @@
 (function() {
-    var fps_time = 1000 / 24;
+    var fps = 1000 / 24;
     var SAMPLE_SIZE = 2048;
     var SAMPLE_RATE = 44100;
 
     var adapter = function(dancer) {
-        this.fps_timer = undefined;
-        this.frame_trigger = true;
         this.dancer = dancer;
         this.audio = new Audio();
+        this.nextTick = 0;
         this._viz = undefined;
         if ('viz' in window === false && 'engine' in window) {
             this._viz = engine;
@@ -31,15 +30,10 @@
 
             this.proc = this.context.createJavaScriptNode(SAMPLE_SIZE / 2, 1, 1);
             this.proc.onaudioprocess = function(e) {
-                if (_this.frame_trigger === false) {
-                    return;
+                if (_this.nextTick < e.timeStamp) {
+                    _this.update.call(_this, e);
+                    _this.nextTick = e.timeStamp + fps;
                 }
-                _this.update.call(_this, e);
-                _this.frame_trigger = false;
-                clearTimeout(_this.fps_timer);
-                _this.fps_timer = setTimeout(function() {
-                    _this.frame_trigger = true;
-                }, fps_time);
             };
             //this.gain = this.context.createGainNode();
 
