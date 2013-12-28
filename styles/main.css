@@ -648,6 +648,9 @@ body.winamp {
 .winamp div.progress.stream > div.loaded {
     background-color: initial;
 }
+.winamp div.progress.download > div.ui-slider-range {
+    background-color: initial;
+}
 @-webkit-keyframes onpausetime {
     0% {opacity: 1;}
     50% {opacity: 0;}
