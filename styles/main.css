@@ -23,9 +23,27 @@ body {
 .player .track > div.name {
     color: #fff;
     font-size: 130%;
+    max-width: 214px;
+}
+.player .track > .name.scroller {
+    overflow: hidden;
+    -webkit-app-region: no-drag;
+}
+.player .track > .name.scroller > span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .player .track > .album {
     font-size: 110%;
+    max-width: 247px;
+}
+.player .track > .album.scroller {
+    overflow: hidden;
+    -webkit-app-region: no-drag;
+}
+.player .track > .album.scroller > span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .player .image_box {
     width: 81px;

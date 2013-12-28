@@ -903,7 +903,7 @@ var view = function() {
         }
         return 'rgba(' + a + ', ' + b + ', ' + c + ', 1)';
     };
-    var calculate_moveble = function(selectors, size) {
+    var calculate_moveble = function(selectors, size, classname) {
         /*
          * Расчитывает стиль прокрутки длиных имен. для Winmap.
          */
@@ -953,7 +953,7 @@ var view = function() {
                         + '}'
                         + '</style>');
             }
-            titles.eq(i).parent().attr('class', 'name ' + move_name);
+            titles.eq(i).parent().attr('class', classname + ' ' + move_name);
         }
     };
     var writeWinampFFT = function() {
@@ -1033,6 +1033,56 @@ var view = function() {
                 });
             }
         });
+    };
+    var setTrueText = function(title, album) {
+        if (is_winamp) {
+            return;
+        }
+        var title_scroller = false;
+        var album_scroller = false;
+        var max_title_line = 2;
+        var max_album_line = 2;
+        var tmp_node = $('<div>', {style: 'line-height: normal; font-size: 130%; width: 214px; overflow: hidden; display: none;', text: title}).appendTo($('body'));
+        var title_line = parseInt(tmp_node.height() / 15.5);
+        tmp_node.remove();
+        tmp_node = $('<div>', {style: 'line-height: normal; font-size: 110%; width: 247px; overflow: hidden; display: none;', text: album}).appendTo($('body'));
+        var album_line = parseInt(tmp_node.height() / 13);
+        tmp_node.remove();
+        console.log(title_line, album_line);
+        if (album.length === 0) {
+            max_title_line = 3;
+            album_line = 0;
+        }
+        if (title_line > max_title_line) {
+            title_scroller = true;
+            title_line = 1;
+        }
+        if (album_line > max_album_line) {
+            album_scroller = true;
+            album_line = 1;
+        }
+        if (title_line === 2) {
+            if (album_line > 1) {
+                album_scroller = true;
+            }
+        }
+        if (title_line === 1) {
+            if (album_line > 2) {
+                album_scroller = true;
+            }
+        }
+        if (album_scroller) {
+            dom_cache.trackalbum.parent().addClass('scroller');
+            calculate_moveble(dom_cache.trackalbum, dom_cache.trackalbum.parent().width(), 'album scroller');
+        } else {
+            dom_cache.trackalbum.parent().attr('class', 'album');
+        }
+        if (title_scroller) {
+            dom_cache.trackname.parent().addClass('scroller');
+            calculate_moveble(dom_cache.trackname, dom_cache.trackname.parent().width(), 'name scroller');
+        } else {
+            dom_cache.trackname.parent().attr('class', 'name');
+        }
     };
     return {
         show: function() {
@@ -1364,10 +1414,10 @@ var view = function() {
             }
             if (is_winamp) {
                 if (trackalbum.length > 0) {
-                    trackalbum = ' — ' + trackalbum;
+                    trackalbum = ' - ' + trackalbum;
                 }
                 dom_cache.trackname.text(title + trackalbum).parent().attr("title", title + trackalbum);
-                calculate_moveble(dom_cache.trackname, 153);
+                calculate_moveble(dom_cache.trackname, 153, 'name');
             } else {
                 dom_cache.trackname.text(title).parent().attr("title", title);
                 dom_cache.trackalbum.text(trackalbum).parent().attr("title", trackalbum);
@@ -1377,6 +1427,7 @@ var view = function() {
             } else {
                 hideImage();
             }
+            setTrueText(title, trackalbum);
             //console.log(tags)
         },
         setProgress: function(max, pos) {
