@@ -23,7 +23,7 @@ body {
 .player .track > div.name {
     color: #fff;
     font-size: 130%;
-    max-width: 214px;
+    max-width: 232px;
 }
 .player .track > .name.scroller {
     overflow: hidden;
@@ -35,7 +35,7 @@ body {
 }
 .player .track > .album {
     font-size: 110%;
-    max-width: 247px;
+    max-width: 232px;
 }
 .player .track > .album.scroller {
     overflow: hidden;
@@ -293,11 +293,19 @@ div.loading {
 }
 .mini {
     background-image: url('../images/_.png');
-    right: 18px;
+    top: 18px;
+    right: 2px;
 }
 .close {
     background-image: url('../images/x.png');
     right: 2px;
+}
+.t_btn.menu {
+    background-image: url('../images/menu.png');
+    top: 34px;
+    right: 2px;
+    background-position: center;
+    background-size: 10px;
 }
 .click_for_open {
     position: absolute;
@@ -465,6 +473,8 @@ body.winamp {
     background-color: inherit;
     opacity: 1;
     -webkit-filter: inherit;
+    right: auto;
+    background-position: center;
 }
 .winamp .t_btn.menu:hover {
     opacity: 1;

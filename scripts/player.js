@@ -875,6 +875,7 @@ var view = function() {
         $('body').data('lang', _lang.t);
         $('.t_btn.mini').attr('title', _lang.mini);
         $('.t_btn.close').attr('title', _lang.close);
+        $('.t_btn.menu').attr('title', _lang.menu);
         $('div.drop span').text(_lang.drop_file);
         $('div.click_for_open span').text(_lang.click_for_open);
         $('.btn.playlist').attr('title', _lang.playlist);
@@ -1067,10 +1068,10 @@ var view = function() {
         var album_scroller = false;
         var max_title_line = 2;
         var max_album_line = 2;
-        var tmp_node = $('<div>', {style: 'line-height: normal; font-size: 130%; width: 214px; word-wrap: break-word; overflow: hidden; display: none;', text: title}).appendTo($('body'));
+        var tmp_node = $('<div>', {style: 'line-height: normal; font-size: 130%; width: 232px; word-wrap: break-word; overflow: hidden; display: none;', text: title}).appendTo($('body'));
         var title_line = parseInt(tmp_node.height() / 15.5);
         tmp_node.remove();
-        tmp_node = $('<div>', {style: 'line-height: normal; font-size: 110%; width: 247px; word-wrap: break-word; overflow: hidden; display: none;', text: album}).appendTo($('body'));
+        tmp_node = $('<div>', {style: 'line-height: normal; font-size: 110%; width: 232px; word-wrap: break-word; overflow: hidden; display: none;', text: album}).appendTo($('body'));
         var album_line = parseInt(tmp_node.height() / 13);
         tmp_node.remove();
         if (album.length === 0) {
@@ -1139,13 +1140,6 @@ var view = function() {
                 var win_w = parseInt(275 * coef);
                 var win_h = parseInt(116 * coef);
                 win.resizeTo(win_w, win_h);
-                $('body').append(
-                        $('<div>', {'class': "menu t_btn"}).on('click', function() {
-                    chrome.runtime.getBackgroundPage(function(bg) {
-                        bg.wm.showDialog({type: "menu", h: 290, w: 250, r: true, list: context_menu});
-                    });
-                })
-                        );
                 $('.player').append(
                         $('<div>', {'class': "shuffle"}),
                 $('<div>', {'class': "loop"}),
@@ -1311,6 +1305,11 @@ var view = function() {
                 });
                 engine.vizMini();
                 chrome.app.window.current().minimize();
+            });
+            $('.t_btn.menu').on('click', function() {
+                chrome.runtime.getBackgroundPage(function(bg) {
+                    bg.wm.showDialog({type: "menu", h: 290, w: 250, r: true, list: context_menu});
+                });
             });
             dom_cache.time.on('click', function() {
                 time_tipe = (time_tipe) ? 0 : 1;
