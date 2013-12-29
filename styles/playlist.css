@@ -120,7 +120,9 @@ div.playlist > ul > li .cover {
     width: 39px;
     display: block;
     position: absolute;
-    background-size: 39px 39px;
+    background-size: 39px;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 div.playlist > ul > li .cover.pic_none {
     background-image: url(../images/no-cover.png);

@@ -120,21 +120,33 @@ var engine = function() {
         }
         playedlist.push(id);
     };
-    var image_resize = function(binary, cb) {
+    var b64toBlob = function(b64Data, contentType, sliceSize) {
+        contentType = contentType || '';
+        sliceSize = sliceSize || 512;
+
+        var byteCharacters = atob(b64Data);
+        var byteArrays = [];
+
+        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+            var byteNumbers = new Array(slice.length);
+            for (var i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            var byteArray = new Uint8Array(byteNumbers);
+
+            byteArrays.push(byteArray);
+        }
+
+        var blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+    };
+    var image_resize = function(url, cb) {
         /*
          * Изменяет размер обложки.
          */
-        var resize_enable = true;
-        if (binary === undefined) {
-            cb(undefined);
-            return;
-        }
-        binary = "data:" + binary[1] + ";base64," + btoa(binary[0]);
-        if (!resize_enable) {
-            var id = add_cover(binary.length, binary);
-            cb(id);
-            return;
-        }
         var img = new Image();
         img.onerror = function() {
             cb(undefined);
@@ -148,24 +160,62 @@ var engine = function() {
             c.width = w;
             c.height = h;
             c.getContext("2d").drawImage(this, 0, 0, w, h);
-            binary = c.toDataURL();
-            var id = add_cover(binary.length, binary);
+            var blob = b64toBlob(c.toDataURL('image/png', 1).split(',')[1], 'image/png');
+            var url = webkitURL.createObjectURL(blob);
+            var id = add_cover(blob.size, url);
             cb(id);
         };
-        img.src = binary;
+        img.src = url;
+    };
+    var read_image = function(binary, cb) {
+        /*
+         * binary = [Array || ArrayBuffer || String, 'image/*'];
+         */
+        var resize = true;
+        if (binary === undefined) {
+            cb(undefined);
+            return;
+        }
+        if (typeof binary[0] === 'string') {
+            var arraybuffe = [];
+            var binStr_len = binary[0].length;
+            for (var i = 0; i < binStr_len; i++) {
+                var c = binary[0].charCodeAt(i);
+                arraybuffe.push(c & 0xff);
+            }
+            binary[0] = new Uint8Array(arraybuffe);
+        }
+        if ('buffer' in binary[0] === false) {
+            binary[0] = new Uint8Array(binary[0]);
+        }
+        if (binary[1].indexOf('image') === -1) {
+            binary[1] = '';
+        }
+        var blob = new Blob([binary[0]], {type: binary[1]});
+        var url = webkitURL.createObjectURL(blob);
+        if (resize) {
+            image_resize(url, cb);
+        } else {
+            var id = add_cover(blob.size, url);
+            cb(id);
+        }
     };
     var add_cover = function(len, bin) {
         /*
          * Добавляет обложку в массив обложек.
          * Проверяет на наличие уже существующей в списке, уберает дубли.
          */
-        for (var i = 0; i < covers.length; i++) {
-            var item = covers[i];
+        var id = undefined;
+        covers.forEach(function(item) {
             if (item.len === len && item.data === bin) {
-                return item.id;
+                id = item.id;
+                return 0;
             }
+        });
+        if (id !== undefined) {
+            return id;
         }
-        var id = covers.length;
+        id = covers.length;
         covers.push({id: id, len: len, data: bin});
         return id;
     };
@@ -256,7 +306,7 @@ var engine = function() {
                 });
                 cloud[playlist[id].type].read_tags(playlist[id], function(tags) {
                     // NOTE: tags.picture = [binary, mime]
-                    image_resize(tags.picture, function(i_id) {
+                    read_image(tags.picture, function(i_id) {
                         if (i_id === undefined) {
                             if ("picture" in tags) {
                                 delete tags.picture;
@@ -293,7 +343,7 @@ var engine = function() {
                         delete tags[key];
                     }
                 });
-                image_resize(tags.picture, function(i_id) {
+                read_image(tags.picture, function(i_id) {
                     if (i_id === undefined) {
                         if ("picture" in tags) {
                             delete tags.picture;

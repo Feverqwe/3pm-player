@@ -706,14 +706,8 @@ var cloud = function() {
                 xhr.open("GET", url, true);
                 xhr.responseType = "arraybuffer";
                 xhr.onload = function() {
-                    var binary = '';
-                    var bytes = new Uint8Array(xhr.response);
-                    var len = bytes.byteLength;
-                    for (var i = 0; i < len; i++) {
-                        binary += String.fromCharCode(bytes[ i ]);
-                    }
                     var mime = 'image/jpeg';
-                    tags.picture = [binary, mime];
+                    tags.picture = [xhr.response, mime];
                     cb(tags);
                 };
                 xhr.onerror = function() {
@@ -1072,14 +1066,8 @@ var cloud = function() {
                 xhr.open("GET", url, true);
                 xhr.responseType = "arraybuffer";
                 xhr.onload = function() {
-                    var binary = '';
-                    var bytes = new Uint8Array(xhr.response);
-                    var len = bytes.byteLength;
-                    for (var i = 0; i < len; i++) {
-                        binary += String.fromCharCode(bytes[ i ]);
-                    }
                     var mime = 'image/jpeg';
-                    tags.picture = [binary, mime];
+                    tags.picture = [xhr.response, mime];
                     cb(tags);
                 };
                 xhr.onerror = function() {

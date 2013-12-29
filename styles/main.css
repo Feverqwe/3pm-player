@@ -61,10 +61,9 @@ body {
     z-index: 10;
     overflow: hidden;
     border-right: 1px solid #000;
-}
-div.image img {
-    max-width: 100%;
-    max-height: 100%;
+    background-size: 80px;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 .player .box {
     overflow: hidden;

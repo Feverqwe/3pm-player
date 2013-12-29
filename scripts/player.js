@@ -33,13 +33,13 @@ var view = function() {
             hideImage();
             return;
         }
-        dom_cache.picture.attr('data-id', id).get(0).src = img.data;
+        dom_cache.picture.css('background-image', 'url(' + img.data + ')');
     };
     var hideImage = function() {
         /*
          * Выставляет статус - без обложки.
          */
-        dom_cache.picture.get(0).src = "images/no-cover.png";
+        dom_cache.picture.css('background-image', 'url(images/no-cover.png)');
     };
     var toHHMMSS = function(val) {
         /*
@@ -1134,7 +1134,7 @@ var view = function() {
                 btnPrev: $('.controls .prev.btn'),
                 btnNext: $('.controls .next.btn'),
                 progress: $('.progress'),
-                picture: $('.image > img'),
+                picture: $('.image'),
                 volume: $('.volume'),
                 mute: $('.volume_controll .pic'),
                 click_for_open: $('.click_for_open'),
@@ -1298,10 +1298,6 @@ var view = function() {
             dom_cache.btnPrev.on('click', function() {
                 engine.preview();
             });
-            dom_cache.picture.get(0).onerror = function() {
-                engine.badImage($(this).attr('data-id'));
-                hideImage();
-            };
             $('.close').on('click', function() {
                 save_pos();
                 engine.sendPlaylist(function(window) {
