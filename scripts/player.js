@@ -1054,9 +1054,7 @@ var view = function() {
                 engine.mute();
             } else
             if (msg === 'menu') {
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.showDialog({type: "menu", h: 290, w: 250, r: true, list: context_menu});
-                });
+                engine.showMenu();
             }
         });
     };
@@ -1320,9 +1318,7 @@ var view = function() {
                 chrome.app.window.current().minimize();
             });
             $('.t_btn.menu').on('click', function() {
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.showDialog({type: "menu", h: 290, w: 250, r: true, list: context_menu});
-                });
+                engine.showMenu();
             });
             dom_cache.time.on('click', function() {
                 time_tipe = (time_tipe) ? 0 : 1;

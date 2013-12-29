@@ -1118,9 +1118,7 @@ var engine = function() {
                     } else
                     if (event.keyCode === 9) {
                         event.preventDefault();
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu()});
-                        });
+                        engine.showMenu();
                     }
                 }
             });
@@ -1156,6 +1154,11 @@ var engine = function() {
         },
         getSettings: function() {
             return settings;
+        },
+        showMenu: function() {
+            chrome.runtime.getBackgroundPage(function(bg) {
+                bg.wm.showDialog({type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: bg.wm.ws.active()});
+            });
         },
         vk: cloud.vk,
         db: cloud.db,

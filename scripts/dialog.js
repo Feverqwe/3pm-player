@@ -624,6 +624,7 @@ var dialog = function() {
          * Создает форму выбора m3u файла
          */
         var context_menu = window.options.list;
+        var webui_state = window.options.webui_state;
         $('.menu_choice').show();
         var pl = $('.menu').children("ul");
         $.each(context_menu, function(key, item) {
@@ -636,7 +637,11 @@ var dialog = function() {
             if (item.contexts.indexOf('page') === -1) {
                 return 1;
             }
-            pl.append($('<li>', {'class': 'item', 'data-id': key, text: item.title}));
+            var dom_item = $('<li>', {'class': 'item', 'data-id': key, text: item.title});
+            if (item.id === 'ws' && webui_state) {
+                dom_item.addClass('is_active');
+            }
+            pl.append(dom_item);
         });
         $('body').on('click', 'li.item', function() {
             var id = $(this).data("id");
