@@ -1,12 +1,10 @@
 (function() {
-    var fps = 1000 / 24;
     var SAMPLE_SIZE = 2048;
     var SAMPLE_RATE = 44100;
 
     var adapter = function(dancer) {
         this.dancer = dancer;
         this.audio = new Audio();
-        this.nextTick = 0;
         this._viz = undefined;
         if ('viz' in window === false && 'engine' in window) {
             this._viz = engine;
@@ -30,10 +28,7 @@
 
             this.proc = this.context.createJavaScriptNode(SAMPLE_SIZE / 2, 1, 1);
             this.proc.onaudioprocess = function(e) {
-                if (_this.nextTick < e.timeStamp) {
-                    _this.update.call(_this, e);
-                    _this.nextTick = e.timeStamp + fps;
-                }
+                _this.update.call(_this, e);
             };
             //this.gain = this.context.createGainNode();
 
