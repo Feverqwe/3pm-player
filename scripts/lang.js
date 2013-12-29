@@ -57,7 +57,21 @@ var get_lang = function(language) {
             12: 'Configure integrated visualization, Winamp',
             13: 'Disable',
             14: 'Spectrogram',
-            15: 'Oscillogram'
+            15: 'Oscillogram',
+            16: 'Play/pause',
+            17: 'Mute',
+            18: 'Shuffle',
+            19: 'Loop',
+            20: 'Next random visualization',
+            21: 'Previous track',
+            22: 'Next track',
+            23: 'Volume up 10%',
+            24: 'Volume down 10%',
+            25: 'Scroll back 10 seconds',
+            26: 'Scroll up 10 seconds',
+            27: 'Menu',
+            28: '* For OSX use Command button instead Ctrl.',
+            29: 'Hotkeys'
         }
     };
     var lang_arr_ru = {
@@ -118,7 +132,21 @@ var get_lang = function(language) {
             12: 'Настройки встроенной визуализации Winamp',
             13: 'Отключить',
             14: 'Спектрограмма',
-            15: 'Осциллограмма'
+            15: 'Осциллограмма',
+            16: 'Пауза/Продолжить воспроизведение',
+            17: 'Отключить звук',
+            18: 'Включить воспроизведение вперемешку',
+            19: 'Включить повтор списка воспроизведения',
+            20: 'Следующая случайная визуализация',
+            21: 'Предыдущий трек',
+            22: 'Следующий трек',
+            23: 'Увеличить громкость на 10%',
+            24: 'Уменьшить громкость на 10%',
+            25: 'Прокрутить назад на 10 секунд',
+            26: 'Прокрутить вперед на 10 секунд',
+            27: 'Меню',
+            28: '* Для OSX вместо Ctrl используется Command.',
+            29: 'Горячих клавиши'
         }
     };
     var lang = language;

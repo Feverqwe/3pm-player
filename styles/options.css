@@ -161,3 +161,12 @@ div.topbtn {
 div.topbtn:hover {
     background-color: #ddd;
 }
+fieldset.hotkeys span.key {
+    background-color: #f0f7fd;
+    border: 1px solid #d0e3f0;
+    border-radius: 0;
+    padding: 1px;
+    padding-left: 3px;
+    padding-right: 3px;
+    color: #c7254e;
+}
