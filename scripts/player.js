@@ -1064,15 +1064,28 @@ var view = function() {
         if (is_winamp) {
             return;
         }
+        if (dom_cache.truetext === undefined) {
+            dom_cache.truetext = {};
+        }
         var title_scroller = false;
         var album_scroller = false;
         var max_title_line = 2;
         var max_album_line = 2;
         var tmp_node = $('<div>', {style: 'line-height: normal; font-size: 130%; width: 232px; word-wrap: break-word; overflow: hidden; display: none;', text: title}).appendTo($('body'));
-        var title_line = parseInt(tmp_node.height() / 15.5);
+        var title_height = tmp_node.height();
+        if (dom_cache.truetext.title_one_line_height === undefined) {
+            tmp_node.text('.');
+            dom_cache.truetext.title_one_line_height = tmp_node.height();
+        }
+        var title_line = parseInt(title_height / dom_cache.truetext.title_one_line_height);
         tmp_node.remove();
         tmp_node = $('<div>', {style: 'line-height: normal; font-size: 110%; width: 232px; word-wrap: break-word; overflow: hidden; display: none;', text: album}).appendTo($('body'));
-        var album_line = parseInt(tmp_node.height() / 13);
+        var album_height = tmp_node.height();
+        if (dom_cache.truetext.album_one_line_height === undefined) {
+            tmp_node.text('.');
+            dom_cache.truetext.album_one_line_height = tmp_node.height();
+        }
+        var album_line = parseInt(album_height / dom_cache.truetext.album_one_line_height);
         tmp_node.remove();
         if (album.length === 0) {
             max_title_line = 3;
