@@ -33,13 +33,21 @@ var view = function() {
             hideImage();
             return;
         }
-        dom_cache.picture.css('background-image', 'url(' + img.data + ')');
+        var url = 'url(' + img.data + ')';
+        if (dom_cache.picture_url !== url) {
+            dom_cache.picture_url = url;
+            dom_cache.picture.css('background-image', url);
+        }
     };
     var hideImage = function() {
         /*
          * Выставляет статус - без обложки.
          */
-        dom_cache.picture.css('background-image', 'url(images/no-cover.png)');
+        var url = 'url(images/no-cover.png)';
+        if (dom_cache.picture_url !== url) {
+            dom_cache.picture_url = url;
+            dom_cache.picture.css('background-image', url);
+        }
     };
     var toHHMMSS = function(val) {
         /*
