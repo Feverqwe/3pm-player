@@ -236,7 +236,7 @@ div.filelist::-webkit-scrollbar-thumb:vertical,
     border-radius: 3px;
 }
 .menu_choice .menu .item.is_active {
-    color: rgb(0, 157, 231);
+    color: rgb(16, 178, 255);
 }
 body.winamp {
     background: -webkit-linear-gradient(left, #1c1c2c 0%,#383758 50%,#1d1d2d 100%);
