@@ -393,7 +393,7 @@ var wm = function() {
             }
         }
         w = 820;
-        h = 480;
+        h = 600;
         var w = w;
         var h = h;
         w = parseInt(w * dpr);
