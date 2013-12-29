@@ -227,6 +227,9 @@ div.filelist::-webkit-scrollbar-thumb:vertical,
     background-size: 100% 1px;
     background-repeat: no-repeat;
 }
+.menu_choice .menu ul > li:first-child {
+    background-image: initial;
+}
 .menu_choice .menu ul > li:hover {
     background-color: rgba(0, 0, 0, 0.41);
     color: #fff;
