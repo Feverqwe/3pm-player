@@ -1,4 +1,33 @@
 var cloud = function() {
+    var dl_xhr = undefined;
+    var getTrack = function(options, cb) {
+        if (options.url === undefined) {
+            cb('');
+            return;
+        }
+        var view = options.view;
+        if (dl_xhr !== undefined) {
+            dl_xhr.abort();
+        }
+        dl_xhr = new XMLHttpRequest();
+        dl_xhr.open("GET", options.url, true);
+        if (options.headers !== undefined) {
+            $.each(options.headers, function(key, value) {
+                dl_xhr.setRequestHeader(key, value);
+            });
+        }
+        dl_xhr.responseType = "blob";
+        dl_xhr.onprogress = function(e) {
+            view.pre_buffering_controller.download(parseInt((e.loaded / e.total) * 100));
+        };
+        dl_xhr.onload = function() {
+            cb(dl_xhr.response);
+        };
+        dl_xhr.onerror = function() {
+            cb('');
+        };
+        dl_xhr.send(null);
+    };
     var cookie = function() {
         return {
             set: function(key, value, expire) {
@@ -113,7 +142,7 @@ var cloud = function() {
                             return;
                         }
                         data.response.forEach(function(item) {
-                            tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
+                            tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
                         });
                         cb(tracks);
                     }
@@ -153,7 +182,7 @@ var cloud = function() {
                             return;
                         }
                         data.response.forEach(function(item) {
-                            tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
+                            tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
                         });
                         cb(tracks);
                     }
@@ -201,7 +230,7 @@ var cloud = function() {
                             }
                             var len = 0;
                             data.items.forEach(function(item) {
-                                tracks.push({id: tracks.length, album_id: item.album_id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration});
+                                tracks.push({id: tracks.length, album_id: item.album_id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
                                 len++;
                             });
                             if (len === 0) {
@@ -436,9 +465,13 @@ var cloud = function() {
                 });
             },
             on_select_list: function(list, cb) {
-                engine.vk.makeAlbumTracks(list.album_id, function(tracks) {
+                cloud.vk.makeAlbumTracks(list.album_id, function(tracks) {
                     cb(tracks, {name: list.name, id: list.id, vk_save: (list.vk_save === true)});
                 });
+            },
+            preload: function(options, cb) {
+                options.url = options.track.file.url;
+                cloud.getTrack(options, cb);
             }
         };
     }();
@@ -569,6 +602,15 @@ var cloud = function() {
                     track.file.url = url;
                     getHead(url);
                 }, track.root, track.path);
+            },
+            preload: function(options, cb) {
+                if ('blob' in options.track === false) {
+                    options.track.tags = undefined;
+                }
+                db.onplay(options.track, options.view, function(url) {
+                    options.url = url;
+                    cloud.getTrack(options, cb);
+                });
             }
         };
     }();
@@ -717,6 +759,10 @@ var cloud = function() {
             },
             on_select_list: function(list, cb) {
                 cb(list.tracks, {name: list.name, id: list.id, type: "sc"});
+            },
+            preload: function(options, cb) {
+                options.url = options.track.file.url;
+                cloud.getTrack(options, cb);
             }
         };
     }();
@@ -791,6 +837,15 @@ var cloud = function() {
                 getToken(function() {
                     cb(track.file.url + '&access_token=' + token);
                 });
+            },
+            preload: function(options, cb) {
+                if ('blob' in options.track === false) {
+                    options.track.tags = undefined;
+                }
+                gd.onplay(options.track, options.view, function(url) {
+                    options.url = url;
+                    cloud.getTrack(options, cb);
+                });
             }
         };
     }();
@@ -800,7 +855,6 @@ var cloud = function() {
         var client_secret = 'PTEyM5lwSgNkvqK5BjBp5iGj4ypPx2wd';
         var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
         var token = undefined;
-        var dl_xhr = undefined;
         var clear_data = function() {
             code = undefined;
             token = undefined;
@@ -952,26 +1006,6 @@ var cloud = function() {
                 }
             });
         };
-        var getTrack = function(track, player, cb) {
-            if (dl_xhr !== undefined) {
-                dl_xhr.abort();
-            }
-            dl_xhr = new XMLHttpRequest();
-            dl_xhr.open("GET", 'https://api.box.com/2.0/files/' + track.file_id + '/content', true);
-            dl_xhr.setRequestHeader("Authorization", "Bearer " + token);
-            dl_xhr.responseType = "blob";
-            dl_xhr.onprogress = function(e) {
-                player.pre_buffering_controller.download(parseInt((e.loaded / e.total) * 100));
-            };
-            dl_xhr.onload = function() {
-                var blob = dl_xhr.response;
-                cb(URL.createObjectURL(blob));
-            };
-            dl_xhr.onerror = function() {
-                cb('');
-            };
-            dl_xhr.send(null);
-        };
         return {
             getFilelist: function(cb, id) {
                 getToken(function() {
@@ -983,8 +1017,15 @@ var cloud = function() {
                     getMedia(a, b);
                 });
             },
-            onplay: function(track, player, cb) {
-                getTrack(track, player, cb);
+            preload: function(options, cb) {
+                if ('blob' in options.track === false) {
+                    options.track.tags = undefined;
+                }
+                getTrack({
+                    view: options.view,
+                    url: 'https://api.box.com/2.0/files/' + options.track.file_id + '/content',
+                    headers: {"Authorization": "Bearer " + token}
+                }, cb);
             }
         };
     }();
@@ -1079,10 +1120,22 @@ var cloud = function() {
                 getToken(function() {
                     cb(track.file.url + '&access_token=' + token);
                 });
+            },
+            preload: function(options, cb) {
+                sd.onplay(options.track, options.view, function(url) {
+                    options.url = url;
+                    cloud.getTrack(options, cb);
+                });
             }
         };
     }();
     return {
+        getTrack: getTrack,
+        abort: function() {
+            if (dl_xhr !== undefined) {
+                dl_xhr.abort();
+            }
+        },
         vk: vk,
         db: db,
         sc: sc,
