@@ -321,15 +321,15 @@ var engine = function() {
             sendPlaylist(function(window) {
                 window.playlist.updPlaylistItem(id, playlist[id]);
             });
-            // /*
+            /*
             if (window.time_log === undefined) {
                 window.time_log = [];
             }
             var startDate = new Date().getTime();
-            // */
+            */
             var params = {tags: ["artist", "title", "album", "picture"], file: file};
             ID3.loadTags(file.name, function() {
-                // /*
+                /*
                 var endDate = new Date().getTime();
                 var raz = ((endDate - startDate) / 1000);
                 console.log("Time: " + raz + "s");
@@ -338,7 +338,7 @@ var engine = function() {
                     return pv + cv;
                 }, 0);
                 console.log('Среднее время: ', sum / window.time_log.length);
-                // */
+                */
                 var tags = ID3.getAllTags(file.name);
                 ID3.clearAll();
                 if ("picture" in tags) {
