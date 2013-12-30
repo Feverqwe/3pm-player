@@ -39,7 +39,7 @@ var StringUtils = {
             offset2 = 1;
         }
 
-        var arr = [];
+        var arr = new Array(maxBytes);
         for (var j = 0; ix < maxBytes; j++) {
             var byte1 = bytes[ix + offset1];
             var byte2 = bytes[ix + offset2];
@@ -69,7 +69,7 @@ var StringUtils = {
             ix = 3;
         }
 
-        var arr = [];
+        var arr = new Array(maxBytes);
         for (var j = 0; ix < maxBytes; j++) {
             var byte1 = bytes[ix++];
             if (byte1 == 0x00) {
@@ -99,8 +99,8 @@ var StringUtils = {
         return string;
     },
     readNullTerminatedString: function(bytes, maxBytes) {
-        var arr = [];
         maxBytes = maxBytes || bytes.length;
+        var arr = new Array(maxBytes);
         for (var i = 0; i < maxBytes; ) {
             var byte1 = bytes[i++];
             if (byte1 == 0x00)
