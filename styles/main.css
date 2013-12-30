@@ -64,6 +64,7 @@ body {
     background-size: 80px;
     background-position: center;
     background-repeat: no-repeat;
+    background-color: #1D1D1D;
 }
 .player .box {
     overflow: hidden;

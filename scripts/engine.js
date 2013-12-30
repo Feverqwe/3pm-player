@@ -120,28 +120,29 @@ var engine = function() {
         }
         playedlist.push(id);
     };
-    var b64toBlob = function(b64Data, contentType, sliceSize) {
+    var str2blob = function(byteCharacters, contentType, sliceSize) {
         contentType = contentType || '';
-        sliceSize = sliceSize || 512;
-
-        var byteCharacters = atob(b64Data);
-        var byteArrays = [];
-
-        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        sliceSize = sliceSize || 256;
+        var byteCharacters_len = byteCharacters.length;
+        var byteArrays = new Array(Math.ceil(byteCharacters_len / sliceSize));
+        var n = 0;
+        for (var offset = 0; offset < byteCharacters_len; offset += sliceSize) {
             var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-            var byteNumbers = new Array(slice.length);
-            for (var i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
+            var slice_len = slice.length;
+            var byteNumbers = new Array(slice_len);
+            for (var i = 0; i < slice_len; i++) {
+                byteNumbers[i] = slice.charCodeAt(i) & 0xff;
             }
-
             var byteArray = new Uint8Array(byteNumbers);
-
-            byteArrays.push(byteArray);
+            byteArrays[n] = byteArray;
+            n++;
         }
-
-        var blob = new Blob(byteArrays, {type: contentType});
-        return blob;
+        return new Blob(byteArrays, {type: contentType});
+    };
+    var b64toBlob = function(b64Data, contentType) {
+        contentType = contentType || '';
+        var byteCharacters = atob(b64Data);
+        return str2blob(byteCharacters, contentType, 256);
     };
     var image_resize = function(url, cb) {
         /*
@@ -176,22 +177,18 @@ var engine = function() {
             cb(undefined);
             return;
         }
-        if (typeof binary[0] === 'string') {
-            var arraybuffe = [];
-            var binStr_len = binary[0].length;
-            for (var i = 0; i < binStr_len; i++) {
-                var c = binary[0].charCodeAt(i);
-                arraybuffe.push(c & 0xff);
-            }
-            binary[0] = new Uint8Array(arraybuffe);
-        }
-        if ('buffer' in binary[0] === false) {
-            binary[0] = new Uint8Array(binary[0]);
-        }
         if (binary[1].indexOf('image') === -1) {
             binary[1] = '';
         }
-        var blob = new Blob([binary[0]], {type: binary[1]});
+        var blob;
+        if (typeof binary[0] === 'string') {
+            blob = str2blob(binary[0], binary[1], 256);
+        } else {
+            if ('buffer' in binary[0] === false) {
+                binary[0] = new Uint8Array(binary[0]);
+            }
+            blob = new Blob([binary[0]], {type: binary[1]});
+        }
         var url = webkitURL.createObjectURL(blob);
         if (resize) {
             image_resize(url, cb);
@@ -324,15 +321,24 @@ var engine = function() {
             sendPlaylist(function(window) {
                 window.playlist.updPlaylistItem(id, playlist[id]);
             });
-            /*
-             var startDate = new Date().getTime();
-             */
+            // /*
+            if (window.time_log === undefined) {
+                window.time_log = [];
+            }
+            var startDate = new Date().getTime();
+            // */
             var params = {tags: ["artist", "title", "album", "picture"], file: file};
             ID3.loadTags(file.name, function() {
-                /*
-                 var endDate = new Date().getTime();
-                 console.log("Time: " + ((endDate - startDate) / 1000) + "s");
-                 */
+                // /*
+                var endDate = new Date().getTime();
+                var raz = ((endDate - startDate) / 1000);
+                console.log("Time: " + raz + "s");
+                window.time_log.push(raz);
+                var sum = window.time_log.reduce(function(pv, cv) {
+                    return pv + cv;
+                }, 0);
+                console.log('Среднее время: ', sum / window.time_log.length);
+                // */
                 var tags = ID3.getAllTags(file.name);
                 ID3.clearAll();
                 if ("picture" in tags) {
