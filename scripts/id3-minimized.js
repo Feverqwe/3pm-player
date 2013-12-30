@@ -205,6 +205,9 @@ var BufferedBinaryFileReader = function(file, fncCallback, fncError) {
              }*/
             return data;
         };
+        this.getBytesAt = function(iOffset, iLength) {
+            return dataFile.subarray(iOffset, iOffset + iLength);
+        };
 
         /**
          * Gets the number of total bytes that have been downloaded.
@@ -296,10 +299,11 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
             return iUShort;
     };
     this.getLongAt = function(iOffset, bBigEndian) {
-        var iByte1 = this.getByteAt(iOffset),
-                iByte2 = this.getByteAt(iOffset + 1),
-                iByte3 = this.getByteAt(iOffset + 2),
-                iByte4 = this.getByteAt(iOffset + 3);
+        var byts = this.getBytesAt(iOffset, 4);
+        var iByte1 = byts[0] & 0xff,
+                iByte2 = byts[1] & 0xff,
+                iByte3 = byts[2] & 0xff,
+                iByte4 = byts[3] & 0xff;
 
         var iLong = bBigEndian ?
                 (((((iByte1 << 8) + iByte2) << 8) + iByte3) << 8) + iByte4
@@ -317,9 +321,10 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
     };
     // @aadsm
     this.getInteger24At = function(iOffset, bBigEndian) {
-        var iByte1 = this.getByteAt(iOffset),
-                iByte2 = this.getByteAt(iOffset + 1),
-                iByte3 = this.getByteAt(iOffset + 2);
+        var byts = this.getBytesAt(iOffset, 3);
+        var iByte1 = byts[0] & 0xff,
+                iByte2 = byts[1] & 0xff,
+                iByte3 = byts[2] & 0xff;
 
         var iInteger = bBigEndian ?
                 ((((iByte1 << 8) + iByte2) << 8) + iByte3)
@@ -329,9 +334,10 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         return iInteger;
     };
     this.getStringAt = function(iOffset, iLength) {
-        var aStr = [];
+        var aStr = new Array(iLength);
+        var byts = this.getBytesAt(iOffset, iLength);
         for (var i = iOffset, j = 0; i < iOffset + iLength; i++, j++) {
-            aStr[j] = String.fromCharCode(this.getByteAt(i));
+            aStr[j] = String.fromCharCode(byts[j] & 0xff);
         }
         return aStr.join("");
     };
@@ -381,7 +387,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
  */
 
 (function(ns) {
-    ns["FileAPIReader"] = function(file, opt_reader) {
+    ns.FileAPIReader = function(file, opt_reader) {
         return function(url, fncCallback, fncError) {
             var reader = opt_reader || new FileReader();
 
@@ -443,39 +449,6 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
      * @param {function()} cb The callback function to be invoked when all tags have been read.
      * @param {{tags: Array.<string>, dataReader: function(string, function(BinaryReader))}} options The set of options that can specify the tags to be read and the dataReader to use in order to read the file located at url.
      */
-    /*
-     ID3.loadTags = function(url, cb, options) {
-     //BufferedBinaryFileReader
-     options = options || {};
-     var dataReader = options["dataReader"] || BufferedBinaryAjax;
-     dataReader(url, function(data) {
-     if (typeof (data) === "string" && options["file"]) {
-     dataReader = BufferedBinaryFileReader;
-     dataReader(options["file"], function(data) {
-     data.loadRange(_formatIDRange, function() {
-     var reader = getTagReader(data);
-     reader.loadData(data, function() {
-     readTags(reader, data, url, options["tags"]);
-     if (cb)
-     cb();
-     });
-     });
-     });
-     } else {
-     // preload the format identifier
-     data.loadRange(_formatIDRange, function() {
-     var reader = getTagReader(data);
-     reader.loadData(data, function() {
-     readTags(reader, data, url, options["tags"]);
-     if (cb)
-     cb();
-     });
-     });
-     }
-     });
-     };
-     */
-    // /*
     ID3.loadTags = function(url, cb, options) {
         options = options || {};
         var dataReader = (options["file"]) ? BufferedBinaryFileReader : options["dataReader"];
@@ -779,10 +752,11 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
 
     // The ID3v2 tag/frame size is encoded with four bytes where the most significant bit (bit 7) is set to zero in every byte, making a total of 28 bits. The zeroed bits are ignored, so a 257 bytes long tag is represented as $00 00 02 01.
     function readSynchsafeInteger32At(offset, data) {
-        var size1 = data.getByteAt(offset);
-        var size2 = data.getByteAt(offset + 1);
-        var size3 = data.getByteAt(offset + 2);
-        var size4 = data.getByteAt(offset + 3);
+        var byts = data.getBytesAt(offset, 4);
+        var size1 = byts[0] & 0xff;
+        var size2 = byts[1] & 0xff;
+        var size3 = byts[2] & 0xff;
+        var size4 = byts[3] & 0xff;
         // 0x7f = 0b01111111
         var size = size4 & 0x7f
                 | ((size3 & 0x7f) << 7)
@@ -924,7 +898,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
     //}
 
     function getFrameData(frames, ids) {
-        if (typeof ids == 'string') {
+        if (typeof ids === 'string') {
             ids = [ids];
         }
 
@@ -1067,22 +1041,6 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         return (time.hours > 0 ? time.hours + ':' : '') + minutes + ':' + seconds;
     }
 
-    var serach_image = function(data) {
-        var index = data.indexOf('JFIF');
-        var type = "jpeg";
-        var pos = 6;
-        if (index === -1) {
-            index = data.indexOf('PNG');
-            type = "png";
-            pos = 1;
-        }
-        if (index !== -1) {
-            return [data.substr(index - pos), "image/" + type];
-        } else {
-            return undefined;
-        }
-    };
-
     ID3v2.readFrameData['APIC'] = function readPictureFrame(offset, length, data, flags, v) {
         v = v || '3';
 
@@ -1093,7 +1051,6 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                 var format = data.getStringAt(offset + 1, 3);
                 offset += 4;
                 break;
-
             case '3':
             case '4':
                 var format = data.getStringWithCharsetAt(offset + 1, length - (offset - start), charset);
@@ -1104,19 +1061,13 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         var type = pictureType[bite];
         var desc = data.getStringWithCharsetAt(offset + 1, length - (offset - start), charset);
 
-        var image = serach_image(data.getStringAt(offset, (start + length) - offset));
-        if (image) {
-            format = image[1];
-            image = image[0];
-        }
-
-        offset += 1 + desc.bytesReadCount;
+        //offset += 1 + desc.bytesReadCount;
 
         return {
             "format": format.toString(),
             "type": type,
             "description": desc.toString(),
-            "data": image || data.getStringAt(offset, (start + length) - offset)
+            "data": data.getBytesAt(offset, (start + length) - offset)
         };
     };
 

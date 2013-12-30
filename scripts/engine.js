@@ -168,7 +168,27 @@ var engine = function() {
         };
         img.src = url;
     };
-    var read_image = function(binary, cb) {
+    var search_image = function(u8a) {
+        var subarr = u8a.subarray(0, 128);
+        var il = subarr.length;
+        var str = new Array(il);
+        for (var i = 0; i < il; i++) {
+            str[i] = String.fromCharCode(subarr[i] & 0xff);
+        }
+        var data = str.join('');
+        var index = data.indexOf('JFIF');
+        var pos = 6;
+        if (index === -1) {
+            index = data.indexOf('PNG');
+            pos = 1;
+        }
+        if (index !== -1) {
+            return u8a.subarray(index - pos);
+        } else {
+            return u8a;
+        }
+    };
+    var read_image = function(binary, cb, enable_search) {
         /*
          * binary = [Array || ArrayBuffer || String, 'image/*'];
          */
@@ -178,17 +198,16 @@ var engine = function() {
             return;
         }
         if (binary[1].indexOf('image') === -1) {
-            binary[1] = '';
+            binary[1] = 'image/jpeg';
         }
         var blob;
-        if (typeof binary[0] === 'string') {
-            blob = str2blob(binary[0], binary[1], 256);
-        } else {
-            if ('buffer' in binary[0] === false) {
-                binary[0] = new Uint8Array(binary[0]);
-            }
-            blob = new Blob([binary[0]], {type: binary[1]});
+        if ('buffer' in binary[0] === false) {
+            binary[0] = new Uint8Array(binary[0]);
         }
+        if (enable_search) {
+            binary[0] = search_image(binary[0]);
+        }
+        blob = new Blob([binary[0]], {type: binary[1]});
         var url = webkitURL.createObjectURL(blob);
         if (resize) {
             image_resize(url, cb);
@@ -322,23 +341,23 @@ var engine = function() {
                 window.playlist.updPlaylistItem(id, playlist[id]);
             });
             /*
-            if (window.time_log === undefined) {
-                window.time_log = [];
-            }
-            var startDate = new Date().getTime();
-            */
+             if (window.time_log === undefined) {
+             window.time_log = [];
+             }
+             var startDate = new Date().getTime();
+             */
             var params = {tags: ["artist", "title", "album", "picture"], file: file};
             ID3.loadTags(file.name, function() {
                 /*
-                var endDate = new Date().getTime();
-                var raz = ((endDate - startDate) / 1000);
-                console.log("Time: " + raz + "s");
-                window.time_log.push(raz);
-                var sum = window.time_log.reduce(function(pv, cv) {
-                    return pv + cv;
-                }, 0);
-                console.log('Среднее время: ', sum / window.time_log.length);
-                */
+                 var endDate = new Date().getTime();
+                 var raz = ((endDate - startDate) / 1000);
+                 console.log("Time: " + raz + "s");
+                 window.time_log.push(raz);
+                 var sum = window.time_log.reduce(function(pv, cv) {
+                 return pv + cv;
+                 }, 0);
+                 console.log('Среднее время: ', sum / window.time_log.length);
+                 */
                 var tags = ID3.getAllTags(file.name);
                 ID3.clearAll();
                 if ("picture" in tags) {
@@ -358,7 +377,7 @@ var engine = function() {
                         tags.picture = i_id;
                     }
                     rt_cb(tags, id);
-                });
+                }, true);
             }, params);
         };
         var getTagBody = function(id) {
