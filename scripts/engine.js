@@ -153,7 +153,7 @@ var engine = function() {
             cb(undefined);
         };
         img.onload = function() {
-            var MAXWidthHeight = 79 * 2;
+            var MAXWidthHeight = 80 * 2;
             var r = MAXWidthHeight / Math.max(this.width, this.height),
                     w = Math.round(this.width * r),
                     h = Math.round(this.height * r),
