@@ -609,7 +609,7 @@ var engine = function() {
                     }
                     id = getRandomInt(0, playlist.length - 1);
                     var n = 2000;
-                    while ($.inArray(id, playedlist) !== -1 && n > 0) {
+                    while (playedlist.indexOf(id) !== -1 && n > 0) {
                         id = getRandomInt(0, playlist.length - 1);
                         n--;
                     }
@@ -632,7 +632,7 @@ var engine = function() {
                 if (shuffle) {
                     var pos = null;
                     if (current_played_pos === -1) {
-                        pos = $.inArray(current_id, playedlist);
+                        pos = playedlist.indexOf(current_id);
                     } else {
                         pos = current_played_pos;
                     }
