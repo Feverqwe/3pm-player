@@ -336,7 +336,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
     this.getStringAt = function(iOffset, iLength) {
         var aStr = new Array(iLength);
         var byts = this.getBytesAt(iOffset, iLength);
-        for (var i = iOffset, j = 0; i < iOffset + iLength; i++, j++) {
+        for (var j = 0; j < iLength; j++) {
             aStr[j] = String.fromCharCode(byts[j] & 0xff);
         }
         return aStr.join("");
