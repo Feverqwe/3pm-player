@@ -36,7 +36,10 @@ var view = function() {
         var url = 'url(' + img.data + ')';
         if (dom_cache.picture_url !== url) {
             dom_cache.picture_url = url;
-            dom_cache.picture.css('background-image', url);
+            clearTimeout(dom_cache.picture_timer);
+            dom_cache.picture_timer = setTimeout(function() {
+                dom_cache.picture.css('background-image', url);
+            }, 50);
         }
     };
     var hideImage = function() {
@@ -46,7 +49,10 @@ var view = function() {
         var url = 'url(images/no-cover.png)';
         if (dom_cache.picture_url !== url) {
             dom_cache.picture_url = url;
-            dom_cache.picture.css('background-image', url);
+            clearTimeout(dom_cache.picture_timer);
+            dom_cache.picture_timer = setTimeout(function() {
+                dom_cache.picture.css('background-image', url);
+            }, 50);
         }
     };
     var toHHMMSS = function(val) {

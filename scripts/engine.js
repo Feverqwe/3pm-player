@@ -108,14 +108,8 @@ var engine = function() {
          * Если такой ID уже есть в списке - он удаляется.
          * ID добавляется в конец списка.
          */
-        var ex_id = null;
-        for (var i = 0; i < playedlist.length; i++) {
-            if (playedlist[i] === id) {
-                ex_id = i;
-                break;
-            }
-        }
-        if (ex_id !== null) {
+        var ex_id = playedlist.indexOf(id);
+        if (ex_id !== -1) {
             playedlist.splice(ex_id, 1);
         }
         playedlist.push(id);
@@ -144,6 +138,19 @@ var engine = function() {
         var byteCharacters = atob(b64Data);
         return str2blob(byteCharacters, contentType, 256);
     };
+    var array_chksum = function(a) {
+        var len = a.length;
+        var c = 128;
+        if (len < c) {
+            c = len;
+        }
+        var step = Math.floor(len / c);
+        var chk = new Array(len);
+        for (var i = 0; i < c; i++) {
+            chk[i] = [i * step];
+        }
+        return chk.join('');
+    };
     var image_resize = function(url, cb) {
         /*
          * Изменяет размер обложки.
@@ -162,9 +169,7 @@ var engine = function() {
             c.height = h;
             c.getContext("2d").drawImage(this, 0, 0, w, h);
             var blob = b64toBlob(c.toDataURL('image/png', 1).split(',')[1], 'image/png');
-            var url = webkitURL.createObjectURL(blob);
-            var id = add_cover(blob.size, url);
-            cb(id);
+            cb(blob);
         };
         img.src = url;
     };
@@ -207,32 +212,47 @@ var engine = function() {
         if (enable_search) {
             binary[0] = search_image(binary[0]);
         }
+        var check_summ = array_chksum(binary[0]);
+        var o_b_len = binary[0].length;
+        var id = check_cover(o_b_len, check_summ);
+        if (id !== undefined) {
+            cb(id);
+            return;
+        }
         blob = new Blob([binary[0]], {type: binary[1]});
         var url = webkitURL.createObjectURL(blob);
         if (resize) {
-            image_resize(url, cb);
+            image_resize(url, function(blob) {
+                if (blob === undefined) {
+                    cb(undefined);
+                    return;
+                }
+                var url = webkitURL.createObjectURL(blob);
+                var id = add_cover(o_b_len, url, check_summ);
+                cb(id);
+            });
         } else {
-            var id = add_cover(blob.size, url);
+            id = add_cover(o_b_len, url, check_summ);
             cb(id);
         }
     };
-    var add_cover = function(len, bin) {
-        /*
-         * Добавляет обложку в массив обложек.
-         * Проверяет на наличие уже существующей в списке, уберает дубли.
-         */
-        var id = undefined;
+    var check_cover = function(len, checksum) {
+        var id;
         covers.forEach(function(item) {
-            if (item.len === len && item.data === bin) {
+            if (item.len === len && item.chk === checksum) {
                 id = item.id;
                 return 0;
             }
         });
-        if (id !== undefined) {
-            return id;
-        }
-        id = covers.length;
-        covers.push({id: id, len: len, data: bin});
+        return id;
+    };
+    var add_cover = function(len, bin, chk) {
+        /*
+         * Добавляет обложку в массив обложек.
+         * Проверяет на наличие уже существующей в списке, уберает дубли.
+         */
+        var id = covers.length;
+        covers.push({id: id, len: len, data: bin, chk: chk});
         return id;
     };
     var getType = function(file) {
