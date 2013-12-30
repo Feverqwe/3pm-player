@@ -364,9 +364,6 @@ var engine = function() {
             var file;
             if ('blob' in playlist[id]) {
                 file = playlist[id].blob;
-                if ('url' in playlist[id].blob) {
-                    playlist[id].blob = {url: playlist[id].blob.url};
-                }
             } else {
                 file = playlist[id].file;
             }
