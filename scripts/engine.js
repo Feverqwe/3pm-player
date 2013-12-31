@@ -1040,7 +1040,7 @@ var engine = function() {
                 if (files[i].tags !== undefined && files[i].tags.picture !== undefined) {
                     files[i].tags = undefined;
                 }
-                if (files[i].id !== undefined && files[i].file !== undefined && files[i].tags !== undefined) {
+                if (files[i].id !== undefined && files[i].file !== undefined && 'tags' in files[i].tags) {
                     files[i].id = my_playlist.length;
                     my_playlist.push(files[i]);
                     continue;
