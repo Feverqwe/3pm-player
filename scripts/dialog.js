@@ -495,14 +495,14 @@ var dialog = function() {
     var skydriveChoice = function() {
         var read_tags = function(item) {
             var tags = {};
-            if ('album' in item && item.album !== null) {
+            if (item.album !== undefined && item.album !== null) {
                 tags.album = item.album;
             }
-            if (('artist' in item && item.artist !== null) || ('album_artist' in item && item.album_artist !== null)) {
+            if ((item.artist !== undefined && item.artist !== null) || (item.album_artist !== undefined && item.album_artist !== null)) {
                 tags.artist = item.artist || item.album_artist;
             }
             tags.title = item.title || item.name;
-            if ('picture' in item && item.picture !== null) {
+            if (item.picture !== undefined && item.picture !== null) {
                 tags.artwork = item.picture;
             }
             return tags;

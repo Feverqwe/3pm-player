@@ -248,7 +248,7 @@ var view = function() {
                 }
                 var proto_url = line.substr(0, 7).toLowerCase();
                 if (proto_url === "http://" || proto_url === "https:/") {
-                    if (name in playlists === false) {
+                    if (playlists[name] === undefined) {
                         playlists[name] = [];
                     }
                     playlists[name].push(line);
@@ -263,7 +263,7 @@ var view = function() {
                 ordered_name_list.push(path_arr[path_len - 1]);
                 var path = entry.fullPath;
                 for (var n = 0; n < path_len; n++) {
-                    if (path in file_tree === false) {
+                    if (file_tree[path] === undefined) {
                         file_tree[path] = {files: [path_arr[n]]};
                     } else
                     if (file_tree[path].files.indexOf(path_arr[n]) === -1) {
@@ -289,7 +289,7 @@ var view = function() {
             };
             r.readAsText(file);
         };
-        if ('file' in entrys) {
+        if (entrys.file !== undefined) {
             fileMede = true;
             playlist_count = 1;
             entrys.file(function(file) {
@@ -319,7 +319,7 @@ var view = function() {
         if (entry_length !== 0) {
             for (var i = 0; i < entry_length; i++) {
                 var item = entry[i];
-                if ('webkitGetAsEntry' in entry[i]) {
+                if (entry[i].webkitGetAsEntry !== undefined) {
                     item = item.webkitGetAsEntry();
                 }
                 if (!item) {
@@ -364,7 +364,7 @@ var view = function() {
             var m3u = [];
             for (var i = 0; i < sub_entry_len; i++) {
                 var item = sub_entry[i];
-                if ("isDirectory" in item && item.isDirectory) {
+                if (item.isDirectory === true) {
                     dir_count++;
                 } else {
                     var ext = item.name.split('.').slice(-1)[0].toLowerCase();
@@ -1232,7 +1232,7 @@ var view = function() {
                 min: 0,
                 max: 1000,
                 change: function(event, ui) {
-                    if ('which' in event === false) {
+                    if (event.which === undefined) {
                         return;
                     }
                     engine.position(ui.value / 10);
@@ -1242,7 +1242,7 @@ var view = function() {
                     }
                 },
                 slide: function(event, ui) {
-                    if ('which' in event === false) {
+                    if (event.which === undefined) {
                         return;
                     }
                     engine.position(ui.value / 10);
@@ -1263,7 +1263,7 @@ var view = function() {
                 min: 0,
                 max: 100,
                 change: function(event, ui) {
-                    if ('which' in event === false) {
+                    if (event.which === undefined) {
                         return;
                     }
                     engine.volume(ui.value);
@@ -1272,7 +1272,7 @@ var view = function() {
                     }
                 },
                 slide: function(event, ui) {
-                    if ('which' in event === false) {
+                    if (event.which === undefined) {
                         return;
                     }
                     engine.volume(ui.value);
@@ -1337,20 +1337,20 @@ var view = function() {
                 view.setProgress(audio.duration, audio.currentTime);
             });
             chrome.storage.local.get('time_tipe', function(storage) {
-                if ('time_tipe' in storage) {
+                if (storage.time_tipe !== undefined) {
                     time_tipe = storage.time_tipe;
                 }
             });
             chrome.storage.local.get('extend_volume_scroll', function(obj) {
-                if ('extend_volume_scroll' in obj) {
+                if (obj.extend_volume_scroll !== undefined) {
                     make_extend_volume(obj.extend_volume_scroll);
                 }
             });
             chrome.storage.local.get('volume', function(storage) {
-                if ('volume' in storage) {
+                if (storage.volume !== undefined) {
                     engine.volume(storage.volume);
                 }
-                if ('volume' in storage === false || storage.volume === 100) {
+                if (storage.volume === undefined || storage.volume === 100) {
                     engine.volume();
                 }
             });
@@ -1370,17 +1370,17 @@ var view = function() {
             });
             engine.set_hotkeys(document);
             chrome.contextMenus.onClicked.addListener(function(info) {
-                if (info.menuItemId in context_menu && context_menu[info.menuItemId].action !== undefined) {
+                if (context_menu[info.menuItemId] !== undefined && context_menu[info.menuItemId].action !== undefined) {
                     context_menu[info.menuItemId].action(info);
                 }
             });
             chrome.storage.local.get('shuffle', function(storage) {
-                if ('shuffle' in storage && storage.shuffle) {
+                if (storage.shuffle !== undefined && storage.shuffle) {
                     engine.shuffle();
                 }
             });
             chrome.storage.local.get('loop', function(storage) {
-                if ('loop' in storage && storage.loop) {
+                if (storage.loop !== undefined && storage.loop) {
                     engine.loop();
                 }
             });
@@ -1440,18 +1440,18 @@ var view = function() {
             }
             var title = "";
             var trackalbum = "";
-            if ("title" in tags && tags.title.length > 0) {
+            if (tags.title !== undefined && tags.title.length > 0) {
                 title = tags.title;
             } else {
                 title = engine.get_filename();
             }
-            if ("album" in tags && "artist" in tags && tags.album.length > 0 && tags.artist.length > 0) {
+            if (tags.album !== undefined && tags.artist !== undefined && tags.album.length > 0 && tags.artist.length > 0) {
                 trackalbum = tags.artist + ' - ' + tags.album;
             } else
-            if ("artist" in tags && tags.artist.length > 0) {
+            if (tags.artist !== undefined && tags.artist.length > 0) {
                 trackalbum = tags.artist;
             } else
-            if ("album" in tags && tags.album.length > 0) {
+            if (tags.album !== undefined && tags.album.length > 0) {
                 trackalbum = tags.album;
             }
             if (is_winamp) {
@@ -1464,7 +1464,7 @@ var view = function() {
                 dom_cache.trackname.text(title).parent().attr("title", title);
                 dom_cache.trackalbum.text(trackalbum).parent().attr("title", trackalbum);
             }
-            if ("picture" in tags) {
+            if (tags.picture !== undefined) {
                 showImage(tags.picture);
             } else {
                 hideImage();

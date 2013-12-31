@@ -6,7 +6,7 @@
         this.dancer = dancer;
         this.audio = new Audio();
         this._viz = undefined;
-        if ('viz' in window === false && 'engine' in window) {
+        if (window.viz === undefined && window.engine !== undefined) {
             this._viz = engine;
         } else {
             this._viz = viz;

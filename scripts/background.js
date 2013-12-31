@@ -32,7 +32,7 @@ var web_socket = function() {
     };
 
     var readUrl = function(headerMap, socketId) {
-        if ('url' in headerMap === false) {
+        if (headerMap.url === undefined) {
             return response_(socketId, headerMap, stringToArrayBuffer("Don't have url!"), ['404 Not Found']);
         }
         var player = wm.getPlayer();
@@ -352,7 +352,7 @@ var wm = function() {
         });
     };
     var create_dialog_window = function(options) {
-        if ("dialog" in windows) {
+        if (windows.dialog !== undefined) {
             if (windows.dialog.contentWindow.window === null) {
                 delete windows.dialog;
             } else {
@@ -385,7 +385,7 @@ var wm = function() {
         create_window(lt[0], lt[1]);
     };
     var create_option_window = function() {
-        if ("option" in windows) {
+        if (windows.option !== undefined) {
             if (windows.option.contentWindow.window === null) {
                 delete windows.option;
             } else {
@@ -418,14 +418,14 @@ var wm = function() {
     };
     var check = function() {
         var player_off = true;
-        if ("player" in windows) {
+        if (windows.player !== undefined) {
             if (windows.player.contentWindow.window === null) {
                 delete windows.player;
             } else {
                 player_off = false;
             }
         }
-        if ("playlist" in windows) {
+        if (windows.playlist !== undefined) {
             if (player_off) {
                 windows.playlist.contentWindow.close();
             }
@@ -433,7 +433,7 @@ var wm = function() {
                 delete windows.playlist;
             }
         }
-        if ("viz" in windows) {
+        if (windows.viz !== undefined) {
             if (player_off) {
                 windows.viz.contentWindow.close();
             }
@@ -445,36 +445,36 @@ var wm = function() {
     };
     return {
         run_player: function() {
-            if (check() && "player" in windows === false) {
+            if (check() && windows.player === undefined) {
                 create_player_window();
             } else {
-                if ("viz" in windows) {
+                if (windows.viz !== undefined) {
                     windows.viz.focus();
                 }
-                if ("playlist" in windows) {
+                if (windows.playlist !== undefined) {
                     windows.playlist.focus();
                 }
                 windows.player.focus();
             }
         },
         toggle_playlist: function() {
-            if (check() && "playlist" in windows) {
+            if (check() && windows.playlist !== undefined) {
                 windows.playlist.contentWindow.close();
             } else {
                 create_playlist_window();
             }
         },
         getPlayer: function() {
-            return (check() && "player" in windows) ? windows.player.contentWindow.window : undefined;
+            return (check() && windows.player !== undefined) ? windows.player.contentWindow.window : undefined;
         },
         getPlaylist: function() {
-            return (check() && "playlist" in windows) ? windows.playlist.contentWindow.window : undefined;
+            return (check() && windows.playlist !== undefined) ? windows.playlist.contentWindow.window : undefined;
         },
         getViz: function() {
-            return (check() && "viz" in windows) ? windows.viz.contentWindow.window : undefined;
+            return (check() && windows.viz !== undefined) ? windows.viz.contentWindow.window : undefined;
         },
         showViz: function() {
-            if (check() && "viz" in windows) {
+            if (check() && windows.viz !== undefined) {
                 windows.viz.contentWindow.close();
             } else {
                 create_viz_window();

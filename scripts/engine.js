@@ -213,7 +213,7 @@ var engine = function() {
             binary[1] = 'image/jpeg';
         }
         var blob;
-        if ('buffer' in binary[0] === false) {
+        if (binary[0].buffer === undefined) {
             binary[0] = new Uint8Array(binary[0]);
         }
         if (enable_search) {
@@ -323,7 +323,7 @@ var engine = function() {
     };
     var discAdapters = function(name) {
         var rmlist = [];
-        if (name !== undefined && name in adapter.proc_list) {
+        if (name !== undefined && adapter.proc_list[name] !== undefined) {
             adapter.proc_list[name].disconnect();
             rmlist.push(name);
         }
@@ -342,7 +342,7 @@ var engine = function() {
         var audio = null;
         var current_id = undefined;
         var read_tags = function(id, rt_cb) {
-            if (playlist[id].type !== undefined && 'read_tags' in cloud[playlist[id].type]) {
+            if (playlist[id].type !== undefined && cloud[playlist[id].type].read_tags !== undefined) {
                 playlist[id].state = "loading";
                 sendPlaylist(function(window) {
                     window.playlist.updPlaylistItem(id, playlist[id]);
@@ -351,7 +351,7 @@ var engine = function() {
                     // NOTE: tags.picture = [binary, mime]
                     read_image(tags.picture, function(i_id) {
                         if (i_id === undefined) {
-                            if ("picture" in tags) {
+                            if (tags.picture !== undefined) {
                                 delete tags.picture;
                             }
                         } else {
@@ -363,7 +363,7 @@ var engine = function() {
                 return;
             }
             var file;
-            if ('blob' in playlist[id]) {
+            if (playlist[id].blob !== undefined) {
                 file = playlist[id].blob;
             } else {
                 file = playlist[id].file;
@@ -393,7 +393,7 @@ var engine = function() {
                  */
                 var tags = ID3.getAllTags(f_name);
                 ID3.clearAll();
-                if ("picture" in tags) {
+                if (tags.picture !== undefined) {
                     tags.picture = [tags.picture.data, tags.picture.format];
                 }
                 $.each(tags, function(key) {
@@ -403,7 +403,7 @@ var engine = function() {
                 });
                 read_image(tags.picture, function(i_id) {
                     if (i_id === undefined) {
-                        if ("picture" in tags) {
+                        if (tags.picture !== undefined) {
                             delete tags.picture;
                         }
                     } else {
@@ -414,7 +414,7 @@ var engine = function() {
             }, params);
         };
         var getTagBody = function(id) {
-            if (id in playlist === false) {
+            if (playlist[id] === undefined) {
                 return ["3pm-player", ""];
             }
             var tags = playlist[id].tags;
@@ -423,18 +423,18 @@ var engine = function() {
             }
             var title = "";
             var album = "";
-            if ("title" in tags && tags.title.length > 0) {
+            if (tags.title !== undefined && tags.title.length > 0) {
                 title = tags.title;
             } else {
                 title = playlist[id].file.name;
             }
-            if ("album" in tags && "artist" in tags && tags.album.length > 0 && tags.artist.length > 0) {
+            if (tags.album !== undefined && tags.artist !== undefined && tags.album.length > 0 && tags.artist.length > 0) {
                 album = tags.artist + ' - ' + tags.album;
             } else
-            if ("artist" in tags && tags.artist.length > 0) {
+            if (tags.artist !== undefined && tags.artist.length > 0) {
                 album = tags.artist;
             } else
-            if ("album" in tags && tags.album.length > 0) {
+            if (tags.album !== undefined && tags.album.length > 0) {
                 album = tags.album;
             }
             return [title, album];
@@ -501,7 +501,7 @@ var engine = function() {
                     }
                     //отображаем уведомление о воспроизведении
                     chrome.notifications.getAll(function(obj) {
-                        if ('current_track' in obj === true) {
+                        if (obj.current_track !== undefined) {
                             starTimer();
                             notification.update();
                             return;
@@ -513,7 +513,7 @@ var engine = function() {
                 },
                 update: function() {
                     chrome.notifications.getAll(function(obj) {
-                        if ('current_track' in obj === false) {
+                        if (obj.current_track === undefined) {
                             return;
                         }
                         var opt = getOpt();
@@ -531,7 +531,7 @@ var engine = function() {
                 /*
                  * preload return only BLOB!
                  */
-                if (item.blob !== undefined && 'url' in item.blob) {
+                if (item.blob !== undefined && item.blob.url !== undefined) {
                     audio.src = item.blob.url;
                     return true;
                 }
@@ -551,7 +551,7 @@ var engine = function() {
                 });
                 return true;
             } else
-            if ('onplay' in cloud[item.type]) {
+            if (cloud[item.type].onplay !== undefined) {
                 /*
                  * onplay return only URL!
                  */
@@ -585,7 +585,7 @@ var engine = function() {
                 sendPlaylist(function(window) {
                     window.playlist.selected(current_id);
                 });
-                if ('url' in item.file) {
+                if (item.file.url !== undefined) {
                     if (!audio_preload(item)) {
                         audio.src = item.file.url;
                     }
@@ -610,7 +610,7 @@ var engine = function() {
                 if (playedlist.length === playlist.length) {
                     playedlist = [];
                 }
-                if ('url' in playlist[current_id].file && audio.src.split(':')[0] === "chrome-extension") {
+                if (playlist[current_id].file.url !== undefined && audio.src.split(':')[0] === "chrome-extension") {
                     var item = playlist[current_id];
                     if (!audio_preload(item)) {
                         audio.src = item.file.url;
@@ -623,7 +623,7 @@ var engine = function() {
                 if (current_id === undefined || playlist[current_id] === undefined) {
                     return;
                 }
-                if ('url' in playlist[current_id].file && audio.duration === Infinity) {
+                if (playlist[current_id].file.url !== undefined && audio.duration === Infinity) {
                     audio.pause();
                     audio.src = "";
                 } else {
@@ -809,7 +809,7 @@ var engine = function() {
                     var ext = mime.substr(1);
                     return (allow_ext.indexOf(ext) > 0);
                 }
-                if (mime in type_list) {
+                if (type_list[mime] !== undefined) {
                     return type_list[mime];
                 }
                 type_list[mime] = audio.canPlayType(mime).length;
@@ -1037,15 +1037,15 @@ var engine = function() {
             }
             var my_playlist = [];
             for (var i = 0; i < files.length; i++) {
-                if ('tags' in files[i] && files[i].tags !== undefined && 'picture' in files[i].tags) {
+                if (files[i].tags !== undefined && files[i].tags.picture !== undefined) {
                     files[i].tags = undefined;
                 }
-                if ("id" in files[i] && "file" in files[i] && "tags" in files[i]) {
+                if (files[i].id !== undefined && files[i].file !== undefined && files[i].tags !== undefined) {
                     files[i].id = my_playlist.length;
                     my_playlist.push(files[i]);
                     continue;
                 }
-                if ("url" in files[i]) {
+                if (files[i].url !== undefined) {
                     my_playlist.push({id: my_playlist.length, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
                     continue;
                 }
@@ -1126,7 +1126,7 @@ var engine = function() {
             for (var i = 0; i < pl.length; i++) {
                 var item = pl[i];
                 var title = item.file.name;
-                if ('url' in item.file) {
+                if (item.file.url !== undefined) {
                     title = player.getTagBody(item.id);
                     if (title[1].length === 0) {
                         title = title[0];
@@ -1281,7 +1281,7 @@ var engine = function() {
                     engine.open(files, {name: list.name, id: id});
                 });
             } else
-            if (cloud[list.type] !== undefined && 'on_select_list' in cloud[list.type]) {
+            if (cloud[list.type] !== undefined && cloud[list.type].on_select_list !== undefined) {
                 cloud[list.type].on_select_list(list, function(track_list, info) {
                     engine.open(track_list, info);
                 });

@@ -29,21 +29,21 @@ var playlist = function() {
         if (item.tags === undefined) {
             title = item.file.name;
         } else {
-            if ("title" in tags && tags.title.length > 0) {
+            if (tags.title !== undefined && tags.title.length > 0) {
                 title = item.tags.title;
             } else {
                 title = item.file.name;
             }
-            if ("album" in tags && "artist" in tags && tags.album.length > 0 && tags.artist.length > 0) {
+            if (tags.album !== undefined && tags.artist !== undefined && tags.album.length > 0 && tags.artist.length > 0) {
                 info = tags.artist + ' - ' + tags.album;
             } else
-            if ("artist" in tags && tags.artist.length > 0) {
+            if (tags.artist !== undefined && tags.artist.length > 0) {
                 info = tags.artist;
             } else
-            if ("album" in tags && tags.album.length > 0) {
+            if (tags.album !== undefined && tags.album.length > 0) {
                 info = tags.album;
             }
-            if ("picture" in tags) {
+            if (tags.picture !== undefined) {
                 pic = tags.picture;
             }
         }
@@ -159,7 +159,7 @@ var playlist = function() {
         }
         dom_cache.title.text(info.name).attr('title', info.name);
         dom_cache.pl_list.children('li.selected').removeClass("selected");
-        if ("id" in info) {
+        if (info.id !== undefined) {
             dom_cache.pl_list.children('li[data-id=' + info.id + ']').addClass("selected");
         }
     };

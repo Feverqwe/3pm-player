@@ -23,7 +23,7 @@ var viz = function() {
         }
     }
     var setTags = function(value) {
-        if ("track" in dom_cache === false) {
+        if (dom_cache.track === undefined) {
             return;
         }
         dom_cache.track.empty().append($('<span>', {text: value[0]}), $('<br>'), $('<span>', {text: value[1]}));
@@ -101,7 +101,7 @@ var viz = function() {
         },
         audio_state: function(key, value) {
             if (dancerInited === false && key === "loadedmetadata") {
-                if ("loadMusic" in reality) {
+                if (reality.loadMusic !== undefined) {
                     reality.loadMusic(audio);
                 }
                 return;
@@ -123,7 +123,7 @@ var viz = function() {
             dancerInited = val;
         },
         randomPreset: function() {
-            if ("randomPreset" in reality) {
+            if (reality.randomPreset !== undefined) {
                 reality.randomPreset();
             }
         },
@@ -138,7 +138,7 @@ var viz = function() {
             $('body').append($('<a>', {'class': 'need_addon', target: '_blank', href: 'https://chrome.google.com/webstore/detail/' + aid, text: msg}));
         },
         waitThree: function(url) {
-            if ('THREE' in window === false) {
+            if (window.THREE === undefined) {
                 setTimeout(function() {
                     viz.waitThree(url);
                 }, 100);
