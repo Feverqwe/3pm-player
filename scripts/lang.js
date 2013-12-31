@@ -45,7 +45,7 @@ var get_lang = function(language) {
         settings: {
             1: "Language",
             2: 'Player',
-            3: 'Visualization',
+            3: 'Clouds',
             4: 'Save',
             5: 'Player settings',
             6: 'Display a notification when changing tracks',
@@ -71,7 +71,9 @@ var get_lang = function(language) {
             26: 'Scroll up 10 seconds',
             27: 'Menu',
             28: '* For OSX use Command button instead Ctrl.',
-            29: 'Hotkeys'
+            29: 'Hotkeys',
+            30: 'Only foreign tracks',
+            31: 'Pre-load track'
         }
     };
     var lang_arr_ru = {
@@ -120,7 +122,7 @@ var get_lang = function(language) {
         settings: {
             1: "Язык / Language",
             2: 'Плеер',
-            3: 'Визуализация',
+            3: 'Облака',
             4: 'Сохранить',
             5: 'Настройки плеера',
             6: 'Показывать уведомление при смене трека',
@@ -146,7 +148,9 @@ var get_lang = function(language) {
             26: 'Прокрутить вперед на 10 секунд',
             27: 'Меню',
             28: '* Для OSX вместо Ctrl используется Command.',
-            29: 'Горячие клавиши'
+            29: 'Горячие клавиши',
+            30: 'Только зарубежные треки',
+            31: 'Предзагружать трек'
         }
     };
     var lang = language;

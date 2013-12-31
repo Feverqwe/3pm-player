@@ -1,5 +1,9 @@
 var cloud = function() {
     var dl_xhr = undefined;
+    var settings = undefined;
+    var set_settings = function(setngs) {
+        settings = setngs;
+    };
     var getTrack = function(options, cb) {
         if (options.url === undefined) {
             cb('');
@@ -115,7 +119,8 @@ var cloud = function() {
             if (genre_id === undefined) {
                 genre_id = 0;
             }
-            var url = 'https://api.vk.com/method/audio.getPopular?v=5.5&access_token=' + token + '&count=100&genre_id=' + genre_id;
+            var only_eng = (settings.foreign_tracks === 1) ? 1 : 0;
+            var url = 'https://api.vk.com/method/audio.getPopular?v=5.5&access_token=' + token + '&count=100&only_eng=' + only_eng + '&genre_id=' + genre_id;
             var tracks = [];
             $.ajax({
                 url: url,
@@ -1130,6 +1135,7 @@ var cloud = function() {
         };
     }();
     return {
+        set_settings: set_settings,
         getTrack: getTrack,
         abort: function() {
             if (dl_xhr !== undefined) {
@@ -1144,3 +1150,6 @@ var cloud = function() {
         sd: sd
     };
 }();
+$(document).on('settings_loaded', function() {
+    cloud.set_settings(engine.getSettings());
+});

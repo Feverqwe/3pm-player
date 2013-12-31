@@ -668,4 +668,5 @@ body.winamp {
     position: absolute;
     bottom: 56px;
     left: 22px;
+    -webkit-app-region: no-drag;
 }

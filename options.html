@@ -14,8 +14,8 @@
         </div>
         <ul class="menu">
             <li><a class="active" href="#main" data-page="main" data-lang="2">Player</a></li>
+            <li><a href="#cloud" data-page="cloud" data-lang="3">Облака</a></li>
             <li><a href="#hotkeys" data-page="hotkeys" data-lang="29">Горячие клавиши</a></li>
-            <li><a href="#cloud" data-page="cloud" data-lang="">Облака</a></li>
             <li class="save_btn"><a href="#save" data-lang="4">Save</a></li>
         </ul>
         <div class="page main active">
@@ -66,9 +66,40 @@
         </div>
         <div class="page cloud">
             <fieldset class="cloud check_list">
-                <legend data-lang="">Настройки плеера</legend>
+                <legend data-lang="">vk.com</legend>
                 <ul>
-                    <li><ul class="item"><li><span class="key">Space</span></li><li data-lang="16">Пауза/Продолжить воспроизведение</li></ul></li>
+                    <li><ul class="item"><li><input type="checkbox" name="preload_vk"/></li><li data-lang="31">Предзагружать трек</li></ul></li>
+                    <li><ul class="item"><li><input type="checkbox" name="foreign_tracks"/></li><li data-lang="30">Только зарубежные треки</li></ul></li>
+                </ul>
+            </fieldset>
+            <fieldset class="cloud check_list">
+                <legend data-lang="">soundcloud.com</legend>
+                <ul>
+                    <li><ul class="item"><li><input type="checkbox" name="preload_sc"/></li><li data-lang="31">Предзагружать трек</li></ul></li>
+                </ul>
+            </fieldset>
+            <fieldset class="cloud check_list">
+                <legend data-lang="">drive.google.com</legend>
+                <ul>
+                    <li><ul class="item"><li><input type="checkbox" name="preload_gd"/></li><li data-lang="31">Предзагружать трек</li></ul></li>
+                </ul>
+            </fieldset>
+            <fieldset class="cloud check_list">
+                <legend data-lang="">dropbox.com</legend>
+                <ul>
+                    <li><ul class="item"><li><input type="checkbox" name="preload_db"/></li><li data-lang="31">Предзагружать трек</li></ul></li>
+                </ul>
+            </fieldset>
+            <fieldset class="cloud check_list">
+                <legend data-lang="">box.com</legend>
+                <ul>
+                    <li><ul class="item"><li><input type="checkbox" name="preload_box" checked disabled/></li><li data-lang="31">Предзагружать трек</li></ul></li>
+                </ul>
+            </fieldset>
+            <fieldset class="cloud check_list">
+                <legend data-lang="">skydrive.com</legend>
+                <ul>
+                    <li><ul class="item"><li><input type="checkbox" name="preload_sd"/></li><li data-lang="31">Предзагружать трек</li></ul></li>
                 </ul>
             </fieldset>
         </div>
