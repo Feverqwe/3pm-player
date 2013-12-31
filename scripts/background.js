@@ -55,7 +55,7 @@ var web_socket = function() {
         if (not_found.indexOf(headerMap.url) >= 0) {
             return response_(socketId, headerMap, stringToArrayBuffer(''), ['404 Not Found']);
         } else
-        if (headerMap.url in cache) {
+        if (cache[headerMap.url] !== undefined) {
             var data = cache[headerMap.url].data;
             if (headerMap["If-None-Match"] === String(data.byteLength)) {
                 return response_(socketId, headerMap, stringToArrayBuffer(''), ["304 Not Modified"]);
@@ -115,7 +115,7 @@ var web_socket = function() {
                 'css': 'text/css',
                 'html': 'text/html; charset=UTF-8'
             };
-            var ext = (ext in ext_content_type) ? 'Content-Type: ' + ext_content_type[ext] : '';
+            var ext = (ext_content_type[ext] !== undefined) ? 'Content-Type: ' + ext_content_type[ext] : '';
             var xhr = new XMLHttpRequest();
             xhr.open('GET', '/www' + headerMap.url, true);
             xhr.responseType = 'arraybuffer';
@@ -527,7 +527,7 @@ var wm = function() {
         },
         ws: web_socket,
         hi: function(type, win) {
-            if (type in windows === false) {
+            if (windows[type] === undefined) {
                 windows[type] = win;
             }
         }

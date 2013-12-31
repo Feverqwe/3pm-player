@@ -875,7 +875,7 @@ var engine = function() {
                         read_tags(current_id, function(tags, id) {
                             var obj = {};
                             $.each(tags, function(key, value) {
-                                if (key in ["title", "artist", "album", "picture"] !== -1) {
+                                if (["title", "artist", "album", "picture"].indexOf(key) !== -1) {
                                     obj[key] = value;
                                 }
                             });
@@ -982,7 +982,7 @@ var engine = function() {
                     read_tags(item.id, function(tags, id) {
                         var obj = {};
                         $.each(tags, function(key, value) {
-                            if (key in ["title", "artist", "album", "picture"] !== -1) {
+                            if (["title", "artist", "album", "picture"].indexOf(key) !== -1) {
                                 obj[key] = value;
                             }
                         });

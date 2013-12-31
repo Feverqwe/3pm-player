@@ -49,7 +49,7 @@ var cloud = function() {
                     if (obj[exp_key] === undefined) {
                         cb(obj);
                     } else
-                    if (key in obj && obj[exp_key] >= time) {
+                    if (obj[key] !== undefined && obj[exp_key] >= time) {
                         cb(obj);
                     } else {
                         cb({});

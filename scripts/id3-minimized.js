@@ -863,14 +863,14 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
             }
 
             // find frame parsing function
-            if (frameID in ID3v2.readFrameData) {
+            if (ID3v2.readFrameData[frameID] !== undefined) {
                 readFrameFunc = ID3v2.readFrameData[frameID];
             } else if (frameID[0] == "T") {
                 readFrameFunc = ID3v2.readFrameData["T*"];
             }
 
             var parsedData = readFrameFunc ? readFrameFunc(frameDataOffset, frameSize, frameData, flags) : undefined;
-            var desc = frameID in ID3v2.frames ? ID3v2.frames[frameID] : 'Unknown';
+            var desc = ID3v2.frames[frameID] !== undefined ? ID3v2.frames[frameID] : 'Unknown';
 
             var frame = {
                 id: frameID,
@@ -879,7 +879,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
                 data: parsedData
             };
 
-            if (frameID in frames) {
+            if (frames[frameID] !== undefined) {
                 if (frames[frameID].id) {
                     frames[frameID] = [frames[frameID]];
                 }
@@ -903,7 +903,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         }
 
         for (var i = 0, id; id = ids[i]; i++) {
-            if (id in frames) {
+            if (frames[id] !== undefined) {
                 return frames[id].data;
             }
         }
@@ -1211,7 +1211,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
             });
         } else {
             // Value atoms
-            var readAtom = atomName in ID4.atom;
+            var readAtom = ID4.atom[atomName] !== undefined;
             data.loadRange([offset + (readAtom ? 0 : atomSize), offset + atomSize + 8], function() {
                 loadAtom(data, offset + atomSize, length, callback);
             });
