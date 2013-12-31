@@ -743,7 +743,6 @@ var cloud = function() {
                     return;
                 }
                 var tags = track.meta;
-                delete track.meta;
                 var url = tags.artwork;
                 if (url === null) {
                     cb(tags);
@@ -1102,7 +1101,6 @@ var cloud = function() {
                     return;
                 }
                 var tags = track.meta;
-                delete track.meta;
                 var url = tags.artwork;
                 if (url === undefined) {
                     cb(tags);
