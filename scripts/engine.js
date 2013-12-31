@@ -1037,7 +1037,7 @@ var engine = function() {
             }
             var my_playlist = [];
             for (var i = 0; i < files.length; i++) {
-                if ('tags' in files[i] && 'picture' in files[i].tags) {
+                if ('tags' in files[i] && files[i].tags !== undefined && 'picture' in files[i].tags) {
                     files[i].tags = undefined;
                 }
                 if ("id" in files[i] && "file" in files[i] && "tags" in files[i]) {
