@@ -1,6 +1,5 @@
 var _debug = false;
 var engine = function() {
-    var setings_loaded = false;
     //options
     var settings = {
         next_track_notification: 0,
@@ -16,18 +15,14 @@ var engine = function() {
         preload_box: 1,
         preload_sd: 0
     };
-    var updateSettings = function(obj) {
+    var loadSettings = function(obj) {
         $.each(settings, function(k) {
             if (obj[k] !== undefined) {
                 settings[k] = obj[k];
             }
         });
-        if (!setings_loaded) {
-            setings_loaded = true;
-            $(document).trigger('settings_loaded');
-        } else {
-            view.updateSettings(settings);
-        }
+        window._settings = settings;
+        $(document).trigger('settings_changed');
     };
     //<<<<<<<
     //allow_ext - only for files without mime.
@@ -42,48 +37,8 @@ var engine = function() {
     var loop = false;
     var current_played_pos = -1;
     var M3UPlaylists = undefined;
-    var _playlist_window = undefined;
-    var _viz_window = undefined;
     var adapter = {};
     var var_cache = {};
-    function sendPlaylist(callback) {
-        /*
-         * Функция отправки действий в плэйлист
-         */
-        if (_playlist_window === undefined || _playlist_window.window === null) {
-            chrome.runtime.getBackgroundPage(function(bg) {
-                _playlist_window = bg.wm.getPlaylist();
-                if (_playlist_window !== undefined) {
-                    callback(_playlist_window);
-                }
-            });
-        } else {
-            callback(_playlist_window);
-        }
-    }
-    function sendViz(callback, fail) {
-        /*
-         * Функция отправки действий в плэйлист
-         */
-        if (_viz_window === undefined || _viz_window.window === null) {
-            chrome.runtime.getBackgroundPage(function(bg) {
-                _viz_window = bg.wm.getViz();
-                if (_viz_window !== undefined) {
-                    if (callback !== undefined) {
-                        callback(_viz_window);
-                    }
-                } else {
-                    if (fail !== undefined) {
-                        fail();
-                    }
-                }
-            });
-        } else {
-            if (callback !== undefined) {
-                callback(_viz_window);
-            }
-        }
-    }
     var reset_player = function() {
         /*
          * Функция сброса плэйлиста.
@@ -105,7 +60,7 @@ var engine = function() {
         //если трек уже был проигран похиция не -1;
         current_played_pos = -1;
         //отправляет команду на очистку плэйлиста
-        sendPlaylist(function(window) {
+        _send('playlist', function(window) {
             window.playlist.empty();
         });
     };
@@ -345,7 +300,7 @@ var engine = function() {
         var read_tags = function(id, rt_cb) {
             if (playlist[id].type !== undefined && cloud[playlist[id].type].read_tags !== undefined) {
                 playlist[id].state = "loading";
-                sendPlaylist(function(window) {
+                _send('playlist', function(window) {
                     window.playlist.updPlaylistItem(id, playlist[id]);
                 });
                 cloud[playlist[id].type].read_tags(playlist[id], function(tags) {
@@ -368,7 +323,7 @@ var engine = function() {
                 file = playlist[id].file;
             }
             playlist[id].state = "loading";
-            sendPlaylist(function(window) {
+            _send('playlist', function(window) {
                 window.playlist.updPlaylistItem(id, playlist[id]);
             });
             /*
@@ -574,7 +529,7 @@ var engine = function() {
                     return;
                 }
                 current_id = id;
-                sendPlaylist(function(window) {
+                _send('playlist', function(window) {
                     window.playlist.selected(current_id);
                 });
                 if (item.file.url !== undefined) {
@@ -645,13 +600,15 @@ var engine = function() {
                     }
                 } else {
                     var pl = sorted_playlist || playlist;
+                    var pl_len = playlist.length;
                     var indx = getObjArrayPos(pl, "id", current_id) + 1;
                     if (pl[indx] !== undefined) {
                         id = pl[indx].id;
-                    } else {
-                        id = 0;
+                    } else
+                    if (pl_len > 0){   
+                        id = pl[0].id;
                     }
-                    if (playlist.length <= id) {
+                    if (pl_len <= id) {
                         id = 0;
                     }
                 }
@@ -792,7 +749,7 @@ var engine = function() {
                 return audio.muted;
             },
             getCurrent: function() {
-                sendPlaylist(function(window) {
+                _send('playlist', function(window) {
                     window.playlist.selected(current_id);
                 });
             },
@@ -808,19 +765,16 @@ var engine = function() {
                 return type_list[mime];
             },
             init: function() {
-                $('.engine').append('<audio/>');
-                audio = $('.engine > audio').get(0);
-
+                audio = new Audio();
                 adapter.context = new window.webkitAudioContext();
                 adapter.audio = audio;
                 adapter.source = adapter.context.createMediaElementSource(adapter.audio);
                 adapter.source.connect(adapter.context.destination);
                 adapter.proc_list = {};
-
                 $(audio).on('loadstart', function(e) {
                     view.setTags(playlist[current_id].tags || {});
                     view.state("loadstart");
-                    sendViz(function(window) {
+                    _send('viz', function(window) {
                         window.viz.audio_state('track', getTagBody(current_id));
                     });
                 });
@@ -854,7 +808,7 @@ var engine = function() {
                         playlist[current_id].duration = this.duration;
                     }
                     view.state("loadedmetadata");
-                    sendViz(function(window) {
+                    _send('viz', function(window) {
                         window.viz.audio_state('loadedmetadata');
                     });
                     discAdapters();
@@ -867,11 +821,11 @@ var engine = function() {
                         read_tags(current_id, function(tags, id) {
                             playlist[id].tags = tags;
                             playlist[id].state = "dune";
-                            sendPlaylist(function(window) {
+                            _send('playlist', function(window) {
                                 window.playlist.updPlaylistItem(id, playlist[id]);
                             });
                             view.setTags(playlist[id].tags);
-                            sendViz(function(window) {
+                            _send('viz', function(window) {
                                 window.viz.audio_state('track', getTagBody(current_id));
                             });
                             if (settings.next_track_notification) {
@@ -879,7 +833,7 @@ var engine = function() {
                             }
                         });
                     } else {
-                        sendViz(function(window) {
+                        _send('viz', function(window) {
                             window.viz.audio_state('track', getTagBody(current_id));
                         });
                         view.setTags(playlist[current_id].tags);
@@ -968,7 +922,7 @@ var engine = function() {
                     read_tags(item.id, function(tags, id) {
                         playlist[id].tags = tags;
                         playlist[id].state = "dune";
-                        sendPlaylist(function(window) {
+                        _send('playlist', function(window) {
                             window.playlist.updPlaylistItem(id, playlist[id]);
                         });
                         thread--;
@@ -1002,14 +956,12 @@ var engine = function() {
     };
     return {
         run: function() {
-            chrome.storage.local.get(function(obj) {
-                updateSettings(obj);
-            });
-            $('.engine').remove();
-            $('body').append($('<div>', {'class': 'engine'}));
             player.init();
+            chrome.storage.local.get(function(obj) {
+                loadSettings(obj);
+            });
         },
-        updateSettings: updateSettings,
+        loadSettings: loadSettings,
         get_filename: player.get_filename,
         open: function(files, info) {
             if (files.length === 0) {
@@ -1038,7 +990,7 @@ var engine = function() {
                 reset_player();
                 playlist = my_playlist;
                 playlist_info = info;
-                sendPlaylist(function(window) {
+                _send('playlist', function(window) {
                     window.playlist.setPlaylist(playlist);
                     window.playlist.setPlaylistInfo(playlist_info);
                 });
@@ -1075,7 +1027,7 @@ var engine = function() {
                 shuffle = !shuffle;
             }
             chrome.storage.local.set({'shuffle': shuffle});
-            sendPlaylist(function(window) {
+            _send('playlist', function(window) {
                 window.playlist.setShuffle(shuffle);
             });
             view.setShuffle(shuffle);
@@ -1085,7 +1037,7 @@ var engine = function() {
                 loop = !loop;
             }
             chrome.storage.local.set({'loop': loop});
-            sendPlaylist(function(window) {
+            _send('playlist', function(window) {
                 window.playlist.setLoop(loop);
             });
             view.setLoop(loop);
@@ -1120,21 +1072,20 @@ var engine = function() {
         },
         setM3UPlaylists: function(m3u) {
             M3UPlaylists = m3u;
-            sendPlaylist(function(window) {
+            _send('playlist', function(window) {
                 window.playlist.setSelectList(M3UPlaylists);
             });
         },
         getM3UPlaylists: function() {
             return M3UPlaylists;
         },
-        sendPlaylist: sendPlaylist,
         setSortedList: function(playlist, type, hide) {
             sorted_playlist = playlist;
             sort_type = type;
             if (hide) {
                 return;
             }
-            sendPlaylist(function(window) {
+            _send('playlist', function(window) {
                 window.playlist.setPlaylist(sorted_playlist);
             });
         },
@@ -1155,17 +1106,17 @@ var engine = function() {
         },
         getTagBody: player.getTagBody,
         vizRandomPreset: function() {
-            sendViz(function(window) {
+            _send('viz', function(window) {
                 window.viz.randomPreset();
             });
         },
         vizClose: function() {
-            sendViz(function(window) {
+            _send('viz', function(window) {
                 window.close();
             });
         },
         vizMini: function() {
-            sendViz(function(window) {
+            _send('viz', function(window) {
                 window.viz.minimize();
             });
         },
@@ -1276,12 +1227,150 @@ var engine = function() {
                 bg.wm.showDialog({type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: bg.wm.ws.active()});
             });
         },
+        window_manager: function(options) {
+            var create_window = function(url, args, oncreate) {
+                if ( (options.toggle || options.only) && _windows[options.type] !== undefined && _windows[options.type].contentWindow.window !== null) {
+                     _windows[options.type].contentWindow.window.close();
+                     if (options.only === undefined) {
+                        return;
+                     }
+                }
+                chrome.app.window.create(url, args, oncreate);
+            };
+            if (options.type === 'playlist') {
+                options.toggle = true;
+                chrome.storage.local.get(['pl_pos_left', 'pl_pos_top', 'pl_w', 'pl_h'], function(storage) {
+                    var position = _check_window_position({
+                        width: storage.pl_w,
+                        height: storage.pl_h,
+                        left: storage.pl_pos_left,
+                        top: storage.pl_pos_top
+                    });
+                    create_window('playlist.html', {
+                        bounds: position, 
+                        frame: "none"
+                    }, function(window) {
+                        _windows[options.type] = window;
+                        window.onClosed.addListener(function() {
+                            delete _windows[options.type];
+                        });
+                        window.contentWindow._lang = _lang;
+                        window.contentWindow._send = _send;
+                    });
+                });
+            };
+            if (options.type === 'viz') {
+                options.toggle = true;
+                chrome.storage.local.get(['viz_pos_left', 'viz_pos_top', 'viz_w', 'viz_h'], function(storage) {
+                    var position = _check_window_position({
+                        width: storage.viz_w,
+                        height: storage.viz_h,
+                        left: storage.viz_pos_left,
+                        top: storage.viz_pos_top
+                    });
+                    create_window('viz.html', {
+                        bounds: position, 
+                        frame: "none"
+                    }, function(window) {
+                        _windows[options.type] = window;
+                        window.onClosed.addListener(function() {
+                            delete _windows[options.type];
+                            discAdapters('viz');
+                        });
+                        window.contentWindow._lang = _lang;
+                        window.contentWindow._send = _send;
+                    });
+                });
+            };
+            if (options.type === 'dialog') {
+                options.only = true;
+                options.config.w = options.config.w || 400;
+                options.config.h = options.config.h || 120;
+                if (options.config.type === 'm3u') {
+                    var len = 3;
+                    if (options.config.playlists !== undefined) {
+                        len = options.config.playlists.length;
+                    }
+                    if (len === 0) {
+                        len = 1;
+                    }
+                    if (len > 8) {
+                        len = 8;
+                    }
+                    options.config.h = len * 52 + 43;
+                } else
+                if (options.config.type === 'menu') {
+                    var len = 14;
+                    if (options.config.list !== undefined) {
+                        len = 0;
+                        for (var index in options.config.list) {
+                            var item = options.config.list[index];
+                            if (item.hide) {
+                                continue;
+                            }
+                            if (item.action === undefined) {
+                                continue;
+                            }
+                            if (item.contexts.indexOf('page') === -1) {
+                                continue;
+                            }
+                            len++;
+                        }
+                    }
+                    if (len === 0) {
+                        len = 1;
+                    }
+                    if (len > 20) {
+                        len = 14;
+                    }
+                    options.config.h = len * 19 + 40;
+                }
+                var position = _check_window_position({
+                    width: options.config.w,
+                    height: options.config.h,
+                    left: undefined,
+                    top: undefined
+                });
+                create_window('dialog.html', {
+                    bounds: position, 
+                    frame: "none",
+                    resizable: options.config.r || false
+                }, function(window) {
+                    _windows[options.type] = window;
+                    window.onClosed.addListener(function() {
+                        delete _windows[options.type];
+                    });
+                    window.contentWindow._lang = _lang;
+                    window.contentWindow.options = options.config;
+                    window.contentWindow._send = _send;
+                });
+            };
+            if (options.type === 'options') {
+                options.only = true;
+                var position = _check_window_position({
+                    width: 820,
+                    height: 600,
+                    left: undefined,
+                    top: undefined
+                });
+                create_window('options.html', {
+                    bounds: position, 
+                    frame: "chrome",
+                    resizable: true
+                }, function(window) {
+                    _windows[options.type] = window;
+                    window.onClosed.addListener(function() {
+                        delete _windows[options.type];
+                    });
+                    window.contentWindow._lang = _lang;
+                    window.contentWindow._send = _send;
+                });
+            }
+        },
         vk: cloud.vk,
         db: cloud.db,
         sc: cloud.sc,
         gd: cloud.gd
     };
 }();
-$(function() {
-    engine.run();
-});
+engine.run();

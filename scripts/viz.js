@@ -4,24 +4,6 @@ var viz = function() {
     var dom_cache = {};
     var dancerInited = false;
     var _lang = undefined;
-    function sendPlayer(callback) {
-        /*
-         * Функция отправки действий в плеер
-         */
-        if (window === null) {
-            return;
-        }
-        if (window._player === undefined || window._player.window === null) {
-            chrome.runtime.getBackgroundPage(function(bg) {
-                window._player = bg.wm.getPlayer();
-                if (window._player !== undefined) {
-                    callback(window._player);
-                }
-            });
-        } else {
-            callback(window._player);
-        }
-    }
     var setTags = function(value) {
         if (dom_cache.track === undefined) {
             return;
@@ -35,7 +17,7 @@ var viz = function() {
     };
     return {
         loadlang: function(cb) {
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 _lang = window._lang;
                 write_language();
                 cb();
@@ -45,34 +27,7 @@ var viz = function() {
             dom_cache.body = $('body');
             dom_cache.track = $('<div>', {'class': 'track'});
             dom_cache.body.append(dom_cache.track);
-            window.onresize = function() {
-                clearTimeout(var_cache.resize_timer);
-                var_cache.resize_timer = setTimeout(function() {
-                    if (document.webkitIsFullScreen) {
-                        return;
-                    }
-                    var coef = window.devicePixelRatio;
-                    var win_w = parseInt(window.innerWidth * coef);
-                    var win_h = parseInt(window.innerHeight * coef);
-                    chrome.storage.local.set({viz_w: win_w, viz_h: win_h});
-                }, 500);
-            };
-            $(window).trigger('resize');
-            var save_pos = function() {
-                if (document.webkitIsFullScreen || document.webkitHidden) {
-                    return;
-                }
-                var wl = window.screenLeft;
-                var wr = window.screenTop;
-                if (var_cache['wl'] !== wl || var_cache['wr'] !== wr) {
-                    var_cache['wl'] = wl;
-                    var_cache['wr'] = wr;
-                    chrome.storage.local.set({'viz_pos_left': wl, 'viz_pos_top': wr});
-                }
-            };
             $('.close').on('click', function() {
-                save_pos();
-                reality.music.audioAdapter.die();
                 window.close();
             });
             $('.mini').on('click', function() {
@@ -85,15 +40,27 @@ var viz = function() {
                     document.webkitCancelFullScreen();
                 }
             });
-            setInterval(function() {
-                save_pos();
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.hi("viz", chrome.app.window.current());
-                });
-            }, 5000);
+            chrome.app.window.current().onBoundsChanged.addListener(function() {
+                if (document.webkitIsFullScreen || document.webkitHidden) {
+                    return;
+                }
+                var dpr = window.devicePixelRatio;
+                var window_left = window.screenLeft;
+                var window_top = window.screenTop;
+                var window_width = parseInt(window.innerWidth * dpr);
+                var window_height = parseInt(window.innerHeight * dpr);
+                if (var_cache.window_left !== window_left || var_cache.window_top !== window_top
+                        || var_cache.window_width !== window_width || var_cache.window_height !== window_height) {
+                    var_cache.window_left = window_left;
+                    var_cache.window_top = window_top;
+                    var_cache.window_height = window_height;
+                    var_cache.window_width = window_width;
+                    chrome.storage.local.set({viz_pos_left: window_left, viz_pos_top: window_top, viz_w: window_width, viz_h: window_height});
+                }
+            });
         },
         run: function() {
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 audio = window.engine.getAudio();
                 setTags(window.engine.getTagBody());
                 window.engine.set_hotkeys(document);
@@ -115,7 +82,7 @@ var viz = function() {
             return audio;
         },
         getAdapter: function(cb) {
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 cb(window.engine.getAdapter());
             });
         },

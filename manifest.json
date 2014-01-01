@@ -11,7 +11,7 @@
     },
     "app": {
         "background": {
-            "scripts": ["scripts/background.js"]
+            "scripts": ["scripts/background.js","scripts/webui.js"]
         }
     },
     "offline_enabled": true,

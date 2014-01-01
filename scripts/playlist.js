@@ -1,23 +1,7 @@
 var playlist = function() {
     var dom_cache = {};
     var var_cache = {};
-    var _lang = undefined;
     var settings = undefined;
-    function sendPlayer(callback) {
-        /*
-         * Функция отправки действий в плеер
-         */
-        if (window._player === undefined || window._player.window === null) {
-            chrome.runtime.getBackgroundPage(function(bg) {
-                window._player = bg.wm.getPlayer();
-                if (window._player !== undefined) {
-                    callback(window._player);
-                }
-            });
-        } else {
-            callback(window._player);
-        }
-    }
     var item_read = function(item) {
         /*
          * Создает обьект элемента для плэйлиста
@@ -59,7 +43,7 @@ var playlist = function() {
             for (var i = 0; i < idl; i++) {
                 var data = "images/no-cover.png";
                 var item = id[i];
-                sendPlayer(function(window) {
+                _send('player',function(window) {
                     if (item !== 'none') {
                         var url = window.engine.getCover(item).data;
                         if (url !== null) {
@@ -78,7 +62,7 @@ var playlist = function() {
         if ($('style.pic_' + id).length > 0) {
             return;
         }
-        sendPlayer(function(window) {
+        _send('player',function(window) {
             var img = window.engine.getCover(id);
             var data = img.data;
             if (data === null) {
@@ -115,7 +99,7 @@ var playlist = function() {
         }
         add_image(pic_list);
         dom_cache.playlist_ul.empty().append(dom_list);
-        sendPlayer(function(window) {
+        _send('player',function(window) {
             window.engine.getCurrent();
         });
     };
@@ -197,9 +181,9 @@ var playlist = function() {
     };
     return {
         preload: function() {
-            sendPlayer(function(window) {
-                _lang = window._lang;
-                settings = window.engine.getSettings();
+            write_language();
+            _send('player',function(window) {
+                settings = window._settings;
                 playlist.show();
             });
         },
@@ -227,25 +211,28 @@ var playlist = function() {
                 $('<div>', {'class': 'w_b_r'})
                         );
             }
+            _send('player',function(window) {
+                write_playlist(window.engine.getPlaylist());
+                window.engine.shuffle(null);
+                window.engine.loop(null);
+                window.engine.set_hotkeys(document);
+                selectPL(window.engine.getM3UPlaylists());
+                setInfo(window.engine.getPlaylistInfo());
+            });
             $('.close').on('click', function() {
-                save_pos();
                 window.close();
             });
             $('.mini').on('click', function() {
                 chrome.app.window.current().minimize();
             });
-            sendPlayer(function(window) {
-                write_playlist(window.engine.getPlaylist());
-            });
-            write_language();
             dom_cache.playlist_ul.on('click', 'li', function() {
                 var id = $(this).attr('data-id');
-                sendPlayer(function(window) {
+                _send('player',function(window) {
                     window.engine.open_id(id);
                 });
             });
             dom_cache.playlist_ul.sortable({handle: ".move", axis: "y", stop: function() {
-                    sendPlayer(function(window) {
+                    _send('player',function(window) {
                         var type = window.engine.getSortedList();
                         var old_sort_list = type[1];
                         var type = -1;
@@ -265,23 +252,17 @@ var playlist = function() {
                 }
             });
             dom_cache.shuffle.on('click', function() {
-                sendPlayer(function(window) {
+                _send('player',function(window) {
                     window.engine.shuffle();
                 });
             });
-            sendPlayer(function(window) {
-                window.engine.shuffle(null);
-            });
             dom_cache.loop.on('click', function() {
-                sendPlayer(function(window) {
+                _send('player',function(window) {
                     window.engine.loop();
                 });
             });
-            sendPlayer(function(window) {
-                window.engine.loop(null);
-            });
             dom_cache.order.on('click', function() {
-                sendPlayer(function(window) {
+                _send('player',function(window) {
                     var type = window.engine.getSortedList();
                     var list_for_sort = type[1];
                     var type = type[0];
@@ -303,55 +284,39 @@ var playlist = function() {
                     window.engine.setSortedList(list_for_sort, type);
                 });
             });
-            var_cache['resize_timer'] = null;
-            window.onresize = function() {
-                clearTimeout(var_cache.resize_timer);
-                var_cache.resize_timer = setTimeout(function() {
-                    var coef = window.devicePixelRatio;
-                    var win_w = parseInt(window.innerWidth * coef);
-                    var win_h = parseInt(window.innerHeight * coef);
-                    chrome.storage.local.set({pl_w: win_w, pl_h: win_h});
-                }, 500);
-            };
-            $(window).trigger('resize');
-            var save_pos = function() {
-                if (document.webkitHidden) {
-                    return;
-                }
-                var wl = window.screenLeft;
-                var wr = window.screenTop;
-                if (var_cache['wl'] !== wl || var_cache['wr'] !== wr) {
-                    var_cache['wl'] = wl;
-                    var_cache['wr'] = wr;
-                    chrome.storage.local.set({'pl_pos_left': wl, 'pl_pos_top': wr});
-                }
-            };
             $('.playlist_select').on('click', function() {
                 dom_cache.pl_list.toggle();
             });
             $('.read_tags.btn').on('click', function() {
-                sendPlayer(function(window) {
+                _send('player',function(window) {
                     window.engine.readAllTags();
                 });
             });
             dom_cache.pl_list.on('click', 'li', function() {
                 var id = $(this).data('id');
-                sendPlayer(function(window) {
+                _send('player',function(window) {
                     window.engine.select_playlist(id);
                 });
                 $(this).parent().hide();
             });
-            sendPlayer(function(window) {
-                selectPL(window.engine.getM3UPlaylists());
-                setInfo(window.engine.getPlaylistInfo());
-                window.engine.set_hotkeys(document);
+            chrome.app.window.current().onBoundsChanged.addListener(function() {
+                if (document.webkitHidden) {
+                    return;
+                }
+                var dpr = window.devicePixelRatio;
+                var window_left = window.screenLeft;
+                var window_top = window.screenTop;
+                var window_width = parseInt(window.innerWidth * dpr);
+                var window_height = parseInt(window.innerHeight * dpr);
+                if (var_cache.window_left !== window_left || var_cache.window_top !== window_top
+                        || var_cache.window_width !== window_width || var_cache.window_height !== window_height) {
+                    var_cache.window_left = window_left;
+                    var_cache.window_top = window_top;
+                    var_cache.window_height = window_height;
+                    var_cache.window_width = window_width;
+                    chrome.storage.local.set({pl_pos_left: window_left, pl_pos_top: window_top, pl_w: window_width, pl_h: window_height});
+                }
             });
-            setInterval(function() {
-                save_pos();
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.hi("playlist", chrome.app.window.current());
-                });
-            }, 5000);
         },
         setPlaylist: function(items) {
             write_playlist(items);

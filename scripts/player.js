@@ -172,9 +172,7 @@ var view = function() {
                 engine.select_playlist(playlist[0].id);
             } else
             if (playlist.length > 0) {
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: playlist});
-                });
+                    engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
             }
         };
         var readM3U = function(content, name) {
@@ -453,9 +451,7 @@ var view = function() {
                         engine.select_playlist(playlist[0].id);
                     } else
                     if (playlist.length > 0) {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: playlist});
-                        });
+                            engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
                     }
                 }
             };
@@ -661,9 +657,7 @@ var view = function() {
                 title: _lang.ctx_open_url,
                 contexts: ['page', 'launcher'],
                 action: function() {
-                    chrome.runtime.getBackgroundPage(function(bg) {
-                        bg.wm.showDialog({type: "url", h: 60});
-                    });
+                        engine.window_manager({type: 'dialog', config:{type: "url", h: 60}});
                 }
             }, 'select_playlist': {
                 id: "select_playlist",
@@ -676,9 +670,7 @@ var view = function() {
                     }
                     var list = playlists.list;
                     if (list.length > 0) {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
-                        });
+                            engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                     }
                 }
             }, 'ws': {
@@ -688,13 +680,13 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function(info) {
                     chrome.runtime.getBackgroundPage(function(bg) {
-                        var state = bg.wm.ws.active();
+                        var state = bg.webui.active();
                         if (state === false) {
-                            bg.wm.ws.start();
+                            bg.webui.start();
                         } else {
-                            bg.wm.ws.stop();
+                            bg.webui.stop();
                         }
-                        chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
+                        chrome.contextMenus.update("ws", {checked: bg.webui.active()});
                     });
                 }
             }, 'viz': {
@@ -702,9 +694,7 @@ var view = function() {
                 title: _lang.ctx_viz,
                 contexts: ['page', 'launcher'],
                 action: function() {
-                    chrome.runtime.getBackgroundPage(function(bg) {
-                        bg.wm.showViz();
-                    });
+                    engine.window_manager({type: 'viz'});
                 }
             }, 'cloud': {
                 id: "cloud",
@@ -722,9 +712,7 @@ var view = function() {
                             engine.select_playlist(list[0].id);
                         } else
                         if (list.length > 0) {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
-                            });
+                                engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                         }
                     });
                 }
@@ -740,9 +728,7 @@ var view = function() {
                             engine.select_playlist(list[0].id);
                         } else
                         if (list.length > 0) {
-                            chrome.runtime.getBackgroundPage(function(bg) {
-                                bg.wm.showDialog({type: "m3u", h: 200, w: 350, r: true, playlists: list});
-                            });
+                                engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                         }
                     });
                 }
@@ -753,9 +739,7 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.gd.getFilelist(undefined, function(list) {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "gd", h: 315, w: 350, r: true, filelist: list});
-                        });
+                            engine.window_manager({type: 'dialog', config:{type: "gd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'db': {
@@ -765,9 +749,7 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.db.getFilelist(function(list) {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "db", h: 315, w: 350, r: true, filelist: list});
-                        });
+                            engine.window_manager({type: 'dialog', config:{type: "db", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'box': {
@@ -777,9 +759,7 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.box.getFilelist(function(list) {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "box", h: 315, w: 350, r: true, filelist: list});
-                        });
+                            engine.window_manager({type: 'dialog', config:{type: "box", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'sd': {
@@ -789,9 +769,7 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.sd.getFilelist(undefined, function(list) {
-                        chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.showDialog({type: "sd", h: 315, w: 350, r: true, filelist: list});
-                        });
+                            engine.window_manager({type: 'dialog', config:{type: "sd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'p_play_pause': {
@@ -820,9 +798,7 @@ var view = function() {
                 title: _lang.ctx_options,
                 contexts: ['page', 'launcher'],
                 action: function() {
-                    chrome.runtime.getBackgroundPage(function(bg) {
-                        bg.wm.showOptions();
-                    });
+                        engine.window_manager({type: 'options'});
                 }
             }, 'save_vk': {
                 id: "save_vk",
@@ -856,7 +832,7 @@ var view = function() {
                 chrome.contextMenus.create(item);
             });
             chrome.runtime.getBackgroundPage(function(bg) {
-                chrome.contextMenus.update("ws", {checked: bg.wm.ws.active()});
+                chrome.contextMenus.update("ws", {checked: bg.webui.active()});
             });
         });
     };
@@ -1128,7 +1104,8 @@ var view = function() {
     };
     return {
         show: function() {
-            settings = engine.getSettings();
+            write_language();
+            settings = window._settings;
             dom_cache = {
                 body: $('body'),
                 drop: $('div.drop'),
@@ -1153,9 +1130,9 @@ var view = function() {
                 $('li.btn.playlist').hide();
                 $('div.pl_state').hide();
                 var win = chrome.app.window.current();
-                var coef = window.devicePixelRatio;
-                var win_w = parseInt(275 * coef);
-                var win_h = parseInt(116 * coef);
+                var dpr = window.devicePixelRatio;
+                var win_w = parseInt(275 * dpr);
+                var win_h = parseInt(116 * dpr);
                 win.resizeTo(win_w, win_h);
                 $('.player').append(
                         $('<div>', {'class': "shuffle"}),
@@ -1165,9 +1142,7 @@ var view = function() {
                 $('<div>', {'class': "w_kHz", text: 44}),
                 $('<div>', {'class': "stereo"}),
                 $('<div>', {'class': "w_playlist"}).on('click', function() {
-                    chrome.runtime.getBackgroundPage(function(bg) {
-                        bg.wm.toggle_playlist();
-                    });
+                    engine.window_manager({type: 'playlist'});
                 }));
                 dom_cache.time = function() {
                     var obj = $('.info > .time');
@@ -1218,7 +1193,6 @@ var view = function() {
                 }();
                 writeWinampFFT();
             }
-            write_language();
             dom_cache.progress.slider({
                 range: "min",
                 min: 0,
@@ -1275,13 +1249,34 @@ var view = function() {
             });
             view.state('emptied');
             view.state("playlist_is_empty");
+            chrome.storage.local.get(['time_tipe', 'extend_volume_scroll', 'volume', 'shuffle', 'loop'], function(storage) {
+                if (storage.time_tipe !== undefined) {
+                    time_tipe = storage.time_tipe;
+                }
+                if (storage.extend_volume_scroll !== undefined) {
+                    make_extend_volume(storage.extend_volume_scroll);
+                }
+                if (storage.shuffle) {
+                    engine.shuffle();
+                }
+                if (storage.loop) {
+                    engine.loop();
+                }
+                engine.volume(storage.volume);
+            });
+            engine.set_hotkeys(document);
+            chrome.contextMenus.onClicked.addListener(function(info) {
+                if (context_menu[info.menuItemId] !== undefined && context_menu[info.menuItemId].action !== undefined) {
+                    context_menu[info.menuItemId].action(info);
+                }
+            });
             dom_cache.body.on('drop', function(event) {
                 event.preventDefault();
                 var files = event.originalEvent.dataTransfer.files;
                 var entrys = event.originalEvent.dataTransfer.items;
                 readFileArray(files, entrys);
             });
-            var drag_timeout = null;
+            var drag_timeout = undefined;
             dom_cache.body.on('dragover', function(event) {
                 event.preventDefault();
                 dom_cache.drop.css({"display": "block"});
@@ -1305,19 +1300,13 @@ var view = function() {
                 engine.preview();
             });
             $('.close').on('click', function() {
-                save_pos();
-                engine.sendPlaylist(function(window) {
-                    window.close();
-                });
-                engine.vizClose();
                 window.close();
             });
             $('.mini').on('click', function() {
-                engine.sendPlaylist(function(window) {
-                    window.playlist.minimize();
-                });
-                engine.vizMini();
-                chrome.app.window.current().minimize();
+                for (var window in _windows) {
+                    _windows[window].minimize();
+                }
+                ;
             });
             $('.t_btn.menu').on('click', function() {
                 engine.showMenu();
@@ -1327,24 +1316,6 @@ var view = function() {
                 chrome.storage.local.set({'time_tipe': time_tipe});
                 var audio = engine.getAudio();
                 view.setProgress(audio.duration, audio.currentTime);
-            });
-            chrome.storage.local.get('time_tipe', function(storage) {
-                if (storage.time_tipe !== undefined) {
-                    time_tipe = storage.time_tipe;
-                }
-            });
-            chrome.storage.local.get('extend_volume_scroll', function(obj) {
-                if (obj.extend_volume_scroll !== undefined) {
-                    make_extend_volume(obj.extend_volume_scroll);
-                }
-            });
-            chrome.storage.local.get('volume', function(storage) {
-                if (storage.volume !== undefined) {
-                    engine.volume(storage.volume);
-                }
-                if (storage.volume === undefined || storage.volume === 100) {
-                    engine.volume();
-                }
             });
             $('.click_for_open').on('click', function() {
                 var accepts = [{
@@ -1359,22 +1330,6 @@ var view = function() {
             });
             dom_cache.mute.on('click', function() {
                 engine.mute();
-            });
-            engine.set_hotkeys(document);
-            chrome.contextMenus.onClicked.addListener(function(info) {
-                if (context_menu[info.menuItemId] !== undefined && context_menu[info.menuItemId].action !== undefined) {
-                    context_menu[info.menuItemId].action(info);
-                }
-            });
-            chrome.storage.local.get('shuffle', function(storage) {
-                if (storage.shuffle !== undefined && storage.shuffle) {
-                    engine.shuffle();
-                }
-            });
-            chrome.storage.local.get('loop', function(storage) {
-                if (storage.loop !== undefined && storage.loop) {
-                    engine.loop();
-                }
             });
             dom_cache.volume.parent().get(0).onmousewheel = function(e) {
                 if (e.wheelDelta > 0) {
@@ -1396,10 +1351,8 @@ var view = function() {
                     }, 25);
                 }
             };
-            dom_cache.btnPlaylist.unbind().on('click', function() {
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.toggle_playlist();
-                });
+            dom_cache.btnPlaylist.on('click', function() {
+                engine.window_manager({type: 'playlist'});
             });
             $('div.loop').on('click', function() {
                 engine.loop();
@@ -1407,24 +1360,18 @@ var view = function() {
             $('div.shuffle').on('click', function() {
                 engine.shuffle();
             });
-            var save_pos = function() {
+            chrome.app.window.current().onBoundsChanged.addListener(function() {
                 if (document.webkitHidden) {
                     return;
                 }
-                var wl = window.screenLeft;
-                var wr = window.screenTop;
-                if (var_cache['wl'] !== wl || var_cache['wr'] !== wr) {
-                    var_cache['wl'] = wl;
-                    var_cache['wr'] = wr;
-                    chrome.storage.local.set({'pos_left': wl, 'pos_top': wr});
+                var window_left = window.screenLeft;
+                var window_top = window.screenTop;
+                if (var_cache.window_left !== window_left || var_cache.window_top !== window_top) {
+                    var_cache.window_left = window_left;
+                    var_cache.window_top = window_top;
+                    chrome.storage.local.set({'pos_left': window_left, 'pos_top': window_top});
                 }
-            };
-            setInterval(function() {
-                save_pos();
-                chrome.runtime.getBackgroundPage(function(bg) {
-                    bg.wm.hi("player", chrome.app.window.current());
-                });
-            }, 5000);
+            });
         },
         setTags: function(tags) {
             if (tags === null) {
@@ -1616,8 +1563,22 @@ var view = function() {
         }
     };
 }();
-$(document).on('settings_loaded', function() {
-    _lang = get_lang(window.language);
-    delete window.get_lang;
+window._flags = [];
+$(document).on('settings_changed', function() {
+    if (window._flags.indexOf('settings_changed') !== -1 && window._flags.indexOf('ready') !== -1) {
+        view.updateSettings(_settings);
+        return;
+    }
+    window._flags.push('settings_changed');
+    if (window._flags.indexOf('ready') === -1) {
+        return;
+    }
+    view.show();
+});
+$(function() {
+    window._flags.push('ready');
+    if (window._flags.indexOf('settings_changed') === -1) {
+        return;
+    }
     view.show();
 });

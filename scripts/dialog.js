@@ -4,21 +4,6 @@ var dialog = function() {
     var dom_cache = {};
     var _lang = undefined;
     var settings = undefined;
-    function sendPlayer(callback) {
-        /*
-         * Функция отправки действий в плеер
-         */
-        if (window._player === undefined || window._player.window === null) {
-            chrome.runtime.getBackgroundPage(function(bg) {
-                window._player = bg.wm.getPlayer();
-                if (window._player !== undefined) {
-                    callback(window._player);
-                }
-            });
-        } else {
-            callback(window._player);
-        }
-    }
     var createURLform = function() {
         /*
          * Создает форму для ввода URL
@@ -26,7 +11,7 @@ var dialog = function() {
         $('.url_dialog').show();
         $('.url_dialog input[name=open_btn]').on('click', function() {
             var text = $(this).parent().children('input[name=url]').get(0);
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.open([{url: text.value}], {name: "URL"});
             });
             window.close();
@@ -52,7 +37,7 @@ var dialog = function() {
         });
         $('body').on('click', 'li.pl_file', function() {
             var id = $(this).data("id");
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.select_playlist(id);
             });
             window.close();
@@ -114,7 +99,7 @@ var dialog = function() {
                     return;
                 }
             }
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.db.getFilelist(function(list) {
                     db_writefilelist(list);
                 }, root, path);
@@ -147,7 +132,7 @@ var dialog = function() {
             var path = item.path;
             var root = item.root;
             var _window = window;
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.db.getFilelist(function(list) {
                     var pl_name = list.path.split('/').slice(-1)[0] || "Dropbox";
                     var playlist = {name: pl_name, id: 0, type: "db", tracks: []};
@@ -162,7 +147,7 @@ var dialog = function() {
                     if (playlist.tracks.length === 0) {
                         return;
                     }
-                    sendPlayer(function(window) {
+                    _send('player',function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
                         window.engine.select_playlist(0);
                     });
@@ -187,7 +172,7 @@ var dialog = function() {
             if (playlist.tracks.length === 0) {
                 return;
             }
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
                 window.engine.select_playlist(0);
             });
@@ -250,7 +235,7 @@ var dialog = function() {
                     return;
                 }
             }
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.gd.getFilelist(folder_id, function(list) {
                     gd_writefilelist(list, folder_id);
                 });
@@ -284,7 +269,7 @@ var dialog = function() {
             var folder_id = item.id;
             var _window = window;
             var pl_name = item.title || "Google Drive";
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.gd.getFilelist(folder_id, function(list) {
                     var playlist = {name: pl_name, id: 0, type: "gd", tracks: []};
                     list.items.forEach(function(item) {
@@ -298,7 +283,7 @@ var dialog = function() {
                     if (playlist.tracks.length === 0) {
                         return;
                     }
-                    sendPlayer(function(window) {
+                    _send('player',function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
                         window.engine.select_playlist(0);
                     });
@@ -324,7 +309,7 @@ var dialog = function() {
             if (playlist.tracks.length === 0) {
                 return;
             }
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
                 window.engine.select_playlist(0);
             });
@@ -389,7 +374,7 @@ var dialog = function() {
                     return;
                 }
             }
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.cloud.box.getFilelist(function(list) {
                     box_writefilelist(list);
                 }, folder_id);
@@ -422,7 +407,7 @@ var dialog = function() {
             var folder_id = item.id;
             var folder_name = item.name;
             var _window = window;
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.cloud.box.getFilelist(function(list) {
                     var playlist = {name: folder_name, id: 0, type: "box", tracks: []};
                     list.entries.forEach(function(item) {
@@ -435,7 +420,7 @@ var dialog = function() {
                     if (playlist.tracks.length === 0) {
                         return;
                     }
-                    sendPlayer(function(window) {
+                    _send('player',function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
                         window.engine.select_playlist(0);
                     });
@@ -459,7 +444,7 @@ var dialog = function() {
             if (playlist.tracks.length === 0) {
                 return;
             }
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
                 window.engine.select_playlist(0);
             });
@@ -536,7 +521,7 @@ var dialog = function() {
                     return;
                 }
             }
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.cloud.sd.getFilelist(folder_id, function(list) {
                     sd_writefilelist(list, folder_id);
                 });
@@ -570,7 +555,7 @@ var dialog = function() {
             var folder_id = item.id;
             var _window = window;
             var pl_name = item.name || "SkyDrive";
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.cloud.sd.getFilelist(folder_id, function(list) {
                     var playlist = {name: pl_name, id: 0, type: "sd", tracks: []};
                     list.data.forEach(function(item) {
@@ -585,7 +570,7 @@ var dialog = function() {
                     if (playlist.tracks.length === 0) {
                         return;
                     }
-                    sendPlayer(function(window) {
+                    _send('player',function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
                         window.engine.select_playlist(0);
                     });
@@ -612,7 +597,7 @@ var dialog = function() {
             if (playlist.tracks.length === 0) {
                 return;
             }
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
                 window.engine.select_playlist(0);
             });
@@ -645,7 +630,7 @@ var dialog = function() {
         });
         $('body').on('click', 'li.item', function() {
             var id = $(this).data("id");
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 context_menu[id].action();
             });
             window.close();
@@ -661,9 +646,9 @@ var dialog = function() {
     };
     return {
         preload: function() {
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 _lang = window._lang;
-                settings = window.engine.getSettings();
+                settings = window._settings;
                 dialog.run();
             });
         },
@@ -681,13 +666,13 @@ var dialog = function() {
                 $('<div>', {'class': 'w_b_r'})
                         );
             }
-            $('.close').on('click', function() {
-                window.close();
-            });
             write_language();
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 window.engine.set_hotkeys(document);
                 allow_ext = window.engine.get_allow_ext();
+            });
+            $('.close').on('click', function() {
+                window.close();
             });
             $(document).keydown(function(event) {
                 if (event.ctrlKey || event.metaKey) {

@@ -1,9 +1,6 @@
 var cloud = function() {
     var dl_xhr = undefined;
-    var settings = undefined;
-    var set_settings = function(setngs) {
-        settings = setngs;
-    };
+    var settings = _settings;
     var getTrack = function(options, cb) {
         if (options.url === undefined) {
             cb('');
@@ -1133,7 +1130,6 @@ var cloud = function() {
         };
     }();
     return {
-        set_settings: set_settings,
         getTrack: getTrack,
         abort: function() {
             if (dl_xhr !== undefined) {
@@ -1148,6 +1144,3 @@ var cloud = function() {
         sd: sd
     };
 }();
-$(document).on('settings_loaded', function() {
-    cloud.set_settings(engine.getSettings());
-});

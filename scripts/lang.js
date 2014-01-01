@@ -153,17 +153,28 @@ var get_lang = function(language) {
             31: 'Предзагружать трек'
         }
     };
-    var lang = language;
+    if (window.options === undefined) {
+        delete window.get_lang;
+    }
+    var lang = language || window._language;
     if (lang === undefined) {
         lang = 'en';
         if (chrome.i18n.getMessage("lang") === 'ru') {
             lang = 'ru';
         }
     }
-    if (lang === 'ru') {
-        return lang_arr_ru;
+    if (window.options === undefined) {
+        if (lang === 'ru') {
+            window._lang = lang_arr_ru;
+        } else {
+            window._lang = lang_arr_en;
+        }
     } else {
-        return lang_arr_en;
+        if (lang === 'ru') {
+            return lang_arr_ru;
+        } else {
+            return lang_arr_en;
+        }
     }
 };
-var _lang = undefined;
+get_lang();

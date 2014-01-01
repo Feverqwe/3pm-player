@@ -1,4 +1,5 @@
 var options = function() {
+    var settings = {};
     var def_settings = {
         next_track_notification: {"v": 0, "t": "checkbox"},
         extend_volume_scroll: {"v": 0, "t": "checkbox"},
@@ -13,21 +14,6 @@ var options = function() {
         preload_box: {"v": 1, "t": "checkbox"},
         preload_sd: {"v": 0, "t": "checkbox"}
     };
-    function sendPlayer(callback) {
-        /*
-         * Функция отправки действий в плеер
-         */
-        if (window._player === undefined || window._player.window === null) {
-            chrome.runtime.getBackgroundPage(function(bg) {
-                window._player = bg.wm.getPlayer();
-                if (window._player !== undefined) {
-                    callback(window._player);
-                }
-            });
-        } else {
-            callback(window._player);
-        }
-    }
     var loadSettings = function(cb) {
         var opt_list = [];
         $.each(def_settings, function(k) {
@@ -136,16 +122,16 @@ var options = function() {
         chrome.storage.local.set(onSave, function() {
             loadSettings(function(stgs) {
                 set_place_holder(stgs);
-                sendPlayer(function(window) {
+                _send('player',function(window) {
                     window._lang = get_lang(onSave.lang);
-                    window.engine.updateSettings(stgs);
+                    window.engine.loadSettings(stgs);
                 });
             });
         });
     };
     return {
         begin: function() {
-            sendPlayer(function(window) {
+            _send('player',function(window) {
                 _lang = window._lang;
                 write_language(_lang.t);
             });

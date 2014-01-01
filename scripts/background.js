@@ -1,263 +1,4 @@
-var web_socket = function() {
-    var active = false;
-    var not_found = [];
-    var cache = {};
-    var server_socketId = null;
-    var timeout = null;
-    var empty_timer = function() {
-        clearTimeout(timeout);
-        if (!active) {
-            return;
-        }
-        timeout = setTimeout(function() {
-            wm.ws.stop();
-            wm.ws.start();
-        }, 5000);
-    };
-    var stringToArrayBuffer = function(string) {
-        var buffer = new ArrayBuffer(string.length);
-        var bufferView = new Uint8Array(buffer);
-        for (var i = 0; i < string.length; i++) {
-            bufferView[i] = string.charCodeAt(i);
-        }
-        return buffer;
-    };
-    var arrayBufferToString = function(buffer) {
-        var array = new Uint8Array(buffer);
-        var str = '';
-        for (var i = 0; i < array.length; ++i) {
-            str += String.fromCharCode(array[i]);
-        }
-        return str;
-    };
-
-    var readUrl = function(headerMap, socketId) {
-        if (headerMap.url === undefined) {
-            return response_(socketId, headerMap, stringToArrayBuffer("Don't have url!"), ['404 Not Found']);
-        }
-        var player = wm.getPlayer();
-        if (player === undefined) {
-            return response_(socketId, headerMap, stringToArrayBuffer("Player don't run!"), ['200 OK']);
-        }
-        if (headerMap.url === '/') {
-            headerMap.url = '/index.html';
-        } else
-        if (headerMap.url === '/favicon.ico') {
-            headerMap.url = '/../icon_16.png';
-        } else
-        if (headerMap.url === '/js/jquery-2.0.3.min.js') {
-            headerMap.url = '/../scripts/jquery-2.0.3.min.js';
-        }
-        if (headerMap.url.substr(0, 8) === '/images/') {
-            headerMap.url = '/..' + headerMap.url;
-        }
-        var is_xhr = false;
-        if (not_found.indexOf(headerMap.url) >= 0) {
-            return response_(socketId, headerMap, stringToArrayBuffer(''), ['404 Not Found']);
-        } else
-        if (cache[headerMap.url] !== undefined) {
-            var data = cache[headerMap.url].data;
-            if (headerMap["If-None-Match"] === String(data.byteLength)) {
-                return response_(socketId, headerMap, stringToArrayBuffer(''), ["304 Not Modified"]);
-            } else {
-                var head = JSON.parse(JSON.stringify(cache[headerMap.url].head));
-                return response_(socketId, headerMap, data, head);
-            }
-        } else
-        if (headerMap.url.substr(0, 4) === '/pl/') {
-            var id = headerMap.url.substr(4);
-            player.engine.open_id(id);
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else
-        if (headerMap.url === '/playlist') {
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIplaylist()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: : text/html']);
-        } else
-        if (headerMap.url === '/status') {
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else
-        if (headerMap.url === '/play') {
-            player.engine.play();
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else
-        if (headerMap.url === '/pause') {
-            player.engine.pause();
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else
-        if (headerMap.url === '/next') {
-            player.engine.next();
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else
-        if (headerMap.url === '/preview') {
-            player.engine.preview();
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else
-        if (headerMap.url.substr(0, 11) === '/volume_up/') {
-            player.engine.volume(headerMap.url.substr(11));
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else
-        if (headerMap.url.substr(0, 13) === '/volume_down/') {
-            player.engine.volume(headerMap.url.substr(13));
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else
-        if (headerMap.url === '/shuffle') {
-            player.engine.shuffle();
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else
-        if (headerMap.url === '/loop') {
-            player.engine.loop();
-            return response_(socketId, headerMap, stringToArrayBuffer(player.engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
-        } else {
-            is_xhr = true;
-            var ext = headerMap.url.substr(headerMap.url.lastIndexOf('.') + 1).toLowerCase();
-            var ext_content_type = {
-                'png': 'image/png',
-                'js': 'application/javascript',
-                'css': 'text/css',
-                'html': 'text/html; charset=UTF-8'
-            };
-            var ext = (ext_content_type[ext] !== undefined) ? 'Content-Type: ' + ext_content_type[ext] : '';
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/www' + headerMap.url, true);
-            xhr.responseType = 'arraybuffer';
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var resp = this.response;
-                    var header = ["200 Ok"];
-                    if (ext.length > 0) {
-                        header.push(ext);
-                    }
-                    header.push("Cache-control: max-age=172800");
-                    header.push("ETag: " + resp.byteLength);
-                    cache[headerMap.url] = {data: resp, head: JSON.parse(JSON.stringify(header))};
-                    if (headerMap["If-None-Match"] === String(resp.byteLength)) {
-                        response_(socketId, headerMap, stringToArrayBuffer(''), ["304 Not Modified"]);
-                    } else {
-                        response_(socketId, headerMap, resp, header);
-                    }
-                }
-            };
-            xhr.onerror = function() {
-                if (xhr.readyState === 4 && xhr.status !== 200) {
-                    not_found.push(headerMap.url);
-                    response_(socketId, headerMap, stringToArrayBuffer(''), ['404 Not Found']);
-                }
-            };
-            xhr.timeout = 100;
-            xhr.send(null);
-        }
-        if (is_xhr === false) {
-            response_(socketId, headerMap, stringToArrayBuffer('Do it more!'), ['200 OK']);
-        }
-    };
-    var response_ = function(socketId, headerMap, content, headers) {
-        if (headers[0].substr(0, 3) === "304") {
-            var head = "HTTP/1.1 " + headers.join('\n');
-            var header = stringToArrayBuffer(head + '\n\n');
-            chrome.socket.write(socketId, header, function(writeInfo) {
-                var keepAlive = headerMap['Connection'] === 'keep-alive';
-                if (keepAlive) {
-                    empty_timer();
-                    readRequestFromSocket_(socketId);
-                } else {
-                    chrome.socket.destroy(socketId);
-                }
-            });
-            return;
-        }
-        headers.push("Content-Length: " + content.byteLength);
-        headers.push("Connection: keep-alive");
-        var head = "HTTP/1.1 " + headers.join('\n');
-        var header = stringToArrayBuffer(head + '\n\n');
-        chrome.socket.write(socketId, header, function(writeInfo) {
-            if (writeInfo.bytesWritten === header.byteLength) {
-                chrome.socket.write(socketId, content, function(writeInfo) {
-                    if (writeInfo.bytesWritten === content.byteLength) {
-                        var keepAlive = headerMap['Connection'] === 'keep-alive';
-                        if (keepAlive) {
-                            empty_timer();
-                            readRequestFromSocket_(socketId);
-                        }
-                    }
-                });
-            }
-        });
-    };
-    var readRequestFromSocket_ = function(socketId) {
-        var requestData = '';
-        var endIndex = 0;
-        var onDataRead = function(readInfo) {
-            empty_timer();
-            if (readInfo.resultCode <= 0) {
-                chrome.socket.disconnect(socketId);
-                chrome.socket.destroy(socketId);
-                empty_timer();
-                return;
-            }
-            requestData += arrayBufferToString(readInfo.data).replace(/\r\n/g, '\n');
-            endIndex = requestData.indexOf('\n\n', endIndex);
-            if (endIndex === -1) {
-                endIndex = requestData.length - 1;
-                chrome.socket.read(socketId, onDataRead);
-                return;
-            }
-
-            var headers = requestData.substring(0, endIndex).split('\n');
-            var headerMap = {};
-            // headers[0] should be the Request-Line
-            var requestLine = headers[0].split(' ');
-            headerMap['method'] = requestLine[0];
-            headerMap['url'] = requestLine[1];
-            headerMap['Http-Version'] = requestLine[2];
-            for (var i = 1; i < headers.length; i++) {
-                requestLine = headers[i].split(':', 2);
-                if (requestLine.length === 2)
-                    headerMap[requestLine[0]] = requestLine[1].trim();
-            }
-
-            return readUrl(headerMap, socketId);
-
-
-        };
-        chrome.socket.read(socketId, onDataRead);
-    };
-    var onConnection_ = function(acceptInfo) {
-        readRequestFromSocket_(acceptInfo.socketId);
-    };
-    var acceptConnection_ = function(socketId) {
-        chrome.socket.accept(socketId, function(acceptInfo) {
-            onConnection_(acceptInfo);
-            acceptConnection_(socketId);
-        });
-    };
-    var start = function() {
-        active = true;
-        chrome.socket.create("tcp", {}, function(createInfo) {
-            server_socketId = createInfo.socketId;
-            chrome.socket.listen(createInfo.socketId, '0.0.0.0', 9898, 1, function(e) {
-                acceptConnection_(server_socketId);
-            });
-        });
-    };
-    var Info = function() {
-        chrome.socket.getInfo(server_socketId, function(e) {
-            console.log(e);
-        });
-    };
-    var stop = function() {
-        active = false;
-        chrome.socket.disconnect(server_socketId);
-        chrome.socket.destroy(server_socketId);
-    };
-    return {
-        start: start,
-        info: Info,
-        stop: stop,
-        active: function() {
-            return active;
-        }
-    };
-}();
-var wm = function() {
+var wm1 = function() {
     var windows = {};
     var screen = [window.screen.width, window.screen.height];
     var dpr = window.devicePixelRatio;
@@ -532,12 +273,98 @@ var wm = function() {
             }
         }
     };
+};
+var bg = function() {
+    var player_window = undefined;
+    var check_window_position = function(position) {
+        var screen_width = screen.width,
+                screen_height = screen.height,
+                dpr = window.devicePixelRatio;
+        position.width = parseInt(position.width * dpr);
+        position.height = parseInt(position.height * dpr);
+        if (position.left === undefined) {
+            position.left = parseInt(screen_width / 2 - position.width / 2);
+        }
+        if (position.top === undefined) {
+            position.top = parseInt(screen_height / 2 - position.height / 2);
+        }
+        if (position.left < 0) {
+            position.left = 0;
+        }
+        if (position.top < 0) {
+            position.top = 0;
+        }
+        if (screen_width < position.left + position.width) {
+            position.left = screen_width - position.width;
+        }
+        if (screen_height < position.top + position.height) {
+            position.top = screen_height - position.height;
+        }
+        return {width: position.width, height: position.height, left: position.left, top: position.top};
+    };
+    var create_player = function() {
+        chrome.storage.local.get(['pos_left', 'pos_top', 'lang'], function(storage) {
+            var position = check_window_position({
+                width: 335,
+                height: 116,
+                left: storage.pos_left,
+                top: storage.pos_top
+            });
+            chrome.app.window.create('index.html', {
+                bounds: position,
+                frame: "none",
+                resizable: false
+            }, function(window) {
+                player_window = window;
+                var sub_window = window.contentWindow;
+                sub_window._language = storage.lang;
+                sub_window._windows = {player: window};
+                sub_window._settings = {};
+                window.onClosed.addListener(function() {
+                    var _windows = sub_window._windows;
+                    for (var i in _windows) {
+                        if (i === 'player') {
+                            continue;
+                        }
+                        _windows[i].contentWindow.close();
+                    }
+                    delete _windows['player'];
+                });
+                sub_window._focus_all = function() {
+                    var windows = sub_window._windows;
+                    for (var i in windows) {
+                        if (i === 'player') {
+                            continue;
+                        }
+                        windows[i].focus();
+                    }
+                    windows['player'].focus();
+                };
+                sub_window._check_window_position = check_window_position;
+                sub_window._send = function(type, cb) {
+                    if (sub_window._windows[type] === undefined || sub_window._windows[type].contentWindow.window === null) {
+                        return;
+                    }
+                    cb(sub_window._windows[type].contentWindow);
+                };
+            });
+        });
+    };
+    return {
+        run_player: function() {
+            if (player_window === undefined || player_window.contentWindow.window === null) {
+                create_player();
+            } else {
+                player_window.contentWindow._focus_all();
+            }
+        }
+    };
 }();
 chrome.app.runtime.onLaunched.addListener(function() {
-    wm.run_player();
+    bg.run_player();
 });
 chrome.runtime.onMessageExternal.addListener(function(msg, sender, resp) {
     if (msg === 'stop') {
-        wm.run_player();
+        bg.run_player();
     }
 });
