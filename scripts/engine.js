@@ -164,9 +164,11 @@ var engine = function() {
          */
         var img = new Image();
         img.onerror = function() {
+            webkitURL.revokeObjectURL(url);
             cb(undefined);
         };
         img.onload = function() {
+            webkitURL.revokeObjectURL(url);
             var MAXWidthHeight = 80 * 2;
             var r = MAXWidthHeight / Math.max(this.width, this.height),
                     w = Math.round(this.width * r),
@@ -212,7 +214,6 @@ var engine = function() {
         if (binary[1].substr(0, 1) !== 'i' && binary[1].substr(4, 1) !== 'e') {
             binary[1] = 'image/jpeg';
         }
-        var blob;
         if (binary[0].buffer === undefined) {
             binary[0] = new Uint8Array(binary[0]);
         }
@@ -226,7 +227,7 @@ var engine = function() {
             cb(id);
             return;
         }
-        blob = new Blob([binary[0]], {type: binary[1]});
+        var blob = new Blob([binary[0]], {type: binary[1]});
         var url = webkitURL.createObjectURL(blob);
         if (resize) {
             image_resize(url, function(blob) {
