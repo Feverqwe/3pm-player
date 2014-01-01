@@ -149,7 +149,7 @@ var viz = function() {
     };
 }();
 $(function() {
-    if (reality === undefined) {
+    if (window.reality === undefined) {
         window.reality = {};
     }
     $.extend(true, reality, {timing: {boot: new Date().getTime()}});
