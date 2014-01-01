@@ -209,7 +209,7 @@ var engine = function() {
             cb(undefined);
             return;
         }
-        if (binary[1].indexOf('image') === -1) {
+        if (binary[1].substr(0, 1) !== 'i' && binary[1].substr(4, 1) !== 'e') {
             binary[1] = 'image/jpeg';
         }
         var blob;
@@ -351,9 +351,7 @@ var engine = function() {
                     // NOTE: tags.picture = [binary, mime]
                     read_image(tags.picture, function(i_id) {
                         if (i_id === undefined) {
-                            if (tags.picture !== undefined) {
-                                delete tags.picture;
-                            }
+                            delete tags.picture;
                         } else {
                             tags.picture = i_id;
                         }
@@ -379,7 +377,7 @@ var engine = function() {
              var startDate = new Date().getTime();
              */
             var params = {tags: ["artist", "title", "album", "picture"], file: file};
-            var f_name = new Date().getTime();
+            var f_name = 0;
             ID3.loadTags(f_name, function() {
                 /*
                  var endDate = new Date().getTime();
@@ -391,21 +389,14 @@ var engine = function() {
                  }, 0);
                  console.log('Среднее время: ', sum / window.time_log.length);
                  */
-                var tags = ID3.getAllTags(f_name);
+                var tags = ID3.getAllTags(0);
                 ID3.clearAll();
                 if (tags.picture !== undefined) {
                     tags.picture = [tags.picture.data, tags.picture.format];
                 }
-                $.each(tags, function(key) {
-                    if ($.inArray(key, ["artist", "title", "album", "picture"]) === -1) {
-                        delete tags[key];
-                    }
-                });
                 read_image(tags.picture, function(i_id) {
                     if (i_id === undefined) {
-                        if (tags.picture !== undefined) {
-                            delete tags.picture;
-                        }
+                        delete tags.picture;
                     } else {
                         tags.picture = i_id;
                     }
@@ -873,13 +864,7 @@ var engine = function() {
                     }
                     if (playlist[current_id].tags === undefined) {
                         read_tags(current_id, function(tags, id) {
-                            var obj = {};
-                            $.each(tags, function(key, value) {
-                                if (["title", "artist", "album", "picture"].indexOf(key) !== -1) {
-                                    obj[key] = value;
-                                }
-                            });
-                            playlist[id].tags = obj;
+                            playlist[id].tags = tags;
                             playlist[id].state = "dune";
                             sendPlaylist(function(window) {
                                 window.playlist.updPlaylistItem(id, playlist[id]);
@@ -980,13 +965,7 @@ var engine = function() {
                 var read_item = function(item) {
                     next_item();
                     read_tags(item.id, function(tags, id) {
-                        var obj = {};
-                        $.each(tags, function(key, value) {
-                            if (["title", "artist", "album", "picture"].indexOf(key) !== -1) {
-                                obj[key] = value;
-                            }
-                        });
-                        playlist[id].tags = obj;
+                        playlist[id].tags = tags;
                         playlist[id].state = "dune";
                         sendPlaylist(function(window) {
                             window.playlist.updPlaylistItem(id, playlist[id]);
