@@ -2,8 +2,8 @@
  follow me on twitter : https://twitter.com/_vor
  */
 
-if (reality === undefined) {
-    reality = {};
+if (window.reality === undefined) {
+    window.reality = {};
 }
 (function($) {
     reality = $.extend(true, {debug: true, isDev: false,
