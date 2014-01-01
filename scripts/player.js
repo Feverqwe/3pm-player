@@ -537,7 +537,7 @@ var view = function() {
             obj.css({left: 0, width: "100%", display: "block"}).attr('class', 'loaded');
             if (state === "inf" || state === "loading") {
                 obj.parent().removeClass("stream");
-            }
+            } else
             if (state === "download") {
                 obj.parent().removeClass("download");
             }
@@ -946,27 +946,19 @@ var view = function() {
             var str_s = size;
             var time_calc = Math.round(parseInt(str_w) / parseInt(str_s) * 3.5);
             var move_name = 'moveble' + '_' + str_s + '_' + str_w;
-            if ($('body').find('.' + move_name).length === 0) {
-                $('body').append('<style class="' + move_name + '">'
-                        + '@-webkit-keyframes a_' + move_name
-                        + '{'
-                        + '0%{margin-left:2px;}'
-                        + '50%{margin-left:-' + (str_w - str_s) + 'px;}'
-                        + '90%{margin-left:6px;}'
-                        + '100%{margin-left:2px;}'
-                        + '}'
-                        + '@keyframes a_' + move_name
-                        + '{'
-                        + '0%{margin-left:2px;}'
-                        + '50%{margin-left:-' + (str_w - str_s) + 'px;}'
-                        + '90%{margin-left:6px;}'
-                        + '100%{margin-left:2px;}'
-                        + '}'
-                        + 'div.' + move_name + ':hover > span {'
-                        + 'overflow: visible;'
-                        + '-webkit-animation:a_' + move_name + ' ' + time_calc + 's;'
-                        + '}'
-                        + '</style>');
+            if (dom_cache.body.children('.' + move_name).length === 0) {
+                dom_cache.body.append($('<style>', {'class': move_name, text:
+                            '@-webkit-keyframes a_' + move_name
+                            + '{'
+                            + '0%{margin-left:2px;}'
+                            + '50%{margin-left:-' + (str_w - str_s) + 'px;}'
+                            + '90%{margin-left:6px;}'
+                            + '100%{margin-left:2px;}'
+                            + '}'
+                            + 'div.' + move_name + ':hover > span {'
+                            + 'overflow: visible;'
+                            + '-webkit-animation:a_' + move_name + ' ' + time_calc + 's;'
+                            + '}'}));
             }
             titles.eq(i).parent().attr('class', classname + ' ' + move_name);
         }
@@ -1083,7 +1075,7 @@ var view = function() {
         var album_scroller = false;
         var max_title_line = 2;
         var max_album_line = 2;
-        var tmp_node = $('<div>', {style: 'line-height: normal; font-size: 130%; width: 232px; word-wrap: break-word; overflow: hidden; display: none;', text: title}).appendTo($('body'));
+        var tmp_node = $('<div>', {style: 'line-height: normal; font-size: 130%; width: 232px; word-wrap: break-word; overflow: hidden; display: none;', text: title}).appendTo(dom_cache.body);
         var title_height = tmp_node.height();
         if (dom_cache.truetext.title_one_line_height === undefined) {
             tmp_node.text('.');
@@ -1091,7 +1083,7 @@ var view = function() {
         }
         var title_line = parseInt(title_height / dom_cache.truetext.title_one_line_height);
         tmp_node.remove();
-        tmp_node = $('<div>', {style: 'line-height: normal; font-size: 110%; width: 232px; word-wrap: break-word; overflow: hidden; display: none;', text: album}).appendTo($('body'));
+        tmp_node = $('<div>', {style: 'line-height: normal; font-size: 110%; width: 232px; word-wrap: break-word; overflow: hidden; display: none;', text: album}).appendTo(dom_cache.body);
         var album_height = tmp_node.height();
         if (dom_cache.truetext.album_one_line_height === undefined) {
             tmp_node.text('.');
@@ -1157,7 +1149,7 @@ var view = function() {
             hotKeyListener();
             is_winamp = settings.is_winamp;
             if (is_winamp) {
-                $('body').addClass('winamp');
+                dom_cache.body.addClass('winamp');
                 $('li.btn.playlist').hide();
                 $('div.pl_state').hide();
                 var win = chrome.app.window.current();

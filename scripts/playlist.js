@@ -57,21 +57,19 @@ var playlist = function() {
             var idl = id.length;
             var dom_list = new Array(idl);
             for (var i = 0; i < idl; i++) {
-                var data;
+                var data = "images/no-cover.png";
                 var item = id[i];
-                if (item === 'none') {
-                    data = "images/no-cover.png";
-                } else {
-                    sendPlayer(function(window) {
+                sendPlayer(function(window) {
+                    if (item !== 'none') {
                         var url = window.engine.getCover(item).data;
                         if (url !== null) {
                             data = url;
                         }
-                    });
-                }
-                dom_list[i] = $('<style>', {'class': 'cover pic_' + item, text: '.pic_' + item + '{background-image:url(' + data + ');}'});
+                    }
+                    dom_list[i] = $('<style>', {'class': 'cover pic_' + item, text: '.pic_' + item + '{background-image:url(' + data + ');}'});
+                });
             }
-            $('body').append(dom_list);
+            dom_cache.body.append(dom_list);
             return;
         }
         if (id === 'none') {
@@ -86,7 +84,7 @@ var playlist = function() {
             if (data === null) {
                 data = "images/no-cover.png";
             }
-            $('body').append($('<style>', {'class': 'cover pic_' + id, text: '.pic_' + id + '{background-image:url(' + data + ');}'}));
+            dom_cache.body.append($('<style>', {'class': 'cover pic_' + id, text: '.pic_' + id + '{background-image:url(' + data + ');}'}));
         });
     };
     var write_playlist = function(items) {
@@ -207,6 +205,7 @@ var playlist = function() {
         },
         show: function() {
             dom_cache = {
+                body: $('body'),
                 playlist: $('div.playlist'),
                 playlist_ul: $('div.playlist ul'),
                 shuffle: $('.shuffle.btn'),
@@ -216,8 +215,8 @@ var playlist = function() {
                 title: $('body').children('div.title')
             };
             if (settings.is_winamp) {
-                $('body').addClass('winamp');
-                $('body').append(
+                dom_cache.body.addClass('winamp');
+                dom_cache.body.append(
                         $('<div>', {'class': 'w_head'}),
                 $('<div>', {'class': 'w_left'}),
                 $('<div>', {'class': 'w_right'}),
