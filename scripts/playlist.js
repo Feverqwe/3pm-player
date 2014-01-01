@@ -133,10 +133,10 @@ var playlist = function() {
         /*
          * Создает список выбора плэйлиста
          */
-        var content = [];
-        arr.forEach(function(item) {
-            content.push($('<li>', {title: item.name, 'data-id': item.id, text: item.name}));
-        });
+        var content = new Array(arr.length);
+        for (var i = 0, item; item = arr[i]; i++) {
+            content[i] = $('<li>', {title: item.name, 'data-id': item.id, text: item.name});
+        }
         dom_cache.pl_list.empty().append(content);
     };
     var selectPL = function(playlist) {
@@ -225,8 +225,7 @@ var playlist = function() {
                     sendPlayer(function(window) {
                         var type = window.engine.getSortedList();
                         var old_sort_list = type[1];
-                        var type = type[0];
-                        type = -1;
+                        var type = -1;
                         var arr = $.makeArray(dom_cache.playlist_ul.children('li'));
                         var new_arr = [];
                         arr.forEach(function(item) {

@@ -401,10 +401,10 @@ var cloud = function() {
                 all_albums.push({title: "[ Speech ]", album_id: "popular19", vk_save: true});
                 all_albums.push({title: "[ Electropop & Disco ]", album_id: "popular22", vk_save: true});
                 all_albums.push({title: "[ Other ]", album_id: "popular18", vk_save: true});
-                var list = [];
-                all_albums.forEach(function(item) {
-                    list.push({name: item.title, album_id: item.album_id, id: list.length, type: "vk", vk_save: (item.vk_save === true)});
-                });
+                var list = new Array(all_albums.length);
+                for (var i = 0, item; item = all_albums[i]; i++) {
+                    list[i] = {name: item.title, album_id: item.album_id, id: i, type: "vk", vk_save: (item.vk_save === true)};
+                }
                 cb(list);
             });
         };
@@ -681,12 +681,12 @@ var cloud = function() {
                         var list = [];
                         data.forEach(function(item) {
                             var tracks = [];
-                            item.tracks.forEach(function(track) {
+                            for (var i = 0, track; track = item.tracks[i]; i++) {
                                 if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
-                                    return 1;
+                                    continue;
                                 }
                                 tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}, duration: track.duration, type: 'sc'});
-                            });
+                            }
                             list.push({name: item.title, id: list.length, type: "sc", tracks: tracks});
                         });
                         if (list.length === 0) {

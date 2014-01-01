@@ -1102,9 +1102,8 @@ var engine = function() {
         },
         APIplaylist: function() {
             var pl = sorted_playlist || playlist;
-            var list = [];
-            for (var i = 0; i < pl.length; i++) {
-                var item = pl[i];
+            var list = new Array(pl.length);
+            for (var i = 0, item; item = pl[i]; i++) {
                 var title = item.file.name;
                 if (item.file.url !== undefined) {
                     title = player.getTagBody(item.id);
@@ -1114,7 +1113,7 @@ var engine = function() {
                         title = title.join(' - ');
                     }
                 }
-                list.push({id: item.id, title: title});
+                list[i] = {id: item.id, title: title};
             }
             var data = window.btoa(unescape(encodeURIComponent(JSON.stringify({'playlist': list}))));
             return data;
