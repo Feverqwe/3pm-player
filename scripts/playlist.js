@@ -53,6 +53,27 @@ var playlist = function() {
         /*
          * Добавляет картинку как стиль.
          */
+        if (typeof id === 'object') {
+            var idl = id.length;
+            var dom_list = new Array(idl);
+            for (var i = 0; i < idl; i++) {
+                var data;
+                var item = id[i];
+                if (item === 'none') {
+                    data = "images/no-cover.png";
+                } else {
+                    sendPlayer(function(window) {
+                        var url = window.engine.getCover(item).data;
+                        if (url !== null) {
+                            data = url;
+                        }
+                    });
+                }
+                dom_list[i] = $('<style>', {'class': 'cover pic_' + item, text: '.pic_' + item + '{background-image:url(' + data + ');}'});
+            }
+            $('body').append(dom_list);
+            return;
+        }
         if (id === 'none') {
             return;
         }
@@ -65,16 +86,16 @@ var playlist = function() {
             if (data === null) {
                 data = "images/no-cover.png";
             }
-            $('body').remove('style.pic_' + id).append('<style class="cover pic_' + id + '">.pic_' + id + '{background-image:url(' + data + ');}</style>');
+            $('body').append($('<style>', {'class': 'cover pic_' + id, text: '.pic_' + id + '{background-image:url(' + data + ');}'}));
         });
     };
     var write_playlist = function(items) {
         /*
          * Выводит плэйлист на страницу.
          */
-        dom_cache.playlist_ul.empty();
-        var n = 0;
-        items.forEach(function(obj) {
+        var dom_list = new Array(items.length);
+        var pic_list = [];
+        for (var i = 0, obj; obj = items[i]; i++) {
             var item = item_read(obj);
             if (settings.is_winamp) {
                 if (item.info.length > 0) {
@@ -83,16 +104,19 @@ var playlist = function() {
                 item.info = '';
                 item.pic = 'none';
             }
-            add_image(item.pic);
-            dom_cache.playlist_ul.append($('<li>', {'data-id': obj.id}).append(
+            if (pic_list.indexOf(item.pic) === -1) {
+                pic_list.push(item.pic);
+            }
+            dom_list[i] = $('<li>', {'data-id': obj.id}).append(
                     $('<div>', {'class': 'gr_line'}),
             $('<div>', {'class': 'cover pic_' + item.pic}),
             $('<span>', {'class': 'name', title: item.title, text: item.title}),
             $('<span>', {'class': 'info', title: item.info, text: item.info}),
             $('<div>', {'class': 'move', title: _lang.move_item})
-                    ));
-            n++;
-        });
+                    );
+        }
+        add_image(pic_list);
+        dom_cache.playlist_ul.empty().append(dom_list);
         sendPlayer(function(window) {
             window.engine.getCurrent();
         });
