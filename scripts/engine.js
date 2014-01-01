@@ -389,7 +389,7 @@ var engine = function() {
                  }, 0);
                  console.log('Среднее время: ', sum / window.time_log.length);
                  */
-                var tags = ID3.getAllTags(0);
+                var tags = ID3.getAllTags(f_name);
                 ID3.clearAll();
                 if (tags.picture !== undefined) {
                     tags.picture = [tags.picture.data, tags.picture.format];
