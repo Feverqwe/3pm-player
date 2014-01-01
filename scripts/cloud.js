@@ -134,7 +134,7 @@ var cloud = function() {
                     200: function(data) {
                         if (data.error !== undefined) {
                             clear_data();
-                            if (data.error['error code'] === 5) {
+                            if (data.error['error_code'] === 5) {
                                 vkAuth(function() {
                                     getPopular(cb, genre_id);
                                 });
@@ -174,7 +174,7 @@ var cloud = function() {
                     200: function(data) {
                         if (data.error !== undefined) {
                             clear_data();
-                            if (data.error['error code'] === 5) {
+                            if (data.error['error_code'] === 5) {
                                 vkAuth(function() {
                                     getRecommendations(cb);
                                 });
@@ -216,7 +216,7 @@ var cloud = function() {
                         200: function(data) {
                             if (data.error !== undefined) {
                                 clear_data();
-                                if (data.error['error code'] === 5) {
+                                if (data.error['error_code'] === 5) {
                                     vkAuth(function() {
                                         getTracks(cb, album_id);
                                     });
@@ -278,7 +278,7 @@ var cloud = function() {
                         200: function(data) {
                             if (data.error !== undefined) {
                                 clear_data();
-                                if (data.error['error code'] === 5) {
+                                if (data.error['error_code'] === 5) {
                                     vkAuth(function() {
                                         getAlbums(cb);
                                     });
@@ -337,7 +337,7 @@ var cloud = function() {
                     200: function(data) {
                         if (data.error !== undefined) {
                             clear_data();
-                            if (data.error['error code'] === 5) {
+                            if (data.error['error_code'] === 5) {
                                 vkAuth(function() {
                                     addInLibrarty(id, oid, cb);
                                 });
