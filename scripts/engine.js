@@ -1228,8 +1228,8 @@ var engine = function() {
                 options.toggle = true;
                 chrome.storage.local.get(['pl_pos_left', 'pl_pos_top', 'pl_w', 'pl_h'], function(storage) {
                     var position = _check_window_position({
-                        width: storage.pl_w,
-                        height: storage.pl_h,
+                        width: storage.pl_w || 335,
+                        height: storage.pl_h || 400,
                         left: storage.pl_pos_left,
                         top: storage.pl_pos_top
                     });
@@ -1250,8 +1250,8 @@ var engine = function() {
                 options.toggle = true;
                 chrome.storage.local.get(['viz_pos_left', 'viz_pos_top', 'viz_w', 'viz_h'], function(storage) {
                     var position = _check_window_position({
-                        width: storage.viz_w,
-                        height: storage.viz_h,
+                        width: storage.viz_w || 1024,
+                        height: storage.viz_h || 768,
                         left: storage.viz_pos_left,
                         top: storage.viz_pos_top
                     });

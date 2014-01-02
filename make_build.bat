@@ -15,6 +15,8 @@ copy .\*.png .\build\.
 java -jar compiler.jar --js .\www\js\main.js --js_output_file .\build\www\js\main.js
 :: make background.js
 java -jar compiler.jar --js .\scripts\background.js --js_output_file .\build\scripts\background.js
+:: make webui.js
+java -jar compiler.jar --js .\scripts\webui.js --js_output_file .\build\scripts\webui.js
 :: make engine.js
 java -jar compiler.jar --js .\scripts\engine.js --js_output_file .\build\scripts\engine.js
 :: make cloud.js
