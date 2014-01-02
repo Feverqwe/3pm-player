@@ -303,11 +303,10 @@ var playlist = function() {
                 if (document.webkitHidden) {
                     return;
                 }
-                var dpr = window.devicePixelRatio;
                 var window_left = window.screenLeft;
                 var window_top = window.screenTop;
-                var window_width = parseInt(window.innerWidth * dpr);
-                var window_height = parseInt(window.innerHeight * dpr);
+                var window_width = parseInt(window.innerWidth);
+                var window_height = parseInt(window.innerHeight);
                 if (var_cache.window_left !== window_left || var_cache.window_top !== window_top
                         || var_cache.window_width !== window_width || var_cache.window_height !== window_height) {
                     var_cache.window_left = window_left;
