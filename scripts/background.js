@@ -60,6 +60,9 @@ var bg = function() {
                         _windows[window].minimize();
                     }
                 });
+                window.onRestored.addListener(function() {
+                    sub_window._focus_all();
+                });
                 sub_window._focus_all = function(type) {
                     if (type === undefined) {
                         type = 'player';
