@@ -605,7 +605,7 @@ var engine = function() {
                     if (pl[indx] !== undefined) {
                         id = pl[indx].id;
                     } else
-                    if (pl_len > 0){   
+                    if (pl_len > 0) {
                         id = pl[0].id;
                     }
                     if (pl_len <= id) {
@@ -1211,16 +1211,16 @@ var engine = function() {
         },
         showMenu: function() {
             chrome.runtime.getBackgroundPage(function(bg) {
-                engine.window_manager({type: 'dialog', config:{type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: bg.webui.active()}});
+                engine.window_manager({type: 'dialog', config: {type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: bg.webui.active()}});
             });
         },
         window_manager: function(options) {
             var create_window = function(url, args, oncreate) {
-                if ( (options.toggle || options.only) && _windows[options.type] !== undefined && _windows[options.type].contentWindow.window !== null) {
-                     _windows[options.type].contentWindow.window.close();
-                     if (options.only === undefined) {
+                if ((options.toggle || options.only) && _windows[options.type] !== undefined && _windows[options.type].contentWindow.window !== null) {
+                    _windows[options.type].contentWindow.window.close();
+                    if (options.only === undefined) {
                         return;
-                     }
+                    }
                 }
                 chrome.app.window.create(url, args, oncreate);
             };
@@ -1234,7 +1234,7 @@ var engine = function() {
                         top: storage.pl_pos_top
                     });
                     create_window('playlist.html', {
-                        bounds: position, 
+                        bounds: position,
                         frame: "none"
                     }, function(window) {
                         _windows[options.type] = window;
@@ -1245,7 +1245,7 @@ var engine = function() {
                         window.contentWindow._send = _send;
                     });
                 });
-            };
+            } else
             if (options.type === 'viz') {
                 options.toggle = true;
                 chrome.storage.local.get(['viz_pos_left', 'viz_pos_top', 'viz_w', 'viz_h'], function(storage) {
@@ -1256,7 +1256,7 @@ var engine = function() {
                         top: storage.viz_pos_top
                     });
                     create_window('viz.html', {
-                        bounds: position, 
+                        bounds: position,
                         frame: "none"
                     }, function(window) {
                         _windows[options.type] = window;
@@ -1268,7 +1268,7 @@ var engine = function() {
                         window.contentWindow._send = _send;
                     });
                 });
-            };
+            } else
             if (options.type === 'dialog') {
                 options.only = true;
                 options.config.w = options.config.w || 400;
@@ -1321,7 +1321,7 @@ var engine = function() {
                     top: undefined
                 });
                 create_window('dialog.html', {
-                    bounds: position, 
+                    bounds: position,
                     frame: "none",
                     resizable: options.config.r || false
                 }, function(window) {
@@ -1333,7 +1333,7 @@ var engine = function() {
                     window.contentWindow.options = options.config;
                     window.contentWindow._send = _send;
                 });
-            };
+            } else
             if (options.type === 'options') {
                 options.only = true;
                 var position = _check_window_position({
@@ -1343,7 +1343,7 @@ var engine = function() {
                     top: undefined
                 });
                 create_window('options.html', {
-                    bounds: position, 
+                    bounds: position,
                     frame: "chrome",
                     resizable: true
                 }, function(window) {
