@@ -35,7 +35,7 @@ var webui = function() {
         if (headerMap.url === undefined) {
             return response_(socketId, headerMap, stringToArrayBuffer("Don't have url!"), ['404 Not Found']);
         }
-        var player = bg.getPlayer();
+        var player = bg.getPlayerWindow();
         if (player === undefined) {
             return response_(socketId, headerMap, stringToArrayBuffer("Player don't run!"), ['200 OK']);
         }

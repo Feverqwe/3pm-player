@@ -65,7 +65,7 @@ var options = function() {
                 language = 'ru';
             }
         }
-        _lang = get_lang(language);
+        get_lang(language);
         var lang = _lang.settings;
         $('select[name="language"]').val(language);
         $.each(lang, function(k, v) {
@@ -122,8 +122,8 @@ var options = function() {
         chrome.storage.local.set(onSave, function() {
             loadSettings(function(stgs) {
                 set_place_holder(stgs);
-                _send('player',function(window) {
-                    window._lang = get_lang(onSave.lang);
+                _send('player', function(window) {
+                    window._lang = _lang;
                     window.engine.loadSettings(stgs);
                 });
             });
@@ -131,10 +131,7 @@ var options = function() {
     };
     return {
         begin: function() {
-            _send('player',function(window) {
-                _lang = window._lang;
-                write_language(_lang.t);
-            });
+            write_language(window._language);
             //binds
             $('select[name="language"]').on('change', function() {
                 write_language($(this).val());

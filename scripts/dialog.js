@@ -2,7 +2,6 @@ var dialog = function() {
     var allow_ext = undefined;
     var var_cache = {};
     var dom_cache = {};
-    var _lang = undefined;
     var settings = undefined;
     var createURLform = function() {
         /*
@@ -645,14 +644,10 @@ var dialog = function() {
         $('input[data-lang=open]').val(_lang.dialog.open);
     };
     return {
-        preload: function() {
-            _send('player',function(window) {
-                _lang = window._lang;
-                settings = window._settings;
-                dialog.run();
-            });
-        },
         run: function() {
+            _send('player',function(window) {
+                settings = window._settings;
+            });
             if (settings.is_winamp) {
                 $('body').addClass('winamp');
                 $('body').append(
@@ -711,5 +706,5 @@ var dialog = function() {
     };
 }();
 $(function() {
-    dialog.preload();
+    dialog.run();
 });

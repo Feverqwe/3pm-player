@@ -3,7 +3,6 @@ var viz = function() {
     var var_cache = {};
     var dom_cache = {};
     var dancerInited = false;
-    var _lang = undefined;
     var setTags = function(value) {
         if (dom_cache.track === undefined) {
             return;
@@ -16,14 +15,8 @@ var viz = function() {
         $('.t_btn.close').attr('title', _lang.close);
     };
     return {
-        loadlang: function(cb) {
-            _send('player',function(window) {
-                _lang = window._lang;
-                write_language();
-                cb();
-            });
-        },
         preload: function() {
+            write_language();
             dom_cache.body = $('body');
             dom_cache.track = $('<div>', {'class': 'track'});
             dom_cache.body.append(dom_cache.track);
@@ -60,7 +53,7 @@ var viz = function() {
             });
         },
         run: function() {
-            _send('player',function(window) {
+            _send('player', function(window) {
                 audio = window.engine.getAudio();
                 setTags(window.engine.getTagBody());
                 window.engine.set_hotkeys(document);
@@ -82,7 +75,7 @@ var viz = function() {
             return audio;
         },
         getAdapter: function(cb) {
-            _send('player',function(window) {
+            _send('player', function(window) {
                 cb(window.engine.getAdapter());
             });
         },
@@ -93,16 +86,6 @@ var viz = function() {
             if (reality.randomPreset !== undefined) {
                 reality.randomPreset();
             }
-        },
-        minimize: function() {
-            $('.mini').trigger('click');
-        },
-        GetLang: function() {
-            return _lang;
-        },
-        noViz: function(aid) {
-            var msg = _lang.no_viz;
-            $('body').append($('<a>', {'class': 'need_addon', target: '_blank', href: 'https://chrome.google.com/webstore/detail/' + aid, text: msg}));
         },
         waitThree: function(url) {
             if (window.THREE === undefined) {
@@ -120,24 +103,23 @@ $(function() {
         window.reality = {};
     }
     $.extend(true, reality, {timing: {boot: new Date().getTime()}});
-    viz.loadlang(function() {
-        viz.preload();
-        var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
-        var ext_url = "chrome-extension://" + aid + "/viz/";
-        $('head').append($('<base>', {href: ext_url}));
-        $.ajax({
-            url: ext_url + 'ping',
-            success: function() {
-                viz.run();
-                var arr = ["storage.js", "three.min.js"];
-                arr.forEach(function(item) {
-                    $('head').append($('<script>', {src: ext_url + item}));
-                });
-                viz.waitThree(ext_url + "boot.js");
-            },
-            error: function() {
-                viz.noViz(aid);
-            }
-        });
+    viz.preload();
+    var aid = "pkjkdmdknbppnobblmffeamifdhjhhma";
+    var ext_url = "chrome-extension://" + aid + "/viz/";
+    $('head').append($('<base>', {href: ext_url}));
+    $.ajax({
+        url: ext_url + 'ping',
+        success: function() {
+            viz.run();
+            var arr = ["storage.js", "three.min.js"];
+            arr.forEach(function(item) {
+                $('head').append($('<script>', {src: ext_url + item}));
+            });
+            viz.waitThree(ext_url + "boot.js");
+        },
+        error: function() {
+            var msg = _lang.no_viz;
+            $('body').append($('<a>', {'class': 'need_addon', target: '_blank', href: 'https://chrome.google.com/webstore/detail/' + aid, text: msg}));
+        }
     });
 });

@@ -432,7 +432,7 @@ var engine = function() {
                     clearTimeout(timer);
                     chrome.notifications.clear('current_track', function(obj) {
                         chrome.runtime.getBackgroundPage(function(bg) {
-                            bg.wm.run_player();
+                            window._focus_all();
                         });
                     });
                 });
@@ -1110,16 +1110,6 @@ var engine = function() {
                 window.viz.randomPreset();
             });
         },
-        vizClose: function() {
-            _send('viz', function(window) {
-                window.close();
-            });
-        },
-        vizMini: function() {
-            _send('viz', function(window) {
-                window.viz.minimize();
-            });
-        },
         get_allow_ext: function() {
             return allow_ext;
         },
@@ -1219,12 +1209,9 @@ var engine = function() {
                 engine.open(list.tracks, {name: list.name, id: id});
             }
         },
-        getSettings: function() {
-            return settings;
-        },
         showMenu: function() {
             chrome.runtime.getBackgroundPage(function(bg) {
-                bg.wm.showDialog({type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: bg.wm.ws.active()});
+                engine.window_manager({type: 'dialog', config:{type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: bg.webui.active()}});
             });
         },
         window_manager: function(options) {
@@ -1300,6 +1287,8 @@ var engine = function() {
                     options.config.h = len * 52 + 43;
                 } else
                 if (options.config.type === 'menu') {
+                    delete options.only;
+                    options.toggle = true;
                     var len = 14;
                     if (options.config.list !== undefined) {
                         len = 0;
@@ -1362,7 +1351,7 @@ var engine = function() {
                     window.onClosed.addListener(function() {
                         delete _windows[options.type];
                     });
-                    window.contentWindow._lang = _lang;
+                    window.contentWindow._language = _language;
                     window.contentWindow._send = _send;
                 });
             }

@@ -163,18 +163,10 @@ var get_lang = function(language) {
             lang = 'ru';
         }
     }
-    if (window.options === undefined) {
-        if (lang === 'ru') {
-            window._lang = lang_arr_ru;
-        } else {
-            window._lang = lang_arr_en;
-        }
+    if (lang === 'ru') {
+        window._lang = lang_arr_ru;
     } else {
-        if (lang === 'ru') {
-            return lang_arr_ru;
-        } else {
-            return lang_arr_en;
-        }
+        window._lang = lang_arr_en;
     }
 };
 get_lang();

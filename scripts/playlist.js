@@ -349,9 +349,6 @@ var playlist = function() {
             dom_cache.playlist_ul.empty();
             setInfo();
         },
-        minimize: function() {
-            $('.mini').trigger('click');
-        },
         setSelectList: selectPL
     };
 }();

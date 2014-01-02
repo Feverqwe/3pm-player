@@ -862,7 +862,6 @@ var view = function() {
         /*
          * Локализация
          */
-        $('body').data('lang', _lang.t);
         $('.t_btn.mini').attr('title', _lang.mini);
         $('.t_btn.close').attr('title', _lang.close);
         $('.t_btn.menu').attr('title', _lang.menu);
@@ -1303,10 +1302,7 @@ var view = function() {
                 window.close();
             });
             $('.mini').on('click', function() {
-                for (var window in _windows) {
-                    _windows[window].minimize();
-                }
-                ;
+                chrome.app.window.current().minimize();
             });
             $('.t_btn.menu').on('click', function() {
                 engine.showMenu();
@@ -1534,10 +1530,11 @@ var view = function() {
                 engine.play();
             }
         },
-        updateSettings: function(obj) {
-            make_extend_volume(obj.extend_volume_scroll);
-            writeWinampFFT(obj.visual_type);
-            if (_lang !== undefined && $('body').data('lang') !== _lang.t) {
+        updateSettings: function() {
+            make_extend_volume(_settings.extend_volume_scroll);
+            writeWinampFFT(_settings.visual_type);
+            if (_lang.t !== window._language) {
+                window._language = _lang.t;
                 write_language();
             }
         },
@@ -1566,7 +1563,7 @@ var view = function() {
 window._flags = [];
 $(document).on('settings_changed', function() {
     if (window._flags.indexOf('settings_changed') !== -1 && window._flags.indexOf('ready') !== -1) {
-        view.updateSettings(_settings);
+        view.updateSettings();
         return;
     }
     window._flags.push('settings_changed');
