@@ -73,7 +73,8 @@ var get_lang = function(language) {
             28: '* For OSX use Command button instead Ctrl.',
             29: 'Hotkeys',
             30: 'Only foreign tracks',
-            31: 'Pre-load track'
+            31: 'Pre-load track',
+            32: 'Last.fm scrobbling'
         }
     };
     var lang_arr_ru = {
@@ -150,7 +151,8 @@ var get_lang = function(language) {
             28: '* Для OSX вместо Ctrl используется Command.',
             29: 'Горячие клавиши',
             30: 'Только зарубежные треки',
-            31: 'Пред загружать трек'
+            31: 'Пред загружать трек',
+            32: 'Last.fm скробблинг'
         }
     };
     if (window.options === undefined) {

@@ -13,7 +13,8 @@ var engine = function() {
         preload_sc: 0,
         preload_gd: 1,
         preload_box: 1,
-        preload_sd: 0
+        preload_sd: 0,
+        lastfm: 0
     };
     var loadSettings = function(obj) {
         $.each(settings, function(k) {
@@ -375,21 +376,29 @@ var engine = function() {
             }
             var title = "";
             var album = "";
+            var artist = "";
+            var artist_album = "";
             if (tags.title !== undefined && tags.title.length > 0) {
                 title = tags.title;
             } else {
                 title = playlist[id].file.name;
             }
-            if (tags.album !== undefined && tags.artist !== undefined && tags.album.length > 0 && tags.artist.length > 0) {
-                album = tags.artist + ' - ' + tags.album;
-            } else
             if (tags.artist !== undefined && tags.artist.length > 0) {
-                album = tags.artist;
-            } else
+                artist = tags.artist;
+            }
             if (tags.album !== undefined && tags.album.length > 0) {
                 album = tags.album;
             }
-            return [title, album];
+            if (album.length > 0 && artist.length > 0) {
+                artist_album = tags.artist + ' - ' + tags.album;
+            } else
+            if (artist.length > 0) {
+                artist_album = artist;
+            } else
+            if (album.length > 0) {
+                artist_album = album;
+            }
+            return [title, artist_album, {title: title, artist: artist, album: album}];
         };
         var notification = function() {
             var timeout = 3000;
@@ -826,22 +835,30 @@ var engine = function() {
                         read_tags(current_id, function(tags, id) {
                             playlist[id].tags = tags;
                             playlist[id].state = "dune";
+                            var tb = getTagBody(current_id);
                             _send('playlist', function(window) {
                                 window.playlist.updPlaylistItem(id, playlist[id]);
                             });
                             view.setTags(playlist[id].tags);
                             _send('viz', function(window) {
-                                window.viz.audio_state('track', getTagBody(current_id));
+                                window.viz.audio_state('track', tb);
                             });
+                            if (settings.lastfm) {
+                                lastfm.updateNowPlaying(tb[2].artist, tb[2].title, tb[2].album, audio.duration);
+                            }
                             if (settings.next_track_notification) {
                                 notification.update();
                             }
                         });
                     } else {
+                        var tb = getTagBody(current_id);
                         _send('viz', function(window) {
-                            window.viz.audio_state('track', getTagBody(current_id));
+                            window.viz.audio_state('track', tb);
                         });
                         view.setTags(playlist[current_id].tags);
+                        if (settings.lastfm) {
+                            lastfm.updateNowPlaying(tb[2].artist, tb[2].title, tb[2].album, audio.duration);
+                        }
                     }
                     view.state("loadeddata");
                 });
