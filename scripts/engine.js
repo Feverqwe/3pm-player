@@ -1018,6 +1018,25 @@ var engine = function() {
             }
             _windows[type].focus();
         };
+        window._show_all = function(type, oncancel) {
+            if (type === undefined) {
+                type = 'player';
+            }
+            var _windows = window._windows;
+            var n = 0;
+            for (var i in _windows) {
+                if (i === type) {
+                    continue;
+                }
+                _windows[i].focus();
+                n++;
+            }
+            if (n === 0) {
+                oncancel();
+                return;
+            }
+            _windows[type].focus();
+        };
         window._send = function(type, cb) {
             var _windows = window._windows;
             if (_windows[type] === undefined || _windows[type].contentWindow.window === null) {

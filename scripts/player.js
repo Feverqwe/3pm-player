@@ -172,7 +172,7 @@ var view = function() {
                 engine.select_playlist(playlist[0].id);
             } else
             if (playlist.length > 0) {
-                    engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
+                engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
             }
         };
         var readM3U = function(content, name) {
@@ -451,7 +451,7 @@ var view = function() {
                         engine.select_playlist(playlist[0].id);
                     } else
                     if (playlist.length > 0) {
-                            engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
+                        engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
                     }
                 }
             };
@@ -657,7 +657,7 @@ var view = function() {
                 title: _lang.ctx_open_url,
                 contexts: ['page', 'launcher'],
                 action: function() {
-                        engine.window_manager({type: 'dialog', config:{type: "url", h: 60}});
+                    engine.window_manager({type: 'dialog', config: {type: "url", h: 60}});
                 }
             }, 'select_playlist': {
                 id: "select_playlist",
@@ -670,7 +670,7 @@ var view = function() {
                     }
                     var list = playlists.list;
                     if (list.length > 0) {
-                            engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: list}});
+                        engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                     }
                 }
             }, 'ws': {
@@ -712,7 +712,7 @@ var view = function() {
                             engine.select_playlist(list[0].id);
                         } else
                         if (list.length > 0) {
-                                engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: list}});
+                            engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                         }
                     });
                 }
@@ -728,7 +728,7 @@ var view = function() {
                             engine.select_playlist(list[0].id);
                         } else
                         if (list.length > 0) {
-                                engine.window_manager({type: 'dialog', config:{type: "m3u", h: 200, w: 350, r: true, playlists: list}});
+                            engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                         }
                     });
                 }
@@ -739,7 +739,7 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.gd.getFilelist(undefined, function(list) {
-                            engine.window_manager({type: 'dialog', config:{type: "gd", h: 315, w: 350, r: true, filelist: list}});
+                        engine.window_manager({type: 'dialog', config: {type: "gd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'db': {
@@ -749,7 +749,7 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.db.getFilelist(function(list) {
-                            engine.window_manager({type: 'dialog', config:{type: "db", h: 315, w: 350, r: true, filelist: list}});
+                        engine.window_manager({type: 'dialog', config: {type: "db", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'box': {
@@ -759,7 +759,7 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.box.getFilelist(function(list) {
-                            engine.window_manager({type: 'dialog', config:{type: "box", h: 315, w: 350, r: true, filelist: list}});
+                        engine.window_manager({type: 'dialog', config: {type: "box", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'sd': {
@@ -769,7 +769,7 @@ var view = function() {
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.sd.getFilelist(undefined, function(list) {
-                            engine.window_manager({type: 'dialog', config:{type: "sd", h: 315, w: 350, r: true, filelist: list}});
+                        engine.window_manager({type: 'dialog', config: {type: "sd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'p_play_pause': {
@@ -798,7 +798,7 @@ var view = function() {
                 title: _lang.ctx_options,
                 contexts: ['page', 'launcher'],
                 action: function() {
-                        engine.window_manager({type: 'options'});
+                    engine.window_manager({type: 'options'});
                 }
             }, 'save_vk': {
                 id: "save_vk",
@@ -1105,6 +1105,24 @@ var view = function() {
         show: function() {
             write_language();
             settings = window._settings;
+            window.onfocus = function() {
+                if (dom_cache.focusing_all && dom_cache.focus_state === false) {
+                    dom_cache.focusing_all = false;
+                    dom_cache.focus_state = true;
+                    return;
+                }
+                if (dom_cache.focus_state) {
+                    return;
+                }
+                dom_cache.focus_state = true;
+                dom_cache.focusing_all = true;
+                window._show_all(undefined, function() {
+                    dom_cache.focusing_all = false;
+                });
+            };
+            window.onblur = function() {
+                dom_cache.focus_state = false;
+            };
             dom_cache = {
                 body: $('body'),
                 drop: $('div.drop'),

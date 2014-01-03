@@ -300,7 +300,7 @@ var playlist = function() {
                 $(this).parent().hide();
             });
             chrome.app.window.current().onBoundsChanged.addListener(function() {
-                if (document.webkitHidden) {
+                if (document.webkitHidden || chrome.app.window.current().isMaximized()) {
                     return;
                 }
                 var window_left = window.screenLeft;

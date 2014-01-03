@@ -34,7 +34,7 @@ var viz = function() {
                 }
             });
             chrome.app.window.current().onBoundsChanged.addListener(function() {
-                if (document.webkitIsFullScreen || document.webkitHidden) {
+                if (document.webkitIsFullScreen || document.webkitHidden || chrome.app.window.current().isMaximized()) {
                     return;
                 }
                 var window_left = window.screenLeft;
