@@ -31,14 +31,7 @@ var webui = function() {
         return str;
     };
 
-    var readUrl = function(headerMap, socketId) {
-        if (headerMap.url === undefined) {
-            return response_(socketId, headerMap, stringToArrayBuffer("Don't have url!"), ['404 Not Found']);
-        }
-        var player = bg.getPlayerWindow();
-        if (player === undefined) {
-            return response_(socketId, headerMap, stringToArrayBuffer("Player don't run!"), ['200 OK']);
-        }
+    var readUrl = function(headerMap, socketId, player) {
         if (headerMap.url === '/') {
             headerMap.url = '/index.html';
         } else
@@ -213,10 +206,19 @@ var webui = function() {
                 if (requestLine.length === 2)
                     headerMap[requestLine[0]] = requestLine[1].trim();
             }
-
-            return readUrl(headerMap, socketId);
-
-
+            if (headerMap.url === undefined) {
+                return response_(socketId, headerMap, stringToArrayBuffer("Don't have url!"), ['404 Not Found']);
+            }
+            if (window.player_window !== undefined && window.player_window.window !== null) {
+                readUrl(headerMap, socketId, window.player_window);
+            } else {
+                chrome.runtime.sendMessage(chrome.runtime.id, '_player_window_', function(res) {
+                    if (res !== 'ok') {
+                        return response_(socketId, headerMap, stringToArrayBuffer("Player don't run!"), ['200 OK']);
+                    }
+                    readUrl(headerMap, socketId, window.player_window);
+                });
+            }
         };
         chrome.socket.read(socketId, onDataRead);
     };

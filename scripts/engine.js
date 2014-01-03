@@ -954,8 +954,88 @@ var engine = function() {
             context_menu.save_vk.hide = 1;
         }
     };
+    var check_window_position = function(position) {
+        var screen_width = screen.width,
+                screen_height = screen.height,
+                dpr = window.devicePixelRatio;
+        position.width = parseInt(position.width * dpr);
+        position.height = parseInt(position.height * dpr);
+        if (position.left === undefined) {
+            position.left = parseInt(screen_width / 2 - position.width / 2);
+        }
+        if (position.top === undefined) {
+            position.top = parseInt(screen_height / 2 - position.height / 2);
+        }
+        if (position.left < 0) {
+            position.left = 0;
+        }
+        if (position.top < 0) {
+            position.top = 0;
+        }
+        if (screen_width < position.left + position.width) {
+            position.left = screen_width - position.width;
+        }
+        if (screen_height < position.top + position.height) {
+            position.top = screen_height - position.height;
+        }
+        return {width: position.width, height: position.height, left: position.left, top: position.top};
+    };
+    var init_engine = function() {
+        chrome.app.window.current().onClosed.addListener(function() {
+            var _windows = window._windows;
+            for (var i in _windows) {
+                if (i === 'player') {
+                    continue;
+                }
+                _windows[i].contentWindow.close();
+            }
+            delete _windows['player'];
+        });
+        chrome.app.window.current().onMinimized.addListener(function() {
+            var _windows = window._windows;
+            for (var i in _windows) {
+                _windows[i].minimize();
+            }
+        });
+        chrome.app.window.current().onRestored.addListener(function() {
+            window._focus_all();
+        });
+        window._focus_all = function(type) {
+            if (type === undefined) {
+                type = 'player';
+            }
+            var _windows = window._windows;
+            for (var i in _windows) {
+                if (i === type) {
+                    continue;
+                }
+                _windows[i].focus();
+            }
+            _windows[type].focus();
+        };
+        window._send = function(type, cb) {
+            var _windows = window._windows;
+            if (_windows[type] === undefined || _windows[type].contentWindow.window === null) {
+                return;
+            }
+            cb(_windows[type].contentWindow);
+        };
+        chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+            if (msg === '_player_') {
+                sendResponse('ok');
+                window._focus_all();
+            } else
+            if (msg === '_player_window_') {
+                chrome.runtime.getBackgroundPage(function(bg) {
+                    bg.player_window = window;
+                    sendResponse('ok');
+                });
+            }
+        });
+    };
     return {
         run: function() {
+            init_engine();
             player.init();
             chrome.storage.local.get(function(obj) {
                 loadSettings(obj);
@@ -1227,7 +1307,7 @@ var engine = function() {
             if (options.type === 'playlist') {
                 options.toggle = true;
                 chrome.storage.local.get(['pl_pos_left', 'pl_pos_top', 'pl_w', 'pl_h'], function(storage) {
-                    var position = _check_window_position({
+                    var position = check_window_position({
                         width: storage.pl_w || 335,
                         height: storage.pl_h || 400,
                         left: storage.pl_pos_left,
@@ -1249,7 +1329,7 @@ var engine = function() {
             if (options.type === 'viz') {
                 options.toggle = true;
                 chrome.storage.local.get(['viz_pos_left', 'viz_pos_top', 'viz_w', 'viz_h'], function(storage) {
-                    var position = _check_window_position({
+                    var position = check_window_position({
                         width: storage.viz_w || 1024,
                         height: storage.viz_h || 768,
                         left: storage.viz_pos_left,
@@ -1314,7 +1394,7 @@ var engine = function() {
                     }
                     options.config.h = len * 19 + 40;
                 }
-                var position = _check_window_position({
+                var position = check_window_position({
                     width: options.config.w,
                     height: options.config.h,
                     left: undefined,
@@ -1336,7 +1416,7 @@ var engine = function() {
             } else
             if (options.type === 'options') {
                 options.only = true;
-                var position = _check_window_position({
+                var position = check_window_position({
                     width: 820,
                     height: 600,
                     left: undefined,

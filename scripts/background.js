@@ -1,5 +1,4 @@
 var bg = function() {
-    var player_window = undefined;
     var check_window_position = function(position) {
         var screen_width = screen.width,
                 screen_height = screen.height,
@@ -39,65 +38,20 @@ var bg = function() {
                 frame: "none",
                 resizable: false
             }, function(window) {
-                player_window = window;
                 var sub_window = window.contentWindow;
                 sub_window._language = storage.lang;
                 sub_window._windows = {player: window};
                 sub_window._settings = {};
-                window.onClosed.addListener(function() {
-                    var _windows = sub_window._windows;
-                    for (var i in _windows) {
-                        if (i === 'player') {
-                            continue;
-                        }
-                        _windows[i].contentWindow.close();
-                    }
-                    delete _windows['player'];
-                });
-                window.onMinimized.addListener(function() {
-                    var _windows = sub_window._windows;
-                    for (var window in _windows) {
-                        _windows[window].minimize();
-                    }
-                });
-                window.onRestored.addListener(function() {
-                    sub_window._focus_all();
-                });
-                sub_window._focus_all = function(type) {
-                    if (type === undefined) {
-                        type = 'player';
-                    }
-                    var windows = sub_window._windows;
-                    for (var i in windows) {
-                        if (i === type) {
-                            continue;
-                        }
-                        windows[i].focus();
-                    }
-                    windows[type].focus();
-                };
-                sub_window._check_window_position = check_window_position;
-                sub_window._send = function(type, cb) {
-                    if (sub_window._windows[type] === undefined || sub_window._windows[type].contentWindow.window === null) {
-                        return;
-                    }
-                    cb(sub_window._windows[type].contentWindow);
-                };
             });
         });
     };
     return {
         run_player: function() {
-            if (player_window === undefined || player_window.contentWindow.window === null) {
-                create_player();
-            } else {
-                player_window.contentWindow._focus_all();
-            }
-        },
-        getPlayerWindow: function() {
-            if (player_window !== undefined && player_window.contentWindow.window !== null) {
-                return player_window.contentWindow;
-            }
+            chrome.runtime.sendMessage(chrome.runtime.id, '_player_', function(res) {
+                if (res === undefined) {
+                    create_player();
+                }
+            });
         }
     };
 }();
