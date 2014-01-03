@@ -159,30 +159,35 @@ var engine = function() {
     };
     var read_image = function(binary, cb, enable_search) {
         /*
-         * binary = [Array || ArrayBuffer || String, 'image/*'];
+         * binary = [Array || ArrayBuffer || Blob, 'image/*'];
          */
         var resize = true;
+        var blob;
         if (binary === undefined) {
             cb(undefined);
             return;
         }
-        if (binary[1].substr(0, 1) !== 'i' && binary[1].substr(4, 1) !== 'e') {
-            binary[1] = 'image/jpeg';
+        if (binary[0].size === undefined) {
+            if (binary[1].substr(0, 1) !== 'i' && binary[1].substr(4, 1) !== 'e') {
+                binary[1] = 'image/jpeg';
+            }
+            if (binary[0].buffer === undefined) {
+                binary[0] = new Uint8Array(binary[0]);
+            }
+            if (enable_search) {
+                binary[0] = search_image(binary[0]);
+            }
+            var check_summ = array_chksum(binary[0]);
+            var o_b_len = binary[0].length;
+            var id = check_cover(o_b_len, check_summ);
+            if (id !== undefined) {
+                cb(id);
+                return;
+            }
+            blob = new Blob([binary[0]], {type: binary[1]});
+        } else {
+            blob = binary[0];
         }
-        if (binary[0].buffer === undefined) {
-            binary[0] = new Uint8Array(binary[0]);
-        }
-        if (enable_search) {
-            binary[0] = search_image(binary[0]);
-        }
-        var check_summ = array_chksum(binary[0]);
-        var o_b_len = binary[0].length;
-        var id = check_cover(o_b_len, check_summ);
-        if (id !== undefined) {
-            cb(id);
-            return;
-        }
-        var blob = new Blob([binary[0]], {type: binary[1]});
         var url = webkitURL.createObjectURL(blob);
         if (resize) {
             image_resize(url, function(blob) {

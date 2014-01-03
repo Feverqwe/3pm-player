@@ -747,10 +747,9 @@ var cloud = function() {
                 }
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url, true);
-                xhr.responseType = "arraybuffer";
+                xhr.responseType = "blob";
                 xhr.onload = function() {
-                    var mime = 'image/jpeg';
-                    tags.picture = [xhr.response, mime];
+                    tags.picture = [xhr.response, ''];
                     cb(tags);
                 };
                 xhr.onerror = function() {
@@ -1105,10 +1104,9 @@ var cloud = function() {
                 }
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url, true);
-                xhr.responseType = "arraybuffer";
+                xhr.responseType = "blob";
                 xhr.onload = function() {
-                    var mime = 'image/jpeg';
-                    tags.picture = [xhr.response, mime];
+                    tags.picture = [xhr.response, ''];
                     cb(tags);
                 };
                 xhr.onerror = function() {
