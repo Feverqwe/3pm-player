@@ -1111,14 +1111,22 @@ var view = function() {
                     dom_cache.focus_state = true;
                     return;
                 }
+                if (dom_cache.focusing_all) {
+                    //protect!
+                    dom_cache.disable_focusing_all = true;
+                    dom_cache.focusing_all = false;
+                    console.log('Focusing disabled!');
+                }
                 if (dom_cache.focus_state) {
                     return;
                 }
                 dom_cache.focus_state = true;
-                dom_cache.focusing_all = true;
-                window._show_all(undefined, function() {
-                    dom_cache.focusing_all = false;
-                });
+                if (!dom_cache.disable_focusing_all) {
+                    dom_cache.focusing_all = true;
+                    window._show_all(undefined, function() {
+                        dom_cache.focusing_all = false;
+                    });
+                }
             };
             window.onblur = function() {
                 dom_cache.focus_state = false;
