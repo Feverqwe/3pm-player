@@ -236,7 +236,11 @@ var cloud = function() {
                                 len++;
                             });
                             if (len === 0) {
-                                console.log("VK", "getTracks", "len = 0", data);
+                                if (tracks.length > 0) {
+                                    cb(tracks);
+                                } else {
+                                    console.log("VK", "getTracks", "len = 0", data);
+                                }
                                 return;
                             }
                             if (tracks.length !== data.count) {
@@ -298,7 +302,11 @@ var cloud = function() {
                                 len++;
                             });
                             if (len === 0) {
-                                console.log("VK", "getAlbums", "len = 0", data);
+                                if (albums.length > 0) {
+                                    cb(albums);
+                                } else {
+                                    console.log("VK", "getAlbums", "len = 0", data);
+                                }
                                 return;
                             }
                             if (albums.length !== data.count) {
