@@ -27,10 +27,10 @@ var StringUtils = {
         var offset1 = 1, offset2 = 0;
         maxBytes = Math.min(maxBytes || bytes.length, bytes.length);
 
-        if (bytes[0] == 0xFE && bytes[1] == 0xFF) {
+        if (bytes[0] === 0xFE && bytes[1] === 0xFF) {
             bigEndian = true;
             ix = 2;
-        } else if (bytes[0] == 0xFF && bytes[1] == 0xFE) {
+        } else if (bytes[0] === 0xFF && bytes[1] === 0xFE) {
             bigEndian = false;
             ix = 2;
         }
@@ -45,7 +45,7 @@ var StringUtils = {
             var byte2 = bytes[ix + offset2];
             var word1 = (byte1 << 8) + byte2;
             ix += 2;
-            if (word1 == 0x0000) {
+            if (word1 === 0x0000) {
                 break;
             } else if (byte1 < 0xD8 || byte1 >= 0xE0) {
                 arr[j] = String.fromCharCode(word1);
@@ -65,14 +65,14 @@ var StringUtils = {
         var ix = 0;
         maxBytes = Math.min(maxBytes || bytes.length, bytes.length);
 
-        if (bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) {
+        if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) {
             ix = 3;
         }
 
         var arr = new Array(maxBytes);
         for (var j = 0; ix < maxBytes; j++) {
             var byte1 = bytes[ix++];
-            if (byte1 == 0x00) {
+            if (byte1 === 0x00) {
                 break;
             } else if (byte1 < 0x80) {
                 arr[j] = String.fromCharCode(byte1);
@@ -103,9 +103,34 @@ var StringUtils = {
         var arr = new Array(maxBytes);
         for (var i = 0; i < maxBytes; ) {
             var byte1 = bytes[i++];
-            if (byte1 == 0x00)
+            if (byte1 === 0x00)
                 break;
             arr[i - 1] = String.fromCharCode(byte1);
+        }
+        var string = new String(arr.join(""));
+        string.bytesReadCount = i;
+        return string;
+    },
+    readISO_8859_1String: function(bytes, maxBytes) {
+        var charmap   = unescape(
+ +          "%u0402%u0403%u201A%u0453%u201E%u2026%u2020%u2021%u20AC%u2030%u0409%u2039%u040A%u040C%u040B%u040F"+
+ +          "%u0452%u2018%u2019%u201C%u201D%u2022%u2013%u2014%u0000%u2122%u0459%u203A%u045A%u045C%u045B%u045F"+
+ +          "%u00A0%u040E%u045E%u0408%u00A4%u0490%u00A6%u00A7%u0401%u00A9%u0404%u00AB%u00AC%u00AD%u00AE%u0407"+
+ +          "%u00B0%u00B1%u0406%u0456%u0491%u00B5%u00B6%u00B7%u0451%u2116%u0454%u00BB%u0458%u0405%u0455%u0457");
+        var code2char = function(code) {
+            if (code >= 0xC0 && code <= 0xFF)
+                return String.fromCharCode(code - 0xC0 + 0x0410);
+            if (code >= 0x80 && code <= 0xBF)
+                return charmap.charAt(code - 0x80);
+            return String.fromCharCode(code);
+        };
+        maxBytes = maxBytes || bytes.length;
+        var arr = new Array(maxBytes);
+        for (var i = 0; i < maxBytes; ) {
+            var byte1 = bytes[i++];
+            if (byte1 === 0x00)
+                break;
+            arr[i - 1] = code2char(byte1);
         }
         var string = new String(arr.join(""));
         string.bytesReadCount = i;
@@ -356,7 +381,9 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
             case 'utf-8':
                 sString = StringUtils.readUTF8String(bytes);
                 break;
-
+            case 'iso-8859-1':
+                sString = StringUtils.readISO_8859_1String(bytes);
+                break;
             default:
                 sString = StringUtils.readNullTerminatedString(bytes);
                 break;
