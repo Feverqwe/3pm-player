@@ -139,26 +139,6 @@ var engine = function() {
         };
         img.src = url;
     };
-    var search_image = function(u8a) {
-        var subarr = u8a.subarray(0, 128);
-        var il = subarr.length;
-        var str = new Array(il);
-        for (var i = 0; i < il; i++) {
-            str[i] = String.fromCharCode(subarr[i] & 0xff);
-        }
-        var data = str.join('');
-        var index = data.indexOf('JFIF');
-        var pos = 6;
-        if (index === -1) {
-            index = data.indexOf('PNG');
-            pos = 1;
-        }
-        if (index !== -1) {
-            return u8a.subarray(index - pos);
-        } else {
-            return u8a;
-        }
-    };
     var read_image = function(binary, cb, enable_search) {
         /*
          * binary = [Array || ArrayBuffer || Blob, 'image/*'];
@@ -175,9 +155,6 @@ var engine = function() {
             }
             if (binary[0].buffer === undefined) {
                 binary[0] = new Uint8Array(binary[0]);
-            }
-            if (enable_search) {
-                binary[0] = search_image(binary[0]);
             }
             var check_summ = array_chksum(binary[0]);
             var o_b_len = binary[0].length;

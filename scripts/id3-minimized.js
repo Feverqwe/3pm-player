@@ -112,11 +112,11 @@ var StringUtils = {
         return string;
     },
     readISO_8859_1String: function(bytes, maxBytes) {
-        var charmap   = unescape(
- +          "%u0402%u0403%u201A%u0453%u201E%u2026%u2020%u2021%u20AC%u2030%u0409%u2039%u040A%u040C%u040B%u040F"+
- +          "%u0452%u2018%u2019%u201C%u201D%u2022%u2013%u2014%u0000%u2122%u0459%u203A%u045A%u045C%u045B%u045F"+
- +          "%u00A0%u040E%u045E%u0408%u00A4%u0490%u00A6%u00A7%u0401%u00A9%u0404%u00AB%u00AC%u00AD%u00AE%u0407"+
- +          "%u00B0%u00B1%u0406%u0456%u0491%u00B5%u00B6%u00B7%u0451%u2116%u0454%u00BB%u0458%u0405%u0455%u0457");
+        var charmap = unescape(
+                +"%u0402%u0403%u201A%u0453%u201E%u2026%u2020%u2021%u20AC%u2030%u0409%u2039%u040A%u040C%u040B%u040F" +
+                +"%u0452%u2018%u2019%u201C%u201D%u2022%u2013%u2014%u0000%u2122%u0459%u203A%u045A%u045C%u045B%u045F" +
+                +"%u00A0%u040E%u045E%u0408%u00A4%u0490%u00A6%u00A7%u0401%u00A9%u0404%u00AB%u00AC%u00AD%u00AE%u0407" +
+                +"%u00B0%u00B1%u0406%u0456%u0491%u00B5%u00B6%u00B7%u0451%u2116%u0454%u00BB%u0458%u0405%u0455%u0457");
         var code2char = function(code) {
             if (code >= 0xC0 && code <= 0xFF)
                 return String.fromCharCode(code - 0xC0 + 0x0410);
@@ -1068,17 +1068,37 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         return (time.hours > 0 ? time.hours + ':' : '') + minutes + ':' + seconds;
     }
 
+    var search_image = function(data) {
+        var index = data.indexOf('JFIF');
+        var pos = index - 11;
+        if (index === -1) {
+            index = data.indexOf('PNG');
+            pos = index - 6;
+        }
+        if (index !== -1) {
+            return pos;
+        } else {
+            return 0;
+        }
+    };
+
     ID3v2.readFrameData['APIC'] = function readPictureFrame(offset, length, data, flags, v) {
         v = v || '3';
 
         var start = offset;
         var charset = getTextEncoding(data.getByteAt(offset));
+        var img_s = false;
         switch (v) {
             case '2':
                 var format = data.getStringAt(offset + 1, 3);
                 offset += 4;
                 break;
             case '3':
+                var img_s_pos = search_image(data.getStringAt(offset, 128));
+                if (img_s_pos > 0) {
+                    img_s = true;
+                    offset += img_s_pos;
+                }
             case '4':
                 var format = data.getStringWithCharsetAt(offset + 1, length - (offset - start), charset);
                 offset += 1 + format.bytesReadCount;
@@ -1087,8 +1107,9 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
         var bite = data.getByteAt(offset, 1);
         var type = pictureType[bite];
         var desc = data.getStringWithCharsetAt(offset + 1, length - (offset - start), charset);
-
-        //offset += 1 + desc.bytesReadCount;
+        if (img_s === false) {
+            offset += 1 + desc.bytesReadCount;
+        }
 
         return {
             "format": format.toString(),
