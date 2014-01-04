@@ -755,6 +755,9 @@ var engine = function() {
                     view.setVolume(audio.volume);
                     return;
                 }
+                if (audio.muted) {
+                    audio.muted = false;
+                }
                 if (typeof (persent) === "string") {
                     if (persent.substr(0, 1) === "+") {
                         persent = parseFloat(persent.substr(1));
@@ -774,9 +777,6 @@ var engine = function() {
                     audio.volume = new_val;
                     save_volume(audio.volume);
                     return;
-                }
-                if (audio.muted) {
-                    audio.muted = false;
                 }
                 audio.volume = 1.0 / 100 * persent;
                 save_volume(audio.volume);
