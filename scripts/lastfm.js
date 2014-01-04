@@ -129,7 +129,13 @@
             format: 'json',
             sk: session_key
         };
-        if (album !== undefined) {
+        if (data.artist.length === 0) {
+            return;
+        }
+        if (data.track.length === 0) {
+            return;
+        }
+        if (album !== undefined && album.length > 0) {
             data.album = album;
         }
         duration = parseInt(duration);
@@ -187,7 +193,13 @@
             format: 'json',
             sk: session_key
         };
-        if (album !== undefined) {
+        if (data.artist.length === 0) {
+            return;
+        }
+        if (data.track.length === 0) {
+            return;
+        }
+        if (album !== undefined && album.length > 0) {
             data.album = album;
         }
         duration = parseInt(duration);
