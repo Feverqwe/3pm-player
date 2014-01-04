@@ -281,6 +281,7 @@
             data: data,
             statusCode: {
                 200: function(data) {
+                    track_cache[cn].check = 1;
                     if (data.error === 9) {
                         session_key = undefined;
                     }
@@ -293,7 +294,6 @@
                     if (data.error !== undefined) {
                         return;
                     }
-                    track_cache[cn].check = 1;
                     if (data.track === undefined
                             || data.track.album === undefined
                             || data.track.album.image === undefined
