@@ -588,7 +588,7 @@ var engine = function() {
             lfm();
         };
         var lastfm_tag_reader = function(tags, id) {
-            if (!settings.lastfm_cover) {
+            if (!settings.lastfm_cover || settings.is_winamp) {
                 return;
             }
             if (playlist[id].lastfm_image === 1
