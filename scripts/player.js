@@ -1432,11 +1432,11 @@ var view = function() {
         },
         setVolume: function(pos) {
             if (engine.getMute()) {
-                if (var_cache['volume_image'] === -1) {
+                if (var_cache.volume_image === -1) {
                     return;
                 }
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_mute_w.png)');
-                var_cache['volume_image'] = -1;
+                dom_cache.volume.parent().children('.pic').attr('class','pic mute');
+                var_cache.volume_image = -1;
                 return;
             }
             var max = 1.0;
@@ -1446,32 +1446,32 @@ var view = function() {
                 dom_cache.volume.css('background', getVolumeColor(width_persent));
             }
             if (width_persent > 70) {
-                if (var_cache['volume_image'] === 1) {
+                if (var_cache.volume_image === 1) {
                     return;
                 }
-                var_cache['volume_image'] = 1;
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_high_w.png)');
+                var_cache.volume_image = 1;
+                dom_cache.volume.parent().children('.pic').attr('class','pic high');
             } else
             if (pos === 0) {
-                if (var_cache['volume_image'] === 2) {
+                if (var_cache.volume_image === 2) {
                     return;
                 }
-                var_cache['volume_image'] = 2;
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_zero_w.png)');
+                var_cache.volume_image = 2;
+                dom_cache.volume.parent().children('.pic').attr('class','pic zero');
             } else
             if (width_persent < 40) {
-                if (var_cache['volume_image'] === 3) {
+                if (var_cache.volume_image === 3) {
                     return;
                 }
-                var_cache['volume_image'] = 3;
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_low_w.png)');
+                var_cache.volume_image = 3;
+                dom_cache.volume.parent().children('.pic').attr('class','pic low');
             } else
             if (width_persent < 70) {
-                if (var_cache['volume_image'] === 4) {
+                if (var_cache.volume_image === 4) {
                     return;
                 }
-                var_cache['volume_image'] = 4;
-                dom_cache.volume.parent().children('.pic').css('background-image', 'url(images/sound_medium_w.png)');
+                var_cache.volume_image = 4;
+                dom_cache.volume.parent().children('.pic').attr('class','pic medium');
             }
         },
         state: function(type) {
@@ -1506,8 +1506,8 @@ var view = function() {
                 dom_cache.time.empty();
                 hideImage();
                 var_cache = {};
-                var_cache['progress_w'] = dom_cache.progress.width();
-                var_cache['volume_w'] = dom_cache.volume.width();
+                var_cache.progress_w = dom_cache.progress.width();
+                var_cache.volume_w = dom_cache.volume.width();
                 isPause();
                 view.setProgress(0.1, 0);
                 pre_buffering_controller.stop();

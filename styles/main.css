@@ -204,6 +204,21 @@ div.progress.download > div.loaded {
     background-repeat: no-repeat;
     cursor: pointer;
 }
+.player > .controls .volume_controll .pic.mute {
+    background-image: url(../images/sound_mute_w.png);
+}
+.player > .controls .volume_controll .pic.high {
+    background-image: url(../images/sound_high_w.png);
+}
+.player > .controls .volume_controll .pic.zero {
+    background-image: url(../images/sound_zero_w.png);
+}
+.player > .controls .volume_controll .pic.low {
+    background-image: url(../images/sound_low_w.png);
+}
+.player > .controls .volume_controll .pic.medium {
+    background-image: url(../images/sound_medium_w.png);
+}
 .player > div.controls li.btn {
     cursor: pointer;
     border-right: 1px solid #000000;
