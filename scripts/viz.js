@@ -3,11 +3,11 @@ var viz = function() {
     var var_cache = {};
     var dom_cache = {};
     var dancerInited = false;
-    var setTags = function(value) {
+    var setTags = function(tb) {
         if (dom_cache.track === undefined) {
             return;
         }
-        dom_cache.track.empty().append($('<span>', {text: value.title}), $('<br>'), $('<span>', {text: value.aa}));
+        dom_cache.track.empty().append($('<span>', {text: tb.title}), $('<br>'), $('<span>', {text: tb.aa || ''}));
     };
     var write_language = function() {
         $('.t_btn.full').attr('title', _lang.full);

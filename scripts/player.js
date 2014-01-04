@@ -1395,24 +1395,24 @@ var view = function() {
                 }
             });
         },
-        setTags: function(tags) {
+        setTags: function(tb) {
             if (is_winamp) {
                 var trackalbum = '';
-                if (tags.aa.length > 0) {
-                    trackalbum = ' - ' + tags.aa;
+                if (tb.aa !== undefined) {
+                    trackalbum = ' - ' + tb.aa;
                 }
-                dom_cache.trackname.text(tags.title + trackalbum).parent().attr("title", tags.title + trackalbum);
+                dom_cache.trackname.text(tb.title + trackalbum).parent().attr("title", tb.title + trackalbum);
                 calculate_moveble(dom_cache.trackname, 153, 'name');
             } else {
-                dom_cache.trackname.text(tags.title).parent().attr("title", tags.title);
-                dom_cache.trackalbum.text(tags.aa).parent().attr("title", tags.aa);
+                dom_cache.trackname.text(tb.title).parent().attr("title", tb.title);
+                dom_cache.trackalbum.text(tb.aa || '').parent().attr("title", tb.aa || '');
             }
-            if (tags.picture !== undefined) {
-                showImage(tags.picture);
+            if (tb.picture !== undefined) {
+                showImage(tb.picture);
             } else {
                 hideImage();
             }
-            setTrueText(tags.title, tags.aa);
+            setTrueText(tb.title, tb.aa || '');
             //console.log(tags)
         },
         setProgress: function(max, pos) {

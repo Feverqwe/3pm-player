@@ -345,12 +345,15 @@ var engine = function() {
             }, params);
         };
         var getTagBody = function(id) {
+            if (id === undefined) {
+                id = current_id;
+            }
             if (playlist[id] === undefined) {
-                return {title: '3pm-player', artist: '', album: '', aa: ''};
+                return {title: '3pm-player'};
             }
             var tags = playlist[id].tags;
             if (tags === undefined) {
-                return {title: playlist[id].file.name, artist: '', album: '', aa: ''};
+                return {title: playlist[id].file.name};
             }
             var title = "";
             var album = "";
@@ -376,7 +379,16 @@ var engine = function() {
             if (album.length > 0) {
                 artist_album = album;
             }
-            var data = {title: title, artist: artist, album: album, aa: artist_album};
+            var data = {title: title};
+            if (artist.length > 0) {
+                data.artist = artist;
+            }
+            if (artist.length > 0) {
+                data.album = album;
+            }
+            if (artist.length > 0) {
+                data.aa = artist_album;
+            }
             if (tags.picture !== undefined) {
                 data.picture = tags.picture;
             }
@@ -393,20 +405,18 @@ var engine = function() {
                 }, timeout);
             };
             var getOpt = function() {
-                var title = player.getTagBody();
+                var tb = getTagBody();
                 var opt = {
                     type: 'basic',
                     iconUrl: '/images/no-cover.png',
-                    title: title.title,
+                    title: tb.title,
                     message: ''
                 };
-                if (title.aa.length !== 0) {
-                    opt.message = title.aa;
+                if (tb.aa !== undefined) {
+                    opt.message = tb.aa;
                 }
-                if (playlist[current_id].tags !== undefined) {
-                    if (playlist[current_id].tags.picture !== undefined) {
-                        opt.iconUrl = engine.getCover(playlist[current_id].tags.picture).data;
-                    }
+                if (tb.picture !== undefined) {
+                    opt.iconUrl = engine.getCover(tb.picture).data;
                 }
                 return opt;
             };
@@ -537,7 +547,7 @@ var engine = function() {
                 });
             };
             var lfm = function() {
-                if (settings.lastfm) {
+                if (settings.lastfm && tb.artist !== undefined && tb.album !== undefined) {
                     lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
                 }
             };
@@ -587,12 +597,7 @@ var engine = function() {
             });
         };
         return {
-            getTagBody: function(id) {
-                if (id === undefined) {
-                    id = current_id;
-                }
-                return getTagBody(id);
-            },
+            getTagBody: getTagBody,
             open: function(id) {
                 id = parseInt(id);
                 var item = playlist[id];
@@ -730,24 +735,11 @@ var engine = function() {
                 status['shuffle'] = shuffle;
                 status['current_id'] = current_id;
                 status['playlist_count'] = playlist.length;
-                if (playlist.length === 0) {
-                    status['title'] = encode_name("3pm-player");
+                var tb = getTagBody(current_id);
+                if (tb.aa !== undefined) {
+                    status['title'] = encode_name(tb.title + ' – ' + tb.aa);
                 } else {
-                    var tags = playlist[current_id].tags;
-                    var title = '';
-                    var album = '';
-                    if (tags !== undefined) {
-                        var title = getTagBody(current_id);
-                        var album = title.aa;
-                        title = title.title;
-                        if (album.length > 0) {
-                            status['title'] = encode_name(title + ' – ' + album);
-                        } else {
-                            status['title'] = encode_name(title);
-                        }
-                    } else {
-                        status['title'] = encode_name(playlist[current_id].file.name);
-                    }
+                    status['title'] = encode_name(tb.title);
                 }
                 if (_debug) {
                     console.log(status);
@@ -1212,14 +1204,12 @@ var engine = function() {
             var pl = sorted_playlist || playlist;
             var list = new Array(pl.length);
             for (var i = 0, item; item = pl[i]; i++) {
-                var title = item.file.name;
-                if (item.file.url !== undefined) {
-                    title = player.getTagBody(item.id);
-                    if (title.aa.length === 0) {
-                        title = title.title;
-                    } else {
-                        title = title.title + ' - ' + title.aa;
-                    }
+                var title;
+                var tb = player.getTagBody(item.id);
+                if (tb.aa === undefined) {
+                    title = tb.title;
+                } else {
+                    title = tb.title + ' - ' + tb.aa;
                 }
                 list[i] = {id: item.id, title: title};
             }
