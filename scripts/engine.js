@@ -1356,9 +1356,7 @@ var engine = function() {
             }
         },
         showMenu: function() {
-            chrome.runtime.getBackgroundPage(function(bg) {
-                engine.window_manager({type: 'dialog', config: {type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: bg.webui.active()}});
-            });
+            engine.window_manager({type: 'dialog', config: {type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: webui.active()}});
         },
         window_manager: function(options) {
             var create_window = function(url, args, oncreate) {

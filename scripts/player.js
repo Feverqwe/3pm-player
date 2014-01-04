@@ -679,15 +679,13 @@ var view = function() {
                 title: _lang.ctx_webui + " (0.0.0.0:9898)",
                 contexts: ['page', 'launcher'],
                 action: function(info) {
-                    chrome.runtime.getBackgroundPage(function(bg) {
-                        var state = bg.webui.active();
-                        if (state === false) {
-                            bg.webui.start();
-                        } else {
-                            bg.webui.stop();
-                        }
-                        chrome.contextMenus.update("ws", {checked: bg.webui.active()});
-                    });
+                    var state = webui.active();
+                    if (state === false) {
+                        webui.start();
+                    } else {
+                        webui.stop();
+                    }
+                    chrome.contextMenus.update("ws", {checked: webui.active()});
                 }
             }, 'viz': {
                 id: "viz",
@@ -831,9 +829,7 @@ var view = function() {
                 }
                 chrome.contextMenus.create(item);
             });
-            chrome.runtime.getBackgroundPage(function(bg) {
-                chrome.contextMenus.update("ws", {checked: bg.webui.active()});
-            });
+            chrome.contextMenus.update("ws", {checked: webui.active()});
         });
     };
     var make_extend_volume = function(extend_volume_scroll) {
@@ -1435,7 +1431,7 @@ var view = function() {
                 if (var_cache.volume_image === -1) {
                     return;
                 }
-                dom_cache.volume.parent().children('.pic').attr('class','pic mute');
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic mute');
                 var_cache.volume_image = -1;
                 return;
             }
@@ -1450,28 +1446,28 @@ var view = function() {
                     return;
                 }
                 var_cache.volume_image = 1;
-                dom_cache.volume.parent().children('.pic').attr('class','pic high');
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic high');
             } else
             if (pos === 0) {
                 if (var_cache.volume_image === 2) {
                     return;
                 }
                 var_cache.volume_image = 2;
-                dom_cache.volume.parent().children('.pic').attr('class','pic zero');
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic zero');
             } else
             if (width_persent < 40) {
                 if (var_cache.volume_image === 3) {
                     return;
                 }
                 var_cache.volume_image = 3;
-                dom_cache.volume.parent().children('.pic').attr('class','pic low');
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic low');
             } else
             if (width_persent < 70) {
                 if (var_cache.volume_image === 4) {
                     return;
                 }
                 var_cache.volume_image = 4;
-                dom_cache.volume.parent().children('.pic').attr('class','pic medium');
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic medium');
             }
         },
         state: function(type) {
