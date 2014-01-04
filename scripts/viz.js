@@ -7,7 +7,7 @@ var viz = function() {
         if (dom_cache.track === undefined) {
             return;
         }
-        dom_cache.track.empty().append($('<span>', {text: value[0]}), $('<br>'), $('<span>', {text: value[1]}));
+        dom_cache.track.empty().append($('<span>', {text: value.title}), $('<br>'), $('<span>', {text: value.aa}));
     };
     var write_language = function() {
         $('.t_btn.full').attr('title', _lang.full);

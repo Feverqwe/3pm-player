@@ -808,7 +808,7 @@ var view = function() {
                 action: function() {
                     var track = engine.getCurrentTrack();
                     if (track !== undefined && track.track_id !== undefined) {
-                        engine.vk.addInLibrarty(track.track_id, track.owner_id);
+                        cloud.vk.addInLibrarty(track.track_id, track.owner_id);
                     }
                 }
             }
@@ -1396,41 +1396,23 @@ var view = function() {
             });
         },
         setTags: function(tags) {
-            if (tags === null) {
-                tags = {};
-            }
-            var title = "";
-            var trackalbum = "";
-            if (tags.title !== undefined && tags.title.length > 0) {
-                title = tags.title;
-            } else {
-                title = engine.get_filename();
-            }
-            if (tags.album !== undefined && tags.artist !== undefined && tags.album.length > 0 && tags.artist.length > 0) {
-                trackalbum = tags.artist + ' - ' + tags.album;
-            } else
-            if (tags.artist !== undefined && tags.artist.length > 0) {
-                trackalbum = tags.artist;
-            } else
-            if (tags.album !== undefined && tags.album.length > 0) {
-                trackalbum = tags.album;
-            }
             if (is_winamp) {
-                if (trackalbum.length > 0) {
-                    trackalbum = ' - ' + trackalbum;
+                var trackalbum = '';
+                if (tags.aa.length > 0) {
+                    trackalbum = ' - ' + tags.aa;
                 }
-                dom_cache.trackname.text(title + trackalbum).parent().attr("title", title + trackalbum);
+                dom_cache.trackname.text(tags.title + trackalbum).parent().attr("title", tags.title + trackalbum);
                 calculate_moveble(dom_cache.trackname, 153, 'name');
             } else {
-                dom_cache.trackname.text(title).parent().attr("title", title);
-                dom_cache.trackalbum.text(trackalbum).parent().attr("title", trackalbum);
+                dom_cache.trackname.text(tags.title).parent().attr("title", tags.title);
+                dom_cache.trackalbum.text(tags.aa).parent().attr("title", tags.aa);
             }
             if (tags.picture !== undefined) {
                 showImage(tags.picture);
             } else {
                 hideImage();
             }
-            setTrueText(title, trackalbum);
+            setTrueText(tags.title, tags.aa);
             //console.log(tags)
         },
         setProgress: function(max, pos) {

@@ -368,11 +368,11 @@ var engine = function() {
         };
         var getTagBody = function(id) {
             if (playlist[id] === undefined) {
-                return ["3pm-player", ""];
+                return {title: '3pm-player', artist: '', album: '', aa: ''};
             }
             var tags = playlist[id].tags;
             if (tags === undefined) {
-                return [playlist[id].file.name, ""];
+                return {title: playlist[id].file.name, artist: '', album: '', aa: ''};
             }
             var title = "";
             var album = "";
@@ -398,7 +398,11 @@ var engine = function() {
             if (album.length > 0) {
                 artist_album = album;
             }
-            return [title, artist_album, {title: title, artist: artist, album: album}];
+            var data = {title: title, artist: artist, album: album, aa: artist_album};
+            if (tags.picture !== undefined) {
+                data.picture = tags.picture;
+            }
+            return data;
         };
         var notification = function() {
             var timeout = 3000;
@@ -415,11 +419,11 @@ var engine = function() {
                 var opt = {
                     type: 'basic',
                     iconUrl: '/images/no-cover.png',
-                    title: title[0],
+                    title: title.title,
                     message: ''
                 };
-                if (title[1].length !== 0) {
-                    opt.message = title[1];
+                if (title.aa.length !== 0) {
+                    opt.message = title.aa;
                 }
                 if (playlist[current_id].tags !== undefined) {
                     if (playlist[current_id].tags.picture !== undefined) {
@@ -546,7 +550,7 @@ var engine = function() {
                 _send('playlist', function(window) {
                     window.playlist.selected(current_id);
                 });
-                if (item.file.url !== undefined) {
+                if ('url' in item.file) {
                     if (!audio_preload(item)) {
                         audio.src = item.file.url;
                     }
@@ -681,8 +685,8 @@ var engine = function() {
                     var album = '';
                     if (tags !== undefined) {
                         var title = getTagBody(current_id);
-                        var album = title[1];
-                        title = title[0];
+                        var album = title.aa;
+                        title = title.title;
                         if (album.length > 0) {
                             status['title'] = encode_name(title + ' – ' + album);
                         } else {
@@ -786,10 +790,11 @@ var engine = function() {
                 adapter.source.connect(adapter.context.destination);
                 adapter.proc_list = {};
                 $(audio).on('loadstart', function(e) {
-                    view.setTags(playlist[current_id].tags || {});
+                    var tb = getTagBody(current_id);
+                    view.setTags(tb);
                     view.state("loadstart");
                     _send('viz', function(window) {
-                        window.viz.audio_state('track', getTagBody(current_id));
+                        window.viz.audio_state('track', tb);
                     });
                 });
                 $(audio).on('progress', function(e) {
@@ -839,12 +844,12 @@ var engine = function() {
                             _send('playlist', function(window) {
                                 window.playlist.updPlaylistItem(id, playlist[id]);
                             });
-                            view.setTags(playlist[id].tags);
+                            view.setTags(tb);
                             _send('viz', function(window) {
                                 window.viz.audio_state('track', tb);
                             });
                             if (settings.lastfm) {
-                                lastfm.updateNowPlaying(tb[2].artist, tb[2].title, tb[2].album, audio.duration);
+                                lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
                             }
                             if (settings.next_track_notification) {
                                 notification.update();
@@ -855,9 +860,9 @@ var engine = function() {
                         _send('viz', function(window) {
                             window.viz.audio_state('track', tb);
                         });
-                        view.setTags(playlist[current_id].tags);
+                        view.setTags(tb);
                         if (settings.lastfm) {
-                            lastfm.updateNowPlaying(tb[2].artist, tb[2].title, tb[2].album, audio.duration);
+                            lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
                         }
                     }
                     view.state("loadeddata");
@@ -1180,10 +1185,10 @@ var engine = function() {
                 var title = item.file.name;
                 if (item.file.url !== undefined) {
                     title = player.getTagBody(item.id);
-                    if (title[1].length === 0) {
-                        title = title[0];
+                    if (title.aa.length === 0) {
+                        title = title.title;
                     } else {
-                        title = title.join(' - ');
+                        title = title.title + ' - ' + title.aa;
                     }
                 }
                 list[i] = {id: item.id, title: title};
@@ -1476,11 +1481,7 @@ var engine = function() {
                     window.contentWindow._send = _send;
                 });
             }
-        },
-        vk: cloud.vk,
-        db: cloud.db,
-        sc: cloud.sc,
-        gd: cloud.gd
+        }
     };
 }();
 engine.run();

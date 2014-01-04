@@ -31,6 +31,7 @@
         var url = 'http://www.last.fm/api/auth/?api_key=' + api_key;
         auth_getToken(type, url, function(tkn) {
             token = tkn;
+            session_key = undefined;
             cb(tkn);
         });
     };
@@ -52,7 +53,7 @@
         chrome.storage.local.remove('lastfm_token');
         token = undefined;
     };
-    function apiCallSignature(params) {
+    var apiCallSignature = function(params) {
         var secret = 'e7599b43e138572644a2c49a629af6b2';
         var keys = new Array();
         var o = '';
@@ -69,53 +70,59 @@
             o = o + keys[i] + params[keys[i]];
         }
         return MD5(o + secret);
-    }
-    function createQueryString(params) {
-        var parts = new Array();
-        for (var x in params) {
-            parts.push(x + '=' + encodeURIComponent(params[x]));
-        }
-        return parts.join('&');
-    }
+    };
     var getSessionKey = function(cb) {
-        getToken(function() {
-            var param = {
-                method: 'auth.getsession',
-                api_key: api_key,
-                token: token,
-                format: 'json'
-            };
-            param.api_sig = apiCallSignature(param);
-            var url = 'http://ws.audioscrobbler.com/2.0/';
-            $.ajax({
-                type: 'GET',
-                url: url,
-                dataType: 'JSON',
-                data: param,
-                statusCode: {
-                    200: function(data) {
-                        if (data.session === undefined || data.session.key === undefined) {
-                            console.log('getSessionKey error!', data);
-                            return;
-                        }
-                        cb(data.session.key);
+        var param = {
+            method: 'auth.getsession',
+            api_key: api_key,
+            token: token,
+            format: 'json'
+        };
+        param.api_sig = apiCallSignature(param);
+        var url = 'http://ws.audioscrobbler.com/2.0/';
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'JSON',
+            data: param,
+            statusCode: {
+                200: function(data) {
+                    if (data.error === 4 || data.error === 15 || data.error === 14) {
+                        clear_data();
+                        return;
                     }
-                },
-                error: function() {
-                    clear_data();
+                    if (data.error === 9) {
+                        session_key = undefined;
+                        return;
+                    }
+                    if (data.error !== undefined) {
+                        return;
+                    }
+                    if (data.session === undefined || data.session.key === undefined) {
+                        console.log('getSessionKey error!', data);
+                        return;
+                    }
+                    cb(data.session.key);
                 }
-            });
+            },
+            error: function() {
+                clear_data();
+            }
         });
     };
-    var createQueryString = function(params) {
-        var parts = new Array();
-        for (var x in params)
-            parts.push(x + '=' + encodeURIComponent(params[x]));
-        return parts.join('&');
+    var getSession = function(cb) {
+        if (session_key !== undefined) {
+            cb(session_key);
+            return;
+        }
+        getSessionKey(function(sk) {
+            session_key = sk;
+            cb(sk);
+        });
     };
     var updateNowPlaying = function(artist, track, album, duration) {
         var data = {
-            method: 'track.updatenowplaying',
+            method: 'track.updateNowPlaying',
             artist: artist || '',
             track: track || '',
             api_key: api_key,
@@ -132,11 +139,22 @@
         var api_sig = apiCallSignature(data);
         $.ajax({
             type: "POST",
-            url: 'http://ws.audioscrobbler.com/2.0/?' + createQueryString(data) + '&api_sig=' + api_sig,
+            url: 'http://ws.audioscrobbler.com/2.0/?' + $.param(data) + '&api_sig=' + api_sig,
             dataType: 'JSON',
             data: data,
             statusCode: {
                 200: function(data) {
+                    if (data.error === 9) {
+                        session_key = undefined;
+                        return;
+                    }
+                    if (data.error === 4) {
+                        clear_data();
+                        return;
+                    }
+                    if (data.error !== undefined) {
+                        return;
+                    }
                     var start_timer = function() {
                         scrobler_timer = setTimeout(function() {
                             var audio = engine.getAudio();
@@ -159,16 +177,6 @@
             }
         });
     };
-    var getSession = function(cb) {
-        if (session_key !== undefined) {
-            cb(session_key);
-            return;
-        }
-        getSessionKey(function(sk) {
-            session_key = sk;
-            cb(sk);
-        });
-    };
     var trackScrobble = function(artist, track, album, duration) {
         var data = {
             method: 'track.scrobble',
@@ -182,18 +190,29 @@
         if (album !== undefined) {
             data.album = album;
         }
-        if (duration !== undefined && duration !== Infinity) {
+        duration = parseInt(duration);
+        if (!isNaN(duration)) {
             data.duration = duration;
         }
         var api_sig = apiCallSignature(data);
         $.ajax({
             type: "POST",
-            url: 'http://ws.audioscrobbler.com/2.0/?' + createQueryString(data) + '&api_sig=' + api_sig,
+            url: 'http://ws.audioscrobbler.com/2.0/?' + $.param(data) + '&api_sig=' + api_sig,
             dataType: 'JSON',
             data: data,
             statusCode: {
                 200: function(data) {
-                    console.log(data);
+                    if (data.error === 9) {
+                        session_key = undefined;
+                        return;
+                    }
+                    if (data.error === 4) {
+                        clear_data();
+                        return;
+                    }
+                    if (data.error !== undefined) {
+                        return;
+                    }
                 }
             }
         });
