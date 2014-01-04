@@ -593,14 +593,12 @@ var engine = function() {
             }
             var tags = playlist[id].tags;
             if (tags === undefined
-                    || playlist[id].lastfm !== undefined
                     || tags.picture !== undefined
                     || tags.artist === undefined
                     || tags.title === undefined) {
                 return;
             }
-            playlist[id].lastfm = {check: 1};
-            lastfm.getCover(playlist[id], function(blob) {
+            lastfm.getCover(tags.artist, tags.title, function(blob) {
                 read_image([blob, ''], function(i_id) {
                     if (i_id === undefined) {
                         delete tags.picture;
@@ -610,7 +608,6 @@ var engine = function() {
                     tags_loaded(tags, id, 3);
                 });
             });
-            return true;
         };
         return {
             getTagBody: function(id) {

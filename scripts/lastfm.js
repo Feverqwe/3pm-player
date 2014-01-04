@@ -6,6 +6,7 @@
     var api_key = '8c51ae859dd656bf61e56fc1fc5f5439';
     var track_start_time = undefined;
     var scrobler_timer = undefined;
+    var track_cache = {};
     var auth_getToken = function(type, url, cb) {
         chrome.identity.launchWebAuthFlow({url: url, interactive: true},
         function(responseURL) {
@@ -243,23 +244,30 @@
         };
         xhr.send(null);
     };
-    lastfm.getCover = function(track, cb) {
-        if (track.lastfm.url !== undefined) {
-            getImage(track.lastfm.url, cb);
+    lastfm.getCover = function(artist, title, cb) {
+        var data = {
+            method: 'track.getInfo',
+            artist: artist || '',
+            track: title || '',
+            api_key: api_key,
+            format: 'json',
+            autocorrect: 0
+        };
+        var cn = MD5(data.artist + data.track);
+        if (track_cache[cn] === undefined) {
+            track_cache[cn] = {};
+        }
+        if (track_cache[cn].url !== undefined) {
+            getImage(track_cache[cn].url, cb);
+            return;
+        }
+        if (track_cache[cn].check) {
             return;
         }
         if (suspand) {
             cb();
             return;
         }
-        var data = {
-            method: 'track.getInfo',
-            artist: track.tags.artist || '',
-            track: track.tags.title || '',
-            api_key: api_key,
-            format: 'json',
-            autocorrect: 0
-        };
         if (data.artist.length === 0) {
             return;
         }
@@ -285,6 +293,7 @@
                     if (data.error !== undefined) {
                         return;
                     }
+                    track_cache[cn].check = 1;
                     if (data.track === undefined
                             || data.track.album === undefined
                             || data.track.album.image === undefined
@@ -292,8 +301,9 @@
                         return;
                     }
                     var item = data.track.album.image.slice(-1)[0];
-                    track.lastfm.url = item['#text'];
-                    getImage(item['#text'], cb);
+                    var url = item['#text'];
+                    track_cache[cn].url = url;
+                    getImage(url, cb);
                 }
             }
         });
