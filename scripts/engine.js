@@ -14,7 +14,8 @@ var engine = function() {
         preload_gd: 1,
         preload_box: 1,
         preload_sd: 0,
-        lastfm: 0
+        lastfm: 0,
+        lastfm_cover: 1
     };
     var loadSettings = function(obj) {
         $.each(settings, function(k) {
@@ -533,6 +534,82 @@ var engine = function() {
             }
             return false;
         };
+        var tags_loaded = function(tags, id, state) {
+            // 1 - playlist only
+            // 2 - viz, pl, lfm, notifi
+            // 3 - covers
+            var tb;
+            playlist[id].tags = tags;
+            playlist[id].state = "dune";
+            var plist = function() {
+                _send('playlist', function(window) {
+                    window.playlist.updPlaylistItem(id, playlist[id]);
+                });
+            };
+            var player = function() {
+                view.setTags(tb);
+            };
+            var notifi = function() {
+                if (settings.next_track_notification) {
+                    notification.update();
+                }
+            };
+            var viz = function() {
+                _send('viz', function(window) {
+                    window.viz.audio_state('track', tb);
+                });
+            };
+            var lfm = function() {
+                if (settings.lastfm) {
+                    lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
+                }
+            };
+            if (state === 1) {
+                plist();
+                return;
+            }
+            tb = getTagBody(id);
+            if (state === 2) {
+                player();
+                lfm();
+                viz();
+                return;
+            }
+            if (state === 3) {
+                plist();
+                player();
+                notifi();
+                return;
+            }
+            player();
+            plist();
+            notifi();
+            viz();
+            lfm();
+        };
+        var lastfm_tag_reader = function(tags, id) {
+            if (!settings.lastfm_cover) {
+                return;
+            }
+            if (playlist[id].lastfm_image === 1
+                    || tags.picture !== undefined
+                    || tags.artist === undefined
+                    || tags.title === undefined) {
+                return;
+            }
+            playlist[id].lastfm_image = 1;
+            lastfm.getCover(tags.artist, tags.title, function(blob) {
+                read_image([blob, ''], function(i_id) {
+                    if (i_id === undefined) {
+                        delete tags.picture;
+                    } else {
+                        tags.picture = i_id;
+                    }
+                    tags_loaded(tags, id, 3);
+                });
+            });
+            return true;
+        };
         return {
             getTagBody: function(id) {
                 if (id === undefined) {
@@ -836,34 +913,15 @@ var engine = function() {
                     if (settings.next_track_notification) {
                         notification.show();
                     }
-                    if (playlist[current_id].tags === undefined) {
+                    var tags = playlist[current_id].tags;
+                    if (tags === undefined) {
                         read_tags(current_id, function(tags, id) {
-                            playlist[id].tags = tags;
-                            playlist[id].state = "dune";
-                            var tb = getTagBody(current_id);
-                            _send('playlist', function(window) {
-                                window.playlist.updPlaylistItem(id, playlist[id]);
-                            });
-                            view.setTags(tb);
-                            _send('viz', function(window) {
-                                window.viz.audio_state('track', tb);
-                            });
-                            if (settings.lastfm) {
-                                lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
-                            }
-                            if (settings.next_track_notification) {
-                                notification.update();
-                            }
+                            tags_loaded(tags, id);
+                            lastfm_tag_reader(tags, id);
                         });
                     } else {
-                        var tb = getTagBody(current_id);
-                        _send('viz', function(window) {
-                            window.viz.audio_state('track', tb);
-                        });
-                        view.setTags(tb);
-                        if (settings.lastfm) {
-                            lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
-                        }
+                        tags_loaded(tags, current_id, 2);
+                        lastfm_tag_reader(tags, current_id);
                     }
                     view.state("loadeddata");
                 });
@@ -947,11 +1005,7 @@ var engine = function() {
                 var read_item = function(item) {
                     next_item();
                     read_tags(item.id, function(tags, id) {
-                        playlist[id].tags = tags;
-                        playlist[id].state = "dune";
-                        _send('playlist', function(window) {
-                            window.playlist.updPlaylistItem(id, playlist[id]);
-                        });
+                        tags_loaded(tags, id, 1);
                         thread--;
                         next_item();
                     });

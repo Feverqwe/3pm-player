@@ -1,5 +1,6 @@
 (function(ns) {
     var lastfm = ns.lastfm = {};
+    var suspand = false;
     var token = undefined;
     var session_key = undefined;
     var api_key = '8c51ae859dd656bf61e56fc1fc5f5439';
@@ -52,6 +53,7 @@
     var clear_data = function() {
         chrome.storage.local.remove('lastfm_token');
         token = undefined;
+        session_key = undefined;
     };
     var apiCallSignature = function(params) {
         var secret = 'e7599b43e138572644a2c49a629af6b2';
@@ -89,11 +91,12 @@
                 200: function(data) {
                     if (data.error === 4 || data.error === 15 || data.error === 14) {
                         clear_data();
-                        return;
                     }
                     if (data.error === 9) {
                         session_key = undefined;
-                        return;
+                    }
+                    if (data.error === 26) {
+                        suspand = true;
                     }
                     if (data.error !== undefined) {
                         return;
@@ -152,11 +155,12 @@
                 200: function(data) {
                     if (data.error === 9) {
                         session_key = undefined;
-                        return;
                     }
                     if (data.error === 4) {
                         clear_data();
-                        return;
+                    }
+                    if (data.error === 26) {
+                        suspand = true;
                     }
                     if (data.error !== undefined) {
                         return;
@@ -216,11 +220,12 @@
                 200: function(data) {
                     if (data.error === 9) {
                         session_key = undefined;
-                        return;
                     }
                     if (data.error === 4) {
                         clear_data();
-                        return;
+                    }
+                    if (data.error === 26) {
+                        suspand = true;
                     }
                     if (data.error !== undefined) {
                         return;
@@ -229,7 +234,67 @@
             }
         });
     };
+    lastfm.getCover = function(artist, track, cb) {
+        if (suspand) {
+            cb();
+            return;
+        }
+        var data = {
+            method: 'track.getInfo',
+            artist: artist || '',
+            track: track || '',
+            api_key: api_key,
+            format: 'json',
+            autocorrect: 0
+        };
+        if (data.artist.length === 0) {
+            return;
+        }
+        if (data.track.length === 0) {
+            return;
+        }
+        $.ajax({
+            type: "GET",
+            url: 'http://ws.audioscrobbler.com/2.0/?' + $.param(data),
+            dataType: 'JSON',
+            data: data,
+            statusCode: {
+                200: function(data) {
+                    if (data.error === 9) {
+                        session_key = undefined;
+                    }
+                    if (data.error === 4) {
+                        clear_data();
+                    }
+                    if (data.error === 26) {
+                        suspand = true;
+                    }
+                    if (data.error !== undefined) {
+                        return;
+                    }
+                    if (data.track === undefined
+                            || data.track.album === undefined
+                            || data.track.album.image === undefined
+                            || data.track.album.image.length === 0) {
+                        return;
+                    }
+                    var item = data.track.album.image.slice(-1)[0];
+                    var url = item['#text'];
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", url, true);
+                    xhr.responseType = "blob";
+                    xhr.onload = function() {
+                        cb(xhr.response);
+                    };
+                    xhr.send(null);
+                }
+            }
+        });
+    };
     lastfm.updateNowPlaying = function(a, b, c, d) {
+        if (suspand) {
+            return;
+        }
         clearTimeout(scrobler_timer);
         track_start_time = parseInt(new Date().getTime() / 1000);
         getToken(function() {
@@ -239,6 +304,9 @@
         });
     };
     lastfm.trackScrobble = function(a, b, c, d) {
+        if (suspand) {
+            return;
+        }
         getToken(function() {
             getSession(function() {
                 trackScrobble(a, b, c, d);
