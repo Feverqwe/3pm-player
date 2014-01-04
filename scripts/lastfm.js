@@ -172,7 +172,7 @@
                             if (isNaN(pos)) {
                                 return;
                             }
-                            if (pos > 30) {
+                            if (pos > 30 && (pos > audio.duration / 2 || pos > 60 * 3)) {
                                 lastfm.trackScrobble(artist, track, album, duration);
                             } else {
                                 start_timer();
@@ -234,15 +234,28 @@
             }
         });
     };
-    lastfm.getCover = function(artist, track, cb) {
+    var getImage = function(url, cb) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.responseType = "blob";
+        xhr.onload = function() {
+            cb(xhr.response);
+        };
+        xhr.send(null);
+    };
+    lastfm.getCover = function(track, cb) {
+        if (track.lastfm.url !== undefined) {
+            getImage(track.lastfm.url, cb);
+            return;
+        }
         if (suspand) {
             cb();
             return;
         }
         var data = {
             method: 'track.getInfo',
-            artist: artist || '',
-            track: track || '',
+            artist: track.tags.artist || '',
+            track: track.tags.title || '',
             api_key: api_key,
             format: 'json',
             autocorrect: 0
@@ -279,14 +292,8 @@
                         return;
                     }
                     var item = data.track.album.image.slice(-1)[0];
-                    var url = item['#text'];
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("GET", url, true);
-                    xhr.responseType = "blob";
-                    xhr.onload = function() {
-                        cb(xhr.response);
-                    };
-                    xhr.send(null);
+                    track.lastfm.url = item['#text'];
+                    getImage(item['#text'], cb);
                 }
             }
         });

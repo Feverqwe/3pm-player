@@ -587,18 +587,20 @@ var engine = function() {
             viz();
             lfm();
         };
-        var lastfm_tag_reader = function(tags, id) {
+        var lastfm_tag_reader = function(id) {
             if (!settings.lastfm_cover || settings.is_winamp) {
                 return;
             }
-            if (playlist[id].lastfm_image === 1
+            var tags = playlist[id].tags;
+            if (tags === undefined
+                    || playlist[id].lastfm !== undefined
                     || tags.picture !== undefined
                     || tags.artist === undefined
                     || tags.title === undefined) {
                 return;
             }
-            playlist[id].lastfm_image = 1;
-            lastfm.getCover(tags.artist, tags.title, function(blob) {
+            playlist[id].lastfm = {check: 1};
+            lastfm.getCover(playlist[id], function(blob) {
                 read_image([blob, ''], function(i_id) {
                     if (i_id === undefined) {
                         delete tags.picture;
@@ -917,11 +919,11 @@ var engine = function() {
                     if (tags === undefined) {
                         read_tags(current_id, function(tags, id) {
                             tags_loaded(tags, id);
-                            lastfm_tag_reader(tags, id);
+                            lastfm_tag_reader(id);
                         });
                     } else {
                         tags_loaded(tags, current_id, 2);
-                        lastfm_tag_reader(tags, current_id);
+                        lastfm_tag_reader(current_id);
                     }
                     view.state("loadeddata");
                 });
