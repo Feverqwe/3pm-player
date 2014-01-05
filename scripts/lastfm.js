@@ -235,13 +235,12 @@
             }
         });
     };
-    var getImage = function(cn, cb) {
-        var url = track_cache[cn].url;
+    var getImage = function(url, cb) {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
         xhr.responseType = "blob";
         xhr.onload = function() {
-            cb(xhr.response, track_cache[cn].info);
+            cb(xhr.response);
         };
         xhr.send(null);
     };
@@ -254,12 +253,12 @@
             format: 'json',
             autocorrect: 0
         };
-        var cn = data.artist + data.track;
+        var cn = MD5(data.artist + data.track);
         if (track_cache[cn] === undefined) {
             track_cache[cn] = {};
         }
         if (track_cache[cn].url !== undefined) {
-            getImage(cn, cb);
+            getImage(track_cache[cn].url, cb);
             return;
         }
         if (track_cache[cn].check) {
@@ -283,7 +282,6 @@
             statusCode: {
                 200: function(data) {
                     track_cache[cn].check = 1;
-                    track_cache[cn].info = {};
                     if (data.error === 9) {
                         session_key = undefined;
                     }
@@ -296,34 +294,16 @@
                     if (data.error !== undefined) {
                         return;
                     }
-                    if (data.track === undefined) {
-                        return;
-                    }
-                    if (data.track.name !== undefined
-                            && data.track.name.length > 0) {
-                        track_cache[cn].info.title = data.track.name;
-                    }
-                    if (data.track.artist !== undefined
-                            && data.track.artist.name !== undefined
-                            && data.track.artist.name.length > 0) {
-                        track_cache[cn].info.artist = data.track.artist.name;
-                    }
-                    if (data.track.album !== undefined
-                            && data.track.album.title !== undefined
-                            && data.track.album.title.length > 0) {
-                        track_cache[cn].info.album = data.track.album.title;
-                    }
-                    if (data.track.album === undefined
+                    if (data.track === undefined
+                            || data.track.album === undefined
                             || data.track.album.image === undefined
                             || data.track.album.image.length === 0) {
                         return;
-                    } else {
-                        cb(undefined, track_cache[cn].info);
                     }
                     var item = data.track.album.image.slice(-1)[0];
                     var url = item['#text'];
                     track_cache[cn].url = url;
-                    getImage(cn, cb);
+                    getImage(url, cb);
                 }
             }
         });
