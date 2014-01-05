@@ -7,9 +7,16 @@
     var track_start_time = undefined;
     var scrobler_timer = undefined;
     var track_cache = {};
+    var dialog_count = 0;
     var auth_getToken = function(type, url, cb) {
+        if (dialog_count > 0) {
+            console.log("Auth","More one opened dialod!", dialog_count);
+            return;
+        }
+        dialog_count++;
         chrome.identity.launchWebAuthFlow({url: url, interactive: true},
         function(responseURL) {
+            dialog_count--;
             if (responseURL === undefined) {
                 console.log("Auth", type, "URL not found!");
                 return;
