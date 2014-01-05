@@ -1326,11 +1326,11 @@ var engine = function() {
             });
         },
         select_playlist: function(id) {
-            cloud.abort();
             var filePlaylists = engine.getM3UPlaylists();
             if (filePlaylists === undefined) {
                 return;
             }
+            cloud.abort();
             var list = {name: undefined};
             filePlaylists.list.forEach(function(item) {
                 if (item.id === id) {
