@@ -586,7 +586,11 @@ var engine = function() {
                 return;
             }
             lastfm.getCover(tags.artist, tags.title, function(blob) {
-                read_image([blob, ''], function(i_id) {
+                var binary;
+                if (blob !== undefined) {
+                    binary = [blob, ''];
+                }
+                read_image(binary, function(i_id) {
                     if (i_id === undefined) {
                         delete tags.picture;
                     } else {
