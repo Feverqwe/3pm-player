@@ -685,7 +685,9 @@ var view = function() {
                     } else {
                         webui.stop();
                     }
-                    chrome.contextMenus.update("ws", {checked: webui.active()});
+                    setTimeout(function() {
+                        chrome.contextMenus.update("ws", {checked: webui.active()});
+                    }, 500);
                 }
             }, 'viz': {
                 id: "viz",
