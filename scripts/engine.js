@@ -778,7 +778,12 @@ var engine = function() {
                     save_volume(audio.volume);
                     return;
                 }
-                audio.volume = 1.0 / 100 * persent;
+                var val = 1.0 / 100 * persent;
+                if (audio.volume === val) {
+                    view.setVolume(audio.volume);
+                } else {
+                    audio.volume = val;
+                }
                 save_volume(audio.volume);
             },
             position: function(persent) {
