@@ -13,7 +13,8 @@ var options = function() {
         preload_gd: {"v": 0, "t": "checkbox"},
         preload_box: {"v": 1, "t": "checkbox"},
         preload_sd: {"v": 0, "t": "checkbox"},
-        lastfm: {"v": 0, "t": "checkbox"}
+        lastfm: {"v": 0, "t": "checkbox"},
+        lastfm_cover: {v: 1, t: 'checkbox'}
     };
     var loadSettings = function(cb) {
         var opt_list = [];
