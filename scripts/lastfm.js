@@ -10,7 +10,7 @@
     var dialog_count = 0;
     var auth_getToken = function(type, url, cb) {
         if (dialog_count > 0) {
-            console.log("Auth","More one opened dialod!", dialog_count);
+            console.log("Auth", "More one opened dialod!", dialog_count);
             return;
         }
         dialog_count++;
@@ -41,6 +41,7 @@
         auth_getToken(type, url, function(tkn) {
             token = tkn;
             session_key = undefined;
+            chrome.storage.local.remove('lastfm_session_key');
             cb(tkn);
         });
     };
@@ -59,7 +60,7 @@
         });
     };
     var clear_data = function() {
-        chrome.storage.local.remove('lastfm_token');
+        chrome.storage.local.remove(['lastfm_token', 'lastfm_session_key']);
         token = undefined;
         session_key = undefined;
     };
@@ -98,15 +99,20 @@
             statusCode: {
                 200: function(data) {
                     if (data.error === 4 || data.error === 15 || data.error === 14) {
+                        console.log('getSessionKey', 'data.error 4 / 15 / 14', data);
                         clear_data();
                     }
                     if (data.error === 9) {
+                        console.log('getSessionKey', 'data.error 9', data);
                         session_key = undefined;
+                        chrome.storage.local.remove('lastfm_session_key');
                     }
                     if (data.error === 26) {
+                        console.log('getSessionKey', 'data.error 26', data);
                         suspand = true;
                     }
                     if (data.error !== undefined) {
+                        console.log('getSessionKey', 'data.error!', data);
                         return;
                     }
                     if (data.session === undefined || data.session.key === undefined) {
@@ -126,9 +132,16 @@
             cb(session_key);
             return;
         }
-        getSessionKey(function(sk) {
-            session_key = sk;
-            cb(sk);
+        chrome.storage.local.get('lastfm_session_key', function(obj) {
+            if (obj.lastfm_session_key !== undefined) {
+                session_key = obj.lastfm_session_key;
+                cb(session_key);
+            } else {
+                getSessionKey(function(sk) {
+                    chrome.storage.local.set({lastfm_session_key: sk});
+                    cb(sk);
+                });
+            }
         });
     };
     var updateNowPlaying = function(artist, track, album, duration) {
@@ -162,15 +175,20 @@
             statusCode: {
                 200: function(data) {
                     if (data.error === 9) {
+                        console.log('updateNowPlaying', 'data.error 9', data);
                         session_key = undefined;
+                        chrome.storage.local.remove('lastfm_session_key');
                     }
                     if (data.error === 4) {
+                        console.log('updateNowPlaying', 'data.error 4', data);
                         clear_data();
                     }
                     if (data.error === 26) {
+                        console.log('updateNowPlaying', 'data.error 26', data);
                         suspand = true;
                     }
                     if (data.error !== undefined) {
+                        console.log('updateNowPlaying', 'data.error!', data);
                         return;
                     }
                     var start_timer = function() {
@@ -227,15 +245,20 @@
             statusCode: {
                 200: function(data) {
                     if (data.error === 9) {
+                        console.log('trackScrobble', 'data.error 9', data);
                         session_key = undefined;
+                        chrome.storage.local.remove('lastfm_session_key');
                     }
                     if (data.error === 4) {
+                        console.log('trackScrobble', 'data.error 4', data);
                         clear_data();
                     }
                     if (data.error === 26) {
+                        console.log('trackScrobble', 'data.error 26', data);
                         suspand = true;
                     }
                     if (data.error !== undefined) {
+                        console.log('trackScrobble', 'data.error', data);
                         return;
                     }
                 }
@@ -290,15 +313,20 @@
                 200: function(data) {
                     track_cache[cn].check = 1;
                     if (data.error === 9) {
+                        console.log('getCover', 'data.error 9', data);
                         session_key = undefined;
+                        chrome.storage.local.remove('lastfm_session_key');
                     }
                     if (data.error === 4) {
+                        console.log('getCover', 'data.error 4', data);
                         clear_data();
                     }
                     if (data.error === 26) {
+                        console.log('getCover', 'data.error 26', data);
                         suspand = true;
                     }
                     if (data.error !== undefined) {
+                        console.log('getCover', 'data.error!', data);
                         return;
                     }
                     if (data.track === undefined
