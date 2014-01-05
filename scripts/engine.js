@@ -15,7 +15,8 @@ var engine = function() {
         preload_box: 1,
         preload_sd: 0,
         lastfm: 0,
-        lastfm_cover: 1
+        lastfm_cover: 1,
+        lastfm_tag_rewrite: 0
     };
     var loadSettings = function(obj) {
         $.each(settings, function(k) {
@@ -585,14 +586,31 @@ var engine = function() {
                     || tags.title === undefined) {
                 return;
             }
-            lastfm.getCover(tags.artist, tags.title, function(blob) {
-                read_image([blob, ''], function(i_id) {
+            lastfm.getCover(tags.artist, tags.title, function(blob, info) {
+                var binary;
+                if (blob !== undefined) {
+                    binary = [blob, ''];
+                }
+                read_image(binary, function(i_id) {
                     if (i_id === undefined) {
                         delete tags.picture;
                     } else {
                         tags.picture = i_id;
                     }
-                    tags_loaded(tags, id, 3);
+                    if (settings.lastfm_tag_rewrite && info !== undefined) {
+                        if (info.artist !== undefined) {
+                            tags.artist = info.artist;
+                        }
+                        if (info.album !== undefined) {
+                            tags.album = info.album;
+                        }
+                        if (info.title !== undefined) {
+                            tags.title = info.title;
+                        }
+                        tags_loaded(tags, id);
+                    } else {
+                        tags_loaded(tags, id, 3);
+                    }
                 });
             });
         };
