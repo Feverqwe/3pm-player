@@ -2,7 +2,7 @@ var webui = function() {
     var active = false;
     var not_found = [];
     var cache = {};
-    var server_socketId = null;
+    var server_socketId;
     var timeout = null;
     var empty_timer = function() {
         clearTimeout(timeout);
@@ -148,7 +148,6 @@ var webui = function() {
             chrome.socket.write(socketId, header_ab, function(writeInfo) {
                 if (writeInfo.bytesWritten === header_ab_len) {
                     if (isKeepAlive) {
-                        empty_timer();
                         readRequestFromSocket_(socketId);
                     } else {
                         chrome.socket.disconnect(socketId);
@@ -177,7 +176,6 @@ var webui = function() {
         chrome.socket.write(socketId, packege_ab, function(writeInfo) {
             if (writeInfo.bytesWritten === packege_ab_len) {
                 if (isKeepAlive) {
-                    empty_timer();
                     readRequestFromSocket_(socketId);
                 } else {
                     chrome.socket.disconnect(socketId);
@@ -187,11 +185,12 @@ var webui = function() {
         });
     };
     var readRequestFromSocket_ = function(socketId) {
+        empty_timer();
         var requestData = '';
         var endIndex = 0;
         var onDataRead = function(readInfo) {
             empty_timer();
-            if (readInfo.resultCode <= 0) {
+            if (readInfo.resultCode === 0) {
                 chrome.socket.disconnect(socketId);
                 chrome.socket.destroy(socketId);
                 empty_timer();
@@ -204,10 +203,8 @@ var webui = function() {
                 chrome.socket.read(socketId, onDataRead);
                 return;
             }
-
             var headers = requestData.substring(0, endIndex).split('\n');
             var headerMap = {};
-            // headers[0] should be the Request-Line
             var requestLine = headers[0].split(' ');
             headerMap['method'] = requestLine[0];
             headerMap['url'] = requestLine[1];
@@ -233,24 +230,32 @@ var webui = function() {
             acceptConnection_(socketId);
         });
     };
+    var stop = function() {
+        active = false;
+        chrome.socket.disconnect(server_socketId);
+        chrome.socket.destroy(server_socketId);
+        server_socketId = undefined;
+    };
     var start = function() {
-        active = true;
-        chrome.socket.create("tcp", {}, function(createInfo) {
+        if (server_socketId !== undefined) {
+            stop();
+        }
+        chrome.socket.create("tcp", function(createInfo) {
+            active = true;
             server_socketId = createInfo.socketId;
-            chrome.socket.listen(createInfo.socketId, '0.0.0.0', 9898, 1, function(e) {
-                acceptConnection_(server_socketId);
-            });
+            try {
+                chrome.socket.listen(createInfo.socketId, '0.0.0.0', 9898, function(e) {
+                    acceptConnection_(server_socketId);
+                });
+            } catch (e) {
+                stop();
+            }
         });
     };
     var Info = function() {
         chrome.socket.getInfo(server_socketId, function(e) {
             console.log(e);
         });
-    };
-    var stop = function() {
-        active = false;
-        chrome.socket.disconnect(server_socketId);
-        chrome.socket.destroy(server_socketId);
     };
     return {
         start: start,
