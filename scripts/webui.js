@@ -148,6 +148,7 @@ var webui = function() {
             chrome.socket.write(socketId, header_ab, function(writeInfo) {
                 if (writeInfo.bytesWritten === header_ab_len) {
                     if (isKeepAlive) {
+                        empty_timer();
                         readRequestFromSocket_(socketId);
                     } else {
                         chrome.socket.disconnect(socketId);
@@ -176,6 +177,7 @@ var webui = function() {
         chrome.socket.write(socketId, packege_ab, function(writeInfo) {
             if (writeInfo.bytesWritten === packege_ab_len) {
                 if (isKeepAlive) {
+                    empty_timer();
                     readRequestFromSocket_(socketId);
                 } else {
                     chrome.socket.disconnect(socketId);
@@ -185,7 +187,6 @@ var webui = function() {
         });
     };
     var readRequestFromSocket_ = function(socketId) {
-        empty_timer();
         var requestData = '';
         var endIndex = 0;
         var onDataRead = function(readInfo) {
