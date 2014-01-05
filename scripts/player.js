@@ -1536,7 +1536,7 @@ var view = function() {
         },
         updateSettings: function() {
             make_extend_volume(_settings.extend_volume_scroll);
-            writeWinampFFT(_settings.visual_type);
+            writeWinampFFT();
             if (_lang.t !== window._language) {
                 window._language = _lang.t;
                 write_language();
