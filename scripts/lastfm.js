@@ -253,7 +253,7 @@
             format: 'json',
             autocorrect: 0
         };
-        var cn = MD5(data.artist + data.track);
+        var cn = data.artist + data.track;
         if (track_cache[cn] === undefined) {
             track_cache[cn] = {};
         }
