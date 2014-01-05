@@ -46,12 +46,12 @@ var webui = function() {
         }
         var is_xhr = false;
         if (not_found.indexOf(headerMap.url) >= 0) {
-            return response_(socketId, headerMap, stringToArrayBuffer(''), ['404 Not Found']);
+            return response_(socketId, headerMap, '', ['404 Not Found']);
         } else
         if (cache[headerMap.url] !== undefined) {
             var data = cache[headerMap.url].data;
             if (headerMap["If-None-Match"] === String(data.byteLength)) {
-                return response_(socketId, headerMap, stringToArrayBuffer(''), ["304 Not Modified"]);
+                return response_(socketId, headerMap, '', ["304 Not Modified"]);
             } else {
                 var head = JSON.parse(JSON.stringify(cache[headerMap.url].head));
                 return response_(socketId, headerMap, data, head);
@@ -60,45 +60,45 @@ var webui = function() {
         if (headerMap.url.substr(0, 4) === '/pl/') {
             var id = headerMap.url.substr(4);
             engine.open_id(id);
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url === '/playlist') {
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIplaylist()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: : text/html']);
+            return response_(socketId, headerMap, engine.APIplaylist(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: : text/html']);
         } else
         if (headerMap.url === '/status') {
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url === '/play') {
             engine.play();
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url === '/pause') {
             engine.pause();
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url === '/next') {
             engine.next();
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url === '/preview') {
             engine.preview();
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url.substr(0, 11) === '/volume_up/') {
             engine.volume(headerMap.url.substr(11));
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url.substr(0, 13) === '/volume_down/') {
             engine.volume(headerMap.url.substr(13));
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url === '/shuffle') {
             engine.shuffle();
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url === '/loop') {
             engine.loop();
-            return response_(socketId, headerMap, stringToArrayBuffer(engine.APIstatus()), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else {
             is_xhr = true;
             var ext = headerMap.url.substr(headerMap.url.lastIndexOf('.') + 1).toLowerCase();
@@ -112,66 +112,77 @@ var webui = function() {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', '/www' + headerMap.url, true);
             xhr.responseType = 'arraybuffer';
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var resp = this.response;
-                    var header = ["200 Ok"];
-                    if (ext.length > 0) {
-                        header.push(ext);
-                    }
-                    header.push("Cache-control: max-age=172800");
-                    header.push("ETag: " + resp.byteLength);
-                    cache[headerMap.url] = {data: resp, head: JSON.parse(JSON.stringify(header))};
-                    if (headerMap["If-None-Match"] === String(resp.byteLength)) {
-                        response_(socketId, headerMap, stringToArrayBuffer(''), ["304 Not Modified"]);
-                    } else {
-                        response_(socketId, headerMap, resp, header);
-                    }
+            xhr.onload = function() {
+                var resp = this.response;
+                var header = ["200 Ok"];
+                if (ext.length > 0) {
+                    header.push(ext);
+                }
+                header.push("Cache-control: max-age=172800");
+                header.push("ETag: " + resp.byteLength);
+                cache[headerMap.url] = {data: resp, head: JSON.parse(JSON.stringify(header))};
+                if (headerMap["If-None-Match"] === String(resp.byteLength)) {
+                    response_(socketId, headerMap, '', ["304 Not Modified"]);
+                } else {
+                    response_(socketId, headerMap, resp, header);
                 }
             };
             xhr.onerror = function() {
-                if (xhr.readyState === 4 && xhr.status !== 200) {
-                    not_found.push(headerMap.url);
-                    response_(socketId, headerMap, stringToArrayBuffer(''), ['404 Not Found']);
-                }
+                not_found.push(headerMap.url);
+                response_(socketId, headerMap, '', ['404 Not Found']);
             };
             xhr.timeout = 100;
             xhr.send(null);
         }
         if (is_xhr === false) {
-            response_(socketId, headerMap, stringToArrayBuffer('Do it more!'), ['200 OK']);
+            response_(socketId, headerMap, 'Do it more!', ['200 OK']);
         }
     };
     var response_ = function(socketId, headerMap, content, headers) {
+        var isKeepAlive = (headerMap['Connection'] === 'keep-alive');
         if (headers[0].substr(0, 3) === "304") {
             var head = "HTTP/1.1 " + headers.join('\n');
-            var header = stringToArrayBuffer(head + '\n\n');
-            chrome.socket.write(socketId, header, function(writeInfo) {
-                var keepAlive = headerMap['Connection'] === 'keep-alive';
-                if (keepAlive) {
-                    empty_timer();
-                    readRequestFromSocket_(socketId);
-                } else {
-                    chrome.socket.destroy(socketId);
+            var header = head + '\n\n';
+            var header_ab = stringToArrayBuffer(header);
+            var header_ab_len = header_ab.byteLength;
+            chrome.socket.write(socketId, header_ab, function(writeInfo) {
+                if (writeInfo.bytesWritten === header_ab_len) {
+                    if (isKeepAlive) {
+                        empty_timer();
+                        readRequestFromSocket_(socketId);
+                    } else {
+                        chrome.socket.disconnect(socketId);
+                        chrome.socket.destroy(socketId);
+                    }
                 }
             });
             return;
         }
-        headers.push("Content-Length: " + content.byteLength);
+        var content_ab;
+        if (typeof content === 'string') {
+            content_ab = stringToArrayBuffer(content);
+        } else {
+            content_ab = content;
+        }
+        headers.push("Content-Length: " + content_ab.byteLength);
         headers.push("Connection: keep-alive");
         var head = "HTTP/1.1 " + headers.join('\n');
-        var header = stringToArrayBuffer(head + '\n\n');
-        chrome.socket.write(socketId, header, function(writeInfo) {
-            if (writeInfo.bytesWritten === header.byteLength) {
-                chrome.socket.write(socketId, content, function(writeInfo) {
-                    if (writeInfo.bytesWritten === content.byteLength) {
-                        var keepAlive = headerMap['Connection'] === 'keep-alive';
-                        if (keepAlive) {
-                            empty_timer();
-                            readRequestFromSocket_(socketId);
-                        }
-                    }
-                });
+        var header = head + '\n\n';
+        var header_ab = stringToArrayBuffer(header);
+        var packege_ab = new ArrayBuffer(content_ab.byteLength + header_ab.byteLength);
+        var packege = new Uint8Array(packege_ab);
+        packege.set(new Uint8Array(header_ab));
+        packege.set(new Uint8Array(content_ab), header_ab.byteLength);
+        var packege_ab_len = packege_ab.byteLength;
+        chrome.socket.write(socketId, packege_ab, function(writeInfo) {
+            if (writeInfo.bytesWritten === packege_ab_len) {
+                if (isKeepAlive) {
+                    empty_timer();
+                    readRequestFromSocket_(socketId);
+                } else {
+                    chrome.socket.disconnect(socketId);
+                    chrome.socket.destroy(socketId);
+                }
             }
         });
     };
@@ -207,7 +218,7 @@ var webui = function() {
                     headerMap[requestLine[0]] = requestLine[1].trim();
             }
             if (headerMap.url === undefined) {
-                return response_(socketId, headerMap, stringToArrayBuffer("Don't have url!"), ['404 Not Found']);
+                return response_(socketId, headerMap, "Don't have url!", ['404 Not Found']);
             }
             readUrl(headerMap, socketId);
         };
