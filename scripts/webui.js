@@ -190,13 +190,13 @@ var webui = function() {
         var requestData = '';
         var endIndex = 0;
         var onDataRead = function(readInfo) {
-            empty_timer();
-            if (readInfo.resultCode === 0) {
+            if (readInfo.resultCode <= 0) {
                 chrome.socket.disconnect(socketId);
                 chrome.socket.destroy(socketId);
                 empty_timer();
                 return;
             }
+            empty_timer();
             requestData += arrayBufferToString(readInfo.data).replace(/\r\n/g, '\n');
             endIndex = requestData.indexOf('\n\n', endIndex);
             if (endIndex === -1) {
