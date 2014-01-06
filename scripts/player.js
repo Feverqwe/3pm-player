@@ -1426,6 +1426,10 @@ var view = function() {
             } else {
                 time = toHHMMSS(pos);
             }
+            if (time === dom_cache.time_cache) {
+                return;
+            }
+            dom_cache.time_cache = time;
             dom_cache.time.text(time);
         },
         setVolume: function(pos) {
