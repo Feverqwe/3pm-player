@@ -232,7 +232,7 @@ var cloud = function() {
                             }
                             var len = 0;
                             data.items.forEach(function(item) {
-                                tracks.push({id: tracks.length, album_id: item.album_id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
+                                tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
                                 len++;
                             });
                             if (len === 0) {
