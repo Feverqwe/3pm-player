@@ -254,6 +254,7 @@ var webui = function() {
     };
     var stop = function() {
         active = false;
+        clearTimeout(timeout);
         if (server_socketId === undefined) {
             return;
         }
