@@ -96,3 +96,6 @@ li a.selected {
         position: fixed;
     }
 }
+div.playlists {
+    display: none;
+}

@@ -1,6 +1,5 @@
 var cloud = function() {
     var dl_xhr = undefined;
-    var settings = _settings;
     var getTrack = function(options, cb) {
         if (options.url === undefined) {
             cb('');
@@ -116,7 +115,7 @@ var cloud = function() {
             if (genre_id === undefined) {
                 genre_id = 0;
             }
-            var only_eng = (settings.foreign_tracks === 1) ? 1 : 0;
+            var only_eng = (_settings.foreign_tracks === 1) ? 1 : 0;
             var url = 'https://api.vk.com/method/audio.getPopular?v=5.5&access_token=' + token + '&count=100&only_eng=' + only_eng + '&genre_id=' + genre_id;
             var tracks = [];
             $.ajax({

@@ -3,15 +3,40 @@ var webui = function() {
     var not_found = [];
     var cache = {};
     var server_socketId;
-    var timeout = null;
-    var empty_timer = function() {
-        clearTimeout(timeout);
+    var reset_timeout = null;
+    var socket_list = [];
+    var socket_close = function(socketId) {
+        if (socketId === undefined) {
+            return;
+        }
+        chrome.socket.disconnect(socketId);
+        chrome.socket.destroy(socketId);
+        var index = socket_list.indexOf(socketId);
+        if (index >= 0) {
+            socket_list.splice(index, 1);
+        }
+    };
+    var socket_open = function(socketId) {
+        if (socketId === undefined) {
+            return;
+        }
+        socket_list.push(socketId);
+    };
+    var socket_killall = function() {
+        socket_list.forEach(function(socketId) {
+            chrome.socket.disconnect(socketId);
+            chrome.socket.destroy(socketId);
+        });
+        socket_list = [];
+    };
+    var reset_server_socket = function() {
+        clearTimeout(reset_timeout);
         if (!active) {
             return;
         }
-        timeout = setTimeout(function() {
-            webui.stop();
-            webui.start();
+        reset_timeout = setTimeout(function() {
+            kill_server_socket();
+            start();
         }, 5000);
     };
     var stringToArrayBuffer = function(string) {
@@ -169,11 +194,10 @@ var webui = function() {
             chrome.socket.write(socketId, header_ab, function(writeInfo) {
                 if (writeInfo.bytesWritten === header_ab_len) {
                     if (isKeepAlive) {
-                        empty_timer();
+                        reset_server_socket();
                         readRequestFromSocket_(socketId);
                     } else {
-                        chrome.socket.disconnect(socketId);
-                        chrome.socket.destroy(socketId);
+                        socket_close(socketId);
                     }
                 }
             });
@@ -198,11 +222,10 @@ var webui = function() {
         chrome.socket.write(socketId, packege_ab, function(writeInfo) {
             if (writeInfo.bytesWritten === packege_ab_len) {
                 if (isKeepAlive) {
-                    empty_timer();
+                    reset_server_socket();
                     readRequestFromSocket_(socketId);
                 } else {
-                    chrome.socket.disconnect(socketId);
-                    chrome.socket.destroy(socketId);
+                    socket_close(socketId);
                 }
             }
         });
@@ -212,12 +235,11 @@ var webui = function() {
         var endIndex = 0;
         var onDataRead = function(readInfo) {
             if (readInfo.resultCode <= 0) {
-                chrome.socket.disconnect(socketId);
-                chrome.socket.destroy(socketId);
-                empty_timer();
+                socket_close(socketId);
+                reset_server_socket();
                 return;
             }
-            empty_timer();
+            reset_server_socket();
             requestData += arrayBufferToString(readInfo.data).replace(/\r\n/g, '\n');
             endIndex = requestData.indexOf('\n\n', endIndex);
             if (endIndex === -1) {
@@ -244,6 +266,7 @@ var webui = function() {
         chrome.socket.read(socketId, onDataRead);
     };
     var onConnection_ = function(acceptInfo) {
+        socket_open(acceptInfo.socketId);
         readRequestFromSocket_(acceptInfo.socketId);
     };
     var acceptConnection_ = function(socketId) {
@@ -252,15 +275,19 @@ var webui = function() {
             acceptConnection_(socketId);
         });
     };
-    var stop = function() {
-        active = false;
-        clearTimeout(timeout);
+    var kill_server_socket = function() {
+        clearTimeout(reset_timeout);
         if (server_socketId === undefined) {
             return;
         }
         chrome.socket.disconnect(server_socketId);
         chrome.socket.destroy(server_socketId);
         server_socketId = undefined;
+    };
+    var stop = function() {
+        kill_server_socket();
+        socket_killall();
+        active = false;
     };
     var start = function() {
         if (server_socketId !== undefined) {
@@ -271,7 +298,7 @@ var webui = function() {
             server_socketId = createInfo.socketId;
             try {
                 chrome.socket.getNetworkList(function(items) {
-                    var addr = '0.0.0.0';
+                    var addr;
                     var n = 0;
                     items.forEach(function(item) {
                         if (item.address.match(':') !== null) {
@@ -282,7 +309,7 @@ var webui = function() {
                             n++;
                         }
                     });
-                    if (n > 1) {
+                    if (n > 1 || n === 0) {
                         addr = '0.0.0.0';
                     }
                     chrome.socket.listen(server_socketId, addr, _settings.webui_port, function(e) {

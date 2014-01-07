@@ -42,9 +42,9 @@ var view = function() {
                 if (item_count !== 0) {
                     dom_cache.playlists.empty();
                 }
-                dom_cache.playlists.hide();
+                dom_cache.playlists.parent().hide();
             } else {
-                dom_cache.playlists.show();
+                dom_cache.playlists.parent().show();
                 if (current_pl !== data.playlist_info.name || item_count !== data.playlists.length) {
                     dom_cache.playlists.empty();
                     data.playlists.forEach(function(item) {
