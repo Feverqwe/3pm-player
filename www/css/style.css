@@ -35,7 +35,7 @@ li a.selected {
     background-color: rgb(255, 204, 0);
 }
 .bottom-panel {
-    position: fixed;
+    position: relative;
     bottom: 0;
     width: 100%;
     background-color: #fff;
@@ -90,4 +90,9 @@ li a.selected {
 }
 .btn {
     padding: 9px 12px;
+}
+@media (min-height: 500px) {
+    .bottom-panel {
+        position: fixed;
+    }
 }
