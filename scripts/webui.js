@@ -254,6 +254,9 @@ var webui = function() {
     };
     var stop = function() {
         active = false;
+        if (server_socketId === undefined) {
+            return;
+        }
         chrome.socket.disconnect(server_socketId);
         chrome.socket.destroy(server_socketId);
         server_socketId = undefined;
