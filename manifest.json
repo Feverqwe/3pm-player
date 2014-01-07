@@ -31,6 +31,6 @@
         "http://api.soundcloud.com/*",
         "http://userserve-ak.last.fm/*",
         "http://cdn.last.fm/*",
-        "http://chart.apis.google.com"
+        "http://chart.apis.google.com/*"
     ]
 }
