@@ -67,8 +67,11 @@ li a.selected {
     text-overflow: ellipsis;
     overflow: hidden
 }
-@media (min-width: 767px) {
-    .hidden-xs {
+.hidden_for_phone {
+    display: none !important;
+}
+@media (min-width: 450px) {
+    .hidden_for_phone {
         display: table-cell !important;
     }
 }
@@ -79,4 +82,7 @@ li a.selected {
     color: #333;
     background-color: #fff;
     border-color: #ccc;
-} 
+}
+.btn {
+    padding: 11px 12px;
+}
