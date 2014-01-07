@@ -83,6 +83,11 @@ li a.selected {
     background-color: #fff;
     border-color: #ccc;
 }
+.btn-default:active {
+    color: #333;
+    background-color: #ccc;
+    border-color: #adadad;
+}
 .btn {
     padding: 9px 12px;
 }
