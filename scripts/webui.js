@@ -62,10 +62,23 @@ var webui = function() {
             engine.open_id(id);
             return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
+        if (headerMap.url.substr(0, 14) === '/set_playlist/') {
+            var id = parseInt(headerMap.url.substr(14));
+            engine.select_playlist(id);
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: : text/html']);
+        } else
         if (headerMap.url === '/playlist') {
             return response_(socketId, headerMap, engine.APIplaylist(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: : text/html']);
         } else
         if (headerMap.url === '/status') {
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+        } else
+        if (headerMap.url === '/playToggle') {
+            engine.playToggle();
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+        } else
+        if (headerMap.url === '/readTags') {
+            engine.readAllTags();
             return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url === '/play') {
@@ -90,6 +103,14 @@ var webui = function() {
         } else
         if (headerMap.url.substr(0, 13) === '/volume_down/') {
             engine.volume(headerMap.url.substr(13));
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+        } else
+        if (headerMap.url.substr(0, 9) === '/next_up/') {
+            engine.position(headerMap.url.substr(9));
+            return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
+        } else
+        if (headerMap.url.substr(0, 11) === '/prew_down/') {
+            engine.position(headerMap.url.substr(11));
             return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url === '/shuffle') {

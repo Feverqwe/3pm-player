@@ -1,7 +1,6 @@
 var view = function() {
     var dom_cache = {};
     var var_cache = {};
-    var lastStatus = {};
     var getStatus = function() {
         if ('status_timer' in var_cache === false) {
             var_cache['status_timer'] = null;
@@ -9,7 +8,6 @@ var view = function() {
         clearTimeout(var_cache.status_timer);
         var_cache.status_timer = setTimeout(function() {
             $.get('/status', function(data) {
-                lastStatus = data;
                 read_status(data);
             });
         }, 50);
@@ -24,14 +22,12 @@ var view = function() {
         });
     };
     var read_status = function(data) {
-        if ('paused' in data) {
-            if (data.paused) {
-                dom_cache.btnPlayPause.removeClass('pause').addClass('play');
-            } else {
-                dom_cache.btnPlayPause.removeClass('play').addClass('pause');
-            }
+        if (data.paused) {
+            dom_cache.btnPlayPause.removeClass('pause').addClass('play');
+        } else {
+            dom_cache.btnPlayPause.removeClass('play').addClass('pause');
         }
-        if ('playlist' in data) {
+        if (data.playlist !== undefined) {
             var items = data.playlist;
             dom_cache.playlist.empty();
             for (var i = 0; i < items.length; i++) {
@@ -39,35 +35,51 @@ var view = function() {
                 dom_cache.playlist.append($('<a>', {href: '#', 'class': 'list-group-item', 'data-id': item.id, text: item.title}));
             }
         }
-        if ('title' in data) {
+        if (data.playlists !== undefined && data.playlist_info !== undefined) {
+            var current_pl = dom_cache.playlists.val();
+            var item_count = dom_cache.playlists.children('option').length;
+            if (data.playlist_info.id === undefined) {
+                if (item_count !== 0) {
+                    dom_cache.playlists.empty();
+                }
+                dom_cache.playlists.hide();
+            } else {
+                dom_cache.playlists.show();
+                if (current_pl !== data.playlist_info.name || item_count !== data.playlists.length) {
+                    dom_cache.playlists.empty();
+                    data.playlists.forEach(function(item) {
+                        dom_cache.playlists.append($('<option>', {text: item.name, value: item.id, selected: (data.playlist_info.id === item.id) ? true : false}));
+                    });
+                }
+            }
+        }
+        if (data.title !== undefined) {
             dom_cache.title.text(decodeURIComponent(escape(window.atob(data.title))));
         }
-        if ('shuffle' in data) {
+        if (data.shuffle !== undefined) {
             if (data.shuffle) {
                 dom_cache.btnShuffle.addClass('on');
             } else {
                 dom_cache.btnShuffle.removeClass('on');
             }
         }
-        if ('loop' in data) {
+        if (data.loop !== undefined) {
             if (data.loop) {
                 dom_cache.btnLoop.addClass('on');
             } else {
                 dom_cache.btnLoop.removeClass('on');
             }
         }
-        if ('current_id' in data) {
+        if (data.current_id !== undefined) {
             $('a.active').removeClass('active');
             $('a[data-id=' + data.current_id + ']').addClass('active');
         }
-        if ('playlist_count' in data) {
-            if ('playlist_count' in var_cache === false) {
-                var_cache['playlist_count'] = data.playlist_count;
+        if (data.playlist_count !== undefined) {
+            if (var_cache.playlist_count === undefined) {
+                var_cache.playlist_count = data.playlist_count;
             } else
             if (data.playlist_count !== var_cache.playlist_count) {
-                getPlaylist(function() {
-                    read_status(lastStatus);
-                });
+                getPlaylist();
                 var_cache.playlist_count = data.playlist_count;
             }
         }
@@ -78,14 +90,28 @@ var view = function() {
             dom_cache = {
                 btnPlayPause: $('.playpause.btn'),
                 btnPrev: $('.prev.btn'),
+                btnPrev_down: $('.prev_10'),
                 btnNext: $('.next.btn'),
+                btnPrev_next: $('.next_10'),
                 playlist: $('.playlist'),
                 title: $('.title'),
                 btnVolume_up: $('.volume.up'),
                 btnVolume_down: $('.volume.down'),
                 btnShuffle: $('.shuffle.btn'),
-                btnLoop: $('.loop.btn')
+                btnLoop: $('.loop.btn'),
+                playlists: $('select.pl_select'),
+                readTags: $('.read_tags.btn')
             };
+            dom_cache.playlists.on('change', function() {
+                var id = this.value;
+                var_cache.playlist_count = null;
+                $.get('/set_playlist/' + id, function(data) {
+                    read_status(data);
+                    setTimeout(function() {
+                        getStatus();
+                    }, 200);
+                });
+            });
             dom_cache.title.on('click', function(e) {
                 e.preventDefault();
                 getStatus();
@@ -98,17 +124,17 @@ var view = function() {
                     read_status(data);
                 });
             });
+            dom_cache.readTags.on('click', function(e) {
+                e.preventDefault();
+                $.get('/readTags', function(data) {
+                    read_status(data);
+                });
+            });
             dom_cache.btnPlayPause.on('click', function(e) {
                 e.preventDefault();
-                if ($(this).hasClass('pause')) {
-                    $.get('/pause', function(data) {
-                        read_status(data);
-                    });
-                } else {
-                    $.get('/play', function(data) {
-                        read_status(data);
-                    });
-                }
+                $.get('/playToggle', function(data) {
+                    read_status(data);
+                });
             });
             dom_cache.btnPrev.on('click', function(e) {
                 e.preventDefault();
@@ -116,9 +142,21 @@ var view = function() {
                     read_status(data);
                 });
             });
+            dom_cache.btnPrev_down.on('click', function(e) {
+                e.preventDefault();
+                $.get('/prew_down/-10', function(data) {
+                    read_status(data);
+                });
+            });
             dom_cache.btnNext.on('click', function(e) {
                 e.preventDefault();
                 $.get('/next', function(data) {
+                    read_status(data);
+                });
+            });
+            dom_cache.btnPrev_next.on('click', function(e) {
+                e.preventDefault();
+                $.get('/next_up/+10', function(data) {
                     read_status(data);
                 });
             });

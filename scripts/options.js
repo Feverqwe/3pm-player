@@ -49,7 +49,7 @@ var options = function() {
     var write_qrcodes = function(settings) {
         var ipv6_disable = true;
         var port = settings.webui_port;
-        var interface = settings.webui_interface;
+        var interface_ = settings.webui_interface;
         var body = $('div.QRcodes').empty();
         var interfaces = $('select.interface').empty().on('change', function() {
             $('input[name=webui_interface]').val(this.value);
@@ -64,11 +64,11 @@ var options = function() {
                     }
                 }
                 var name = item.name + ' (' + item.address + ')';
-                interfaces.append($('<option>', {value: item.name, text: name, selected: (interface === item.name) ? true : false}));
+                interfaces.append($('<option>', {value: item.name, text: name, selected: (interface_ === item.name) ? true : false}));
             });
-            interface = interfaces.val();
+            interface_ = interfaces.val();
             items.forEach(function(item) {
-                if (interface !== 'Any' && item.name !== interface) {
+                if (interface_ !== 'Any' && item.name !== interface_) {
                     return 1;
                 }
                 if (ipv6_disable && item.address.match(':') !== null) {

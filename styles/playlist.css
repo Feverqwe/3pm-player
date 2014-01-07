@@ -46,7 +46,7 @@ body {
     display: none;
 }
 .read_tags {
-    background-image: url('../images/read_tags.png');
+    background-image: url('../images/read_tags_w.png');
     right: 2px;
 }
 ul.track_list {

@@ -5,6 +5,9 @@
 .btn.prev {
     background-image: url(/images/playback_prev.png);
 }
+.btn.prev_10 {
+    background-image: url(/images/playback_prev_down.png);
+}
 .btn.play {
     background-image: url(/images/playback_play.png);
 }
@@ -16,6 +19,9 @@
 }
 .btn.next {
     background-image: url(/images/playback_next.png);
+}
+.btn.next_10 {
+    background-image: url(/images/playback_next_up.png);
 }
 .btn.playlist {
     background-image: url(/images/playlist.png);
@@ -51,6 +57,9 @@ li a.selected {
 .btn.volume {
     font-weight: bolder;
 }
+.btn.read_tags {
+    background-image: url(../images/read_tags.png);
+}
 .title {
     text-align: center;
     height: 38px;
@@ -58,3 +67,16 @@ li a.selected {
     text-overflow: ellipsis;
     overflow: hidden
 }
+@media (min-width: 767px) {
+    .hidden-xs {
+        display: table-cell !important;
+    }
+}
+.playlists {
+    margin-top: 10px;
+}
+.btn-default:focus {
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+} 

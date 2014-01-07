@@ -1230,7 +1230,21 @@ var engine = function() {
                 }
                 list[i] = {id: item.id, title: title};
             }
-            var data = window.btoa(unescape(encodeURIComponent(JSON.stringify({'playlist': list}))));
+            var pls = [];
+            if (M3UPlaylists !== undefined) {
+                M3UPlaylists.list.forEach(function(item) {
+                    pls.push({name: item.name, id: item.id});
+                });
+            }
+            var pl_i = {name: _lang.playlist_title};
+            if (playlist_info !== undefined) {
+                pl_i = {name: playlist_info.name, id: playlist_info.id};
+            }
+            var rez = player.status();
+            rez.playlist = list;
+            rez.playlists = pls;
+            rez.playlist_info = pl_i;
+            var data = window.btoa(unescape(encodeURIComponent(JSON.stringify(rez))));
             return data;
         },
         setM3UPlaylists: function(m3u) {
