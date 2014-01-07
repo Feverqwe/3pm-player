@@ -676,7 +676,7 @@ var view = function() {
             }, 'ws': {
                 type: "checkbox",
                 id: "ws",
-                title: _lang.ctx_webui + " (0.0.0.0:9898)",
+                title: _lang.ctx_webui,
                 contexts: ['page', 'launcher'],
                 action: function(info) {
                     var state = webui.active();

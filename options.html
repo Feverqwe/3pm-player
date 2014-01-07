@@ -15,6 +15,7 @@
         <ul class="menu">
             <li><a class="active" href="#main" data-page="main" data-lang="2">Player</a></li>
             <li><a href="#cloud" data-page="cloud" data-lang="3">Облака</a></li>
+            <li><a href="#webui" data-page="webui" data-lang="34">WebUI</a></li>
             <li><a href="#hotkeys" data-page="hotkeys" data-lang="29">Горячие клавиши</a></li>
             <li class="save_btn"><a href="#save" data-lang="4">Save</a></li>
         </ul>
@@ -45,6 +46,16 @@
                     <li><ul class="item"><li><input type="radio" name="visual_type" value="2"/></li><li data-lang="15">Осциллограмма</li></ul></li>
                 </ul>
             </fieldset>
+        </div>
+        <div class="page webui">
+            <fieldset class="check_list">
+                <ul>
+                    <li><ul class="item"><li data-lang="35">Порт: </li><li><input type="number" name="webui_port" placeholder="9898"/></li></ul></li>
+                    <li><ul class="item"><li data-lang="36">Интерфейс: </li><li><select class="interface" name="webui_interface"></select></li></ul></li>
+                </ul>
+                <input type="text" name="webui_interface" style="display: none" />
+            </fieldset>
+            <div class="QRcodes"></div>
         </div>
         <div class="page hotkeys">
             <fieldset class="hotkeys check_list">

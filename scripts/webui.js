@@ -245,8 +245,24 @@ var webui = function() {
             active = true;
             server_socketId = createInfo.socketId;
             try {
-                chrome.socket.listen(createInfo.socketId, '0.0.0.0', 9898, function(e) {
-                    acceptConnection_(server_socketId);
+                chrome.socket.getNetworkList(function(items) {
+                    var addr = '0.0.0.0';
+                    var n = 0;
+                    items.forEach(function(item) {
+                        if (item.address.match(':') !== null) {
+                            item.name += ' (IPv6)';
+                        }
+                        if (_settings.webui_interface === item.name) {
+                            addr = item.address;
+                            n++;
+                        }
+                    });
+                    if (n > 1) {
+                        addr = '0.0.0.0';
+                    }
+                    chrome.socket.listen(createInfo.socketId, addr, _settings.webui_port, function(e) {
+                        acceptConnection_(server_socketId);
+                    });
                 });
             } catch (e) {
                 stop();

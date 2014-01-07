@@ -14,7 +14,9 @@ var options = function() {
         preload_box: {v: 1, t: 'checkbox'},
         preload_sd: {v: 0, t: 'checkbox'},
         lastfm: {v: 0, t: 'checkbox'},
-        lastfm_cover: {v: 1, t: 'checkbox'}
+        lastfm_cover: {v: 1, t: 'checkbox'},
+        webui_port: {v: 9898, t: 'number'},
+        webui_interface: {v: 'Any', t: 'text'}
     };
     var loadSettings = function(cb) {
         var opt_list = [];
@@ -30,6 +32,62 @@ var options = function() {
                 settings[k] = obj[k];
             });
             cb(settings);
+        });
+    };
+    var getImage = function(url, cb) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.responseType = "blob";
+        xhr.onload = function() {
+            cb(xhr.response);
+        };
+        xhr.onerror = function() {
+            cb();
+        };
+        xhr.send(null);
+    };
+    var write_qrcodes = function(settings) {
+        var ipv6_disable = true;
+        var port = settings.webui_port;
+        var interface = settings.webui_interface;
+        var body = $('div.QRcodes').empty();
+        var interfaces = $('select.interface').empty().on('change', function() {
+            $('input[name=webui_interface]').val(this.value);
+        });
+        interfaces.append($('<option>', {value: 'Any', text: 'Any (0.0.0.0)'}));
+        chrome.socket.getNetworkList(function(items) {
+            items.forEach(function(item) {
+                if (item.address.match(':') !== null) {
+                    item.name += ' (IPv6)';
+                    if (ipv6_disable) {
+                        return 1;
+                    }
+                }
+                var name = item.name + ' (' + item.address + ')';
+                interfaces.append($('<option>', {value: item.name, text: name, selected: (interface === item.name) ? true : false}));
+            });
+            interface = interfaces.val();
+            items.forEach(function(item) {
+                if (interface !== 'Any' && item.name !== interface) {
+                    return 1;
+                }
+                if (ipv6_disable && item.address.match(':') !== null) {
+                    return 1;
+                }
+                var url = 'http://' + item.address + ':' + port + '/';
+                getImage('http://chart.apis.google.com/chart?cht=qr&chs=150x150&chl=' + encodeURIComponent(url) + '&chld=H|0', function(blob) {
+                    var image = '';
+                    if (blob !== undefined) {
+                        image = $('<img>', {src: webkitURL.createObjectURL(blob)});
+                    }
+                    body.append(
+                            $('<div>', {'class': 'qr_item'}).append(
+                            $('<div>', {'class': 'qr_name', text: item.name}),
+                    $('<div>', {'class': 'qr_url'}).append($('<a>', {text: url, href: url, target: '_blank'})),
+                            image
+                            ));
+                });
+            });
         });
     };
     var set_place_holder = function(settings) {
@@ -59,6 +117,7 @@ var options = function() {
                 }
             }
         });
+        write_qrcodes(settings);
     };
     var write_language = function(language) {
         if (language === undefined) {
@@ -113,6 +172,7 @@ var options = function() {
                 if (val.length <= 0) {
                     val = $('input[name="' + key + '"]').attr('placeholder');
                 }
+                val = parseInt(val);
             } else
             if (value.t === "radio") {
                 val = $('input[name="' + key + '"]:checked').val();

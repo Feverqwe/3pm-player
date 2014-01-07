@@ -75,7 +75,10 @@ var get_lang = function(language) {
             30: 'Only foreign tracks',
             31: 'Pre-load track',
             32: 'Last.fm scrobbling',
-            33: 'Download album cover from the site Last.fm'
+            33: 'Download album cover from the site Last.fm',
+            34: 'WebUI',
+            35: 'Port: ',
+            36: 'Interface: '
         }
     };
     var lang_arr_ru = {
@@ -154,7 +157,10 @@ var get_lang = function(language) {
             30: 'Только зарубежные треки',
             31: 'Пред загружать трек',
             32: 'Last.fm скробблинг',
-            33: 'Загрузить обложку альбома с сайта Last.fm.'
+            33: 'Загрузить обложку альбома с сайта Last.fm.',
+            34: 'Веб-интерфейс',
+            35: 'Порт: ',
+            36: 'Интерфейс: '
         }
     };
     if (window.options === undefined) {

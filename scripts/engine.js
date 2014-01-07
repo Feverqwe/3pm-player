@@ -15,9 +15,17 @@ var engine = function() {
         preload_box: 1,
         preload_sd: 0,
         lastfm: 0,
-        lastfm_cover: 1
+        lastfm_cover: 1,
+        webui_port: 9898,
+        webui_interface: 'Any'
     };
     var loadSettings = function(obj) {
+        if ((obj.webui_port !== settings.webui_port || obj.webui_interface !== settings.webui_interface) && webui.active()) {
+            settings.webui_port = obj.webui_port;
+            settings.webui_interface = obj.webui_interface;
+            webui.stop();
+            webui.start();
+        }
         $.each(settings, function(k) {
             if (obj[k] !== undefined) {
                 settings[k] = obj[k];
