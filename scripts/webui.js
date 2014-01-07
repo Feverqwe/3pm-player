@@ -281,7 +281,7 @@ var webui = function() {
                     if (n > 1) {
                         addr = '0.0.0.0';
                     }
-                    chrome.socket.listen(createInfo.socketId, addr, _settings.webui_port, function(e) {
+                    chrome.socket.listen(server_socketId, addr, _settings.webui_port, function(e) {
                         acceptConnection_(server_socketId);
                     });
                 });

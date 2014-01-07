@@ -78,11 +78,11 @@ li a.selected {
 .playlists {
     margin-top: 10px;
 }
-.btn-default:focus {
+.btn-default:focus, .btn-default:hover {
     color: #333;
     background-color: #fff;
     border-color: #ccc;
 }
 .btn {
-    padding: 11px 12px;
+    padding: 9px 12px;
 }
