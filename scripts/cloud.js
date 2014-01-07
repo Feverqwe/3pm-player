@@ -103,7 +103,7 @@ var cloud = function() {
         };
         var vkAuth = function(cb) {
             var client_id = "4037628";
-            var settings = "audio, status";
+            var settings = "audio";
             var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
             var display = "page";
             var url = 'https://oauth.vk.com/authorize?v=5.5&client_id=' + client_id + '&scope=' + settings + '&redirect_uri=' + redirect_uri + '&display=' + display + '&response_type=token';
@@ -232,7 +232,7 @@ var cloud = function() {
                             }
                             var len = 0;
                             data.items.forEach(function(item) {
-                                tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
+                                tracks.push({id: tracks.length, album_id: item.album_id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
                                 len++;
                             });
                             if (len === 0) {
@@ -366,42 +366,6 @@ var cloud = function() {
                 }
             });
         };
-        var set_status = function(oid_aid, cb) {
-            var url = 'https://api.vk.com/method/status.set?v=5.5&audio=' + oid_aid + '&access_token=' + token;
-            $.ajax({
-                url: url,
-                dataType: 'JSON',
-                statusCode: {
-                    401: function() {
-                        vkAuth(function() {
-                            addInLibrarty(oid_aid, cb);
-                        });
-                    },
-                    200: function(data) {
-                        if (data.error !== undefined) {
-                            if (data.error.error_code === 221) {
-                                return;
-                            }
-                            clear_data();
-                            console.log("VK", "set_status", "API error", data);
-                            return;
-                        }
-                        if (data.response !== 1) {
-                            console.log("VK", "set_status", "API bad response", data);
-                            return;
-                        }
-                        if (cb !== undefined) {
-                            cb(true);
-                        }
-                    }
-                },
-                error: function(jqXHR) {
-                    if (jqXHR.status === 401)
-                        return;
-                    clear_data();
-                }
-            });
-        };
         var getToken = function(cb) {
             if (token !== undefined) {
                 cb(token);
@@ -514,14 +478,6 @@ var cloud = function() {
                 cloud.vk.makeAlbumTracks(list.album_id, function(tracks) {
                     cb(tracks, {name: list.name, id: list.id, vk_save: (list.vk_save === true)});
                 });
-            },
-            onplay: function(track, player, cb) {
-                if (settings.vk_status || 1) {
-                    getToken(function() {
-                        set_status(track.owner_id + '_' + track.track_id);
-                    });
-                }
-                cb(track.file.url);
             },
             preload: function(options, cb) {
                 options.url = options.track.file.url;
