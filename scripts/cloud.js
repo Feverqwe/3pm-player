@@ -48,7 +48,7 @@ var cloud = function() {
                     if (obj[key] !== undefined && obj[exp_key] >= time) {
                         cb(obj);
                     } else {
-                        chrome.storage.local.remove([key + '_expire']);
+                        chrome.storage.local.remove([key, key + '_expire']);
                         cb({});
                     }
                 });
