@@ -48,6 +48,7 @@ var cloud = function() {
                     if (obj[key] !== undefined && obj[exp_key] >= time) {
                         cb(obj);
                     } else {
+                        chrome.storage.local.remove([key + '_expire']);
                         cb({});
                     }
                 });
@@ -78,7 +79,7 @@ var cloud = function() {
                 }
             }
             if (token !== undefined) {
-                if (expires !== undefined) {
+                if (expires !== undefined && expires !== 0) {
                     cookie.set(type + '_token', token, expires);
                 } else {
                     var obj = {};
@@ -102,7 +103,7 @@ var cloud = function() {
         };
         var vkAuth = function(cb) {
             var client_id = "4037628";
-            var settings = "audio";
+            var settings = "audio,offline";
             var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
             var display = "page";
             var url = 'https://oauth.vk.com/authorize?v=5.5&client_id=' + client_id + '&scope=' + settings + '&redirect_uri=' + redirect_uri + '&display=' + display + '&response_type=token';
