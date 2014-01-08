@@ -286,7 +286,7 @@
             track: title || '',
             api_key: api_key,
             format: 'json',
-            autocorrect: 0
+            autocorrect: 1
         };
         var cn = data.artist + data.track;
         if (track_cache[cn] === undefined) {
