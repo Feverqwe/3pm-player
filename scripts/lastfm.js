@@ -265,12 +265,17 @@
             }
         });
     };
-    var getImage = function(url, cb) {
+    var getImage = function(cn, cb) {
+        var url = track_cache[cn].url;
+        if (url === undefined) {
+            cb(track_cache[cn].info);
+            return;
+        }
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
         xhr.responseType = "blob";
         xhr.onload = function() {
-            cb(xhr.response);
+            cb(track_cache[cn].info, xhr.response);
         };
         xhr.send(null);
     };
@@ -286,16 +291,11 @@
         var cn = data.artist + data.track;
         if (track_cache[cn] === undefined) {
             track_cache[cn] = {};
-        }
-        if (track_cache[cn].url !== undefined) {
-            getImage(track_cache[cn].url, cb);
-            return;
-        }
-        if (track_cache[cn].check) {
+        } else {
+            getImage(cn, cb);
             return;
         }
         if (suspand) {
-            cb();
             return;
         }
         if (data.artist.length === 0) {
@@ -311,34 +311,46 @@
             data: data,
             statusCode: {
                 200: function(data) {
-                    track_cache[cn].check = 1;
-                    if (data.error === 9) {
-                        console.log('getCover', 'data.error 9', data);
-                        session_key = undefined;
-                        chrome.storage.local.remove('lastfm_session_key');
-                    }
-                    if (data.error === 4) {
-                        console.log('getCover', 'data.error 4', data);
-                        clear_data();
-                    }
                     if (data.error === 26) {
                         console.log('getCover', 'data.error 26', data);
                         suspand = true;
                     }
+                    track_cache[cn].info = {};
                     if (data.error !== undefined) {
                         console.log('getCover', 'data.error!', data);
                         return;
                     }
-                    if (data.track === undefined
-                            || data.track.album === undefined
+                    if (data.track === undefined) {
+                        return;
+                    }
+                    if (data.track.name !== undefined
+                            && data.track.name.length > 0) {
+                        track_cache[cn].info.title = data.track.name;
+                    }
+                    if (data.track.artist !== undefined
+                            && data.track.artist.name !== undefined
+                            && data.track.artist.name.length > 0) {
+                        track_cache[cn].info.artist = data.track.artist.name;
+                    }
+                    if (data.track.album !== undefined
+                            && data.track.album.title !== undefined
+                            && data.track.album.title.length > 0) {
+                        track_cache[cn].info.album = data.track.album.title;
+                    }
+                    if (track_cache[cn].info.artist !== undefined && track_cache[cn].info.title !== undefined) {
+                        var _cn = track_cache[cn].info.artist + track_cache[cn].info.title;
+                        track_cache[_cn] = track_cache[cn];
+                    }
+                    if (data.track.album === undefined
                             || data.track.album.image === undefined
                             || data.track.album.image.length === 0) {
+                        cb(track_cache[cn].info);
                         return;
                     }
                     var item = data.track.album.image.slice(-1)[0];
                     var url = item['#text'];
                     track_cache[cn].url = url;
-                    getImage(url, cb);
+                    getImage(cn, cb);
                 }
             }
         });

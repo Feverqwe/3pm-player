@@ -116,10 +116,19 @@ var cloud = function() {
                 genre_id = 0;
             }
             var only_eng = (_settings.foreign_tracks === 1) ? 1 : 0;
-            var url = 'https://api.vk.com/method/audio.getPopular?v=5.5&access_token=' + token + '&count=100&only_eng=' + only_eng + '&genre_id=' + genre_id;
+            var data = {
+                v: '5.5',
+                access_token: token,
+                count: 100,
+                only_eng: only_eng,
+                genre_id: genre_id
+            };
+            var url = 'https://api.vk.com/method/audio.getPopular';
             var tracks = [];
             $.ajax({
+                type: 'POST',
                 url: url,
+                data: data,
                 dataType: 'JSON',
                 statusCode: {
                     401: function() {
@@ -147,18 +156,21 @@ var cloud = function() {
                         });
                         cb(tracks);
                     }
-                },
-                error: function(jqXHR) {
-                    if (jqXHR.status === 401)
-                        return;
-                    clear_data();
                 }
             });
         };
         var getRecommendations = function(cb) {
-            var url = 'https://api.vk.com/method/audio.getRecommendations?v=5.5&access_token=' + token + '&count=100&shuffle=1';
+            var data = {
+                v: '5.5',
+                access_token: token,
+                count: 100,
+                shuffle: 1
+            };
+            var url = 'https://api.vk.com/method/audio.getRecommendations';
             var tracks = [];
             $.ajax({
+                type: 'POST',
+                data: data,
                 url: url,
                 dataType: 'JSON',
                 statusCode: {
@@ -187,21 +199,27 @@ var cloud = function() {
                         });
                         cb(tracks);
                     }
-                },
-                error: function(jqXHR) {
-                    if (jqXHR.status === 401)
-                        return;
-                    clear_data();
                 }
             });
         };
         var getTracks = function(cb, album_id) {
-            var url = 'https://api.vk.com/method/audio.get?v=5.5&access_token=' + token + ((album_id !== undefined) ? '&album_id=' + album_id : '');
+            var data = {
+                v: '5.5',
+                access_token: token
+            };
+            if (album_id !== undefined) {
+                data.album_id = album_id;
+            }
+            var url = 'https://api.vk.com/method/audio.get';
             var tracks = [];
             var offset = 0;
             var getPage = function(offset) {
+                data.count = 6000;
+                data.offset = offset;
                 $.ajax({
-                    url: url + "&count=6000&offset=" + offset,
+                    type: 'POST',
+                    data: data,
+                    url: url,
                     dataType: 'JSON',
                     statusCode: {
                         401: function() {
@@ -231,7 +249,7 @@ var cloud = function() {
                             }
                             var len = 0;
                             data.items.forEach(function(item) {
-                                tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
+                                tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk', from_lib: true});
                                 len++;
                             });
                             if (len === 0) {
@@ -251,23 +269,26 @@ var cloud = function() {
                                 cb(tracks);
                             }
                         }
-                    },
-                    error: function(jqXHR) {
-                        if (jqXHR.status === 401)
-                            return;
-                        clear_data();
                     }
                 });
             };
             getPage(offset);
         };
         var getAlbums = function(cb) {
-            var url = 'https://api.vk.com/method/audio.getAlbums?v=5.5&access_token=' + token;
+            var data = {
+                v: '5.5',
+                access_token: token
+            };
+            var url = 'https://api.vk.com/method/audio.getAlbums';
             var albums = [];
             var offset = 0;
             var getPage = function(offset) {
+                data.count = 100;
+                data.offset = offset;
                 $.ajax({
-                    url: url + "&count=100&offset=" + offset,
+                    type: 'POST',
+                    data: data,
+                    url: url,
                     dataType: 'JSON',
                     statusCode: {
                         401: function() {
@@ -317,19 +338,61 @@ var cloud = function() {
                                 cb(albums);
                             }
                         }
-                    },
-                    error: function(jqXHR) {
-                        if (jqXHR.status === 401)
-                            return;
-                        clear_data();
                     }
                 });
             };
             getPage(offset);
         };
-        var addInLibrarty = function(id, oid, cb) {
-            var url = 'https://api.vk.com/method/audio.add?v=5.5&audio_id=' + id + '&owner_id=' + oid + '&access_token=' + token;
+        var updateTags = function(owner_id, audio_id, artist, title) {
+            var data = {
+                v: '5.5',
+                audio_id: audio_id,
+                owner_id: owner_id,
+                artist: artist,
+                title: title,
+                access_token: token
+            };
+            var url = 'https://api.vk.com/method/audio.edit';
             $.ajax({
+                type: 'POST',
+                url: url,
+                data: data,
+                dataType: 'JSON',
+                statusCode: {
+                    200: function(data) {
+                        if (data.error !== undefined) {
+                            if (data.error.error_code === 15) {
+                                _settings.vk_tag_update = 0;
+                                return;
+                            }
+                            clear_data();
+                            if (data.error.error_code === 5) {
+                                vkAuth(function() {
+                                    updateTags(owner_id, audio_id, artist, title);
+                                });
+                            }
+                            console.log("VK", "addInLibrarty", "API error", data);
+                            return;
+                        }
+                        if (data.response === undefined) {
+                            console.log("VK", "addInLibrarty", "API error", data);
+                            return;
+                        }
+                    }
+                }
+            });
+        };
+        var addInLibrarty = function(id, oid, cb) {
+            var data = {
+                v: '5.5',
+                access_token: token,
+                audio_id: id,
+                owner_id: oid
+            };
+            var url = 'https://api.vk.com/method/audio.add';
+            $.ajax({
+                type: 'POST',
+                data: data,
                 url: url,
                 dataType: 'JSON',
                 statusCode: {
@@ -357,11 +420,6 @@ var cloud = function() {
                             cb(true);
                         }
                     }
-                },
-                error: function(jqXHR) {
-                    if (jqXHR.status === 401)
-                        return;
-                    clear_data();
                 }
             });
         };
@@ -481,6 +539,11 @@ var cloud = function() {
             preload: function(options, cb) {
                 options.url = options.track.file.url;
                 cloud.getTrack(options, cb);
+            },
+            update_tags: function(a, b, c, d) {
+                getToken(function() {
+                    updateTags(a, b, c, d);
+                });
             }
         };
     }();
