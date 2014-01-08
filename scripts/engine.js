@@ -543,19 +543,31 @@ var engine = function() {
                 });
             };
             var player = function() {
+                if (id !== current_id) {
+                    return;
+                }
                 view.setTags(tb);
             };
             var notifi = function() {
+                if (id !== current_id) {
+                    return;
+                }
                 if (settings.next_track_notification) {
                     notification.update();
                 }
             };
             var viz = function() {
+                if (id !== current_id) {
+                    return;
+                }
                 _send('viz', function(window) {
                     window.viz.audio_state('track', tb);
                 });
             };
             var lfm = function() {
+                if (id !== current_id) {
+                    return;
+                }
                 if (settings.lastfm && tb.artist !== undefined && tb.album !== undefined) {
                     lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
                 }
