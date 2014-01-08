@@ -589,6 +589,13 @@ var engine = function() {
                 notifi();
                 return;
             }
+            if (state === 4) {
+                player();
+                plist();
+                notifi();
+                viz();
+                return;
+            }
             player();
             plist();
             notifi();
@@ -642,7 +649,7 @@ var engine = function() {
                             cloud.vk.update_tags(track.owner_id, track.track_id, tags.artist, tags.title);
                         }
                         if (changes) {
-                            tags_loaded(tags, id);
+                            tags_loaded(tags, id, 4);
                         } else
                         if (i_id !== undefined) {
                             tags_loaded(tags, id, 3);
