@@ -532,8 +532,10 @@ var engine = function() {
         };
         var tags_loaded = function(tags, id, state) {
             // 1 - playlist only
-            // 2 - viz, pl, lfm, notifi
-            // 3 - covers
+            // 2 - player, lfm, notifi
+            // 3 - player, playlist, notifi
+            // 4 - viz, playlist, player, notifi
+            // other - all
             var tb;
             playlist[id].tags = tags;
             playlist[id].state = "dune";
