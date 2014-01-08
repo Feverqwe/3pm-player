@@ -80,7 +80,8 @@ var get_lang = function(language) {
             35: 'Port: ',
             36: 'Interface: ',
             37: 'Display tags from Last.fm',
-            38: 'Rewrite incorrect tags'
+            38: 'Rewrite incorrect tags',
+            39: 'Run at startup the player.'
         }
     };
     var lang_arr_ru = {
@@ -164,7 +165,8 @@ var get_lang = function(language) {
             35: 'Порт: ',
             36: 'Интерфейс: ',
             37: 'Отображать теги с Last.fm',
-            38: 'Переписывать неправильные теги'
+            38: 'Переписывать неправильные теги',
+            39: 'Запустить при включении плеера'
         }
     };
     if (window.options === undefined) {

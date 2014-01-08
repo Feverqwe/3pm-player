@@ -1,6 +1,7 @@
 var _debug = false;
 var engine = function() {
     //options
+    var boot = true;
     var settings = {
         next_track_notification: 0,
         extend_volume_scroll: 0,
@@ -19,21 +20,26 @@ var engine = function() {
         lastfm_tag_update: 1,
         webui_port: 9898,
         webui_interface: 'Any',
+        webui_run_onboot: 0,
         vk_tag_update: 0
     };
     var loadSettings = function(obj) {
-        if ((obj.webui_port !== settings.webui_port || obj.webui_interface !== settings.webui_interface) && webui.active()) {
-            settings.webui_port = obj.webui_port;
-            settings.webui_interface = obj.webui_interface;
-            webui.start();
-        }
+        var _old_settings = JSON.parse(JSON.stringify(settings));
         $.each(settings, function(k) {
             if (obj[k] !== undefined) {
                 settings[k] = obj[k];
             }
         });
-        window._settings = settings;
-        $(document).trigger('settings_changed');
+        if (boot) {
+            window._settings = settings;
+            chrome.runtime.sendMessage(chrome.runtime.id, 'settings_ready');
+            boot = undefined;
+            return;
+        }
+        if ((settings.webui_port !== _old_settings.webui_port || settings.webui_interface !== _old_settings.webui_interface) && webui.active()) {
+            webui.start();
+        }
+        chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
     };
     //<<<<<<<
     //allow_ext - only for files without mime.

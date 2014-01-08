@@ -284,17 +284,23 @@ var webui = function() {
         chrome.socket.destroy(server_socketId);
         server_socketId = undefined;
     };
-    var stop = function() {
+    var stop = function(cb) {
         kill_server_socket();
         socket_killall();
         active = false;
+        if (cb !== undefined) {
+            cb();
+        }
     };
-    var start = function() {
+    var start = function(cb) {
         if (server_socketId !== undefined) {
             stop();
         }
         chrome.socket.create("tcp", function(createInfo) {
             active = true;
+            if (cb !== undefined) {
+                cb();
+            }
             server_socketId = createInfo.socketId;
             try {
                 chrome.socket.getNetworkList(function(items) {
@@ -317,7 +323,7 @@ var webui = function() {
                     });
                 });
             } catch (e) {
-                stop();
+                stop(cb);
             }
         });
     };
@@ -327,11 +333,26 @@ var webui = function() {
         });
     };
     return {
-        start: start,
+        start: function() {
+            start(function() {
+                chrome.contextMenus.update("ws", {checked: active});
+            });
+        },
         info: Info,
-        stop: stop,
+        stop: function() {
+            stop(function() {
+                chrome.contextMenus.update("ws", {checked: active});
+            });
+        },
         active: function() {
             return active;
         }
     };
 }();
+chrome.runtime.onMessage.addListener(function(msg, sender, resp) {
+    if (msg === 'settings_ready') {
+        if (_settings.webui_run_onboot) {
+            webui.start();
+        }
+    }
+});

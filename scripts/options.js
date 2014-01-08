@@ -18,6 +18,7 @@ var options = function() {
         lastfm_tag_update: {v: 1, t: 'checkbox'},
         webui_port: {v: 9898, t: 'number'},
         webui_interface: {v: 'Any', t: 'text'},
+        webui_run_onboot: {v: 0, t: 'checkbox'},
         vk_tag_update: {v: 0, t: 'checkbox'}
     };
     var loadSettings = function(cb) {

@@ -685,9 +685,6 @@ var view = function() {
                     } else {
                         webui.stop();
                     }
-                    setTimeout(function() {
-                        chrome.contextMenus.update("ws", {checked: webui.active()});
-                    }, 500);
                 }
             }, 'viz': {
                 id: "viz",
@@ -1570,22 +1567,28 @@ var view = function() {
         }
     };
 }();
-window._flags = [];
-$(document).on('settings_changed', function() {
-    if (window._flags.indexOf('settings_changed') !== -1 && window._flags.indexOf('ready') !== -1) {
-        view.updateSettings();
-        return;
-    }
-    window._flags.push('settings_changed');
-    if (window._flags.indexOf('ready') === -1) {
-        return;
-    }
-    view.show();
-});
-$(function() {
-    window._flags.push('ready');
-    if (window._flags.indexOf('settings_changed') === -1) {
-        return;
-    }
-    view.show();
-});
+(function() {
+    var settings_ready = false;
+    var dom_ready = false;
+    chrome.runtime.onMessage.addListener(function(msg, sender, resp) {
+        if (msg === 'settings_ready') {
+            settings_ready = true;
+            if (dom_ready) {
+                view.show();
+                settings_ready = undefined;
+                dom_ready = undefined;
+            }
+        } else
+        if (msg === 'settings_changed') {
+            view.updateSettings();
+        }
+    });
+    $(function() {
+        dom_ready = true;
+        if (settings_ready) {
+            view.show();
+            settings_ready = undefined;
+            dom_ready = undefined;
+        }
+    });
+})();
