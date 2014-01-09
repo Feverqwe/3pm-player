@@ -59,7 +59,7 @@ var dialog = function() {
             } else {
                 action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
-            var ext = filename.split('.').slice(-1)[0].toLowerCase();
+            var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
             if (item.is_dir === false && allow_ext.indexOf(ext) === -1) {
                 return 1;
             }
@@ -137,7 +137,7 @@ var dialog = function() {
                     var playlist = {name: pl_name, id: 0, type: "db", tracks: []};
                     list.contents.forEach(function(item) {
                         var filename = item.path.split('/').slice(-1)[0];
-                        var ext = filename.split('.').slice(-1)[0].toLowerCase();
+                        var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
                         if (item.is_dir || allow_ext.indexOf(ext) === -1) {
                             return 1;
                         }
@@ -334,7 +334,7 @@ var dialog = function() {
             } else {
                 action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
-            var ext = item.name.split('.').slice(-1)[0].toLowerCase();
+            var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
             if (item.type !== "folder" && allow_ext.indexOf(ext) === -1) {
                 return 1;
             }
@@ -410,7 +410,7 @@ var dialog = function() {
                 window.cloud.box.getFilelist(function(list) {
                     var playlist = {name: folder_name, id: 0, type: "box", tracks: []};
                     list.entries.forEach(function(item) {
-                        var ext = item.name.split('.').slice(-1)[0].toLowerCase();
+                        var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
                         if (item.type === "folder" || allow_ext.indexOf(ext) === -1) {
                             return 1;
                         }
