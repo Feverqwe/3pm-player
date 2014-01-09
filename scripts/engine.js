@@ -24,25 +24,8 @@ var _debug = false;
         webui_run_onboot: 0,
         vk_tag_update: 0
     };
-    var loadSettings = function(obj) {
-        var _old_settings = JSON.parse(JSON.stringify(_settings));
-        $.each(_settings, function(k) {
-            if (obj[k] !== undefined) {
-                _settings[k] = obj[k];
-            }
-        });
-        if (boot) {
-            chrome.runtime.sendMessage(chrome.runtime.id, 'settings_ready');
-            boot = undefined;
-            return;
-        }
-        if ((_settings.webui_port !== _old_settings.webui_port || _settings.webui_interface !== _old_settings.webui_interface) && webui.active()) {
-            webui.start();
-        }
-        chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
-    };
     chrome.storage.local.get(function(obj) {
-        loadSettings(obj);
+        engine.loadSettings(obj);
     });
     //<<<<<<<
     //allow_ext - only for files without mime.
@@ -382,6 +365,84 @@ var _debug = false;
                 }, true);
             }, params);
         };
+        var notification;
+        (function(ns) {
+            notification = {};
+            var timeout = 3000;
+            var timer = undefined;
+            var starTimer = function() {
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    chrome.notifications.clear('current_track', function() {
+                    });
+                }, timeout);
+            };
+            var getOpt = function() {
+                var tb = getTagBody();
+                var opt = {
+                    type: 'basic',
+                    iconUrl: '/images/no-cover.png',
+                    title: tb.title,
+                    message: ''
+                };
+                if (tb.aa !== undefined) {
+                    opt.message = tb.aa;
+                }
+                if (tb.picture !== undefined) {
+                    opt.iconUrl = engine.getCover(tb.picture).data;
+                }
+                return opt;
+            };
+            chrome.notifications.onButtonClicked.addListener(function(a, b) {
+                if (a !== 'current_track') {
+                    return;
+                }
+                clearTimeout(timer);
+                chrome.notifications.clear('current_track', function(obj) {
+                });
+                if (b === 1) {
+                    player.preview();
+                } else {
+                    player.next();
+                }
+            });
+            chrome.notifications.onClicked.addListener(function(a, b) {
+                clearTimeout(timer);
+                chrome.notifications.clear('current_track', function(obj) {
+                    window._focus_all();
+                });
+            });
+            notification.show = function() {
+                var opt = getOpt();
+                if (_settings.notifi_buttons) {
+                    opt.buttons = [
+                        {title: _lang.next, iconUrl: '/images/playback_next.png'},
+                        {title: _lang.prev, iconUrl: '/images/playback_prev.png'}
+                    ];
+                }
+                //отображаем уведомление о воспроизведении
+                chrome.notifications.getAll(function(obj) {
+                    if (obj.current_track !== undefined) {
+                        starTimer();
+                        notification.update();
+                        return;
+                    }
+                    chrome.notifications.create('current_track', opt, function(obj) {
+                        starTimer();
+                    });
+                });
+            };
+            notification.update = function() {
+                chrome.notifications.getAll(function(obj) {
+                    if (obj.current_track === undefined) {
+                        return;
+                    }
+                    var opt = getOpt();
+                    chrome.notifications.update('current_track', opt, function(obj) {
+                    });
+                });
+            };
+        })();
         var audio_preload = function(item) {
             if (item.type === undefined) {
                 return false;
@@ -602,14 +663,14 @@ var _debug = false;
         };
         player.get_filename = function() {
             return playlist[current_id].file.name;
-        },
-                player.playToggle = function() {
-                    if (audio.paused) {
-                        player.play();
-                    } else {
-                        player.pause();
-                    }
-                };
+        };
+        player.playToggle = function() {
+            if (audio.paused) {
+                player.play();
+            } else {
+                player.pause();
+            }
+        };
         player.play = function() {
             if (current_id === undefined || playlist[current_id] === undefined) {
                 return;
@@ -968,84 +1029,6 @@ var _debug = false;
             return current_id;
         };
     })();
-    var notification;
-    (function(ns) {
-        notification = {};
-        var timeout = 3000;
-        var timer = undefined;
-        var starTimer = function() {
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                chrome.notifications.clear('current_track', function() {
-                });
-            }, timeout);
-        };
-        var getOpt = function() {
-            var tb = getTagBody();
-            var opt = {
-                type: 'basic',
-                iconUrl: '/images/no-cover.png',
-                title: tb.title,
-                message: ''
-            };
-            if (tb.aa !== undefined) {
-                opt.message = tb.aa;
-            }
-            if (tb.picture !== undefined) {
-                opt.iconUrl = engine.getCover(tb.picture).data;
-            }
-            return opt;
-        };
-        chrome.notifications.onButtonClicked.addListener(function(a, b) {
-            if (a !== 'current_track') {
-                return;
-            }
-            clearTimeout(timer);
-            chrome.notifications.clear('current_track', function(obj) {
-            });
-            if (b === 1) {
-                player.preview();
-            } else {
-                player.next();
-            }
-        });
-        chrome.notifications.onClicked.addListener(function(a, b) {
-            clearTimeout(timer);
-            chrome.notifications.clear('current_track', function(obj) {
-                window._focus_all();
-            });
-        });
-        notification.show = function() {
-            var opt = getOpt();
-            if (_settings.notifi_buttons) {
-                opt.buttons = [
-                    {title: _lang.next, iconUrl: '/images/playback_next.png'},
-                    {title: _lang.prev, iconUrl: '/images/playback_prev.png'}
-                ];
-            }
-            //отображаем уведомление о воспроизведении
-            chrome.notifications.getAll(function(obj) {
-                if (obj.current_track !== undefined) {
-                    starTimer();
-                    notification.update();
-                    return;
-                }
-                chrome.notifications.create('current_track', opt, function(obj) {
-                    starTimer();
-                });
-            });
-        };
-        notification.update = function() {
-            chrome.notifications.getAll(function(obj) {
-                if (obj.current_track === undefined) {
-                    return;
-                }
-                var opt = getOpt();
-                chrome.notifications.update('current_track', opt, function(obj) {
-                });
-            });
-        };
-    })();
     var add_in_ctx_menu = function(playlist_info) {
         var context_menu = view.getContextMenu();
         if (playlist_info !== undefined && playlist_info.vk_save === true) {
@@ -1195,7 +1178,23 @@ var _debug = false;
             engine.showMenu();
         }
     });
-    engine.loadSettings = loadSettings;
+    engine.loadSettings = function(obj) {
+        var _old_settings = JSON.parse(JSON.stringify(_settings));
+        $.each(_settings, function(k) {
+            if (obj[k] !== undefined) {
+                _settings[k] = obj[k];
+            }
+        });
+        if (boot) {
+            chrome.runtime.sendMessage(chrome.runtime.id, 'settings_ready');
+            boot = undefined;
+            return;
+        }
+        if ((_settings.webui_port !== _old_settings.webui_port || _settings.webui_interface !== _old_settings.webui_interface) && webui.active()) {
+            webui.start();
+        }
+        chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
+    };
     engine.get_filename = player.get_filename;
     engine.open = function(files, info) {
         if (files.length === 0) {
@@ -1237,9 +1236,6 @@ var _debug = false;
             add_in_ctx_menu(playlist_info);
         }
     };
-    /*
-     * refact!
-     */
     engine.play = player.play;
     engine.playToggle = player.playToggle;
     engine.open_id = player.open;
@@ -1252,9 +1248,6 @@ var _debug = false;
     engine.getMute = player.getMute;
     engine.getAudio = player.getAudio;
     engine.getCurrentTrack = player.getCurrentTrack;
-    /*
-     * <<<
-     */
     engine.getCover = function(id) {
         return covers[id];
     };
