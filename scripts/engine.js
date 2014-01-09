@@ -139,7 +139,7 @@ var _debug = false;
         };
         img.src = url;
     };
-    var read_image = function(binary, cb, enable_search) {
+    var read_image = function(binary, cb) {
         /*
          * binary = [Array || ArrayBuffer || Blob, 'image/*'];
          */
@@ -201,6 +201,69 @@ var _debug = false;
         var id = covers.length;
         covers.push({id: id, len: len, data: bin, chk: chk});
         return id;
+    };
+    var read_tags = function(id, rt_cb) {
+        if (playlist[id].type !== undefined && cloud[playlist[id].type].read_tags !== undefined) {
+            playlist[id].state = "loading";
+            _send('playlist', function(window) {
+                window.playlist.updPlaylistItem(id, playlist[id]);
+            });
+            cloud[playlist[id].type].read_tags(playlist[id], function(tags) {
+                // NOTE: tags.picture = [binary, mime]
+                read_image(tags.picture, function(i_id) {
+                    if (i_id === undefined) {
+                        delete tags.picture;
+                    } else {
+                        tags.picture = i_id;
+                    }
+                    rt_cb(tags, id);
+                });
+            });
+            return;
+        }
+        var file;
+        if (playlist[id].blob !== undefined) {
+            file = playlist[id].blob;
+        } else {
+            file = playlist[id].file;
+        }
+        playlist[id].state = "loading";
+        _send('playlist', function(window) {
+            window.playlist.updPlaylistItem(id, playlist[id]);
+        });
+        /*
+         if (window.time_log === undefined) {
+         window.time_log = [];
+         }
+         var startDate = new Date().getTime();
+         */
+        var params = {tags: ["artist", "title", "album", "picture"], file: file};
+        var f_name = 0;
+        ID3.loadTags(f_name, function() {
+            /*
+             var endDate = new Date().getTime();
+             var raz = ((endDate - startDate) / 1000);
+             console.log("Time: " + raz + "s");
+             window.time_log.push(raz);
+             var sum = window.time_log.reduce(function(pv, cv) {
+             return pv + cv;
+             }, 0);
+             console.log('Среднее время: ', sum / window.time_log.length);
+             */
+            var tags = ID3.getAllTags(f_name);
+            ID3.clearAll();
+            if (tags.picture !== undefined) {
+                tags.picture = [tags.picture.data, tags.picture.format];
+            }
+            read_image(tags.picture, function(i_id) {
+                if (i_id === undefined) {
+                    delete tags.picture;
+                } else {
+                    tags.picture = i_id;
+                }
+                rt_cb(tags, id);
+            });
+        }, params);
     };
     var getType = function(file) {
         /*
@@ -302,69 +365,6 @@ var _debug = false;
             return _ad;
         }();
         var current_id = undefined;
-        var read_tags = function(id, rt_cb) {
-            if (playlist[id].type !== undefined && cloud[playlist[id].type].read_tags !== undefined) {
-                playlist[id].state = "loading";
-                _send('playlist', function(window) {
-                    window.playlist.updPlaylistItem(id, playlist[id]);
-                });
-                cloud[playlist[id].type].read_tags(playlist[id], function(tags) {
-                    // NOTE: tags.picture = [binary, mime]
-                    read_image(tags.picture, function(i_id) {
-                        if (i_id === undefined) {
-                            delete tags.picture;
-                        } else {
-                            tags.picture = i_id;
-                        }
-                        rt_cb(tags, id);
-                    });
-                });
-                return;
-            }
-            var file;
-            if (playlist[id].blob !== undefined) {
-                file = playlist[id].blob;
-            } else {
-                file = playlist[id].file;
-            }
-            playlist[id].state = "loading";
-            _send('playlist', function(window) {
-                window.playlist.updPlaylistItem(id, playlist[id]);
-            });
-            /*
-             if (window.time_log === undefined) {
-             window.time_log = [];
-             }
-             var startDate = new Date().getTime();
-             */
-            var params = {tags: ["artist", "title", "album", "picture"], file: file};
-            var f_name = 0;
-            ID3.loadTags(f_name, function() {
-                /*
-                 var endDate = new Date().getTime();
-                 var raz = ((endDate - startDate) / 1000);
-                 console.log("Time: " + raz + "s");
-                 window.time_log.push(raz);
-                 var sum = window.time_log.reduce(function(pv, cv) {
-                 return pv + cv;
-                 }, 0);
-                 console.log('Среднее время: ', sum / window.time_log.length);
-                 */
-                var tags = ID3.getAllTags(f_name);
-                ID3.clearAll();
-                if (tags.picture !== undefined) {
-                    tags.picture = [tags.picture.data, tags.picture.format];
-                }
-                read_image(tags.picture, function(i_id) {
-                    if (i_id === undefined) {
-                        delete tags.picture;
-                    } else {
-                        tags.picture = i_id;
-                    }
-                    rt_cb(tags, id);
-                }, true);
-            }, params);
-        };
         var notification;
         (function(ns) {
             notification = {};
