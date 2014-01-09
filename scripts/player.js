@@ -210,7 +210,6 @@
                 /*
                  * ищет внутри всех папок, в соответствие с {} file_tree, и если внутри есть файлы из [] file_arr добавляет из в массив.
                  */
-                var has_files = file_tree[entry.fullPath] !== undefined;
                 stream_count++;
                 getEntryFromDir(entry, function(sub_entry) {
                     var len = sub_entry.length;
@@ -222,8 +221,7 @@
                                     readEntry(sub_entry[n], file_tree);
                                 }
                             });
-                        } else
-                        if (has_files) {
+                        } else {
                             var file_arr = file_tree[entry.fullPath].files;
                             if (file_arr.indexOf(sub_entry[n].name) !== -1) {
                                 files.push(sub_entry[n]);
