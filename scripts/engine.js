@@ -3,7 +3,7 @@ var _debug = false;
     var engine = ns.engine = {};
     //options
     var boot = true;
-    var settings = {
+    _settings = {
         next_track_notification: 0,
         extend_volume_scroll: 0,
         notifi_buttons: 0,
@@ -24,12 +24,11 @@ var _debug = false;
         webui_run_onboot: 0,
         vk_tag_update: 0
     };
-    ns._settings = settings;
     var loadSettings = function(obj) {
-        var _old_settings = JSON.parse(JSON.stringify(settings));
-        $.each(settings, function(k) {
+        var _old_settings = JSON.parse(JSON.stringify(_settings));
+        $.each(_settings, function(k) {
             if (obj[k] !== undefined) {
-                settings[k] = obj[k];
+                _settings[k] = obj[k];
             }
         });
         if (boot) {
@@ -37,7 +36,7 @@ var _debug = false;
             boot = undefined;
             return;
         }
-        if ((settings.webui_port !== _old_settings.webui_port || settings.webui_interface !== _old_settings.webui_interface) && webui.active()) {
+        if ((_settings.webui_port !== _old_settings.webui_port || _settings.webui_interface !== _old_settings.webui_interface) && webui.active()) {
             webui.start();
         }
         chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
@@ -64,7 +63,7 @@ var _debug = false;
          * Функция сброса плэйлиста.
          */
         //останавливает воспроизведение
-        engine.player.stop();
+        player.stop();
         //массив плэйлиста
         playlist = [];
         //название плэйлиста
@@ -226,7 +225,7 @@ var _debug = false;
          */
         var type = file.type;
         if (type !== undefined && type.length > 0) {
-            if (engine.player.canPlay(type) === 0) {
+            if (player.canPlay(type) === 0) {
                 return;
             }
             return type;
@@ -255,8 +254,59 @@ var _debug = false;
         });
         return index;
     };
-    (function(ns) {
-        var player = ns.player = {};
+    var getTagBody = function(id) {
+        if (id === undefined) {
+            id = player.getTrackID();
+        }
+        if (playlist[id] === undefined) {
+            return {title: '3pm-player'};
+        }
+        var tags = playlist[id].tags;
+        if (tags === undefined) {
+            return {title: playlist[id].file.name};
+        }
+        var title = "";
+        var album = "";
+        var artist = "";
+        var artist_album = "";
+        if (tags.title !== undefined && tags.title.length > 0) {
+            title = tags.title;
+        } else {
+            title = playlist[id].file.name;
+        }
+        if (tags.artist !== undefined && tags.artist.length > 0) {
+            artist = tags.artist;
+        }
+        if (tags.album !== undefined && tags.album.length > 0) {
+            album = tags.album;
+        }
+        if (album.length > 0 && artist.length > 0) {
+            artist_album = tags.artist + ' - ' + tags.album;
+        } else
+        if (artist.length > 0) {
+            artist_album = artist;
+        } else
+        if (album.length > 0) {
+            artist_album = album;
+        }
+        var data = {title: title};
+        if (artist.length > 0) {
+            data.artist = artist;
+        }
+        if (artist.length > 0) {
+            data.album = album;
+        }
+        if (artist.length > 0) {
+            data.aa = artist_album;
+        }
+        if (tags.picture !== undefined) {
+            data.picture = tags.picture;
+        }
+        return data;
+    };
+    var player;
+    (function() {
+        player = {};
         var type_list = {};
         var audio = new Audio();
         var adapter = function() {
@@ -332,138 +382,11 @@ var _debug = false;
                 }, true);
             }, params);
         };
-        var getTagBody = function(id) {
-            if (id === undefined) {
-                id = current_id;
-            }
-            if (playlist[id] === undefined) {
-                return {title: '3pm-player'};
-            }
-            var tags = playlist[id].tags;
-            if (tags === undefined) {
-                return {title: playlist[id].file.name};
-            }
-            var title = "";
-            var album = "";
-            var artist = "";
-            var artist_album = "";
-            if (tags.title !== undefined && tags.title.length > 0) {
-                title = tags.title;
-            } else {
-                title = playlist[id].file.name;
-            }
-            if (tags.artist !== undefined && tags.artist.length > 0) {
-                artist = tags.artist;
-            }
-            if (tags.album !== undefined && tags.album.length > 0) {
-                album = tags.album;
-            }
-            if (album.length > 0 && artist.length > 0) {
-                artist_album = tags.artist + ' - ' + tags.album;
-            } else
-            if (artist.length > 0) {
-                artist_album = artist;
-            } else
-            if (album.length > 0) {
-                artist_album = album;
-            }
-            var data = {title: title};
-            if (artist.length > 0) {
-                data.artist = artist;
-            }
-            if (artist.length > 0) {
-                data.album = album;
-            }
-            if (artist.length > 0) {
-                data.aa = artist_album;
-            }
-            if (tags.picture !== undefined) {
-                data.picture = tags.picture;
-            }
-            return data;
-        };
-        (function(ns) {
-            var notification = ns.notification = {};
-            var timeout = 3000;
-            var timer = undefined;
-            var starTimer = function() {
-                clearTimeout(timer);
-                timer = setTimeout(function() {
-                    chrome.notifications.clear('current_track', function() {
-                    });
-                }, timeout);
-            };
-            var getOpt = function() {
-                var tb = getTagBody();
-                var opt = {
-                    type: 'basic',
-                    iconUrl: '/images/no-cover.png',
-                    title: tb.title,
-                    message: ''
-                };
-                if (tb.aa !== undefined) {
-                    opt.message = tb.aa;
-                }
-                if (tb.picture !== undefined) {
-                    opt.iconUrl = engine.getCover(tb.picture).data;
-                }
-                return opt;
-            };
-            chrome.notifications.onButtonClicked.addListener(function(a, b) {
-                if (a !== 'current_track') {
-                    return;
-                }
-                clearTimeout(timer);
-                chrome.notifications.clear('current_track', function(obj) {
-                });
-                if (b === 1) {
-                    engine.player.preview();
-                } else {
-                    engine.player.next();
-                }
-            });
-            chrome.notifications.onClicked.addListener(function(a, b) {
-                clearTimeout(timer);
-                chrome.notifications.clear('current_track', function(obj) {
-                    window._focus_all();
-                });
-            });
-            notification.show = function() {
-                var opt = getOpt();
-                if (settings.notifi_buttons) {
-                    opt.buttons = [
-                        {title: _lang.next, iconUrl: '/images/playback_next.png'},
-                        {title: _lang.prev, iconUrl: '/images/playback_prev.png'}
-                    ];
-                }
-                //отображаем уведомление о воспроизведении
-                chrome.notifications.getAll(function(obj) {
-                    if (obj.current_track !== undefined) {
-                        starTimer();
-                        notification.update();
-                        return;
-                    }
-                    chrome.notifications.create('current_track', opt, function(obj) {
-                        starTimer();
-                    });
-                });
-            };
-            notification.update = function() {
-                chrome.notifications.getAll(function(obj) {
-                    if (obj.current_track === undefined) {
-                        return;
-                    }
-                    var opt = getOpt();
-                    chrome.notifications.update('current_track', opt, function(obj) {
-                    });
-                });
-            };
-        })(engine);
         var audio_preload = function(item) {
             if (item.type === undefined) {
                 return false;
             }
-            if (parseInt(settings['preload_' + item.type]) === 1) {
+            if (parseInt(_settings['preload_' + item.type]) === 1) {
                 /*
                  * preload return only BLOB!
                  */
@@ -528,8 +451,8 @@ var _debug = false;
                 if (id !== current_id) {
                     return;
                 }
-                if (settings.next_track_notification) {
-                    engine.notification.update();
+                if (_settings.next_track_notification) {
+                    notification.update();
                 }
             };
             var viz = function() {
@@ -544,7 +467,7 @@ var _debug = false;
                 if (id !== current_id) {
                     return;
                 }
-                if (settings.lastfm && tb.artist !== undefined && tb.album !== undefined) {
+                if (_settings.lastfm && tb.artist !== undefined && tb.album !== undefined) {
                     lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
                 }
             };
@@ -579,7 +502,7 @@ var _debug = false;
             lfm();
         };
         var lastfm_tag_reader = function(id) {
-            if (!settings.lastfm_cover || settings.is_winamp) {
+            if (!_settings.lastfm_cover || _settings.is_winamp) {
                 return;
             }
             var tags = playlist[id].tags;
@@ -603,7 +526,7 @@ var _debug = false;
                     } else {
                         tags.picture = i_id;
                     }
-                    if (settings.lastfm_tag_update && lfm_tags !== undefined) {
+                    if (_settings.lastfm_tag_update && lfm_tags !== undefined) {
                         var track = playlist[id];
                         var changes = false;
                         var changes_vk = false;
@@ -621,7 +544,7 @@ var _debug = false;
                             changes = true;
                             changes_vk = true;
                         }
-                        if (changes_vk && settings.vk_tag_update && track.type === 'vk' && track.from_lib === true) {
+                        if (changes_vk && _settings.vk_tag_update && track.type === 'vk' && track.from_lib === true) {
                             cloud.vk.update_tags(track.owner_id, track.track_id, tags.artist, tags.title);
                         }
                         if (changes) {
@@ -659,7 +582,6 @@ var _debug = false;
                 cb(adapter);
             }
         };
-        player.getTagBody = getTagBody;
         player.open = function(id) {
             id = parseInt(id);
             var item = playlist[id];
@@ -938,8 +860,8 @@ var _debug = false;
             player.discAdapters();
         });
         $(audio).on('loadeddata', function(e) {
-            if (settings.next_track_notification) {
-                engine.notification.show();
+            if (_settings.next_track_notification) {
+                notification.show();
             }
             var tags = playlist[current_id].tags;
             if (tags === undefined) {
@@ -1042,7 +964,88 @@ var _debug = false;
         player.getCurrentTrack = function() {
             return playlist[current_id];
         };
-    })(engine);
+        player.getTrackID = function() {
+            return current_id;
+        };
+    })();
+    var notification;
+    (function(ns) {
+        notification = {};
+        var timeout = 3000;
+        var timer = undefined;
+        var starTimer = function() {
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                chrome.notifications.clear('current_track', function() {
+                });
+            }, timeout);
+        };
+        var getOpt = function() {
+            var tb = getTagBody();
+            var opt = {
+                type: 'basic',
+                iconUrl: '/images/no-cover.png',
+                title: tb.title,
+                message: ''
+            };
+            if (tb.aa !== undefined) {
+                opt.message = tb.aa;
+            }
+            if (tb.picture !== undefined) {
+                opt.iconUrl = engine.getCover(tb.picture).data;
+            }
+            return opt;
+        };
+        chrome.notifications.onButtonClicked.addListener(function(a, b) {
+            if (a !== 'current_track') {
+                return;
+            }
+            clearTimeout(timer);
+            chrome.notifications.clear('current_track', function(obj) {
+            });
+            if (b === 1) {
+                player.preview();
+            } else {
+                player.next();
+            }
+        });
+        chrome.notifications.onClicked.addListener(function(a, b) {
+            clearTimeout(timer);
+            chrome.notifications.clear('current_track', function(obj) {
+                window._focus_all();
+            });
+        });
+        notification.show = function() {
+            var opt = getOpt();
+            if (_settings.notifi_buttons) {
+                opt.buttons = [
+                    {title: _lang.next, iconUrl: '/images/playback_next.png'},
+                    {title: _lang.prev, iconUrl: '/images/playback_prev.png'}
+                ];
+            }
+            //отображаем уведомление о воспроизведении
+            chrome.notifications.getAll(function(obj) {
+                if (obj.current_track !== undefined) {
+                    starTimer();
+                    notification.update();
+                    return;
+                }
+                chrome.notifications.create('current_track', opt, function(obj) {
+                    starTimer();
+                });
+            });
+        };
+        notification.update = function() {
+            chrome.notifications.getAll(function(obj) {
+                if (obj.current_track === undefined) {
+                    return;
+                }
+                var opt = getOpt();
+                chrome.notifications.update('current_track', opt, function(obj) {
+                });
+            });
+        };
+    })();
     var add_in_ctx_menu = function(playlist_info) {
         var context_menu = view.getContextMenu();
         if (playlist_info !== undefined && playlist_info.vk_save === true) {
@@ -1193,7 +1196,7 @@ var _debug = false;
         }
     });
     engine.loadSettings = loadSettings;
-    engine.get_filename = engine.player.get_filename;
+    engine.get_filename = player.get_filename;
     engine.open = function(files, info) {
         if (files.length === 0) {
             return;
@@ -1230,25 +1233,25 @@ var _debug = false;
             if (shuffle) {
                 id = getRandomInt(0, playlist.length - 1);
             }
-            engine.player.open(id);
+            player.open(id);
             add_in_ctx_menu(playlist_info);
         }
     };
     /*
      * refact!
      */
-    engine.play = engine.player.play;
-    engine.playToggle = engine.player.playToggle;
-    engine.open_id = engine.player.open;
-    engine.pause = engine.player.pause;
-    engine.next = engine.player.next;
-    engine.preview = engine.player.preview;
-    engine.position = engine.player.position;
-    engine.volume = engine.player.volume;
-    engine.mute = engine.player.mute;
-    engine.getMute = engine.player.getMute;
-    engine.getAudio = engine.player.getAudio;
-    engine.getCurrentTrack = engine.player.getCurrentTrack;
+    engine.play = player.play;
+    engine.playToggle = player.playToggle;
+    engine.open_id = player.open;
+    engine.pause = player.pause;
+    engine.next = player.next;
+    engine.preview = player.preview;
+    engine.position = player.position;
+    engine.volume = player.volume;
+    engine.mute = player.mute;
+    engine.getMute = player.getMute;
+    engine.getAudio = player.getAudio;
+    engine.getCurrentTrack = player.getCurrentTrack;
     /*
      * <<<
      */
@@ -1285,16 +1288,16 @@ var _debug = false;
     engine.getPlaylistInfo = function() {
         return playlist_info;
     };
-    engine.getCurrent = engine.player.getCurrent;
+    engine.getCurrent = player.getCurrent;
     engine.APIstatus = function() {
-        return JSON.stringify(engine.player.status());
+        return JSON.stringify(player.status());
     };
     engine.APIplaylist = function() {
         var pl = sorted_playlist || playlist;
         var list = new Array(pl.length);
         for (var i = 0, item; item = pl[i]; i++) {
             var title;
-            var tb = engine.player.getTagBody(item.id);
+            var tb = getTagBody(item.id);
             if (tb.aa === undefined) {
                 title = tb.title;
             } else {
@@ -1312,7 +1315,7 @@ var _debug = false;
         if (playlist_info !== undefined) {
             pl_i = {name: playlist_info.name, id: playlist_info.id};
         }
-        var rez = engine.player.status();
+        var rez = player.status();
         rez.playlist = list;
         rez.playlists = pls;
         rez.playlist_info = pl_i;
@@ -1342,10 +1345,10 @@ var _debug = false;
         var list = (sorted_playlist || playlist).slice();
         return [sort_type, list];
     };
-    engine.readAllTags = engine.player.readAllTags;
-    engine.getAdapter = engine.player.getAdapter;
-    engine.discAdapters = engine.player.discAdapters;
-    engine.getTagBody = engine.player.getTagBody;
+    engine.readAllTags = player.readAllTags;
+    engine.getAdapter = player.getAdapter;
+    engine.discAdapters = player.discAdapters;
+    engine.getTagBody = getTagBody;
     engine.vizRandomPreset = function() {
         _send('viz', function(window) {
             window.viz.randomPreset();
@@ -1354,7 +1357,7 @@ var _debug = false;
     engine.get_allow_ext = function() {
         return allow_ext;
     };
-    engine.canPlay = engine.player.canPlay;
+    engine.canPlay = player.canPlay;
     engine.set_hotkeys = function(_document) {
         $(_document).keydown(function(event) {
             if (event.ctrlKey || event.metaKey) {
@@ -1501,7 +1504,7 @@ var _debug = false;
                     _windows[options.type] = window;
                     window.onClosed.addListener(function() {
                         delete _windows[options.type];
-                        engine.player.discAdapters('viz');
+                        player.discAdapters('viz');
                     });
                     window.contentWindow._lang = _lang;
                     window.contentWindow._send = _send;
