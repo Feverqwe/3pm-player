@@ -145,7 +145,6 @@ var _debug = false;
          * data = Array || ArrayBuffer || Blob
          */
         var blob;
-        var type = 'image/jpeg';
         if (data === undefined) {
             cb(undefined);
             return;
@@ -163,7 +162,7 @@ var _debug = false;
                 cb(id);
                 return;
             }
-            blob = new Blob([data], {type: type});
+            blob = new Blob([data], {type: 'image/jpeg'});
         } else {
             blob = data;
         }
