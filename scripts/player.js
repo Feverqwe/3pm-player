@@ -206,13 +206,11 @@
                 playlists[name] = arr;
                 dune();
             };
-            var readEntry = function(entry, file_tree, file_arr) {
+            var readEntry = function(entry, file_tree) {
                 /*
                  * ищет внутри всех папок, в соответствие с {} file_tree, и если внутри есть файлы из [] file_arr добавляет из в массив.
                  */
-                if (file_arr === undefined) {
-                    file_arr = [];
-                }
+                var has_files = file_tree[entry.fullPath] !== undefined;
                 stream_count++;
                 getEntryFromDir(entry, function(sub_entry) {
                     var len = sub_entry.length;
@@ -221,10 +219,12 @@
                         if (sub_entry[n].isDirectory) {
                             $.each(file_tree, function(item) {
                                 if (sub_entry[n].fullPath === item) {
-                                    readEntry(sub_entry[n], file_tree, file_tree[item].files);
+                                    readEntry(sub_entry[n], file_tree);
                                 }
                             });
-                        } else {
+                        } else
+                        if (has_files) {
+                            var file_arr = file_tree[entry.fullPath].files;
                             if (file_arr.indexOf(sub_entry[n].name) !== -1) {
                                 files.push(sub_entry[n]);
                             }
