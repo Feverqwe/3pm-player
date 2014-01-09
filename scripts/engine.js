@@ -3,7 +3,7 @@ var _debug = false;
     var engine = ns.engine = {};
     //options
     var boot = true;
-    _settings = {
+    var settings = _settings = {
         next_track_notification: 0,
         extend_volume_scroll: 0,
         notifi_buttons: 0,
@@ -414,7 +414,7 @@ var _debug = false;
             });
             notification.show = function() {
                 var opt = getOpt();
-                if (_settings.notifi_buttons) {
+                if (settings.notifi_buttons) {
                     opt.buttons = [
                         {title: _lang.next, iconUrl: '/images/playback_next.png'},
                         {title: _lang.prev, iconUrl: '/images/playback_prev.png'}
@@ -447,7 +447,7 @@ var _debug = false;
             if (item.type === undefined) {
                 return false;
             }
-            if (parseInt(_settings['preload_' + item.type]) === 1) {
+            if (parseInt(settings['preload_' + item.type]) === 1) {
                 /*
                  * preload return only BLOB!
                  */
@@ -512,7 +512,7 @@ var _debug = false;
                 if (id !== current_id) {
                     return;
                 }
-                if (_settings.next_track_notification) {
+                if (settings.next_track_notification) {
                     notification.update();
                 }
             };
@@ -528,7 +528,7 @@ var _debug = false;
                 if (id !== current_id) {
                     return;
                 }
-                if (_settings.lastfm && tb.artist !== undefined && tb.album !== undefined) {
+                if (settings.lastfm && tb.artist !== undefined && tb.album !== undefined) {
                     lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
                 }
             };
@@ -563,7 +563,7 @@ var _debug = false;
             lfm();
         };
         var lastfm_tag_reader = function(id) {
-            if (!_settings.lastfm_cover || _settings.is_winamp) {
+            if (!settings.lastfm_cover || settings.is_winamp) {
                 return;
             }
             var tags = playlist[id].tags;
@@ -587,7 +587,7 @@ var _debug = false;
                     } else {
                         tags.picture = i_id;
                     }
-                    if (_settings.lastfm_tag_update && lfm_tags !== undefined) {
+                    if (settings.lastfm_tag_update && lfm_tags !== undefined) {
                         var track = playlist[id];
                         var changes = false;
                         var changes_vk = false;
@@ -605,7 +605,7 @@ var _debug = false;
                             changes = true;
                             changes_vk = true;
                         }
-                        if (changes_vk && _settings.vk_tag_update && track.type === 'vk' && track.from_lib === true) {
+                        if (changes_vk && settings.vk_tag_update && track.type === 'vk' && track.from_lib === true) {
                             cloud.vk.update_tags(track.owner_id, track.track_id, tags.artist, tags.title);
                         }
                         if (changes) {
@@ -921,7 +921,7 @@ var _debug = false;
             player.discAdapters();
         });
         $(audio).on('loadeddata', function(e) {
-            if (_settings.next_track_notification) {
+            if (settings.next_track_notification) {
                 notification.show();
             }
             var tags = playlist[current_id].tags;
@@ -1179,10 +1179,10 @@ var _debug = false;
         }
     });
     engine.loadSettings = function(obj) {
-        var _old_settings = JSON.parse(JSON.stringify(_settings));
-        $.each(_settings, function(k) {
+        var _old_settings = JSON.parse(JSON.stringify(settings));
+        $.each(settings, function(k) {
             if (obj[k] !== undefined) {
-                _settings[k] = obj[k];
+                settings[k] = obj[k];
             }
         });
         if (boot) {
@@ -1190,7 +1190,7 @@ var _debug = false;
             boot = undefined;
             return;
         }
-        if ((_settings.webui_port !== _old_settings.webui_port || _settings.webui_interface !== _old_settings.webui_interface) && webui.active()) {
+        if ((settings.webui_port !== _old_settings.webui_port || settings.webui_interface !== _old_settings.webui_interface) && webui.active()) {
             webui.start();
         }
         chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
