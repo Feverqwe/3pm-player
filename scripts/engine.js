@@ -145,7 +145,6 @@ var _debug = false;
          * data = Array || ArrayBuffer || Blob
          */
         var blob;
-        var cover_id;
         var type = 'image/jpeg';
         if (data === undefined) {
             cb(undefined);
@@ -175,7 +174,7 @@ var _debug = false;
                 return;
             }
             var url = URL.createObjectURL(blob);
-            cover_id = add_cover(o_b_len, url, check_summ);
+            var cover_id = add_cover(o_b_len, url, check_summ);
             cb(cover_id);
         });
     };
