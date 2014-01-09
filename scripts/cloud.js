@@ -820,7 +820,7 @@ var cloud = function() {
                 xhr.open("GET", url, true);
                 xhr.responseType = "blob";
                 xhr.onload = function() {
-                    tags.picture = [xhr.response, ''];
+                    tags.picture = {data: xhr.response};
                     cb(tags);
                 };
                 xhr.onerror = function() {
@@ -1177,7 +1177,7 @@ var cloud = function() {
                 xhr.open("GET", url, true);
                 xhr.responseType = "blob";
                 xhr.onload = function() {
-                    tags.picture = [xhr.response, ''];
+                    tags.picture = {data: xhr.response};
                     cb(tags);
                 };
                 xhr.onerror = function() {

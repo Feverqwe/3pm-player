@@ -29,17 +29,13 @@
         /*
          * Отображает изображение, получает картинку из engine
          */
-        var img = engine.getCover(id);
-        if (img.data === null) {
-            hideImage();
-            return;
-        }
-        var url = 'url(' + img.data + ')';
+        var url = engine.getCover(id);
+        var img_url = 'url(' + url + ')';
         if (dom_cache.picture_url !== url) {
             dom_cache.picture_url = url;
             clearTimeout(dom_cache.picture_timer);
             dom_cache.picture_timer = setTimeout(function() {
-                dom_cache.picture.css('background-image', url);
+                dom_cache.picture.css('background-image', img_url);
             }, 50);
         }
     };
@@ -47,12 +43,13 @@
         /*
          * Выставляет статус - без обложки.
          */
-        var url = 'url(images/no-cover.png)';
+        var url = 'images/no-cover.png';
+        var img_url = 'url(' + url + ')';
         if (dom_cache.picture_url !== url) {
             dom_cache.picture_url = url;
             clearTimeout(dom_cache.picture_timer);
             dom_cache.picture_timer = setTimeout(function() {
-                dom_cache.picture.css('background-image', url);
+                dom_cache.picture.css('background-image', img_url);
             }, 50);
         }
     };

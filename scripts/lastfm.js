@@ -267,7 +267,7 @@
     };
     var getImage = function(cn, cb) {
         var url = track_cache[cn].url;
-        if (url === undefined) {
+        if (url === undefined || url.indexOf('noimage') !== -1) {
             cb(track_cache[cn].info);
             return;
         }

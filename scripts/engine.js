@@ -115,8 +115,9 @@ var _debug = false;
         }
         return chk.join('');
     };
-    var image_resize = function(url, cb) {
+    var image_check = function(url, cb) {
         /*
+         * Проверяет изображение на возможность прочтения
          * Изменяет размер обложки.
          */
         var img = new Image();
@@ -139,49 +140,44 @@ var _debug = false;
         };
         img.src = url;
     };
-    var read_image = function(binary, cb) {
+    var read_image = function(data, cb) {
         /*
-         * binary = [Array || ArrayBuffer || Blob, 'image/*'];
+         * data = Array || ArrayBuffer || Blob
          */
-        var resize = true;
         var blob;
-        if (binary === undefined) {
+        var cover_id;
+        var type = 'image/jpeg';
+        if (data === undefined) {
             cb(undefined);
             return;
         }
-        if (binary[0].size === undefined) {
-            if (binary[1].substr(0, 1) !== 'i' && binary[1].substr(4, 1) !== 'e') {
-                binary[1] = 'image/jpeg';
+        if (data.size === undefined) {
+            if (data.buffer === undefined) {
+                //data is Array
+                data = new Uint8Array(data);
             }
-            if (binary[0].buffer === undefined) {
-                binary[0] = new Uint8Array(binary[0]);
-            }
-            var check_summ = array_chksum(binary[0]);
-            var o_b_len = binary[0].length;
+            //data is Uint8Array
+            var check_summ = array_chksum(data);
+            var o_b_len = data.length;
             var id = check_cover(o_b_len, check_summ);
             if (id !== undefined) {
                 cb(id);
                 return;
             }
-            blob = new Blob([binary[0]], {type: binary[1]});
+            blob = new Blob([data], {type: type});
         } else {
-            blob = binary[0];
+            blob = data;
         }
         var url = URL.createObjectURL(blob);
-        if (resize) {
-            image_resize(url, function(blob) {
-                if (blob === undefined) {
-                    cb(undefined);
-                    return;
-                }
-                var url = URL.createObjectURL(blob);
-                var id = add_cover(o_b_len, url, check_summ);
-                cb(id);
-            });
-        } else {
-            id = add_cover(o_b_len, url, check_summ);
-            cb(id);
-        }
+        image_check(url, function(blob) {
+            if (blob === undefined) {
+                cb(undefined);
+                return;
+            }
+            var url = URL.createObjectURL(blob);
+            cover_id = add_cover(o_b_len, url, check_summ);
+            cb(cover_id);
+        });
     };
     var check_cover = function(len, checksum) {
         var id;
@@ -209,12 +205,15 @@ var _debug = false;
                 window.playlist.updPlaylistItem(id, playlist[id]);
             });
             cloud[playlist[id].type].read_tags(playlist[id], function(tags) {
-                // NOTE: tags.picture = [binary, mime]
-                read_image(tags.picture, function(i_id) {
-                    if (i_id === undefined) {
+                if (tags.picture === undefined) {
+                    rt_cb(tags, id);
+                    return;
+                }
+                read_image(tags.picture.data, function(cover_id) {
+                    if (cover_id === undefined) {
                         delete tags.picture;
                     } else {
-                        tags.picture = i_id;
+                        tags.picture = cover_id;
                     }
                     rt_cb(tags, id);
                 });
@@ -252,14 +251,15 @@ var _debug = false;
              */
             var tags = ID3.getAllTags(f_name);
             ID3.clearAll();
-            if (tags.picture !== undefined) {
-                tags.picture = [tags.picture.data, tags.picture.format];
+            if (tags.picture === undefined) {
+                rt_cb(tags, id);
+                return;
             }
-            read_image(tags.picture, function(i_id) {
-                if (i_id === undefined) {
+            read_image(tags.picture.data, function(cover_id) {
+                if (cover_id === undefined) {
                     delete tags.picture;
                 } else {
-                    tags.picture = i_id;
+                    tags.picture = cover_id;
                 }
                 rt_cb(tags, id);
             });
@@ -381,7 +381,6 @@ var _debug = false;
                 var tb = getTagBody();
                 var opt = {
                     type: 'basic',
-                    iconUrl: '/images/no-cover.png',
                     title: tb.title,
                     message: ''
                 };
@@ -389,7 +388,7 @@ var _debug = false;
                     opt.message = tb.aa;
                 }
                 if (tb.picture !== undefined) {
-                    opt.iconUrl = engine.getCover(tb.picture).data;
+                    opt.iconUrl = engine.getCover(tb.picture);
                 }
                 return opt;
             };
@@ -544,8 +543,8 @@ var _debug = false;
                 return;
             }
             if (state === 3) {
-                plist();
                 player();
+                plist();
                 notifi();
                 return;
             }
@@ -577,15 +576,11 @@ var _debug = false;
                 if (lfm_tags === undefined) {
                     return;
                 }
-                var binary;
-                if (blob !== undefined) {
-                    binary = [blob, ''];
-                }
-                read_image(binary, function(i_id) {
-                    if (i_id === undefined) {
+                read_image(blob, function(cover_id) {
+                    if (cover_id === undefined) {
                         delete tags.picture;
                     } else {
-                        tags.picture = i_id;
+                        tags.picture = cover_id;
                     }
                     if (settings.lastfm_tag_update && lfm_tags !== undefined) {
                         var track = playlist[id];
@@ -611,7 +606,7 @@ var _debug = false;
                         if (changes) {
                             tags_loaded(tags, id, 4);
                         } else
-                        if (i_id !== undefined) {
+                        if (cover_id !== undefined) {
                             tags_loaded(tags, id, 3);
                         }
                     } else {
@@ -1249,11 +1244,12 @@ var _debug = false;
     engine.getAudio = player.getAudio;
     engine.getCurrentTrack = player.getCurrentTrack;
     engine.getCover = function(id) {
-        return covers[id];
-    };
-    engine.badImage = function(id) {
-        covers[id].data = null;
-        covers[id].len = null;
+        /*
+         if (id === undefined || covers[id] === undefined) {
+         return 'images/no-cover.png';
+         }
+         */
+        return covers[id].data;
     };
     engine.shuffle = function(c) {
         if (c === undefined) {

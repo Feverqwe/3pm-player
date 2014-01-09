@@ -41,16 +41,13 @@ var playlist = function() {
             var idl = id.length;
             var dom_list = new Array(idl);
             for (var i = 0; i < idl; i++) {
-                var data = "images/no-cover.png";
+                var url = "images/no-cover.png";
                 var item = id[i];
                 _send('player',function(window) {
                     if (item !== 'none') {
-                        var url = window.engine.getCover(item).data;
-                        if (url !== null) {
-                            data = url;
-                        }
+                        url = window.engine.getCover(item);
                     }
-                    dom_list[i] = $('<style>', {'class': 'cover pic_' + item, text: '.pic_' + item + '{background-image:url(' + data + ');}'});
+                    dom_list[i] = $('<style>', {'class': 'cover pic_' + item, text: '.pic_' + item + '{background-image:url(' + url + ');}'});
                 });
             }
             dom_cache.body.append(dom_list);
@@ -63,12 +60,8 @@ var playlist = function() {
             return;
         }
         _send('player',function(window) {
-            var img = window.engine.getCover(id);
-            var data = img.data;
-            if (data === null) {
-                data = "images/no-cover.png";
-            }
-            dom_cache.body.append($('<style>', {'class': 'cover pic_' + id, text: '.pic_' + id + '{background-image:url(' + data + ');}'}));
+            var url = window.engine.getCover(id);
+            dom_cache.body.append($('<style>', {'class': 'cover pic_' + id, text: '.pic_' + id + '{background-image:url(' + url + ');}'}));
         });
     };
     var write_playlist = function(items) {
