@@ -82,7 +82,7 @@ var options = function() {
                 getImage('http://chart.apis.google.com/chart?cht=qr&chs=150x150&chl=' + encodeURIComponent(url) + '&chld=H|0', function(blob) {
                     var image = '';
                     if (blob !== undefined) {
-                        image = $('<img>', {src: webkitURL.createObjectURL(blob)});
+                        image = $('<img>', {src: URL.createObjectURL(blob)});
                     }
                     body.append(
                             $('<div>', {'class': 'qr_item'}).append(

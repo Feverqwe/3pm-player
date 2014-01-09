@@ -121,11 +121,11 @@ var _debug = false;
          */
         var img = new Image();
         img.onerror = function() {
-            webkitURL.revokeObjectURL(url);
+            URL.revokeObjectURL(url);
             cb(undefined);
         };
         img.onload = function() {
-            webkitURL.revokeObjectURL(url);
+            URL.revokeObjectURL(url);
             var MAXWidthHeight = 80 * 2;
             var r = MAXWidthHeight / Math.max(this.width, this.height),
                     w = Math.round(this.width * r),
@@ -167,14 +167,14 @@ var _debug = false;
         } else {
             blob = binary[0];
         }
-        var url = webkitURL.createObjectURL(blob);
+        var url = URL.createObjectURL(blob);
         if (resize) {
             image_resize(url, function(blob) {
                 if (blob === undefined) {
                     cb(undefined);
                     return;
                 }
-                var url = webkitURL.createObjectURL(blob);
+                var url = URL.createObjectURL(blob);
                 var id = add_cover(o_b_len, url, check_summ);
                 cb(id);
             });
