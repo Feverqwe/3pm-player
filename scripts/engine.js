@@ -24,6 +24,7 @@ var _debug = false;
         webui_run_onboot: 0,
         vk_tag_update: 0
     };
+    ns._settings = settings;
     var loadSettings = function(obj) {
         var _old_settings = JSON.parse(JSON.stringify(settings));
         $.each(settings, function(k) {
@@ -32,7 +33,6 @@ var _debug = false;
             }
         });
         if (boot) {
-            window._settings = settings;
             chrome.runtime.sendMessage(chrome.runtime.id, 'settings_ready');
             boot = undefined;
             return;
@@ -42,6 +42,9 @@ var _debug = false;
         }
         chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
     };
+    chrome.storage.local.get(function(obj) {
+        loadSettings(obj);
+    });
     //<<<<<<<
     //allow_ext - only for files without mime.
     var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
@@ -386,9 +389,8 @@ var _debug = false;
             }
             return data;
         };
-        var notification;
-        (function(notification) {
-            notification = {};
+        (function(ns) {
+            var notification = ns.notification = {};
             var timeout = 3000;
             var timer = undefined;
             var starTimer = function() {
@@ -463,7 +465,7 @@ var _debug = false;
                     });
                 });
             };
-        })(notification);
+        })(engine);
         var audio_preload = function(item) {
             if (item.type === undefined) {
                 return false;
@@ -534,7 +536,7 @@ var _debug = false;
                     return;
                 }
                 if (settings.next_track_notification) {
-                    notification.update();
+                    engine.notification.update();
                 }
             };
             var viz = function() {
@@ -929,7 +931,7 @@ var _debug = false;
                 });
                 $(audio).on('loadeddata', function(e) {
                     if (settings.next_track_notification) {
-                        notification.show();
+                        engine.notification.show();
                     }
                     var tags = playlist[current_id].tags;
                     if (tags === undefined) {
@@ -1186,9 +1188,6 @@ var _debug = false;
     });
     engine.run = function() {
         player.init();
-        chrome.storage.local.get(function(obj) {
-            loadSettings(obj);
-        });
     };
     engine.loadSettings = loadSettings;
     engine.get_filename = player.get_filename;
