@@ -689,7 +689,7 @@ var _debug = false;
             if (current_id === undefined || playlist[current_id] === undefined) {
                 return;
             }
-            if (playlist[current_id].file.url !== undefined && audio.duration === Infinity) {
+            if (playlist[current_id].file.url !== undefined && (audio.duration === Infinity || audio.currentTime === 0)) {
                 audio.pause();
                 audio.src = "";
             } else {
