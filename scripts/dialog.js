@@ -187,6 +187,7 @@ var dialog = function() {
             fl.append($('<li>', {'class': 'gd_file', 'data-id': -1}).append($('<span>', {title: _lang.dialog.back, text: _lang.dialog.back})));
         }
         var n = -1;
+        list.items.reverse();
         list.items.forEach(function(item) {
             n++;
             var filename = item.title;
@@ -271,6 +272,7 @@ var dialog = function() {
             _send('player',function(window) {
                 window.cloud.gd.getFilelist(folder_id, function(list) {
                     var playlist = {name: pl_name, id: 0, type: "gd", tracks: []};
+                    list.items.reverse();
                     list.items.forEach(function(item) {
                         var is_dir = (item.mimeType.indexOf('.folder') !== -1);
                         if (is_dir || item.downloadUrl === undefined || item.mimeType.indexOf('audio/') === -1) {
