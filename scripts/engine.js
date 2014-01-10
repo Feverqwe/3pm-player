@@ -263,23 +263,17 @@ var _debug = false;
             });
         }, params);
     };
-    var getType = function(file) {
+    var canFilePlay = function(file) {
         /*
          * Определяет может ли плеер проигрывать файл, возвращает тип файла для плеера.
          */
         var type = file.type;
         if (type !== undefined && type.length > 0) {
-            if (player.canPlay(type) === 0) {
-                return;
-            }
-            return type;
-        }
-        var filename = file.name;
-        var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
-        if (allow_ext.indexOf(ext) !== -1) {
-            return true;
+            return player.canPlay(type);
         } else {
-            return false;
+            var filename = file.name;
+            var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
+            return player.canPlay('.' + ext);
         }
     };
     var getRandomInt = function(min, max) {
@@ -872,7 +866,7 @@ var _debug = false;
             if (type_list[mime] !== undefined) {
                 return type_list[mime];
             }
-            type_list[mime] = audio.canPlayType(mime).length;
+            type_list[mime] = audio.canPlayType(mime).length > 0;
             return type_list[mime];
         };
         $(audio).on('loadstart', function(e) {
@@ -1212,7 +1206,7 @@ var _debug = false;
                 my_playlist.push({id: my_playlist.length, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
                 continue;
             }
-            if (getType(files[i]) === undefined) {
+            if (canFilePlay(files[i]) === undefined) {
                 continue;
             }
             my_playlist.push({id: my_playlist.length, file: files[i], tags: undefined, duration: undefined});
@@ -1288,12 +1282,10 @@ var _debug = false;
         var pl = sorted_playlist || playlist;
         var list = new Array(pl.length);
         for (var i = 0, item; item = pl[i]; i++) {
-            var title;
             var tb = getTagBody(item.id);
-            if (tb.aa === undefined) {
-                title = tb.title;
-            } else {
-                title = tb.title + ' - ' + tb.aa;
+            var title = tb.title;
+            if (tb.aa !== undefined) {
+                title += ' - ' + tb.aa;
             }
             list[i] = {id: item.id, title: title};
         }
