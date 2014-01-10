@@ -858,10 +858,16 @@ var cloud = function() {
             if (id === undefined) {
                 id = 'root';
             }
-            var colums = encodeURIComponent('items(downloadUrl,id,mimeType,parents(isRoot),title)');
-            var url = 'https://www.googleapis.com/drive/v2/files?q=\'' + id + '\'+in+parents&fields=' + colums;
+            var colums = 'items(downloadUrl,id,mimeType,parents(isRoot),title)';
+            var data = {
+                q : '\''+id+'\' in parents', 
+                fields: colums
+            };
+            var url = 'https://www.googleapis.com/drive/v2/files';
             $.ajax({
+                type: 'GET',
                 url: url,
+                data: data,
                 dataType: 'JSON',
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + token);
