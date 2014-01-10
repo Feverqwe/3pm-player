@@ -197,12 +197,12 @@ var _debug = false;
         return id;
     };
     var read_tags = function(id, rt_cb) {
-        if (playlist[id].type !== undefined && cloud[playlist[id].type].read_tags !== undefined) {
+        if (playlist[id].cloud !== undefined && cloud[playlist[id].cloud.type].read_tags !== undefined) {
             playlist[id].state = "loading";
             _send('playlist', function(window) {
                 window.playlist.updPlaylistItem(id, playlist[id]);
             });
-            cloud[playlist[id].type].read_tags(playlist[id], function(tags) {
+            cloud[playlist[id].cloud.type].read_tags(playlist[id], function(tags) {
                 if (tags.picture === undefined) {
                     rt_cb(tags, id);
                     return;
@@ -440,40 +440,41 @@ var _debug = false;
                 });
             };
         })();
-        var audio_preload = function(item) {
-            if (item.type === undefined) {
+        var audio_preload = function(track) {
+            if (track.cloud === undefined) {
                 return false;
             }
-            if (parseInt(settings['preload_' + item.type]) === 1) {
+            var track_type = track.cloud.type;
+            if (parseInt(settings['preload_' + track_type]) === 1) {
                 /*
                  * preload return only BLOB!
                  */
-                if (item.blob !== undefined && item.blob.url !== undefined) {
-                    audio.src = item.blob.url;
+                if (track.blob !== undefined && track.blob.url !== undefined) {
+                    audio.src = track.blob.url;
                     return true;
                 }
                 view.state("preloading");
-                cloud[item.type].preload({
+                cloud[track_type].preload({
                     view: view,
-                    track: item
+                    track: track
                 }, function(blob) {
                     view.state("preloading_dune");
                     if (typeof blob === 'string') {
                         console.log('No url');
                         return;
                     }
-                    item.blob = blob;
-                    item.blob.url = URL.createObjectURL(blob);
-                    audio.src = item.blob.url;
+                    track.blob = blob;
+                    track.blob.url = URL.createObjectURL(blob);
+                    audio.src = track.blob.url;
                 });
                 return true;
             } else
-            if (cloud[item.type].onplay !== undefined) {
+            if (cloud[track_type].onplay !== undefined) {
                 /*
                  * onplay return only URL!
                  */
                 view.state("preloading");
-                cloud[item.type].onplay(item, view, function(url) {
+                cloud[track_type].onplay(track, view, function(url) {
                     view.state("preloading_dune");
                     if (url.length === 0) {
                         console.log('No url');
@@ -588,8 +589,8 @@ var _debug = false;
                         changes = true;
                         changes_vk = true;
                     }
-                    if (changes_vk && settings.vk_tag_update && track.type === 'vk' && track.from_lib === true) {
-                        cloud.vk.update_tags(track.owner_id, track.track_id, tags.artist, tags.title);
+                    if (changes_vk && settings.vk_tag_update && track.cloud !== undefined && track.cloud.type === 'vk' && track.cloud.from_lib === true) {
+                        cloud.vk.update_tags(track.cloud.owner_id, track.cloud.track_id, tags.artist, tags.title);
                     }
                     if (changes) {
                         tags_loaded(tags, id, 4);
@@ -1028,7 +1029,7 @@ var _debug = false;
     })();
     var add_in_ctx_menu = function(playlist_info) {
         var context_menu = view.getContextMenu();
-        if (playlist_info !== undefined && playlist_info.vk_save === true) {
+        if (playlist_info !== undefined && playlist_info.cloud !== undefined && playlist_info.cloud.vk_save === true) {
             if (context_menu.save_vk.hide === 0) {
                 return;
             }
@@ -1420,28 +1421,28 @@ var _debug = false;
             return;
         }
         cloud.abort();
-        var list = {name: undefined};
+        var album = {name: undefined};
         filePlaylists.list.forEach(function(item) {
             if (item.id === id) {
-                list = item;
+                album = item;
             }
         });
-        if (list.type === 'subfiles') {
-            view.getFilesFromFolder(list.entry, function(files) {
-                engine.open(files, {name: list.name, id: id});
+        if (album.type === 'subfiles') {
+            view.getFilesFromFolder(album.entry, function(files) {
+                engine.open(files, {name: album.name, id: id});
             });
         } else
-        if (list.type === 'm3u') {
-            view.entry2files(list.entrys, function(files) {
-                engine.open(files, {name: list.name, id: id});
+        if (album.type === 'm3u') {
+            view.entry2files(album.entrys, function(files) {
+                engine.open(files, {name: album.name, id: id});
             });
         } else
-        if (cloud[list.type] !== undefined && cloud[list.type].on_select_list !== undefined) {
-            cloud[list.type].on_select_list(list, function(track_list, info) {
+        if (album.cloud !== undefined && cloud[album.cloud.type] !== undefined && cloud[album.cloud.type].on_select_list !== undefined) {
+            cloud[album.cloud.type].on_select_list(album, function(track_list, info) {
                 engine.open(track_list, info);
             });
         } else {
-            engine.open(list.tracks, {name: list.name, id: id});
+            engine.open(album.tracks, {name: album.name, id: id});
         }
     };
     engine.showMenu = function() {

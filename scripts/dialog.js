@@ -10,7 +10,7 @@ var dialog = function() {
         $('.url_dialog').show();
         $('.url_dialog input[name=open_btn]').on('click', function() {
             var text = $(this).parent().children('input[name=url]').get(0);
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.engine.open([{url: text.value}], {name: "URL"});
             });
             window.close();
@@ -36,7 +36,7 @@ var dialog = function() {
         });
         $('body').on('click', 'li.pl_file', function() {
             var id = $(this).data("id");
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.engine.select_playlist(id);
             });
             window.close();
@@ -98,7 +98,7 @@ var dialog = function() {
                     return;
                 }
             }
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.cloud.db.getFilelist(function(list) {
                     db_writefilelist(list);
                 }, root, path);
@@ -131,7 +131,7 @@ var dialog = function() {
             var path = item.path;
             var root = item.root;
             var _window = window;
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.cloud.db.getFilelist(function(list) {
                     var pl_name = list.path.split('/').slice(-1)[0] || "Dropbox";
                     var playlist = {name: pl_name, id: 0, type: "db", tracks: []};
@@ -141,12 +141,12 @@ var dialog = function() {
                         if (item.is_dir || allow_ext.indexOf(ext) === -1) {
                             return 1;
                         }
-                        playlist.tracks.push({id: -1, file: {name: filename, url: undefined}, tags: {}, duration: 0, type: "db", root: item.root, path: item.path});
+                        playlist.tracks.push({id: -1, file: {name: filename, url: undefined}, tags: {}, duration: 0, cloud: {type: "db", root: item.root, path: item.path}});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
                     }
-                    _send('player',function(window) {
+                    _send('player', function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
                         window.engine.select_playlist(0);
                     });
@@ -166,12 +166,12 @@ var dialog = function() {
                     return 1;
                 }
                 var filename = item.path.split('/').slice(-1)[0];
-                playlist.tracks.push({id: -1, file: {name: filename, url: undefined}, tags: {}, duration: 0, type: "db", root: item.root, path: item.path});
+                playlist.tracks.push({id: -1, file: {name: filename, url: undefined}, tags: {}, duration: 0, cloud: {type: "db", root: item.root, path: item.path}});
             });
             if (playlist.tracks.length === 0) {
                 return;
             }
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
                 window.engine.select_playlist(0);
             });
@@ -235,7 +235,7 @@ var dialog = function() {
                     return;
                 }
             }
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.cloud.gd.getFilelist(folder_id, function(list) {
                     gd_writefilelist(list, folder_id);
                 });
@@ -269,7 +269,7 @@ var dialog = function() {
             var folder_id = item.id;
             var _window = window;
             var pl_name = item.title || "Google Drive";
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.cloud.gd.getFilelist(folder_id, function(list) {
                     var playlist = {name: pl_name, id: 0, type: "gd", tracks: []};
                     list.items.reverse();
@@ -279,12 +279,12 @@ var dialog = function() {
                             return 1;
                         }
                         var filename = item.title;
-                        playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl}, tags: {}, duration: 0, type: 'gd'});
+                        playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl}, tags: {}, duration: 0, cloud: {type: 'gd'}});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
                     }
-                    _send('player',function(window) {
+                    _send('player', function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
                         window.engine.select_playlist(0);
                     });
@@ -305,12 +305,12 @@ var dialog = function() {
                     return 1;
                 }
                 var filename = item.title;
-                playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl}, tags: {}, duration: 0, type: 'gd'});
+                playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl}, tags: {}, duration: 0, cloud: {type: 'gd'}});
             });
             if (playlist.tracks.length === 0) {
                 return;
             }
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
                 window.engine.select_playlist(0);
             });
@@ -375,7 +375,7 @@ var dialog = function() {
                     return;
                 }
             }
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.cloud.box.getFilelist(function(list) {
                     box_writefilelist(list);
                 }, folder_id);
@@ -408,7 +408,7 @@ var dialog = function() {
             var folder_id = item.id;
             var folder_name = item.name;
             var _window = window;
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.cloud.box.getFilelist(function(list) {
                     var playlist = {name: folder_name, id: 0, type: "box", tracks: []};
                     list.entries.forEach(function(item) {
@@ -416,12 +416,12 @@ var dialog = function() {
                         if (item.type === "folder" || allow_ext.indexOf(ext) === -1) {
                             return 1;
                         }
-                        playlist.tracks.push({id: -1, file: {name: item.name, url: undefined}, tags: {}, duration: 0, type: "box", file_id: item.id});
+                        playlist.tracks.push({id: -1, file: {name: item.name, url: undefined}, tags: {}, duration: 0, cloud: {type: "box", file_id: item.id}});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
                     }
-                    _send('player',function(window) {
+                    _send('player', function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
                         window.engine.select_playlist(0);
                     });
@@ -440,12 +440,12 @@ var dialog = function() {
                 if (item.type === "folder") {
                     return 1;
                 }
-                playlist.tracks.push({id: -1, file: {name: item.name, url: undefined}, tags: {}, duration: 0, type: "box", file_id: item.id});
+                playlist.tracks.push({id: -1, file: {name: item.name, url: undefined}, tags: {}, duration: 0, cloud: {type: "box", file_id: item.id}});
             });
             if (playlist.tracks.length === 0) {
                 return;
             }
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
                 window.engine.select_playlist(0);
             });
@@ -522,7 +522,7 @@ var dialog = function() {
                     return;
                 }
             }
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.cloud.sd.getFilelist(folder_id, function(list) {
                     sd_writefilelist(list, folder_id);
                 });
@@ -556,7 +556,7 @@ var dialog = function() {
             var folder_id = item.id;
             var _window = window;
             var pl_name = item.name || "SkyDrive";
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.cloud.sd.getFilelist(folder_id, function(list) {
                     var playlist = {name: pl_name, id: 0, type: "sd", tracks: []};
                     list.data.forEach(function(item) {
@@ -566,12 +566,12 @@ var dialog = function() {
                         }
                         var filename = item.name;
                         var tags = read_tags(item);
-                        playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, meta: tags, duration: 0, type: 'sd'});
+                        playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, duration: 0, cloud: {meta: tags, type: 'sd'}});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
                     }
-                    _send('player',function(window) {
+                    _send('player', function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
                         window.engine.select_playlist(0);
                     });
@@ -593,12 +593,12 @@ var dialog = function() {
                 }
                 var filename = item.name;
                 var tags = read_tags(item);
-                playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, meta: tags, duration: 0, type: 'sd'});
+                playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, duration: 0, cloud: {meta: tags, type: 'sd'}});
             });
             if (playlist.tracks.length === 0) {
                 return;
             }
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
                 window.engine.select_playlist(0);
             });
@@ -631,7 +631,7 @@ var dialog = function() {
         });
         $('body').on('click', 'li.item', function() {
             var id = $(this).data("id");
-            _send('player',function(window) {
+            _send('player', function(window) {
                 context_menu[id].action();
             });
             window.close();
@@ -647,7 +647,7 @@ var dialog = function() {
     };
     return {
         run: function() {
-            _send('player',function(window) {
+            _send('player', function(window) {
                 settings = window._settings;
             });
             if (settings.is_winamp) {
@@ -664,7 +664,7 @@ var dialog = function() {
                         );
             }
             write_language();
-            _send('player',function(window) {
+            _send('player', function(window) {
                 window.engine.set_hotkeys(document);
                 allow_ext = window.engine.get_allow_ext();
             });

@@ -153,7 +153,7 @@ var cloud = function() {
                             return;
                         }
                         data.response.forEach(function(item) {
-                            tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
+                            tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, cloud: {type: 'vk', owner_id: item.owner_id, track_id: item.id}});
                         });
                         cb(tracks);
                     }
@@ -196,7 +196,7 @@ var cloud = function() {
                             return;
                         }
                         data.response.forEach(function(item) {
-                            tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk'});
+                            tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, cloud: {type: 'vk', owner_id: item.owner_id, track_id: item.id}});
                         });
                         cb(tracks);
                     }
@@ -250,7 +250,7 @@ var cloud = function() {
                             }
                             var len = 0;
                             data.items.forEach(function(item) {
-                                tracks.push({id: tracks.length, owner_id: item.owner_id, track_id: item.id, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, type: 'vk', from_lib: true});
+                                tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, cloud: {type: 'vk', owner_id: item.owner_id, track_id: item.id, from_lib: true}});
                                 len++;
                             });
                             if (len === 0) {
@@ -319,7 +319,7 @@ var cloud = function() {
                             }
                             var len = 0;
                             data.items.forEach(function(item) {
-                                albums.push({id: albums.length, album_id: item.album_id, title: item.title});
+                                albums.push({id: albums.length, name: item.title, cloud: {vk_save: false, album_id: item.album_id, type: 'vk'}});
                                 len++;
                             });
                             if (len === 0) {
@@ -440,44 +440,43 @@ var cloud = function() {
         };
         var makeAlbums = function(cb) {
             getAlbums(function(all_albums) {
-                all_albums.push({title: _lang.vk_all, album_id: "nogroup"});
-                all_albums.push({title: _lang.vk_rec, album_id: "recommendations", vk_save: true});
-                all_albums.push({title: _lang.vk_pop, album_id: "popular0", vk_save: true});
-                all_albums.push({title: "[ Rock ]", album_id: "popular1", vk_save: true});
-                all_albums.push({title: "[ Pop ]", album_id: "popular2", vk_save: true});
-                all_albums.push({title: "[ Rap & Hip-Hop ]", album_id: "popular3", vk_save: true});
-                all_albums.push({title: "[ Easy Listening ]", album_id: "popular4", vk_save: true});
-                all_albums.push({title: "[ Dance & House ]", album_id: "popular5", vk_save: true});
-                all_albums.push({title: "[ Instrumental ]", album_id: "popular6", vk_save: true});
-                all_albums.push({title: "[ Metal ]", album_id: "popular7", vk_save: true});
-                all_albums.push({title: "[ Alternative ]", album_id: "popular21", vk_save: true});
-                all_albums.push({title: "[ Dubstep ]", album_id: "popular8", vk_save: true});
-                all_albums.push({title: "[ Jazz & Blues ]", album_id: "popular9", vk_save: true});
-                all_albums.push({title: "[ Drum & Bass ]", album_id: "popular10", vk_save: true});
-                all_albums.push({title: "[ Trance ]", album_id: "popular11", vk_save: true});
-                all_albums.push({title: "[ Chanson ]", album_id: "popular12", vk_save: true});
-                all_albums.push({title: "[ Ethnic ]", album_id: "popular13", vk_save: true});
-                all_albums.push({title: "[ Acoustic & Vocal ]", album_id: "popular14", vk_save: true});
-                all_albums.push({title: "[ Reggae ]", album_id: "popular15", vk_save: true});
-                all_albums.push({title: "[ Classical ]", album_id: "popular16", vk_save: true});
-                all_albums.push({title: "[ Indie Pop ]", album_id: "popular17", vk_save: true});
-                all_albums.push({title: "[ Speech ]", album_id: "popular19", vk_save: true});
-                all_albums.push({title: "[ Electropop & Disco ]", album_id: "popular22", vk_save: true});
-                all_albums.push({title: "[ Other ]", album_id: "popular18", vk_save: true});
-                var list = new Array(all_albums.length);
-                for (var i = 0, item; item = all_albums[i]; i++) {
-                    list[i] = {name: item.title, album_id: item.album_id, id: i, type: "vk", vk_save: (item.vk_save === true)};
-                }
-                cb(list);
+                all_albums.push({name: _lang.vk_all, cloud: {vk_save: false, type: 'vk', album_id: "nogroup"}});
+                all_albums.push({name: _lang.vk_rec, cloud: {vk_save: true, type: 'vk', album_id: "recommendations"}});
+                all_albums.push({name: _lang.vk_pop, cloud: {vk_save: true, type: 'vk', album_id: "popular0"}});
+                all_albums.push({name: "[ Rock ]", cloud: {vk_save: true, type: 'vk', album_id: "popular1"}});
+                all_albums.push({name: "[ Pop ]", cloud: {vk_save: true, type: 'vk', album_id: "popular2"}});
+                all_albums.push({name: "[ Rap & Hip-Hop ]", cloud: {vk_save: true, type: 'vk', album_id: "popular3"}});
+                all_albums.push({name: "[ Easy Listening ]", cloud: {vk_save: true, type: 'vk', album_id: "popular4"}});
+                all_albums.push({name: "[ Dance & House ]", cloud: {vk_save: true, type: 'vk', album_id: "popular5"}});
+                all_albums.push({name: "[ Instrumental ]", cloud: {vk_save: true, type: 'vk', album_id: "popular6"}});
+                all_albums.push({name: "[ Metal ]", cloud: {vk_save: true, type: 'vk', album_id: "popular7"}});
+                all_albums.push({name: "[ Alternative ]", cloud: {vk_save: true, type: 'vk', album_id: "popular21"}});
+                all_albums.push({name: "[ Dubstep ]", cloud: {vk_save: true, type: 'vk', album_id: "popular8"}});
+                all_albums.push({name: "[ Jazz & Blues ]", cloud: {vk_save: true, type: 'vk', album_id: "popular9"}});
+                all_albums.push({name: "[ Drum & Bass ]", cloud: {vk_save: true, type: 'vk', album_id: "popular10"}});
+                all_albums.push({name: "[ Trance ]", cloud: {vk_save: true, type: 'vk', album_id: "popular11"}});
+                all_albums.push({name: "[ Chanson ]", cloud: {vk_save: true, type: 'vk', album_id: "popular12"}});
+                all_albums.push({name: "[ Ethnic ]", cloud: {vk_save: true, type: 'vk', album_id: "popular13"}});
+                all_albums.push({name: "[ Acoustic & Vocal ]", cloud: {vk_save: true, type: 'vk', album_id: "popular14"}});
+                all_albums.push({name: "[ Reggae ]", cloud: {vk_save: true, type: 'vk', album_id: "popular15"}});
+                all_albums.push({name: "[ Classical ]", cloud: {vk_save: true, type: 'vk', album_id: "popular16"}});
+                all_albums.push({name: "[ Indie Pop ]", cloud: {vk_save: true, type: 'vk', album_id: "popular17"}});
+                all_albums.push({name: "[ Speech ]", cloud: {vk_save: true, type: 'vk', album_id: "popular19"}});
+                all_albums.push({name: "[ Electropop & Disco ]", cloud: {vk_save: true, type: 'vk', album_id: "popular22"}});
+                all_albums.push({name: "[ Other ]", cloud: {vk_save: true, type: 'vk', album_id: "popular18"}});
+                all_albums.forEach(function(item, b) {
+                    item.id = b;
+                });
+                cb(all_albums);
             });
         };
-        var makeAlbumTracks = function(id, cb) {
-            if (id === "nogroup") {
-                id = undefined;
+        var makeAlbumTracks = function(album_id, cb) {
+            if (album_id === "nogroup") {
+                album_id = undefined;
             }
-            if (id !== undefined) {
-                if (id.length > 7 && id.substr(0, 7) === "popular") {
-                    var sid = parseInt(id.substr(7));
+            if (album_id !== undefined) {
+                if (album_id.length > 7 && album_id.substr(0, 7) === "popular") {
+                    var sid = parseInt(album_id.substr(7));
                     if (isNaN(sid)) {
                         return;
                     }
@@ -489,7 +488,7 @@ var cloud = function() {
                     }, sid);
                     return;
                 } else
-                if (id === "recommendations") {
+                if (album_id === "recommendations") {
                     getRecommendations(function(tracks) {
                         if (tracks.length === 0) {
                             return;
@@ -504,7 +503,7 @@ var cloud = function() {
                     return;
                 }
                 cb(tracks);
-            }, id);
+            }, album_id);
         };
         return {
             makeAlbums: function(a) {
@@ -532,14 +531,14 @@ var cloud = function() {
                     });
                 });
             },
-            on_select_list: function(list, cb) {
-                cloud.vk.makeAlbumTracks(list.album_id, function(tracks) {
-                    cb(tracks, {name: list.name, id: list.id, vk_save: (list.vk_save === true), type: 'vk'});
+            on_select_list: function(album, cb) {
+                vk.makeAlbumTracks(album.cloud.album_id, function(tracks) {
+                    cb(tracks, {name: album.name, id: album.id, cloud: album.cloud});
                 });
             },
             preload: function(options, cb) {
                 options.url = options.track.file.url;
-                cloud.getTrack(options, cb);
+                getTrack(options, cb);
             },
             update_tags: function(a, b, c, d) {
                 getToken(function() {
@@ -655,26 +654,26 @@ var cloud = function() {
                 var getHead = function(url) {
                     $.ajax({type: "HEAD", url: url,
                         success: function() {
-                            track.file.head = true;
+                            track.cloud.head = true;
                             cb(url);
                         }, error: function() {
-                            track.file.head = false;
+                            track.cloud.head = false;
                             cb('');
                         }
                     });
                 };
-                if (track.file.url !== undefined && track.file.head === true) {
+                if (track.file.url !== undefined && track.cloud.head === true) {
                     cb(track.file.url);
                     return;
                 }
-                if (track.file.head === false) {
+                if (track.cloud.head === false) {
                     getHead(track.file.url);
                     return;
                 }
                 db.getMedia(function(url) {
                     track.file.url = url;
                     getHead(url);
-                }, track.root, track.path);
+                }, track.cloud.root, track.cloud.path);
             },
             preload: function(options, cb) {
                 if (options.track.blob === undefined) {
@@ -682,7 +681,7 @@ var cloud = function() {
                 }
                 db.onplay(options.track, options.view, function(url) {
                     options.url = url;
-                    cloud.getTrack(options, cb);
+                    getTrack(options, cb);
                 });
             }
         };
@@ -753,9 +752,9 @@ var cloud = function() {
                                 if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
                                     continue;
                                 }
-                                tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}, duration: track.duration, type: 'sc'});
+                                tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, duration: track.duration, cloud: {type: 'sc', meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}}});
                             }
-                            list.push({name: item.title, id: list.length, type: "sc", tracks: tracks});
+                            list.push({name: item.title, id: list.length, tracks: tracks, cloud: {type: "sc"}});
                         });
                         if (list.length === 0) {
                             return;
@@ -807,33 +806,33 @@ var cloud = function() {
                 });
             },
             read_tags: function(track, cb) {
-                if (track.meta === undefined) {
+                if (track.cloud.meta === undefined) {
                     return;
                 }
-                var tags = track.meta;
-                var url = tags.artwork;
+                var meta_tags = track.cloud.meta;
+                var url = meta_tags.artwork;
                 if (url === null) {
-                    cb(tags);
+                    cb(meta_tags);
                     return;
                 }
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url, true);
                 xhr.responseType = "blob";
                 xhr.onload = function() {
-                    tags.picture = {data: xhr.response};
-                    cb(tags);
+                    meta_tags.picture = {data: xhr.response};
+                    cb(meta_tags);
                 };
                 xhr.onerror = function() {
-                    cb(tags);
+                    cb(meta_tags);
                 };
                 xhr.send(null);
             },
             on_select_list: function(list, cb) {
-                cb(list.tracks, {name: list.name, id: list.id, type: "sc"});
+                cb(list.tracks, {name: list.name, id: list.id, cloud: {type: "sc"}});
             },
             preload: function(options, cb) {
                 options.url = options.track.file.url;
-                cloud.getTrack(options, cb);
+                getTrack(options, cb);
             }
         };
     }();
@@ -860,7 +859,7 @@ var cloud = function() {
             }
             var colums = 'items(downloadUrl,id,mimeType,parents(isRoot),title)';
             var data = {
-                q : '\''+id+'\' in parents', 
+                q: '\'' + id + '\' in parents',
                 fields: colums
             };
             var url = 'https://www.googleapis.com/drive/v2/files';
@@ -921,7 +920,7 @@ var cloud = function() {
                 }
                 gd.onplay(options.track, options.view, function(url) {
                     options.url = url;
-                    cloud.getTrack(options, cb);
+                    getTrack(options, cb);
                 });
             }
         };
@@ -1100,7 +1099,7 @@ var cloud = function() {
                 }
                 getTrack({
                     view: options.view,
-                    url: 'https://api.box.com/2.0/files/' + options.track.file_id + '/content',
+                    url: 'https://api.box.com/2.0/files/' + options.track.cloud.file_id + '/content',
                     headers: {"Authorization": "Bearer " + token}
                 }, cb);
             }
@@ -1170,24 +1169,24 @@ var cloud = function() {
                 });
             },
             read_tags: function(track, cb) {
-                if (track.meta === undefined) {
+                if (track.cloud.meta === undefined) {
                     return;
                 }
-                var tags = track.meta;
-                var url = tags.artwork;
+                var meta_tags = track.cloud.meta;
+                var url = meta_tags.artwork;
                 if (url === undefined) {
-                    cb(tags);
+                    cb(meta_tags);
                     return;
                 }
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url, true);
                 xhr.responseType = "blob";
                 xhr.onload = function() {
-                    tags.picture = {data: xhr.response};
-                    cb(tags);
+                    meta_tags.picture = {data: xhr.response};
+                    cb(meta_tags);
                 };
                 xhr.onerror = function() {
-                    cb(tags);
+                    cb(meta_tags);
                 };
                 xhr.send(null);
             },
@@ -1197,9 +1196,9 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
-                sd.onplay(options.track, options.view, function(url) {
+                sd.onplay(options.track, undefined, function(url) {
                     options.url = url;
-                    cloud.getTrack(options, cb);
+                    getTrack(options, cb);
                 });
             }
         };

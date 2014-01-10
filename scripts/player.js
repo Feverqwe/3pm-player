@@ -800,8 +800,8 @@
                 hide: 1,
                 action: function() {
                     var track = engine.getCurrentTrack();
-                    if (track !== undefined && track.track_id !== undefined) {
-                        cloud.vk.addInLibrarty(track.track_id, track.owner_id);
+                    if (track !== undefined && track.cloud.track_id !== undefined) {
+                        cloud.vk.addInLibrarty(track.cloud.track_id, track.cloud.owner_id);
                     }
                 }
             }
