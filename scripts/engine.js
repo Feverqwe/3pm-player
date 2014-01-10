@@ -17,8 +17,8 @@ var _debug = false;
         preload_box: 1,
         preload_sd: 0,
         lastfm: 0,
+        lastfm_info: 1,
         lastfm_cover: 1,
-        lastfm_tag_update: 1,
         webui_port: 9898,
         webui_interface: 'Any',
         webui_run_onboot: 0,
@@ -559,8 +559,51 @@ var _debug = false;
             viz();
             lfm();
         };
+        var lastfm_tag_ready = function(id, lfm_tags, blob) {
+            if (lfm_tags === undefined) {
+                return;
+            }
+            var tags = playlist[id].tags;
+            read_image(blob, function(cover_id) {
+                if (cover_id === undefined) {
+                    delete tags.picture;
+                } else {
+                    tags.picture = cover_id;
+                }
+                if (lfm_tags !== undefined) {
+                    var track = playlist[id];
+                    var changes = false;
+                    var changes_vk = false;
+                    if (lfm_tags.artist !== undefined && tags.artist !== lfm_tags.artist) {
+                        tags.artist = lfm_tags.artist;
+                        changes = true;
+                        changes_vk = true;
+                    }
+                    if (lfm_tags.album !== undefined && tags.album !== lfm_tags.album) {
+                        tags.album = lfm_tags.album;
+                        changes = true;
+                    }
+                    if (lfm_tags.title !== undefined && tags.title !== lfm_tags.title) {
+                        tags.title = lfm_tags.title;
+                        changes = true;
+                        changes_vk = true;
+                    }
+                    if (changes_vk && settings.vk_tag_update && track.type === 'vk' && track.from_lib === true) {
+                        cloud.vk.update_tags(track.owner_id, track.track_id, tags.artist, tags.title);
+                    }
+                    if (changes) {
+                        tags_loaded(tags, id, 4);
+                    } else
+                    if (cover_id !== undefined) {
+                        tags_loaded(tags, id, 3);
+                    }
+                } else {
+                    tags_loaded(tags, id, 3);
+                }
+            });
+        };
         var lastfm_tag_reader = function(id) {
-            if (!settings.lastfm_cover || settings.is_winamp) {
+            if (!settings.lastfm_info) {
                 return;
             }
             var tags = playlist[id].tags;
@@ -570,47 +613,8 @@ var _debug = false;
                     || tags.title === undefined) {
                 return;
             }
-            lastfm.getCover(tags.artist, tags.title, function(lfm_tags, blob) {
-                if (lfm_tags === undefined) {
-                    return;
-                }
-                read_image(blob, function(cover_id) {
-                    if (cover_id === undefined) {
-                        delete tags.picture;
-                    } else {
-                        tags.picture = cover_id;
-                    }
-                    if (settings.lastfm_tag_update && lfm_tags !== undefined) {
-                        var track = playlist[id];
-                        var changes = false;
-                        var changes_vk = false;
-                        if (lfm_tags.artist !== undefined && tags.artist !== lfm_tags.artist) {
-                            tags.artist = lfm_tags.artist;
-                            changes = true;
-                            changes_vk = true;
-                        }
-                        if (lfm_tags.album !== undefined && tags.album !== lfm_tags.album) {
-                            tags.album = lfm_tags.album;
-                            changes = true;
-                        }
-                        if (lfm_tags.title !== undefined && tags.title !== lfm_tags.title) {
-                            tags.title = lfm_tags.title;
-                            changes = true;
-                            changes_vk = true;
-                        }
-                        if (changes_vk && settings.vk_tag_update && track.type === 'vk' && track.from_lib === true) {
-                            cloud.vk.update_tags(track.owner_id, track.track_id, tags.artist, tags.title);
-                        }
-                        if (changes) {
-                            tags_loaded(tags, id, 4);
-                        } else
-                        if (cover_id !== undefined) {
-                            tags_loaded(tags, id, 3);
-                        }
-                    } else {
-                        tags_loaded(tags, id, 3);
-                    }
-                });
+            lastfm.getInfo(tags.artist, tags.title, function(lfm_tags, blob) {
+                lastfm_tag_ready(id, lfm_tags, blob);
             });
         };
         player.discAdapters = function(name) {

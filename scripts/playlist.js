@@ -43,7 +43,7 @@ var playlist = function() {
             for (var i = 0; i < idl; i++) {
                 var url = "images/no-cover.png";
                 var item = id[i];
-                _send('player',function(window) {
+                _send('player', function(window) {
                     if (item !== 'none') {
                         url = window.engine.getCover(item);
                     }
@@ -59,7 +59,7 @@ var playlist = function() {
         if ($('style.pic_' + id).length > 0) {
             return;
         }
-        _send('player',function(window) {
+        _send('player', function(window) {
             var url = window.engine.getCover(id);
             dom_cache.body.append($('<style>', {'class': 'cover pic_' + id, text: '.pic_' + id + '{background-image:url(' + url + ');}'}));
         });
@@ -92,7 +92,7 @@ var playlist = function() {
         }
         add_image(pic_list);
         dom_cache.playlist_ul.empty().append(dom_list);
-        _send('player',function(window) {
+        _send('player', function(window) {
             window.engine.getCurrent();
         });
     };
@@ -175,7 +175,7 @@ var playlist = function() {
     return {
         preload: function() {
             write_language();
-            _send('player',function(window) {
+            _send('player', function(window) {
                 settings = window._settings;
                 playlist.show();
             });
@@ -204,7 +204,7 @@ var playlist = function() {
                 $('<div>', {'class': 'w_b_r'})
                         );
             }
-            _send('player',function(window) {
+            _send('player', function(window) {
                 write_playlist(window.engine.getPlaylist());
                 window.engine.shuffle(null);
                 window.engine.loop(null);
@@ -220,12 +220,12 @@ var playlist = function() {
             });
             dom_cache.playlist_ul.on('click', 'li', function() {
                 var id = $(this).attr('data-id');
-                _send('player',function(window) {
+                _send('player', function(window) {
                     window.engine.open_id(id);
                 });
             });
             dom_cache.playlist_ul.sortable({handle: ".move", axis: "y", stop: function() {
-                    _send('player',function(window) {
+                    _send('player', function(window) {
                         var type = window.engine.getSortedList();
                         var old_sort_list = type[1];
                         var type = -1;
@@ -245,17 +245,17 @@ var playlist = function() {
                 }
             });
             dom_cache.shuffle.on('click', function() {
-                _send('player',function(window) {
+                _send('player', function(window) {
                     window.engine.shuffle();
                 });
             });
             dom_cache.loop.on('click', function() {
-                _send('player',function(window) {
+                _send('player', function(window) {
                     window.engine.loop();
                 });
             });
             dom_cache.order.on('click', function() {
-                _send('player',function(window) {
+                _send('player', function(window) {
                     var type = window.engine.getSortedList();
                     var list_for_sort = type[1];
                     var type = type[0];
@@ -281,13 +281,13 @@ var playlist = function() {
                 dom_cache.pl_list.toggle();
             });
             $('.read_tags.btn').on('click', function() {
-                _send('player',function(window) {
+                _send('player', function(window) {
                     window.engine.readAllTags();
                 });
             });
             dom_cache.pl_list.on('click', 'li', function() {
                 var id = $(this).data('id');
-                _send('player',function(window) {
+                _send('player', function(window) {
                     window.engine.select_playlist(id);
                 });
                 $(this).parent().hide();

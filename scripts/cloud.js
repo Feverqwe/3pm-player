@@ -534,7 +534,7 @@ var cloud = function() {
             },
             on_select_list: function(list, cb) {
                 cloud.vk.makeAlbumTracks(list.album_id, function(tracks) {
-                    cb(tracks, {name: list.name, id: list.id, vk_save: (list.vk_save === true)});
+                    cb(tracks, {name: list.name, id: list.id, vk_save: (list.vk_save === true), type: 'vk'});
                 });
             },
             preload: function(options, cb) {

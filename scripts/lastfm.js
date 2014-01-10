@@ -8,6 +8,122 @@
     var scrobler_timer = undefined;
     var track_cache = {};
     var dialog_count = 0;
+    //DB
+    var iDB = lastfm.iDB = {
+        db_name: 'lastfm',
+        db: null,
+        open: function() {
+            iDB.db_open = true;
+            var version = 1;
+            var request = indexedDB.open(iDB.db_name, version);
+            request.onupgradeneeded = function(e) {
+                var db = e.target.result;
+                e.target.transaction.onerror = indexedDB.onerror;
+                if (db.objectStoreNames.contains("cache")) {
+                    db.deleteObjectStore("cache");
+                }
+
+                var store = db.createObjectStore("cache", {keyPath: "key"});
+            };
+            request.onsuccess = function(e) {
+                iDB.db = e.target.result;
+            };
+
+            request.onerror = function(e) {
+                iDB.onerror(e);
+            };
+        },
+        onerror: function(e) {
+            console.log('indexedDB', 'error!', e);
+        },
+        add: function(key, data) {
+            //add new or update if cn exists
+            var db = iDB.db;
+            var trans = db.transaction(["cache"], "readwrite");
+            var store = trans.objectStore("cache");
+            var request = store.put({
+                key: key,
+                data: data,
+                timeStamp: new Date().getTime()
+            });
+            /*
+             request.onsuccess = function(e) {
+             iDB.getAll(function(item){console.log(item);});
+             };
+             */
+            request.onerror = iDB.onerror;
+        },
+        success: function(e) {
+            if (e.code === 8) {
+                console.log('indexedDB', e.message);
+                return;
+            }
+            console.log('indexedDB', 'success!', e);
+        },
+        getAll: function(cb) {
+            var db = iDB.db;
+            var trans = db.transaction(["cache"], "readwrite");
+            var store = trans.objectStore("cache");
+            var keyRange = IDBKeyRange.lowerBound(0);
+            var cursorRequest = store.openCursor(keyRange);
+
+            cursorRequest.onsuccess = function(e) {
+                var result = e.target.result;
+                if (!!result === false)
+                    return;
+                cb(result.value);
+                result.continue();
+            };
+            cursorRequest.onerror = iDB.onerror;
+        },
+        rm: function(cn) {
+            //remove by key (in keyPath)
+            var db = iDB.db;
+            var trans = db.transaction(["cache"], "readwrite");
+            var store = trans.objectStore("cache");
+
+            var request = store.delete(cn);
+            /*
+             request.onsuccess = function(e) {
+             iDB.getAll(function(item){console.log(item);});
+             };
+             */
+
+            request.onerror = iDB.onerror;
+        },
+        get: function(cn, cb) {
+            //remove by cn (keyPath)
+            var db = iDB.db;
+            var trans = db.transaction(["cache"], "readwrite");
+            var store = trans.objectStore("cache");
+
+            var request = store.get(cn);
+
+            request.onsuccess = function(e) {
+                var result = e.target.result;
+                cb(result);
+            };
+
+            request.onerror = iDB.onerror;
+        },
+        clear: function() {
+            /*
+             * Удаляет старые ключи, созданные более 7 дней назад.
+             */
+            var now_date = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
+            var rm_list = [];
+            iDB.getAll(function(item) {
+                if (item.timeStamp < now_date) {
+                    rm_list.push(item.key);
+                }
+            });
+            rm_list.forEach(function(item) {
+                iDB.rm(item);
+            });
+        }
+    };
+    iDB.open();
+    //
     var auth_getToken = function(type, url, cb) {
         if (dialog_count > 0) {
             console.log("Auth", "More one opened dialod!", dialog_count);
@@ -267,7 +383,7 @@
     };
     var getImage = function(cn, cb) {
         var url = track_cache[cn].url;
-        if (url === undefined || url.indexOf('noimage') !== -1) {
+        if (url === undefined || !_settings.lastfm_cover) {
             cb(track_cache[cn].info);
             return;
         }
@@ -277,18 +393,20 @@
         xhr.onload = function() {
             cb(track_cache[cn].info, xhr.response);
         };
+        xhr.onerror = function() {
+            cb(track_cache[cn].info, xhr.response);
+        };
         xhr.send(null);
     };
-    lastfm.getCover = function(artist, title, cb) {
+    var getInfo = function(cn, artist, title, cb) {
         var data = {
             method: 'track.getInfo',
-            artist: artist || '',
-            track: title || '',
+            artist: artist,
+            track: title,
             api_key: api_key,
             format: 'json',
             autocorrect: 1
         };
-        var cn = data.artist + data.track;
         if (track_cache[cn] === undefined) {
             track_cache[cn] = {};
         } else {
@@ -296,12 +414,6 @@
             return;
         }
         if (suspand) {
-            return;
-        }
-        if (data.artist.length === 0) {
-            return;
-        }
-        if (data.track.length === 0) {
             return;
         }
         $.ajax({
@@ -338,21 +450,46 @@
                         track_cache[cn].info.album = data.track.album.title;
                     }
                     if (track_cache[cn].info.artist !== undefined && track_cache[cn].info.title !== undefined) {
-                        var _cn = track_cache[cn].info.artist + track_cache[cn].info.title;
+                        var _cn = (track_cache[cn].info.artist + track_cache[cn].info.title).toLowerCase();
                         track_cache[_cn] = track_cache[cn];
                     }
                     if (data.track.album === undefined
                             || data.track.album.image === undefined
                             || data.track.album.image.length === 0) {
+                        iDB.add(cn, track_cache[cn]);
                         cb(track_cache[cn].info);
                         return;
                     }
                     var item = data.track.album.image.slice(-1)[0];
                     var url = item['#text'];
+                    if (url === undefined || url.indexOf('noimage') !== -1) {
+                        iDB.add(cn, track_cache[cn]);
+                        cb(track_cache[cn].info);
+                        return;
+                    }
                     track_cache[cn].url = url;
+                    iDB.add(cn, track_cache[cn]);
                     getImage(cn, cb);
                 }
             }
+        });
+    };
+    lastfm.getInfo = function(artist, title, cb, cache_only) {
+        if (artist === undefined || title === undefined || artist.length === 0 || title.length === 0) {
+            return;
+        }
+        var cn = (artist + title).toLowerCase();
+        if (track_cache[cn] !== undefined) {
+            return getInfo(cn, artist, title, cb);
+        }
+        iDB.get(cn, function(item) {
+            if (item !== undefined) {
+                track_cache[cn] = item.data;
+            } else
+            if (cache_only) {
+                return;
+            }
+            getInfo(cn, artist, title, cb);
         });
     };
     lastfm.updateNowPlaying = function(a, b, c, d) {

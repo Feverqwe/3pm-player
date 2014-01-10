@@ -15,7 +15,7 @@ var options = function() {
         preload_sd: {v: 0, t: 'checkbox'},
         lastfm: {v: 0, t: 'checkbox'},
         lastfm_cover: {v: 1, t: 'checkbox'},
-        lastfm_tag_update: {v: 1, t: 'checkbox'},
+        lastfm_info: {v: 1, t: 'checkbox'},
         webui_port: {v: 9898, t: 'number'},
         webui_interface: {v: 'Any', t: 'text'},
         webui_run_onboot: {v: 0, t: 'checkbox'},
