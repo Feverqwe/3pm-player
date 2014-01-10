@@ -27,6 +27,7 @@
             };
             request.onsuccess = function(e) {
                 iDB.db = e.target.result;
+                iDB.clear();
             };
 
             request.onerror = function(e) {
