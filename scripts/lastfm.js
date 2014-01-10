@@ -8,6 +8,7 @@
     var scrobler_timer = undefined;
     var track_cache = {};
     var dialog_count = 0;
+    var today_date = new Date().getTime();
     //DB
     var iDB = lastfm.iDB = {
         db_name: 'lastfm',
@@ -62,17 +63,20 @@
             console.log('indexedDB', 'success!', e);
         },
         getAll: function(cb) {
+            var items = [];
             var db = iDB.db;
-            var trans = db.transaction(["cache"], "readwrite");
+            var trans = db.transaction(["cache"], "readonly");
             var store = trans.objectStore("cache");
             var keyRange = IDBKeyRange.lowerBound(0);
             var cursorRequest = store.openCursor(keyRange);
 
             cursorRequest.onsuccess = function(e) {
                 var result = e.target.result;
-                if (!!result === false)
+                if (!!result === false) {
+                    cb(items);
                     return;
-                cb(result.value);
+                }
+                items.push(result.value);
                 result.continue();
             };
             cursorRequest.onerror = iDB.onerror;
@@ -95,7 +99,7 @@
         get: function(cn, cb) {
             //remove by cn (keyPath)
             var db = iDB.db;
-            var trans = db.transaction(["cache"], "readwrite");
+            var trans = db.transaction(["cache"], "readonly");
             var store = trans.objectStore("cache");
 
             var request = store.get(cn);
@@ -112,14 +116,12 @@
              * Удаляет старые ключи, созданные более 7 дней назад.
              */
             var now_date = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
-            var rm_list = [];
-            iDB.getAll(function(item) {
-                if (item.timeStamp < now_date) {
-                    rm_list.push(item.key);
-                }
-            });
-            rm_list.forEach(function(item) {
-                iDB.rm(item);
+            iDB.getAll(function(items) {
+                items.forEach(function(item) {
+                    if (item.timeStamp < now_date) {
+                        iDB.rm(item.key);
+                    }
+                });
             });
         }
     };
@@ -485,6 +487,9 @@
         }
         iDB.get(cn, function(item) {
             if (item !== undefined) {
+                if (item.timeStamp < today_date - 2 * 24 * 60 * 60 * 1000) {
+                    iDB.add(cn, item.data);
+                }
                 track_cache[cn] = item.data;
             } else
             if (cache_only) {
