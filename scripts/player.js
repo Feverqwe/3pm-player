@@ -411,6 +411,9 @@
          * Отдает список файлов в папке
          */
         getEntryFromDir(entry, function(sub_entry) {
+            sub_entry.sort(function(a, b) {
+                return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+            });
             entry2files(sub_entry, function(files) {
                 cb(files);
             });
@@ -441,14 +444,18 @@
             var dune_count = 0;
             var dune = function() {
                 dune_count++;
-                if (dune_count === list_dir_len && playlist.length > 0) {
-                    engine.setM3UPlaylists({list: playlist});
-                    if (playlist.length === 1) {
-                        engine.select_playlist(playlist[0].id);
-                    } else
-                    if (playlist.length > 0) {
-                        engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
-                    }
+                if (dune_count !== list_dir_len || playlist.length === 0) {
+                    return;
+                }
+                playlist.sort(function(a, b) {
+                    return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+                });
+                engine.setM3UPlaylists({list: playlist});
+                if (playlist.length === 1) {
+                    engine.select_playlist(playlist[0].id);
+                } else
+                if (playlist.length > 0) {
+                    engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
                 }
             };
             list_dir.forEach(function(item) {
