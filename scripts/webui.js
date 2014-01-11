@@ -177,7 +177,10 @@ var webui = function() {
                 not_found.push(headerMap.url);
                 response_(socketId, headerMap, '', ['404 Not Found']);
             };
-            xhr.timeout = 200;
+            xhr.ontimeout = function() {
+                response_(socketId, headerMap, '', ['404 Not Found']);
+            };
+            xhr.timeout = 500;
             xhr.send(null);
         }
         if (is_xhr === false) {

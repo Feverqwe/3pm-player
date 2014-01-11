@@ -47,6 +47,9 @@ var options = function() {
         xhr.onerror = function() {
             cb();
         };
+        xhr.ontimeout = function() {
+            cb();
+        };
         xhr.timeout = 2000;
         xhr.send(null);
     };
