@@ -120,6 +120,35 @@
             });
         });
     };
+    var trackSort = function(items) {
+        var is_num = 0;
+        var len = items.length;
+        for (var i = 0, item; item = items[i]; i++) {
+            if (!isNaN(parseInt(item.name))) {
+                is_num += 1;
+            }
+        }
+        is_num = is_num / len * 100 > 70;
+        if (is_num) {
+            return items.sort(function(a, b) {
+                var c = parseInt(a.name);
+                var d = parseInt(b.name);
+                if (isNaN(c) && isNaN(d)) {
+                    return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+                } else
+                if (isNaN(c)) {
+                    return 1;
+                } else
+                if (isNaN(d)) {
+                    return -1;
+                }
+                return (c === d) ? 0 : (c > d) ? 1 : -1;
+            });
+        }
+        return items.sort(function(a, b) {
+            return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+        });
+    };
     var readDirectoryWithM3U = function(entrys, entry) {
         var playlists = {};
         var playlist_count = entrys.length;
@@ -162,9 +191,7 @@
                     playlist.push({name: name, entrys: item, id: playlist.length, type: "m3u"});
                 }
             });
-            playlist.sort(function(a, b) {
-                return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
-            });
+            playlist = trackSort(playlist);
             engine.setM3UPlaylists({list: playlist});
             if (playlist.length === 1) {
                 engine.select_playlist(playlist[0].id);
@@ -411,9 +438,7 @@
          * Отдает список файлов в папке
          */
         getEntryFromDir(entry, function(sub_entry) {
-            sub_entry.sort(function(a, b) {
-                return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
-            });
+            sub_entry = trackSort(sub_entry);
             entry2files(sub_entry, function(files) {
                 cb(files);
             });
@@ -447,9 +472,7 @@
                 if (dune_count !== list_dir_len || playlist.length === 0) {
                     return;
                 }
-                playlist.sort(function(a, b) {
-                    return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
-                });
+                playlist = trackSort(playlist);
                 engine.setM3UPlaylists({list: playlist});
                 if (playlist.length === 1) {
                     engine.select_playlist(playlist[0].id);
