@@ -291,6 +291,11 @@ var _debug = false;
                 }
             }
             if (config === 'blob') {
+                if (track.blob === undefined) {
+                    //if loading
+                    track.tags.reader_state = false;
+                    return;
+                }
                 loading_mode(id, track);
                 fileTagReader(id, function(id) {
                     postTagReader(id, cb);
@@ -1240,6 +1245,7 @@ var _debug = false;
                  *  не переписываетс список треков при выборе
                  *  или нету read_tags который получает тэги не из track.tags
                  */
+                delete files[i].lfm;
                 files[i].tags = undefined;
             }
             if (files[i].id !== undefined && files[i].file !== undefined) {
