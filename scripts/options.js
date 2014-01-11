@@ -75,7 +75,7 @@ var options = function() {
                 if (interface_ !== 'Any' && item.name !== interface_) {
                     return 1;
                 }
-                if (ipv6_disable && item.address.match(':') !== null) {
+                if (ipv6_disable && item.address.indexOf(':') !== -1) {
                     return 1;
                 }
                 var url = 'http://' + item.address + ':' + port + '/';

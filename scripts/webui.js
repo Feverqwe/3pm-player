@@ -307,7 +307,7 @@ var webui = function() {
                     var addr;
                     var n = 0;
                     items.forEach(function(item) {
-                        if (item.address.match(':') !== null) {
+                        if (item.address.indexOf(':') !== -1) {
                             item.name += ' (IPv6)';
                         }
                         if (_settings.webui_interface === item.name) {
