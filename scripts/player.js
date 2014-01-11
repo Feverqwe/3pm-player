@@ -191,7 +191,9 @@
                     playlist.push({name: name, entrys: item, id: playlist.length, type: "m3u"});
                 }
             });
-            playlist = trackSort(playlist);
+            playlist.sort(function(a, b) {
+                return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+            });
             engine.setM3UPlaylists({list: playlist});
             if (playlist.length === 1) {
                 engine.select_playlist(playlist[0].id);
@@ -438,7 +440,9 @@
          * Отдает список файлов в папке
          */
         getEntryFromDir(entry, function(sub_entry) {
-            sub_entry = trackSort(sub_entry);
+            sub_entry.sort(function(a, b) {
+                return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+            });
             entry2files(sub_entry, function(files) {
                 cb(files);
             });
@@ -472,7 +476,9 @@
                 if (dune_count !== list_dir_len || playlist.length === 0) {
                     return;
                 }
-                playlist = trackSort(playlist);
+                playlist.sort(function(a, b) {
+                    return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
+                });
                 engine.setM3UPlaylists({list: playlist});
                 if (playlist.length === 1) {
                     engine.select_playlist(playlist[0].id);
