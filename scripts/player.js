@@ -120,27 +120,6 @@
             });
         });
     };
-    var numberSort = function(items) {
-        return items.sort(function(a, b) {
-            var c = parseInt(a.name);
-            var d = parseInt(b.name);
-            if (isNaN(c) && isNaN(d)) {
-                return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
-            } else
-            if (isNaN(c)) {
-                return 1;
-            } else
-            if (isNaN(d)) {
-                return -1;
-            }
-            return (c === d) ? 0 : (c > d) ? 1 : -1;
-        });
-    };
-    var textSort = function(items) {
-        return items.sort(function(a, b) {
-            return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
-        });
-    };
     var readDirectoryWithM3U = function(entrys, entry) {
         var playlists = {};
         var playlist_count = entrys.length;

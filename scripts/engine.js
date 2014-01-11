@@ -32,7 +32,8 @@ var _debug = false;
     var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
     var playlist = [];
     var playlist_info = undefined;
-    var sorted_playlist = undefined;
+    var playlist_order = {};
+    var order_index = 0;
     var sort_type = 0;
     var covers = [];
     var playedlist = [];
@@ -51,8 +52,10 @@ var _debug = false;
         playlist = [];
         //название плэйлиста
         playlist_info = undefined;
-        //сортированный лист
-        sorted_playlist = undefined;
+        //индекс сортировки
+        order_index = 0;
+        //порядок сортровки
+        playlist_order = {};
         //сбрасываем текущий тип сортировки
         sort_type = 0;
         //кэш изображений альбомов
@@ -752,17 +755,14 @@ var _debug = false;
                     n--;
                 }
             } else {
-                var pl = sorted_playlist || playlist;
-                var pl_len = playlist.length;
-                var indx = getObjArrayPos(pl, "id", current_id) + 1;
-                if (pl[indx] !== undefined) {
-                    id = pl[indx].id;
-                } else
-                if (pl_len > 0) {
-                    id = pl[0].id;
+                var pos = playlist_order[order_index].indexOf(current_id);
+                if (pos < 0) {
+                    return;
                 }
-                if (pl_len <= id) {
-                    id = 0;
+                if (pos === playlist_order[order_index].length - 1) {
+                    id = playlist_order[order_index][0];
+                } else {
+                    id = playlist_order[order_index][pos + 1];
                 }
             }
             player.open(id);
@@ -782,15 +782,14 @@ var _debug = false;
                 current_played_pos = pos - 1;
                 id = playedlist[current_played_pos];
             } else {
-                var pl = sorted_playlist || playlist;
-                var indx = getObjArrayPos(pl, "id", current_id) - 1;
-                if (pl[indx] !== undefined) {
-                    id = pl[indx].id;
-                } else {
-                    id = -1;
+                var pos = playlist_order[order_index].indexOf(current_id);
+                if (pos < 0) {
+                    return;
                 }
-                if (id < 0) {
-                    id = playlist.length - 1;
+                if (pos === 0) {
+                    id = playlist_order[order_index].slice(-1)[0];
+                } else {
+                    id = playlist_order[order_index][pos - 1];
                 }
             }
             player.open(id);
@@ -1000,8 +999,8 @@ var _debug = false;
                     player.next();
                 }
             } else {
-                var pl = sorted_playlist || playlist;
-                if (loop || current_id !== pl[pl.length - 1].id) {
+                var pos = playlist_order[order_index].indexOf(current_id);
+                if (loop || pos !== playlist_order[order_index].length - 1) {
                     player.next();
                 }
             }
@@ -1236,7 +1235,9 @@ var _debug = false;
             return;
         }
         var my_playlist = [];
+        var my_playlist_order = {0: []};
         for (var i = 0; i < files.length; i++) {
+            my_playlist_order[0].push(i);
             if (files[i].tags !== undefined && files[i].tags.picture !== undefined) {
                 /*
                  * Возможны конфиликты, если в облаке
@@ -1263,10 +1264,10 @@ var _debug = false;
         if (my_playlist.length > 0) {
             reset_player();
             playlist = my_playlist;
+            playlist_order = my_playlist_order;
             playlist_info = info;
             _send('playlist', function(window) {
-                window.playlist.setPlaylist(playlist);
-                window.playlist.setPlaylistInfo(playlist_info);
+                window.playlist.setPlaylist(engine.getPlaylist());
             });
             view.state("playlist_not_empty");
             var id = 0;
@@ -1318,25 +1319,24 @@ var _debug = false;
         view.setLoop(loop);
     };
     engine.getPlaylist = function() {
-        return sorted_playlist || playlist;
-    };
-    engine.getPlaylistInfo = function() {
-        return playlist_info;
+        return {order_index: order_index, playlist_ordered: playlist_order[order_index], playlist: playlist, info: playlist_info};
     };
     engine.getCurrent = player.getCurrent;
     engine.APIstatus = function() {
         return JSON.stringify(player.status());
     };
     engine.APIplaylist = function() {
-        var pl = sorted_playlist || playlist;
-        var list = new Array(pl.length);
-        for (var i = 0, item; item = pl[i]; i++) {
-            var tb = getTagBody(item.id);
+        var playlist_ordered = playlist_order[order_index];
+        var playlist_order_len = playlist_ordered.length;
+        var list = new Array(playlist_order_len);
+        for (var i = 0; i < playlist_order_len; i++) {
+            var track = playlist[playlist_ordered[i]];
+            var tb = getTagBody(track.id);
             var title = tb.title;
             if (tb.aa !== undefined) {
                 title += ' - ' + tb.aa;
             }
-            list[i] = {id: item.id, title: title};
+            list[i] = {id: track.id, title: title};
         }
         var pls = [];
         if (M3UPlaylists !== undefined) {
@@ -1364,19 +1364,22 @@ var _debug = false;
     engine.getM3UPlaylists = function() {
         return M3UPlaylists;
     };
-    engine.setSortedList = function(playlist, type, hide) {
-        sorted_playlist = playlist;
-        sort_type = type;
-        if (hide) {
+    engine.setSortedList = function(new_playlist_order, new_order_index, no_update_pl) {
+        playlist_order[new_order_index] = new_playlist_order;
+        order_index = new_order_index;
+        if (no_update_pl) {
             return;
         }
         _send('playlist', function(window) {
-            window.playlist.setPlaylist(sorted_playlist);
+            window.playlist.setPlaylist(engine.getPlaylist());
         });
     };
-    engine.getSortedList = function() {
-        var list = (sorted_playlist || playlist).slice();
-        return [sort_type, list];
+    engine.getPlaylistOrder = function() {
+        return playlist_order;
+    };
+    engine.setPlaylistOrder = function(new_order_index) {
+        order_index = new_order_index;
+        return engine.getPlaylist();
     };
     engine.readAllTags = player.readAllTags;
     engine.getAdapter = player.getAdapter;
