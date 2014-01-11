@@ -206,143 +206,89 @@ var cloud = function() {
         var getTracks = function(cb, album_id) {
             var data = {
                 v: '5.5',
-                access_token: token
+                access_token: token,
+                count: 6000
             };
             if (album_id !== undefined) {
                 data.album_id = album_id;
             }
             var url = 'https://api.vk.com/method/audio.get';
-            var tracks = [];
-            var offset = 0;
-            var getPage = function(offset) {
-                data.count = 6000;
-                data.offset = offset;
-                $.ajax({
-                    type: 'POST',
-                    data: data,
-                    url: url,
-                    dataType: 'JSON',
-                    statusCode: {
-                        401: function() {
-                            vkAuth(function() {
-                                getTracks(cb, album_id);
-                            });
-                        },
-                        200: function(data) {
-                            if (data.error !== undefined) {
-                                clear_data();
-                                if (data.error.error_code === 5) {
-                                    vkAuth(function() {
-                                        getTracks(cb, album_id);
-                                    });
-                                }
-                                console.log("VK", "getTracks", "API error", data);
-                                return;
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        vkAuth(function() {
+                            getTracks(cb, album_id);
+                        });
+                    },
+                    200: function(data) {
+                        if (data.error !== undefined) {
+                            clear_data();
+                            if (data.error.error_code === 5) {
+                                vkAuth(function() {
+                                    getTracks(cb, album_id);
+                                });
                             }
-                            if (data.response === undefined || data.response.items === undefined || data.response.count === undefined) {
-                                console.log("VK", "getTracks", "API error", data);
-                                return;
-                            }
-                            data = data.response;
-                            if (data.count === 0) {
-                                cb(tracks);
-                                return;
-                            }
-                            var len = 0;
-                            data.items.forEach(function(item) {
-                                tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, cloud: {type: 'vk', owner_id: item.owner_id, track_id: item.id, from_lib: true}});
-                                len++;
-                            });
-                            if (len === 0) {
-                                if (tracks.length > 0) {
-                                    cb(tracks);
-                                } else {
-                                    console.log("VK", "getTracks", "len = 0", data);
-                                }
-                                return;
-                            }
-                            if (tracks.length !== data.count) {
-                                offset += len;
-                                setTimeout(function() {
-                                    getPage(offset);
-                                }, timeout);
-                            } else {
-                                cb(tracks);
-                            }
+                            console.log("VK", "getTracks", "API error", data);
+                            return;
                         }
+                        if (data.response === undefined || data.response.items === undefined || data.response.count === undefined) {
+                            console.log("VK", "getTracks", "API error", data);
+                            return;
+                        }
+                        var tracks = [];
+                        data.response.items.forEach(function(item) {
+                            tracks.push({id: tracks.length, file: {name: item.url, url: item.url}, tags: {title: item.title, artist: item.artist}, duration: item.duration, cloud: {type: 'vk', owner_id: item.owner_id, track_id: item.id, from_lib: true}});
+                        });
+                        cb(tracks);
                     }
-                });
-            };
-            getPage(offset);
+                }
+            });
         };
         var getAlbums = function(cb) {
             var data = {
                 v: '5.5',
-                access_token: token
+                access_token: token,
+                count: 100
             };
             var url = 'https://api.vk.com/method/audio.getAlbums';
-            var albums = [];
-            var offset = 0;
-            var getPage = function(offset) {
-                data.count = 100;
-                data.offset = offset;
-                $.ajax({
-                    type: 'POST',
-                    data: data,
-                    url: url,
-                    dataType: 'JSON',
-                    statusCode: {
-                        401: function() {
-                            vkAuth(function() {
-                                getAlbums(cb);
-                            });
-                        },
-                        200: function(data) {
-                            if (data.error !== undefined) {
-                                clear_data();
-                                if (data.error.error_code === 5) {
-                                    vkAuth(function() {
-                                        getAlbums(cb);
-                                    });
-                                }
-                                console.log("VK", "getAlbums", "API error", data);
-                                return;
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        vkAuth(function() {
+                            getAlbums(cb);
+                        });
+                    },
+                    200: function(data) {
+                        if (data.error !== undefined) {
+                            clear_data();
+                            if (data.error.error_code === 5) {
+                                vkAuth(function() {
+                                    getAlbums(cb);
+                                });
                             }
-                            if (data.response === undefined || data.response.items === undefined || data.response.count === undefined) {
-                                console.log("VK", "getAlbums", "API error", data);
-                                return;
-                            }
-                            data = data.response;
-                            if (data.count === 0) {
-                                cb(albums);
-                                return;
-                            }
-                            var len = 0;
-                            data.items.forEach(function(item) {
-                                albums.push({id: albums.length, name: item.title, cloud: {vk_save: false, album_id: item.album_id, type: 'vk'}});
-                                len++;
-                            });
-                            if (len === 0) {
-                                if (albums.length > 0) {
-                                    cb(albums);
-                                } else {
-                                    console.log("VK", "getAlbums", "len = 0", data);
-                                }
-                                return;
-                            }
-                            if (albums.length !== data.count) {
-                                offset += len;
-                                setTimeout(function() {
-                                    getPage(offset);
-                                }, timeout);
-                            } else {
-                                cb(albums);
-                            }
+                            console.log("VK", "getAlbums", "API error", data);
+                            return;
                         }
+                        if (data.response === undefined || data.response.items === undefined || data.response.count === undefined) {
+                            console.log("VK", "getAlbums", "API error", data);
+                            return;
+                        }
+                        var albums = [];
+                        data.response.items.forEach(function(item) {
+                            albums.push({id: albums.length, name: item.title, cloud: {vk_save: false, album_id: item.album_id, type: 'vk'}});
+                        });
+                        cb(albums);
                     }
-                });
-            };
-            getPage(offset);
+                }
+            });
         };
         var updateTags = function(owner_id, audio_id, artist, title) {
             var data = {
