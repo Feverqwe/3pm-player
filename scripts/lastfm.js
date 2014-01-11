@@ -494,7 +494,7 @@
                 }
                 track_cache[cn] = item.data;
             } else
-            if (cache_only) {
+            if (cache_only || navigator.onLine === false) {
                 cb();
                 return;
             }

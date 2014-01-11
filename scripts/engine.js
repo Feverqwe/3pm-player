@@ -620,7 +620,7 @@ var _debug = false;
             if (track.lfm === undefined) {
                 track.lfm = {};
             }
-            if (!settings.lastfm_info || track.lfm.lastfm || navigator.onLine === false) {
+            if (!settings.lastfm_info || track.lfm.lastfm) {
                 cb(id);
                 return;
             }
