@@ -286,7 +286,6 @@ var playlist = function() {
             dom_cache.order.on('click', function() {
                 _send('player', function(window) {
                     var playlist_order = window.engine.getPlaylistOrder();
-                    console.log(playlist_order, order_index);
                     var next = order_index + 1;
                     if (next > 2) {
                         if (playlist_order[-1] !== undefined) {

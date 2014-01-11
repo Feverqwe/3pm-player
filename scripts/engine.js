@@ -34,7 +34,6 @@ var _debug = false;
     var playlist_info = undefined;
     var playlist_order = {};
     var order_index = 0;
-    var sort_type = 0;
     var covers = [];
     var playedlist = [];
     var shuffle = false;
@@ -56,8 +55,6 @@ var _debug = false;
         order_index = 0;
         //порядок сортровки
         playlist_order = {};
-        //сбрасываем текущий тип сортировки
-        sort_type = 0;
         //кэш изображений альбомов
         covers = [];
         //список проигранных компазиций
@@ -332,16 +329,6 @@ var _debug = false;
          * Получает случайное число [a,b] 
          */
         return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-    var getObjArrayPos = function(array, type, value) {
-        var index = undefined;
-        array.forEach(function(item, n) {
-            if (item[type] === value) {
-                index = n;
-                return false;
-            }
-        });
-        return index;
     };
     var getTagBody = function(id) {
         if (id === undefined) {
