@@ -288,6 +288,7 @@ var _debug = false;
                     config = 'cloud';
                 } else {
                     postTagReader(id, cb);
+                    return;
                 }
             }
             if (config === 'blob') {
