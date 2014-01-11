@@ -514,9 +514,7 @@ var _debug = false;
         };
         var tags_loaded = function(id, state) {
             // 1 - playlist only
-            // 2 - player, lfm, notifi
-            // 3 - player, playlist, notifi
-            // 4 - viz, playlist, player, notifi
+            // 2 - player, lfm, viz
             // other - all
             var tb;
             playlist[id].state = "dune";
@@ -563,19 +561,6 @@ var _debug = false;
             if (state === 2) {
                 player();
                 lfm();
-                viz();
-                return;
-            }
-            if (state === 3) {
-                player();
-                plist();
-                notifi();
-                return;
-            }
-            if (state === 4) {
-                player();
-                plist();
-                notifi();
                 viz();
                 return;
             }
