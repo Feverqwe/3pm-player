@@ -291,11 +291,6 @@ var _debug = false;
                 }
             }
             if (config === 'blob') {
-                if (track.blob === undefined) {
-                    //if loading
-                    track.tags.reader_state = false;
-                    return;
-                }
                 loading_mode(id, track);
                 fileTagReader(id, function(id) {
                     postTagReader(id, cb);
@@ -508,6 +503,7 @@ var _debug = false;
                     view.state("preloading_dune");
                     if (blob === undefined) {
                         console.log('No url');
+                        audio.trigger('error');
                         return;
                     }
                     track.blob = blob;

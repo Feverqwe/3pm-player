@@ -24,15 +24,7 @@ var cloud = function() {
             cb(dl_xhr.response);
         };
         dl_xhr.onerror = function() {
-            if (options.track.cloud.tag_config === 'blob') {
-                delete options.track.cloud.tag_config;
-            }
             cb();
-        };
-        dl_xhr.onabort = function() {
-            if (options.track.cloud.tag_config === 'blob') {
-                delete options.track.cloud.tag_config;
-            }
         };
         dl_xhr.send(null);
     };
@@ -630,13 +622,17 @@ var cloud = function() {
                 }, track.cloud.root, track.cloud.path);
             },
             preload: function(options, cb) {
-                options.track.cloud.tag_config = 'blob';
-                if (options.track.blob === undefined && options.track.tags !== undefined) {
-                    delete options.track.tags.reader_state;
-                }
                 db.onplay(options.track, options.view, function(url) {
                     options.url = url;
-                    getTrack(options, cb);
+                    getTrack(options, function(blob) {
+                        if (blob !== undefined) {
+                            options.track.cloud.tag_config = 'blob';
+                            if (options.track.blob === undefined && options.track.tags !== undefined) {
+                                delete options.track.tags.reader_state;
+                            }
+                        }
+                        cb(blob);
+                    });
                 });
             }
         };
@@ -870,13 +866,17 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
-                options.track.cloud.tag_config = 'blob';
-                if (options.track.blob === undefined && options.track.tags !== undefined) {
-                    options.track.tags.reader_state = false;
-                }
                 gd.onplay(options.track, options.view, function(url) {
                     options.url = url;
-                    getTrack(options, cb);
+                    getTrack(options, function(blob) {
+                        if (blob !== undefined) {
+                            options.track.cloud.tag_config = 'blob';
+                            if (options.track.blob === undefined && options.track.tags !== undefined) {
+                                delete options.track.tags.reader_state;
+                            }
+                        }
+                        cb(blob);
+                    });
                 });
             }
         };
@@ -1050,15 +1050,19 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
-                options.track.cloud.tag_config = 'blob';
-                if (options.track.blob === undefined && options.track.tags !== undefined) {
-                    options.track.tags.reader_state = false;
-                }
                 getTrack({
                     view: options.view,
                     url: 'https://api.box.com/2.0/files/' + options.track.cloud.file_id + '/content',
                     headers: {"Authorization": "Bearer " + token}
-                }, cb);
+                }, function(blob) {
+                    if (blob !== undefined) {
+                        options.track.cloud.tag_config = 'blob';
+                        if (options.track.blob === undefined && options.track.tags !== undefined) {
+                            delete options.track.tags.reader_state;
+                        }
+                    }
+                    cb(blob);
+                });
             }
         };
     }();
@@ -1153,13 +1157,17 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
-                options.track.cloud.tag_config = 'blob';
-                if (options.track.blob === undefined && options.track.tags !== undefined) {
-                    options.track.tags.reader_state = false;
-                }
                 sd.onplay(options.track, undefined, function(url) {
                     options.url = url;
-                    getTrack(options, cb);
+                    getTrack(options, function(blob) {
+                    if (blob !== undefined) {
+                        options.track.cloud.tag_config = 'blob';
+                        if (options.track.blob === undefined && options.track.tags !== undefined) {
+                            delete options.track.tags.reader_state;
+                        }
+                    }
+                    cb(blob);
+                });
                 });
             }
         };
