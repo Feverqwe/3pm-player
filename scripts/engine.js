@@ -496,6 +496,7 @@ var _debug = false;
                  * preload return only BLOB!
                  */
                 if (track.blob !== undefined && track.blob.url !== undefined) {
+                    cloud.abort();
                     audio.src = track.blob.url;
                     return true;
                 }
@@ -505,7 +506,7 @@ var _debug = false;
                     track: track
                 }, function(blob) {
                     view.state("preloading_dune");
-                    if (typeof blob === 'string') {
+                    if (blob === undefined) {
                         console.log('No url');
                         return;
                     }

@@ -2,7 +2,7 @@ var cloud = function() {
     var dl_xhr = undefined;
     var getTrack = function(options, cb) {
         if (options.url === undefined) {
-            cb('');
+            cb();
             return;
         }
         var view = options.view;
@@ -24,7 +24,15 @@ var cloud = function() {
             cb(dl_xhr.response);
         };
         dl_xhr.onerror = function() {
-            cb('');
+            if (options.track.cloud.tag_config === 'blob') {
+                delete options.track.cloud.tag_config;
+            }
+            cb();
+        };
+        dl_xhr.onabort = function() {
+            if (options.track.cloud.tag_config === 'blob') {
+                delete options.track.cloud.tag_config;
+            }
         };
         dl_xhr.send(null);
     };
