@@ -742,6 +742,9 @@ var _debug = false;
                     n--;
                 }
             } else {
+                if (playlist_order[order_index] === undefined) {
+                    return;
+                }
                 var pos = playlist_order[order_index].indexOf(current_id);
                 if (pos < 0) {
                     return;
@@ -769,6 +772,9 @@ var _debug = false;
                 current_played_pos = pos - 1;
                 id = playedlist[current_played_pos];
             } else {
+                if (playlist_order[order_index] === undefined) {
+                    return;
+                }
                 var pos = playlist_order[order_index].indexOf(current_id);
                 if (pos < 0) {
                     return;
