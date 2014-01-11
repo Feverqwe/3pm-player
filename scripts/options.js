@@ -47,7 +47,7 @@ var options = function() {
         xhr.onerror = function() {
             cb();
         };
-        xhr.timeout = 100;
+        xhr.timeout = 2000;
         xhr.send(null);
     };
     var write_qrcodes = function(settings) {
