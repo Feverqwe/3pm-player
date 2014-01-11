@@ -417,6 +417,7 @@
             return;
         }
         if (suspand) {
+            cb();
             return;
         }
         $.ajax({
@@ -479,6 +480,7 @@
     };
     lastfm.getInfo = function(artist, title, cb, cache_only) {
         if (artist === undefined || title === undefined || artist.length === 0 || title.length === 0) {
+            cb();
             return;
         }
         var cn = (artist + title).toLowerCase();
@@ -493,12 +495,16 @@
                 track_cache[cn] = item.data;
             } else
             if (cache_only) {
+                cb();
                 return;
             }
             getInfo(cn, artist, title, cb);
         });
     };
     lastfm.updateNowPlaying = function(a, b, c, d) {
+        if (navigator.onLine === false) {
+            return;
+        }
         if (suspand) {
             return;
         }

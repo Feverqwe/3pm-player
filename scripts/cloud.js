@@ -537,6 +537,7 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
+                options.track.tagReader = {};
                 options.url = options.track.file.url;
                 getTrack(options, cb);
             },
@@ -677,7 +678,7 @@ var cloud = function() {
             },
             preload: function(options, cb) {
                 if (options.track.blob === undefined) {
-                    options.track.tags = undefined;
+                    delete options.track.tagReader;
                 }
                 db.onplay(options.track, options.view, function(url) {
                     options.url = url;
@@ -831,6 +832,7 @@ var cloud = function() {
                 cb(list.tracks, {name: list.name, id: list.id, cloud: {type: "sc"}});
             },
             preload: function(options, cb) {
+                options.track.tagReader = {};
                 options.url = options.track.file.url;
                 getTrack(options, cb);
             }
@@ -916,7 +918,7 @@ var cloud = function() {
             },
             preload: function(options, cb) {
                 if (options.track.blob === undefined) {
-                    options.track.tags = undefined;
+                    delete options.track.tagReader;
                 }
                 gd.onplay(options.track, options.view, function(url) {
                     options.url = url;
@@ -1095,7 +1097,7 @@ var cloud = function() {
             },
             preload: function(options, cb) {
                 if (options.track.blob === undefined) {
-                    options.track.tags = undefined;
+                    delete options.track.tagReader;
                 }
                 getTrack({
                     view: options.view,
@@ -1196,6 +1198,9 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
+                if (options.track.blob === undefined) {
+                    delete options.track.tagReader;
+                }
                 sd.onplay(options.track, undefined, function(url) {
                     options.url = url;
                     getTrack(options, cb);

@@ -196,76 +196,108 @@ var _debug = false;
         covers.push({id: id, len: len, data: bin, chk: chk});
         return id;
     };
-    var read_tags = function(id, rt_cb) {
-        if (playlist[id].cloud !== undefined && cloud[playlist[id].cloud.type].read_tags !== undefined) {
-            playlist[id].state = "loading";
-            _send('playlist', function(window) {
-                window.playlist.updPlaylistItem(id, playlist[id]);
-            });
-            cloud[playlist[id].cloud.type].read_tags(playlist[id], function(tags) {
-                if (tags.picture === undefined) {
-                    rt_cb(tags, id);
-                    return;
-                }
-                read_image(tags.picture.data, function(cover_id) {
-                    if (cover_id === undefined) {
-                        delete tags.picture;
-                    } else {
-                        tags.picture = cover_id;
-                    }
-                    rt_cb(tags, id);
-                });
-            });
-            return;
+    var tagReader = function(id, rt_cb) {
+        var dune = function(id) {
+            if (settings.lastfm_info) {
+                player.lastfm_tag_reader(id, rt_cb);
+            } else {
+                rt_cb(id);
+            }
+        };
+        var track = playlist[id];
+        if (track.tags === undefined) {
+            track.tags = {};
         }
-        var file;
-        if (playlist[id].blob !== undefined) {
-            file = playlist[id].blob;
-        } else {
-            file = playlist[id].file;
-        }
-        playlist[id].state = "loading";
-        _send('playlist', function(window) {
-            window.playlist.updPlaylistItem(id, playlist[id]);
-        });
-        /*
-         if (window.time_log === undefined) {
-         window.time_log = [];
-         }
-         var startDate = new Date().getTime();
-         */
-        var params = {tags: ["artist", "title", "album", "picture"], file: file};
-        var f_name = 0;
-        ID3.loadTags(f_name, function() {
-            /*
-             var endDate = new Date().getTime();
-             var raz = ((endDate - startDate) / 1000);
-             console.log("Time: " + raz + "s");
-             window.time_log.push(raz);
-             var sum = window.time_log.reduce(function(pv, cv) {
-             return pv + cv;
-             }, 0);
-             console.log('Среднее время: ', sum / window.time_log.length);
-             */
-            var tags = ID3.getAllTags(f_name);
-            ID3.clearAll();
-            if (tags.picture === undefined) {
-                rt_cb(tags, id);
+        if (track.tagReader === undefined) {
+            track.tagReader = {};
+            if (track.blob !== undefined || track.file.slice !== undefined) {
+                track.tagReader.id3 = true;
+            } else
+            if (track.cloud !== undefined && track.blob === undefined) {
+                track.tagReader.cloud = true;
+            } else {
+                dune(id);
                 return;
             }
-            read_image(tags.picture.data, function(cover_id) {
-                if (cover_id === undefined) {
-                    delete tags.picture;
-                } else {
-                    tags.picture = cover_id;
+        } else {
+            dune(id);
+            return;
+        }
+
+        track.state = "loading";
+        _send('playlist', function(window) {
+            window.playlist.updPlaylistItem(id, track);
+        });
+
+        if (track.tagReader.cloud) {
+            if (cloud[track.cloud.type].read_tags === undefined) {
+                dune(id);
+                return;
+            }
+            cloud[track.cloud.type].read_tags(track, function(new_tags) {
+                ['title', 'artist', 'album'].forEach(function(key) {
+                    var item = new_tags[key];
+                    if (item !== undefined) {
+                        track.tags[key] = item;
+                    }
+                });
+                if (new_tags.picture === undefined) {
+                    dune(id);
+                    return;
                 }
-                rt_cb(tags, id);
+                read_image(new_tags.picture.data, function(cover_id) {
+                    if (cover_id !== undefined) {
+                        track.tags.picture = cover_id;
+                    }
+                    dune(id);
+                });
             });
-        }, params);
+        } else
+        if (track.tagReader.id3) {
+            var file = (track.blob !== undefined) ? track.blob : track.file;
+            /*
+             if (window.time_log === undefined) {
+             window.time_log = [];
+             }
+             var startDate = new Date().getTime();
+             */
+            var params = {tags: ["artist", "title", "album", "picture"], file: file};
+            ID3.loadTags(0, function() {
+                /*
+                 var endDate = new Date().getTime();
+                 var raz = ((endDate - startDate) / 1000);
+                 console.log("Time: " + raz + "s");
+                 window.time_log.push(raz);
+                 var sum = window.time_log.reduce(function(pv, cv) {
+                 return pv + cv;
+                 }, 0);
+                 console.log('Среднее время: ', sum / window.time_log.length);
+                 */
+                var new_tags = ID3.getAllTags(0);
+                ID3.clearAll();
+
+                ['title', 'artist', 'album'].forEach(function(key) {
+                    var item = new_tags[key];
+                    if (item !== undefined) {
+                        track.tags[key] = item;
+                    }
+                });
+                if (new_tags.picture === undefined) {
+                    dune(id);
+                    return;
+                }
+                read_image(new_tags.picture.data, function(cover_id) {
+                    if (cover_id !== undefined) {
+                        track.tags.picture = cover_id;
+                    }
+                    dune(id);
+                });
+            }, params);
+        }
     };
     var canFilePlay = function(file) {
         /*
-         * Определяет может ли плеер проигрывать файл, возвращает тип файла для плеера.
+         * Определяет может ли плеер проигрывать файл, возвращает true / false.
          */
         var type = file.type;
         if (type !== undefined && type.length > 0) {
@@ -480,14 +512,13 @@ var _debug = false;
             }
             return false;
         };
-        var tags_loaded = function(tags, id, state) {
+        var tags_loaded = function(id, state) {
             // 1 - playlist only
             // 2 - player, lfm, notifi
             // 3 - player, playlist, notifi
             // 4 - viz, playlist, player, notifi
             // other - all
             var tb;
-            playlist[id].tags = tags;
             playlist[id].state = "dune";
             var plist = function() {
                 _send('playlist', function(window) {
@@ -554,63 +585,66 @@ var _debug = false;
             viz();
             lfm();
         };
-        var lastfm_tag_ready = function(id, lfm_tags, blob) {
-            if (lfm_tags === undefined) {
+        var lastfm_tag_ready = function(id, new_tags, blob, cb) {
+            if (new_tags === undefined) {
+                cb(id);
                 return;
             }
-            var tags = playlist[id].tags;
+            var track = playlist[id];
             read_image(blob, function(cover_id) {
-                if (cover_id === undefined) {
-                    delete tags.picture;
-                } else {
-                    tags.picture = cover_id;
+                if (cover_id !== undefined) {
+                    track.tags.picture = cover_id;
                 }
-                if (lfm_tags !== undefined) {
-                    var track = playlist[id];
-                    var changes = false;
+                if (new_tags !== undefined) {
                     var changes_vk = false;
-                    if (lfm_tags.artist !== undefined && tags.artist !== lfm_tags.artist) {
-                        tags.artist = lfm_tags.artist;
-                        changes = true;
+                    if (new_tags.artist !== undefined && track.tags.artist !== new_tags.artist) {
+                        track.tags.artist = new_tags.artist;
                         changes_vk = true;
                     }
-                    if (lfm_tags.album !== undefined && tags.album !== lfm_tags.album) {
-                        tags.album = lfm_tags.album;
-                        changes = true;
+                    if (new_tags.album !== undefined && track.tags.album !== new_tags.album) {
+                        track.tags.album = new_tags.album;
                     }
-                    if (lfm_tags.title !== undefined && tags.title !== lfm_tags.title) {
-                        tags.title = lfm_tags.title;
-                        changes = true;
+                    if (new_tags.title !== undefined && track.tags.title !== new_tags.title) {
+                        track.tags.title = new_tags.title;
                         changes_vk = true;
                     }
                     if (changes_vk && settings.vk_tag_update && track.cloud !== undefined && track.cloud.type === 'vk' && track.cloud.from_lib === true) {
-                        cloud.vk.update_tags(track.cloud.owner_id, track.cloud.track_id, tags.artist, tags.title);
+                        cloud.vk.update_tags(track.cloud.owner_id, track.cloud.track_id, track.tags.artist, track.tags.title);
                     }
-                    if (changes) {
-                        tags_loaded(tags, id, 4);
-                    } else
-                    if (cover_id !== undefined) {
-                        tags_loaded(tags, id, 3);
-                    }
-                } else {
-                    tags_loaded(tags, id, 3);
                 }
+                cb(id);
             });
         };
-        var lastfm_tag_reader = function(id) {
-            if (!settings.lastfm_info) {
+        player.lastfm_tag_reader = function(id, cb) {
+            var track = playlist[id];
+            if (!settings.lastfm_info || track.tagReader.lastfm || navigator.onLine === false) {
+                cb(id);
                 return;
             }
-            var tags = playlist[id].tags;
-            if (tags === undefined
-                    || tags.picture !== undefined
-                    || tags.artist === undefined
-                    || tags.title === undefined) {
+            var cache = current_id !== id;
+            if (cache) {
+                if (track.tagReader.lastfm_cache) {
+                    cb(id);
+                    return;
+                } else {
+                    track.tagReader.lastfm_cache = true;
+                }
+            } else {
+                track.tagReader.lastfm = true;
+            }
+            if (track.tags === undefined
+                    || track.tags.picture !== undefined
+                    || track.tags.artist === undefined
+                    || track.tags.title === undefined) {
+                cb(id);
                 return;
             }
-            lastfm.getInfo(tags.artist, tags.title, function(lfm_tags, blob) {
-                lastfm_tag_ready(id, lfm_tags, blob);
-            });
+            lastfm.getInfo(track.tags.artist, track.tags.title, function(lfm_tags, blob) {
+                if (lfm_tags === undefined) {
+                    cb(id);
+                }
+                lastfm_tag_ready(id, lfm_tags, blob, cb);
+            }, cache);
         };
         player.discAdapters = function(name) {
             var rmlist = [];
@@ -916,15 +950,12 @@ var _debug = false;
             if (settings.next_track_notification) {
                 notification.show();
             }
-            var tags = playlist[current_id].tags;
-            if (tags === undefined) {
-                read_tags(current_id, function(tags, id) {
-                    tags_loaded(tags, id);
-                    lastfm_tag_reader(id);
+            if (playlist[current_id].tagReader === undefined || (settings.lastfm_info && playlist[current_id].tagReader.lastfm === undefined)) {
+                tagReader(current_id, function(id) {
+                    tags_loaded(id);
                 });
             } else {
-                tags_loaded(tags, current_id, 2);
-                lastfm_tag_reader(current_id);
+                tags_loaded(current_id, 2);
             }
             view.state("loadeddata");
         });
@@ -996,7 +1027,7 @@ var _debug = false;
                         return;
                     }
                     var item = playlist[item_id];
-                    if (item.tags !== undefined) {
+                    if (item.tagReader !== undefined) {
                         thread--;
                         next_item();
                         return;
@@ -1006,8 +1037,8 @@ var _debug = false;
             };
             var read_item = function(item) {
                 next_item();
-                read_tags(item.id, function(tags, id) {
-                    tags_loaded(tags, id, 1);
+                tagReader(item.id, function(id) {
+                    tags_loaded(id, 1);
                     thread--;
                     next_item();
                 });
@@ -1206,7 +1237,7 @@ var _debug = false;
                 my_playlist.push({id: my_playlist.length, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
                 continue;
             }
-            if (canFilePlay(files[i]) === undefined) {
+            if (canFilePlay(files[i]) === false) {
                 continue;
             }
             my_playlist.push({id: my_playlist.length, file: files[i], tags: undefined, duration: undefined});
