@@ -1235,6 +1235,11 @@ var _debug = false;
         var my_playlist = [];
         for (var i = 0; i < files.length; i++) {
             if (files[i].tags !== undefined && files[i].tags.picture !== undefined) {
+                /*
+                 * Возможны конфиликты, если в облаке
+                 *  не переписываетс список треков при выборе
+                 *  или нету read_tags который получает тэги не из track.tags
+                 */
                 files[i].tags = undefined;
             }
             if (files[i].id !== undefined && files[i].file !== undefined) {
