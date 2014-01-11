@@ -1360,12 +1360,7 @@ var _debug = false;
     engine.setSortedList = function(new_playlist_order, new_order_index, no_update_pl) {
         playlist_order[new_order_index] = new_playlist_order;
         order_index = new_order_index;
-        if (no_update_pl) {
-            return;
-        }
-        _send('playlist', function(window) {
-            window.playlist.setPlaylist(engine.getPlaylist());
-        });
+        return engine.getPlaylist();
     };
     engine.getPlaylistOrder = function() {
         return playlist_order;

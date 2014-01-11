@@ -121,7 +121,7 @@ var playlist = function() {
             }
             dom_list[i] = $('<li>', {'data-id': track.id}).append(
                     $('<div>', {'class': 'gr_line'}),
-            $('<div>', {'class': 'cover pic_' + tags.pic}),
+            $('<div>', {'class': 'cover pic_' + tags.pic, title: (track.file.url !== track.file.name) ? track.file.name : ''}),
             $('<span>', {'class': 'name', title: tags.title, text: tags.title}),
             $('<span>', {'class': 'info', title: tags.info, text: tags.info}),
             $('<div>', {'class': 'move', title: _lang.move_item})
@@ -269,7 +269,7 @@ var playlist = function() {
                             var id = parseInt($(item).attr('data-id'));
                             new_playlist_order.push(id);
                         });
-                        window.engine.setSortedList(new_playlist_order, new_order_index, 1);
+                        window.engine.setSortedList(new_playlist_order, new_order_index);
                     });
                 }
             });
@@ -301,13 +301,13 @@ var playlist = function() {
                         var new_playlist_order = playlist_order[0].slice();
                         var new_order_index = 1;
                         new_playlist_order = textSort(new_playlist_order);
-                        window.engine.setSortedList(new_playlist_order, new_order_index);
+                        write_playlist(window.engine.setSortedList(new_playlist_order, new_order_index));
                     } else
                     if (next === 2) {
                         var new_playlist_order = playlist_order[0].slice();
                         var new_order_index = 2;
                         new_playlist_order = numberSort(new_playlist_order);
-                        window.engine.setSortedList(new_playlist_order, new_order_index);
+                        write_playlist(window.engine.setSortedList(new_playlist_order, new_order_index));
                     }
                 });
             });
