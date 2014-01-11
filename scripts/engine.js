@@ -196,103 +196,118 @@ var _debug = false;
         covers.push({id: id, len: len, data: bin, chk: chk});
         return id;
     };
-    var tagReader = function(id, rt_cb) {
-        var dune = function(id) {
-            if (settings.lastfm_info) {
-                player.lastfm_tag_reader(id, rt_cb);
-            } else {
-                rt_cb(id);
+    var fileTagReader = function(id, cb) {
+        var track = playlist[id];
+        var file = track.blob || track.file;
+        /*
+         if (window.time_log === undefined) {
+         window.time_log = [];
+         }
+         var startDate = new Date().getTime();
+         */
+        var params = {tags: ["artist", "title", "album", "picture"], file: file};
+        ID3.loadTags(0, function() {
+            /*
+             var endDate = new Date().getTime();
+             var raz = ((endDate - startDate) / 1000);
+             console.log("Time: " + raz + "s");
+             window.time_log.push(raz);
+             var sum = window.time_log.reduce(function(pv, cv) {
+             return pv + cv;
+             }, 0);
+             console.log('Среднее время: ', sum / window.time_log.length);
+             */
+            var new_tags = ID3.getAllTags(0);
+            ID3.clearAll();
+
+            ['title', 'artist', 'album'].forEach(function(key) {
+                var item = new_tags[key];
+                if (item !== undefined) {
+                    track.tags[key] = item;
+                }
+            });
+            if (new_tags.picture === undefined) {
+                cb(id);
+                return;
             }
+            read_image(new_tags.picture.data, function(cover_id) {
+                if (cover_id !== undefined) {
+                    track.tags.picture = cover_id;
+                }
+                cb(id);
+            });
+        }, params);
+    };
+    var cloudTagReader = function(id, cb) {
+        var track = playlist[id];
+        cloud[track.cloud.type].read_tags(track, function(new_tags) {
+            ['title', 'artist', 'album'].forEach(function(key) {
+                var item = new_tags[key];
+                if (item !== undefined) {
+                    track.tags[key] = item;
+                }
+            });
+            if (new_tags.picture === undefined) {
+                cb(id);
+                return;
+            }
+            read_image(new_tags.picture.data, function(cover_id) {
+                if (cover_id !== undefined) {
+                    track.tags.picture = cover_id;
+                }
+                cb(id);
+            });
+        });
+    };
+    var postTagReader = function(id, cb) {
+        if (settings.lastfm_info) {
+            player.lfmTagReader(id, cb);
+        } else {
+            cb(id);
+        }
+    };
+    var tagReader = function(id, cb) {
+        var loading_mode = function(id, track) {
+            track.state = "loading";
+            _send('playlist', function(window) {
+                window.playlist.updPlaylistItem(id, track);
+            });
         };
         var track = playlist[id];
         if (track.tags === undefined) {
             track.tags = {};
         }
-        if (track.tagReader === undefined) {
-            track.tagReader = {};
-            if (track.blob !== undefined || track.file.slice !== undefined) {
-                track.tagReader.id3 = true;
-            } else
-            if (track.cloud !== undefined && track.blob === undefined) {
-                track.tagReader.cloud = true;
-            } else {
-                dune(id);
-                return;
-            }
-        } else {
-            dune(id);
+        if (track.tags.reader_state === true) {
             return;
         }
-
-        track.state = "loading";
-        _send('playlist', function(window) {
-            window.playlist.updPlaylistItem(id, track);
-        });
-
-        if (track.tagReader.cloud) {
-            if (cloud[track.cloud.type].read_tags === undefined) {
-                dune(id);
-                return;
+        track.tags.reader_state = true;
+        if (track.cloud !== undefined) {
+            var config = track.cloud.tag_config;
+            if (config === undefined) {
+                if (cloud[track.cloud.type].read_tags) {
+                    config = 'cloud';
+                } else {
+                    postTagReader(id, cb);
+                }
             }
-            cloud[track.cloud.type].read_tags(track, function(new_tags) {
-                ['title', 'artist', 'album'].forEach(function(key) {
-                    var item = new_tags[key];
-                    if (item !== undefined) {
-                        track.tags[key] = item;
-                    }
+            if (config === 'blob') {
+                loading_mode(id, track);
+                fileTagReader(id, function(id) {
+                    postTagReader(id, cb);
                 });
-                if (new_tags.picture === undefined) {
-                    dune(id);
-                    return;
-                }
-                read_image(new_tags.picture.data, function(cover_id) {
-                    if (cover_id !== undefined) {
-                        track.tags.picture = cover_id;
-                    }
-                    dune(id);
+            } else
+            if (config === 'cloud') {
+                loading_mode(id, track);
+                cloudTagReader(id, function(id) {
+                    postTagReader(id, cb);
                 });
-            });
+            }
         } else
-        if (track.tagReader.id3) {
-            var file = (track.blob !== undefined) ? track.blob : track.file;
-            /*
-             if (window.time_log === undefined) {
-             window.time_log = [];
-             }
-             var startDate = new Date().getTime();
-             */
-            var params = {tags: ["artist", "title", "album", "picture"], file: file};
-            ID3.loadTags(0, function() {
-                /*
-                 var endDate = new Date().getTime();
-                 var raz = ((endDate - startDate) / 1000);
-                 console.log("Time: " + raz + "s");
-                 window.time_log.push(raz);
-                 var sum = window.time_log.reduce(function(pv, cv) {
-                 return pv + cv;
-                 }, 0);
-                 console.log('Среднее время: ', sum / window.time_log.length);
-                 */
-                var new_tags = ID3.getAllTags(0);
-                ID3.clearAll();
-
-                ['title', 'artist', 'album'].forEach(function(key) {
-                    var item = new_tags[key];
-                    if (item !== undefined) {
-                        track.tags[key] = item;
-                    }
-                });
-                if (new_tags.picture === undefined) {
-                    dune(id);
-                    return;
-                }
-                read_image(new_tags.picture.data, function(cover_id) {
-                    if (cover_id !== undefined) {
-                        track.tags.picture = cover_id;
-                    }
-                    dune(id);
-                });
-            }, params);
+        if (track.file.slice !== undefined) {
+            loading_mode(id, track);
+            fileTagReader(id, function(id) {
+                postTagReader(id, cb);
+            });
         }
     };
     var canFilePlay = function(file) {
@@ -600,22 +615,25 @@ var _debug = false;
                 cb(id);
             });
         };
-        player.lastfm_tag_reader = function(id, cb) {
+        player.lfmTagReader = function(id, cb) {
             var track = playlist[id];
-            if (!settings.lastfm_info || track.tagReader.lastfm || navigator.onLine === false) {
+            if (track.lfm === undefined) {
+                track.lfm = {};
+            }
+            if (!settings.lastfm_info || track.lfm.lastfm || navigator.onLine === false) {
                 cb(id);
                 return;
             }
             var cache = current_id !== id;
             if (cache) {
-                if (track.tagReader.lastfm_cache) {
+                if (track.lfm.lastfm_cache) {
                     cb(id);
                     return;
                 } else {
-                    track.tagReader.lastfm_cache = true;
+                    track.lfm.lastfm_cache = true;
                 }
             } else {
-                track.tagReader.lastfm = true;
+                track.lfm.lastfm = true;
             }
             if (track.tags === undefined
                     || track.tags.picture !== undefined
@@ -935,8 +953,14 @@ var _debug = false;
             if (settings.next_track_notification) {
                 notification.show();
             }
-            if (playlist[current_id].tagReader === undefined || (settings.lastfm_info && playlist[current_id].tagReader.lastfm === undefined)) {
+            var track = playlist[current_id];
+            if (track.tags === undefined || track.tags.reader_state !== true) {
                 tagReader(current_id, function(id) {
+                    tags_loaded(id);
+                });
+            } else
+            if (settings.lastfm_info && (track.lfm === undefined || track.lfm.lastfm !== true)) {
+                player.lfmTagReader(current_id, function(id) {
                     tags_loaded(id);
                 });
             } else {
@@ -1011,13 +1035,13 @@ var _debug = false;
                          */
                         return;
                     }
-                    var item = playlist[item_id];
-                    if (item.tagReader !== undefined) {
+                    var track = playlist[item_id];
+                    if (track.tags !== undefined && track.tags.reader_state === true) {
                         thread--;
                         next_item();
                         return;
                     }
-                    read_item(item);
+                    read_item(track);
                 }
             };
             var read_item = function(item) {
@@ -1213,7 +1237,7 @@ var _debug = false;
             if (files[i].tags !== undefined && files[i].tags.picture !== undefined) {
                 files[i].tags = undefined;
             }
-            if (files[i].id !== undefined && files[i].file !== undefined && 'tags' in files[i]) {
+            if (files[i].id !== undefined && files[i].file !== undefined) {
                 files[i].id = my_playlist.length;
                 my_playlist.push(files[i]);
                 continue;

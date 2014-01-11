@@ -483,7 +483,6 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
-                options.track.tagReader = {};
                 options.url = options.track.file.url;
                 getTrack(options, cb);
             },
@@ -623,8 +622,9 @@ var cloud = function() {
                 }, track.cloud.root, track.cloud.path);
             },
             preload: function(options, cb) {
-                if (options.track.blob === undefined) {
-                    delete options.track.tagReader;
+                options.track.cloud.tag_config = 'blob';
+                if (options.track.blob === undefined && options.track.tags !== undefined) {
+                    delete options.track.tags.reader_state;
                 }
                 db.onplay(options.track, options.view, function(url) {
                     options.url = url;
@@ -778,7 +778,6 @@ var cloud = function() {
                 cb(list.tracks, {name: list.name, id: list.id, cloud: {type: "sc"}});
             },
             preload: function(options, cb) {
-                options.track.tagReader = {};
                 options.url = options.track.file.url;
                 getTrack(options, cb);
             }
@@ -863,8 +862,9 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
-                if (options.track.blob === undefined) {
-                    delete options.track.tagReader;
+                options.track.cloud.tag_config = 'blob';
+                if (options.track.blob === undefined && options.track.tags !== undefined) {
+                    options.track.tags.reader_state = false;
                 }
                 gd.onplay(options.track, options.view, function(url) {
                     options.url = url;
@@ -1042,8 +1042,9 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
-                if (options.track.blob === undefined) {
-                    delete options.track.tagReader;
+                options.track.cloud.tag_config = 'blob';
+                if (options.track.blob === undefined && options.track.tags !== undefined) {
+                    options.track.tags.reader_state = false;
                 }
                 getTrack({
                     view: options.view,
@@ -1144,8 +1145,9 @@ var cloud = function() {
                 });
             },
             preload: function(options, cb) {
-                if (options.track.blob === undefined) {
-                    delete options.track.tagReader;
+                options.track.cloud.tag_config = 'blob';
+                if (options.track.blob === undefined && options.track.tags !== undefined) {
+                    options.track.tags.reader_state = false;
                 }
                 sd.onplay(options.track, undefined, function(url) {
                     options.url = url;
