@@ -1138,7 +1138,7 @@ var _debug = false;
         var _windows = window._windows;
         var n = 0;
         for (var i in _windows) {
-            if (i === type) {
+            if (i === type || _windows[i].isMinimized()) {
                 continue;
             }
             _windows[i].focus();
