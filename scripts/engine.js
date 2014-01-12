@@ -1219,10 +1219,7 @@ var _debug = false;
         }
         chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
     };
-    engine.open = function(files, info) {
-        if (files.length === 0) {
-            return;
-        }
+    var readTrackList = function(files) {
         var my_playlist = [];
         var my_playlist_order = {0: []};
         for (var i = 0; i < files.length; i++) {
@@ -1253,22 +1250,55 @@ var _debug = false;
             my_playlist_order[0].push(id);
             my_playlist.push({id: id, file: files[i], tags: undefined, duration: undefined});
         }
-        if (my_playlist.length > 0) {
-            resetPlayer();
-            playlist = my_playlist;
-            playlist_order = my_playlist_order;
-            playlist_info = info;
-            _send('playlist', function(window) {
-                window.playlist.setPlaylist(engine.getPlaylist());
-            });
-            view.state("playlist_not_empty");
-            var id = 0;
-            if (shuffle) {
-                id = getRandomInt(0, playlist.length - 1);
-            }
-            player.open(id);
-            addInCtxMenu(playlist_info);
+        return [my_playlist, my_playlist_order];
+    };
+    engine.open = function(files, info) {
+        if (files.length === 0) {
+            return;
         }
+        var trackList = readTrackList(files);
+        if (trackList[0].length === 0) {
+            return;
+        }
+        resetPlayer();
+        playlist = trackList[0];
+        playlist_order = trackList[1];
+        playlist_info = info;
+        _send('playlist', function(window) {
+            window.playlist.setPlaylist(engine.getPlaylist());
+        });
+        view.state("playlist_not_empty");
+        var id = 0;
+        if (shuffle) {
+            id = getRandomInt(0, playlist.length - 1);
+        }
+        player.open(id);
+        addInCtxMenu(playlist_info);
+    };
+    engine.append = function(files) {
+        if (files.length === 0) {
+            return;
+        }
+        var tracks = readTrackList(files)[0];
+        if (tracks.length === 0) {
+            return;
+        }
+        if (playlist.length === 0) {
+            engine.open(files);
+            return;
+        }
+        var id = playlist.slice(-1)[0].id;
+        for (var i = 0, track; track = tracks[i]; i++) {
+            id++;
+            track.id = id;
+            playlist.push(track);
+            $.each(playlist_order, function(key, value) {
+                value.push(id);
+            });
+        }
+        _send('playlist', function(window) {
+            window.playlist.setPlaylist(engine.getPlaylist());
+        });
     };
     engine.play = player.play;
     engine.playToggle = player.playToggle;
