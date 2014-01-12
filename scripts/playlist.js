@@ -130,7 +130,7 @@ var playlist = function() {
         add_image(pic_list);
         dom_cache.playlist_ul.empty().append(dom_list);
         _send('player', function(window) {
-            window.engine.getCurrent();
+            playlist.selected(window.engine.getCurrentTrackID());
         });
     };
     var update_playlist_item = function(id, item) {

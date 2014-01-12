@@ -492,7 +492,7 @@ var dialog = function() {
                 tags.artwork = item.picture;
             }
             return tags;
-        }
+        };
         /*
          * Создает форму выбора папок иди файлов
          */

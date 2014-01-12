@@ -332,7 +332,7 @@ var _debug = false;
     };
     var getTagBody = function(id) {
         if (id === undefined) {
-            id = player.getTrackID();
+            id = player.getCurrentTrackID();
         }
         if (playlist[id] === undefined) {
             return {title: '3pm-player'};
@@ -885,11 +885,6 @@ var _debug = false;
         player.getMute = function() {
             return audio.muted;
         };
-        player.getCurrent = function() {
-            _send('playlist', function(window) {
-                window.playlist.selected(current_id);
-            });
-        };
         player.canPlay = function(mime) {
             if (mime[0] === '.') {
                 var ext = mime.substr(1);
@@ -1052,7 +1047,7 @@ var _debug = false;
         player.getCurrentTrack = function() {
             return playlist[current_id];
         };
-        player.getTrackID = function() {
+        player.getCurrentTrackID = function() {
             return current_id;
         };
     })();
@@ -1314,7 +1309,7 @@ var _debug = false;
     engine.getPlaylist = function() {
         return {order_index: order_index, playlist_ordered: playlist_order[order_index], playlist: playlist, info: playlist_info};
     };
-    engine.getCurrent = player.getCurrent;
+    engine.getCurrentTrackID = player.getCurrentTrackID;
     engine.APIstatus = function() {
         return JSON.stringify(player.status());
     };
