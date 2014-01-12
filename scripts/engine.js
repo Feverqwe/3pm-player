@@ -1316,7 +1316,10 @@ var _debug = false;
     };
     engine.APIplaylist = function() {
         var playlist_ordered = playlist_order[order_index];
-        var playlist_order_len = playlist_ordered.length;
+        var playlist_order_len = 0;
+        if (playlist_ordered !== undefined) {
+            playlist_order_len = playlist_ordered.length;
+        }
         var list = new Array(playlist_order_len);
         for (var i = 0; i < playlist_order_len; i++) {
             var track = playlist[playlist_ordered[i]];

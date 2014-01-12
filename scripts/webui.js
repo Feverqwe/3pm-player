@@ -278,7 +278,11 @@ var webui = function() {
                 webui.stop();
                 return;
             }
-            onConnection_(acceptInfo);
+            chrome.socket.setKeepAlive(acceptInfo.socketId, true, 5, function(e) {
+                if (e) {
+                    onConnection_(acceptInfo);
+                }
+            });
             acceptConnection_(socketId);
         });
     };
