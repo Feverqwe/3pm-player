@@ -1,5 +1,4 @@
-(function(ns) {
-    var playlist = ns.playlist = {};
+var playlist = function() {
     var dom_cache = {};
     var var_cache = {};
     var settings = undefined;
@@ -210,176 +209,178 @@
         $('.btn.sort').attr('title', _lang.sort);
         $('.btn.read_tags').attr('title', _lang.read_tags);
     };
-    playlist.preload = function() {
-        write_language();
-        _send('player', function(window) {
-            settings = window._settings;
-            playlist.show();
-        });
-    };
-    playlist.show = function() {
-        dom_cache = {
-            body: $('body'),
-            playlist: $('div.playlist'),
-            playlist_ul: $('div.playlist ul'),
-            shuffle: $('.shuffle.btn'),
-            loop: $('.loop.btn'),
-            order: $('.sort.btn'),
-            pl_list: $('.pl_list_select'),
-            title: $('body').children('div.title')
-        };
-        if (settings.is_winamp) {
-            dom_cache.body.addClass('winamp');
-            dom_cache.body.append(
-                    $('<div>', {'class': 'w_head'}),
-            $('<div>', {'class': 'w_left'}),
-            $('<div>', {'class': 'w_right'}),
-            $('<div>', {'class': 'w_bottom'}),
-            $('<div>', {'class': 'w_l_t'}),
-            $('<div>', {'class': 'w_r_t'}),
-            $('<div>', {'class': 'w_b_l'}),
-            $('<div>', {'class': 'w_b_r'})
-                    );
-        }
-        _send('player', function(window) {
-            write_playlist(window.engine.getPlaylist());
-            window.engine.shuffle(null);
-            window.engine.loop(null);
-            window.engine.setHotkeys(document);
-            selectPL(window.engine.getM3UPlaylists());
-        });
-        $('.close').on('click', function() {
-            window.close();
-        });
-        $('.mini').on('click', function() {
-            chrome.app.window.current().minimize();
-        });
-        dom_cache.playlist_ul.on('click', 'li', function() {
-            var id = $(this).attr('data-id');
+    return {
+        preload: function() {
+            write_language();
             _send('player', function(window) {
-                window.engine.openById(id);
+                settings = window._settings;
+                playlist.show();
             });
-        });
-        dom_cache.playlist_ul.sortable({handle: ".move", axis: "y", stop: function() {
-                _send('player', function(window) {
-                    var new_order_index = -1;
-                    var arr = $.makeArray(dom_cache.playlist_ul.children('li'));
-                    var new_playlist_order = [];
-                    arr.forEach(function(item) {
-                        var id = parseInt($(item).attr('data-id'));
-                        new_playlist_order.push(id);
-                    });
-                    window.engine.setSortedList(new_playlist_order, new_order_index);
-                });
+        },
+        show: function() {
+            dom_cache = {
+                body: $('body'),
+                playlist: $('div.playlist'),
+                playlist_ul: $('div.playlist ul'),
+                shuffle: $('.shuffle.btn'),
+                loop: $('.loop.btn'),
+                order: $('.sort.btn'),
+                pl_list: $('.pl_list_select'),
+                title: $('body').children('div.title')
+            };
+            if (settings.is_winamp) {
+                dom_cache.body.addClass('winamp');
+                dom_cache.body.append(
+                        $('<div>', {'class': 'w_head'}),
+                $('<div>', {'class': 'w_left'}),
+                $('<div>', {'class': 'w_right'}),
+                $('<div>', {'class': 'w_bottom'}),
+                $('<div>', {'class': 'w_l_t'}),
+                $('<div>', {'class': 'w_r_t'}),
+                $('<div>', {'class': 'w_b_l'}),
+                $('<div>', {'class': 'w_b_r'})
+                        );
             }
-        });
-        dom_cache.shuffle.on('click', function() {
             _send('player', function(window) {
-                window.engine.shuffle();
+                write_playlist(window.engine.getPlaylist());
+                window.engine.shuffle(null);
+                window.engine.loop(null);
+                window.engine.setHotkeys(document);
+                selectPL(window.engine.getM3UPlaylists());
             });
-        });
-        dom_cache.loop.on('click', function() {
-            _send('player', function(window) {
-                window.engine.loop();
+            $('.close').on('click', function() {
+                window.close();
             });
-        });
-        dom_cache.order.on('click', function() {
-            _send('player', function(window) {
-                var playlist_order = window.engine.getPlaylistOrder();
-                if (playlist_order[0] === undefined) {
+            $('.mini').on('click', function() {
+                chrome.app.window.current().minimize();
+            });
+            dom_cache.playlist_ul.on('click', 'li', function() {
+                var id = $(this).attr('data-id');
+                _send('player', function(window) {
+                    window.engine.openById(id);
+                });
+            });
+            dom_cache.playlist_ul.sortable({handle: ".move", axis: "y", stop: function() {
+                    _send('player', function(window) {
+                        var new_order_index = -1;
+                        var arr = $.makeArray(dom_cache.playlist_ul.children('li'));
+                        var new_playlist_order = [];
+                        arr.forEach(function(item) {
+                            var id = parseInt($(item).attr('data-id'));
+                            new_playlist_order.push(id);
+                        });
+                        window.engine.setSortedList(new_playlist_order, new_order_index);
+                    });
+                }
+            });
+            dom_cache.shuffle.on('click', function() {
+                _send('player', function(window) {
+                    window.engine.shuffle();
+                });
+            });
+            dom_cache.loop.on('click', function() {
+                _send('player', function(window) {
+                    window.engine.loop();
+                });
+            });
+            dom_cache.order.on('click', function() {
+                _send('player', function(window) {
+                    var playlist_order = window.engine.getPlaylistOrder();
+                    if (playlist_order[0] === undefined) {
+                        return;
+                    }
+                    var next = order_index + 1;
+                    if (next > 2) {
+                        if (playlist_order[-1] !== undefined) {
+                            next = -1;
+                        } else {
+                            next = 0;
+                        }
+                    }
+                    if (next === 0 || next === -1) {
+                        write_playlist(window.engine.setPlaylistOrder(next));
+                    } else
+                    if (next === 1) {
+                        var new_playlist_order = playlist_order[0].slice();
+                        var new_order_index = 1;
+                        new_playlist_order = textSort(new_playlist_order);
+                        write_playlist(window.engine.setSortedList(new_playlist_order, new_order_index));
+                    } else
+                    if (next === 2) {
+                        var new_playlist_order = playlist_order[0].slice();
+                        var new_order_index = 2;
+                        new_playlist_order = numberSort(new_playlist_order);
+                        write_playlist(window.engine.setSortedList(new_playlist_order, new_order_index));
+                    }
+                });
+            });
+            $('.playlist_select').on('click', function() {
+                dom_cache.pl_list.toggle();
+            });
+            $('.read_tags.btn').on('click', function() {
+                _send('player', function(window) {
+                    window.engine.readAllTags();
+                });
+            });
+            dom_cache.pl_list.on('click', 'li', function() {
+                var id = $(this).data('id');
+                _send('player', function(window) {
+                    window.engine.selectPlaylist(id);
+                });
+                $(this).parent().hide();
+            });
+            chrome.app.window.current().onBoundsChanged.addListener(function() {
+                if (document.webkitHidden || chrome.app.window.current().isMaximized()) {
                     return;
                 }
-                var next = order_index + 1;
-                if (next > 2) {
-                    if (playlist_order[-1] !== undefined) {
-                        next = -1;
-                    } else {
-                        next = 0;
-                    }
-                }
-                if (next === 0 || next === -1) {
-                    write_playlist(window.engine.setPlaylistOrder(next));
-                } else
-                if (next === 1) {
-                    var new_playlist_order = playlist_order[0].slice();
-                    var new_order_index = 1;
-                    new_playlist_order = textSort(new_playlist_order);
-                    write_playlist(window.engine.setSortedList(new_playlist_order, new_order_index));
-                } else
-                if (next === 2) {
-                    var new_playlist_order = playlist_order[0].slice();
-                    var new_order_index = 2;
-                    new_playlist_order = numberSort(new_playlist_order);
-                    write_playlist(window.engine.setSortedList(new_playlist_order, new_order_index));
+                var window_left = window.screenLeft;
+                var window_top = window.screenTop;
+                var window_width = parseInt(window.innerWidth);
+                var window_height = parseInt(window.innerHeight);
+                if (var_cache.window_left !== window_left || var_cache.window_top !== window_top
+                        || var_cache.window_width !== window_width || var_cache.window_height !== window_height) {
+                    var_cache.window_left = window_left;
+                    var_cache.window_top = window_top;
+                    var_cache.window_height = window_height;
+                    var_cache.window_width = window_width;
+                    chrome.storage.local.set({pl_pos_left: window_left, pl_pos_top: window_top, pl_w: window_width, pl_h: window_height});
                 }
             });
-        });
-        $('.playlist_select').on('click', function() {
-            dom_cache.pl_list.toggle();
-        });
-        $('.read_tags.btn').on('click', function() {
-            _send('player', function(window) {
-                window.engine.readAllTags();
-            });
-        });
-        dom_cache.pl_list.on('click', 'li', function() {
-            var id = $(this).data('id');
-            _send('player', function(window) {
-                window.engine.selectPlaylist(id);
-            });
-            $(this).parent().hide();
-        });
-        chrome.app.window.current().onBoundsChanged.addListener(function() {
-            if (document.webkitHidden || chrome.app.window.current().isMaximized()) {
-                return;
+        },
+        setPlaylist: function(a) {
+            write_playlist(a);
+        },
+        setPlaylistInfo: setInfo,
+        updPlaylistItem: function(id, item) {
+            update_playlist_item(id, item);
+        },
+        selected: function(id) {
+            dom_cache.playlist_ul.children('li.selected').removeClass('selected');
+            var el = dom_cache.playlist_ul.children('li[data-id=' + id + ']').addClass('selected');
+            scrool_to(el);
+        },
+        setShuffle: function(status) {
+            if (status) {
+                dom_cache.shuffle.css('background-image', 'url(images/shuffle_on.png)');
+            } else {
+                dom_cache.shuffle.css('background-image', 'url(images/shuffle_w.png)');
             }
-            var window_left = window.screenLeft;
-            var window_top = window.screenTop;
-            var window_width = parseInt(window.innerWidth);
-            var window_height = parseInt(window.innerHeight);
-            if (var_cache.window_left !== window_left || var_cache.window_top !== window_top
-                    || var_cache.window_width !== window_width || var_cache.window_height !== window_height) {
-                var_cache.window_left = window_left;
-                var_cache.window_top = window_top;
-                var_cache.window_height = window_height;
-                var_cache.window_width = window_width;
-                chrome.storage.local.set({pl_pos_left: window_left, pl_pos_top: window_top, pl_w: window_width, pl_h: window_height});
+        },
+        setLoop: function(status) {
+            if (status) {
+                dom_cache.loop.css('background-image', 'url(images/loop_on.png)');
+            } else {
+                dom_cache.loop.css('background-image', 'url(images/loop_w.png)');
             }
-        });
+        },
+        empty: function() {
+            $('style.cover').remove();
+            dom_cache.playlist_ul.empty();
+            setInfo();
+        },
+        setSelectList: selectPL
     };
-    playlist.setPlaylist = function(a) {
-        write_playlist(a);
-    };
-    playlist.setPlaylistInfo = setInfo;
-    playlist.updPlaylistItem = function(id, item) {
-        update_playlist_item(id, item);
-    };
-    playlist.selected = function(id) {
-        dom_cache.playlist_ul.children('li.selected').removeClass('selected');
-        var el = dom_cache.playlist_ul.children('li[data-id=' + id + ']').addClass('selected');
-        scrool_to(el);
-    };
-    playlist.setShuffle = function(status) {
-        if (status) {
-            dom_cache.shuffle.css('background-image', 'url(images/shuffle_on.png)');
-        } else {
-            dom_cache.shuffle.css('background-image', 'url(images/shuffle_w.png)');
-        }
-    };
-    playlist.setLoop = function(status) {
-        if (status) {
-            dom_cache.loop.css('background-image', 'url(images/loop_on.png)');
-        } else {
-            dom_cache.loop.css('background-image', 'url(images/loop_w.png)');
-        }
-    };
-    playlist.empty = function() {
-        $('style.cover').remove();
-        dom_cache.playlist_ul.empty();
-        setInfo();
-    };
-    playlist.setSelectList = selectPL;
-})(this);
+}();
 $(function() {
     playlist.preload();
 });
