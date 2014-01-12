@@ -468,7 +468,7 @@
             });
         });
     };
-    var pre_buffering_controller = function() {
+    var preBufferingController = function() {
         /*
          * Управляет полоской буферизации
          */
@@ -620,7 +620,7 @@
             }
         };
     }();
-    var make_ctx_menu = function() {
+    var makeCtxMenu = function() {
         /*
          * Формирует контекстное меню
          */
@@ -875,7 +875,7 @@
         $('.volume_controll .pic').attr('title', _lang.mute);
         $('div.shuffle').attr('title', _lang.shuffle);
         $('div.loop').attr('title', _lang.loop);
-        make_ctx_menu();
+        makeCtxMenu();
     };
     var getVolumeColor = function(value) {
         /*
@@ -894,7 +894,7 @@
         }
         return 'rgba(' + a + ', ' + b + ', ' + c + ', 1)';
     };
-    var calculate_moveble = function(selectors, size, classname) {
+    var calculateMoveble = function(selectors, size, classname) {
         /*
          * Расчитывает стиль прокрутки длиных имен. для Winmap.
          */
@@ -1051,13 +1051,13 @@
         }
         if (album_scroller) {
             dom_cache.trackalbum.parent().addClass('scroller');
-            calculate_moveble(dom_cache.trackalbum, dom_cache.trackalbum.parent().width(), 'album scroller');
+            calculateMoveble(dom_cache.trackalbum, dom_cache.trackalbum.parent().width(), 'album scroller');
         } else {
             dom_cache.trackalbum.parent().attr('class', 'album');
         }
         if (title_scroller) {
             dom_cache.trackname.parent().addClass('scroller');
-            calculate_moveble(dom_cache.trackname, dom_cache.trackname.parent().width(), 'name scroller');
+            calculateMoveble(dom_cache.trackname, dom_cache.trackname.parent().width(), 'name scroller');
         } else {
             dom_cache.trackname.parent().attr('class', 'name');
         }
@@ -1204,7 +1204,7 @@
             create: function() {
                 var div_loaded = $('<div>', {'class': 'loaded'});
                 dom_cache.progress.append(div_loaded);
-                pre_buffering_controller.setObj(div_loaded);
+                preBufferingController.setObj(div_loaded);
                 dom_cache.progress_ui_a = dom_cache.progress.find('a').eq(0);
             }
         });
@@ -1361,7 +1361,7 @@
                 trackalbum = ' - ' + tb.aa;
             }
             dom_cache.trackname.text(tb.title + trackalbum).parent().attr("title", tb.title + trackalbum);
-            calculate_moveble(dom_cache.trackname, 153, 'name');
+            calculateMoveble(dom_cache.trackname, 153, 'name');
         } else {
             dom_cache.trackname.text(tb.title).parent().attr("title", tb.title);
             dom_cache.trackalbum.text(tb.aa || '').parent().attr("title", tb.aa || '');
@@ -1455,12 +1455,12 @@
         }
         if (type === "loadstart") {
             dom_cache.loading.show();
-            pre_buffering_controller.loading();
+            preBufferingController.loading();
         }
         if (type === "loadeddata") {
             dom_cache.loading.hide();
-            pre_buffering_controller.update();
-            pre_buffering_controller.start();
+            preBufferingController.update();
+            preBufferingController.start();
         }
         if (type === "emptied") {
             dom_cache.loading.hide();
@@ -1473,13 +1473,13 @@
             var_cache.volume_w = dom_cache.volume.width();
             isPause();
             view.setProgress(0.1, 0);
-            pre_buffering_controller.stop();
-            pre_buffering_controller.hide();
+            preBufferingController.stop();
+            preBufferingController.hide();
         }
         if (type === "error") {
             dom_cache.loading.hide();
-            pre_buffering_controller.stop();
-            pre_buffering_controller.hide();
+            preBufferingController.stop();
+            preBufferingController.hide();
             isPause();
         }
         if (type === "waiting") {
@@ -1511,7 +1511,7 @@
     };
     view.getFilesFromFolder = getFilesFromFolder;
     view.entry2files = entry2files;
-    view.pre_buffering_controller = pre_buffering_controller;
+    view.preBufferingController = preBufferingController;
     view.setShuffle = function(shuffle) {
         if (shuffle) {
             $('div.shuffle').addClass('on');

@@ -18,7 +18,7 @@ var cloud = function() {
         }
         dl_xhr.responseType = "blob";
         dl_xhr.onprogress = function(e) {
-            view.pre_buffering_controller.download(parseInt((e.loaded / e.total) * 100));
+            view.preBufferingController.download(parseInt((e.loaded / e.total) * 100));
         };
         dl_xhr.onload = function() {
             cb(dl_xhr.response);
