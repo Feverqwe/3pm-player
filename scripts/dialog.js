@@ -37,7 +37,7 @@ var dialog = function() {
         $('body').on('click', 'li.pl_file', function() {
             var id = $(this).data("id");
             _send('player', function(window) {
-                window.engine.select_playlist(id);
+                window.engine.selectPlaylist(id);
             });
             window.close();
         });
@@ -148,7 +148,7 @@ var dialog = function() {
                     }
                     _send('player', function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
-                        window.engine.select_playlist(0);
+                        window.engine.selectPlaylist(0);
                     });
                     _window.close();
                 }, root, path);
@@ -173,7 +173,7 @@ var dialog = function() {
             }
             _send('player', function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
-                window.engine.select_playlist(0);
+                window.engine.selectPlaylist(0);
             });
             window.close();
         });
@@ -286,7 +286,7 @@ var dialog = function() {
                     }
                     _send('player', function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
-                        window.engine.select_playlist(0);
+                        window.engine.selectPlaylist(0);
                     });
                     _window.close();
                 });
@@ -312,7 +312,7 @@ var dialog = function() {
             }
             _send('player', function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
-                window.engine.select_playlist(0);
+                window.engine.selectPlaylist(0);
             });
             window.close();
         });
@@ -423,7 +423,7 @@ var dialog = function() {
                     }
                     _send('player', function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
-                        window.engine.select_playlist(0);
+                        window.engine.selectPlaylist(0);
                     });
                     _window.close();
                 }, folder_id);
@@ -447,7 +447,7 @@ var dialog = function() {
             }
             _send('player', function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
-                window.engine.select_playlist(0);
+                window.engine.selectPlaylist(0);
             });
             window.close();
         });
@@ -573,7 +573,7 @@ var dialog = function() {
                     }
                     _send('player', function(window) {
                         window.engine.setM3UPlaylists({list: [playlist]});
-                        window.engine.select_playlist(0);
+                        window.engine.selectPlaylist(0);
                     });
                     _window.close();
                 });
@@ -600,7 +600,7 @@ var dialog = function() {
             }
             _send('player', function(window) {
                 window.engine.setM3UPlaylists({list: [playlist]});
-                window.engine.select_playlist(0);
+                window.engine.selectPlaylist(0);
             });
             window.close();
         });
@@ -665,8 +665,8 @@ var dialog = function() {
             }
             write_language();
             _send('player', function(window) {
-                window.engine.set_hotkeys(document);
-                allow_ext = window.engine.get_allow_ext();
+                window.engine.setHotkeys(document);
+                allow_ext = window.engine.getAllowExt();
             });
             $('.close').on('click', function() {
                 window.close();

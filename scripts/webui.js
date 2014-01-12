@@ -84,12 +84,12 @@ var webui = function() {
         } else
         if (headerMap.url.substr(0, 4) === '/pl/') {
             var id = headerMap.url.substr(4);
-            engine.open_id(id);
+            engine.openById(id);
             return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url.substr(0, 14) === '/set_playlist/') {
             var id = parseInt(headerMap.url.substr(14));
-            engine.select_playlist(id);
+            engine.selectPlaylist(id);
             return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: : text/html']);
         } else
         if (headerMap.url === '/playlist') {

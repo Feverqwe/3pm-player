@@ -245,7 +245,7 @@ var playlist = function() {
                 write_playlist(window.engine.getPlaylist());
                 window.engine.shuffle(null);
                 window.engine.loop(null);
-                window.engine.set_hotkeys(document);
+                window.engine.setHotkeys(document);
                 selectPL(window.engine.getM3UPlaylists());
             });
             $('.close').on('click', function() {
@@ -257,7 +257,7 @@ var playlist = function() {
             dom_cache.playlist_ul.on('click', 'li', function() {
                 var id = $(this).attr('data-id');
                 _send('player', function(window) {
-                    window.engine.open_id(id);
+                    window.engine.openById(id);
                 });
             });
             dom_cache.playlist_ul.sortable({handle: ".move", axis: "y", stop: function() {
@@ -325,7 +325,7 @@ var playlist = function() {
             dom_cache.pl_list.on('click', 'li', function() {
                 var id = $(this).data('id');
                 _send('player', function(window) {
-                    window.engine.select_playlist(id);
+                    window.engine.selectPlaylist(id);
                 });
                 $(this).parent().hide();
             });

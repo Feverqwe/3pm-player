@@ -41,7 +41,7 @@ var _debug = false;
     var current_played_pos = -1;
     var M3UPlaylists = undefined;
     var var_cache = {};
-    var reset_player = function() {
+    var resetPlayer = function() {
         /*
          * Функция сброса плэйлиста.
          */
@@ -66,7 +66,7 @@ var _debug = false;
             window.playlist.empty();
         });
     };
-    var add_played = function(id) {
+    var addPlayed = function(id) {
         /*
          * Добавляет трек в список програнного.
          * Если такой ID уже есть в списке - он удаляется.
@@ -102,7 +102,7 @@ var _debug = false;
         var byteCharacters = atob(b64Data);
         return str2blob(byteCharacters, contentType, 256);
     };
-    var array_chksum = function(a) {
+    var arrayChksum = function(a) {
         var len = a.length;
         var c = 128;
         if (len < c) {
@@ -115,7 +115,7 @@ var _debug = false;
         }
         return chk.join('');
     };
-    var image_check = function(url, cb) {
+    var imageCheck = function(url, cb) {
         /*
          * Проверяет изображение на возможность прочтения
          * Изменяет размер обложки.
@@ -140,7 +140,7 @@ var _debug = false;
         };
         img.src = url;
     };
-    var read_image = function(data, cb) {
+    var readImage = function(data, cb) {
         /*
          * data = Array || ArrayBuffer || Blob
          */
@@ -155,9 +155,9 @@ var _debug = false;
                 data = new Uint8Array(data);
             }
             //data is Uint8Array
-            var check_summ = array_chksum(data);
+            var check_summ = arrayChksum(data);
             var o_b_len = data.length;
-            var id = check_cover(o_b_len, check_summ);
+            var id = checkCover(o_b_len, check_summ);
             if (id !== undefined) {
                 cb(id);
                 return;
@@ -167,17 +167,17 @@ var _debug = false;
             blob = data;
         }
         var url = URL.createObjectURL(blob);
-        image_check(url, function(blob) {
+        imageCheck(url, function(blob) {
             if (blob === undefined) {
                 cb(undefined);
                 return;
             }
             var url = URL.createObjectURL(blob);
-            var cover_id = add_cover(o_b_len, url, check_summ);
+            var cover_id = addCover(o_b_len, url, check_summ);
             cb(cover_id);
         });
     };
-    var check_cover = function(len, checksum) {
+    var checkCover = function(len, checksum) {
         /*
          * Проверяет наличие уже обложке в массиве обложек по некой checksum
          */
@@ -190,7 +190,7 @@ var _debug = false;
         });
         return id;
     };
-    var add_cover = function(len, bin, chk) {
+    var addCover = function(len, bin, chk) {
         /*
          * Добавляет обложку в массив обложек.
          */
@@ -232,7 +232,7 @@ var _debug = false;
                 cb(id);
                 return;
             }
-            read_image(new_tags.picture.data, function(cover_id) {
+            readImage(new_tags.picture.data, function(cover_id) {
                 if (cover_id !== undefined) {
                     track.tags.picture = cover_id;
                 }
@@ -253,7 +253,7 @@ var _debug = false;
                 cb(id);
                 return;
             }
-            read_image(new_tags.picture.data, function(cover_id) {
+            readImage(new_tags.picture.data, function(cover_id) {
                 if (cover_id !== undefined) {
                     track.tags.picture = cover_id;
                 }
@@ -440,7 +440,7 @@ var _debug = false;
             chrome.notifications.onClicked.addListener(function(a, b) {
                 clearTimeout(timer);
                 chrome.notifications.clear('current_track', function(obj) {
-                    window._focus_all();
+                    window._focusAll();
                 });
             });
             notification.show = function() {
@@ -474,7 +474,7 @@ var _debug = false;
                 });
             };
         })();
-        var audio_preload = function(track) {
+        var audioPreload = function(track) {
             if (track.cloud === undefined) {
                 return false;
             }
@@ -522,7 +522,7 @@ var _debug = false;
             }
             return false;
         };
-        var tags_loaded = function(id, state) {
+        var tagsLoaded = function(id, state) {
             // 1 - playlist only
             // 2 - player, lfm, viz
             // other - all
@@ -580,13 +580,13 @@ var _debug = false;
             viz();
             lfm();
         };
-        var lastfm_tag_ready = function(id, new_tags, blob, cb) {
+        var lastfmTagReady = function(id, new_tags, blob, cb) {
             if (new_tags === undefined) {
                 cb(id);
                 return;
             }
             var track = playlist[id];
-            read_image(blob, function(cover_id) {
+            readImage(blob, function(cover_id) {
                 if (cover_id !== undefined) {
                     track.tags.picture = cover_id;
                 }
@@ -641,7 +641,7 @@ var _debug = false;
                 if (lfm_tags === undefined) {
                     cb(id);
                 }
-                lastfm_tag_ready(id, lfm_tags, blob, cb);
+                lastfmTagReady(id, lfm_tags, blob, cb);
             }, cache);
         };
         player.discAdapters = function(name) {
@@ -678,14 +678,14 @@ var _debug = false;
                 window.playlist.selected(current_id);
             });
             if ('url' in item.file) {
-                if (!audio_preload(item)) {
+                if (!audioPreload(item)) {
                     audio.src = item.file.url;
                 }
             } else {
                 audio.src = window.URL.createObjectURL(item.file);
             }
         };
-        player.get_filename = function() {
+        player.getFilename = function() {
             return playlist[current_id].file.name;
         };
         player.playToggle = function() {
@@ -704,7 +704,7 @@ var _debug = false;
             }
             if (playlist[current_id].file.url !== undefined && audio.src.split(':')[0] === "chrome-extension") {
                 var item = playlist[current_id];
-                if (!audio_preload(item)) {
+                if (!audioPreload(item)) {
                     audio.src = item.file.url;
                 }
             } else {
@@ -948,15 +948,15 @@ var _debug = false;
             var track = playlist[current_id];
             if (track.tags === undefined || track.tags.reader_state !== true) {
                 tagReader(current_id, function(id) {
-                    tags_loaded(id);
+                    tagsLoaded(id);
                 });
             } else
             if (settings.lastfm_info && (track.lfm === undefined || track.lfm.lastfm !== true)) {
                 player.lfmTagReader(current_id, function(id) {
-                    tags_loaded(id);
+                    tagsLoaded(id);
                 });
             } else {
-                tags_loaded(current_id, 2);
+                tagsLoaded(current_id, 2);
             }
             view.state("loadeddata");
         });
@@ -964,7 +964,7 @@ var _debug = false;
             view.state("waiting");
         });
         $(audio).on('playing', function(e) {
-            add_played(current_id);
+            addPlayed(current_id);
             view.state("playing");
         });
         $(audio).on('canplay', function(e) {
@@ -1039,7 +1039,7 @@ var _debug = false;
             var read_item = function(item) {
                 next_item();
                 tagReader(item.id, function(id) {
-                    tags_loaded(id, 1);
+                    tagsLoaded(id, 1);
                     thread--;
                     next_item();
                 });
@@ -1053,7 +1053,7 @@ var _debug = false;
             return current_id;
         };
     })();
-    var add_in_ctx_menu = function(playlist_info) {
+    var addInCtxMenu = function(playlist_info) {
         var context_menu = view.getContextMenu();
         if (playlist_info !== undefined && playlist_info.cloud !== undefined && playlist_info.cloud.vk_save === true) {
             if (context_menu.save_vk.hide === 0) {
@@ -1071,7 +1071,7 @@ var _debug = false;
             context_menu.save_vk.hide = 1;
         }
     };
-    var check_window_position = function(position) {
+    var checkWindowPosition = function(position) {
         var screen_width = screen.width,
                 screen_height = screen.height,
                 dpr = window.devicePixelRatio;
@@ -1114,9 +1114,9 @@ var _debug = false;
         }
     });
     chrome.app.window.current().onRestored.addListener(function() {
-        window._focus_all();
+        window._focusAll();
     });
-    window._focus_all = function(type) {
+    window._focusAll = function(type) {
         if (type === undefined) {
             type = 'player';
         }
@@ -1129,7 +1129,7 @@ var _debug = false;
         }
         _windows[type].focus();
     };
-    window._show_all = function(type, oncancel) {
+    window._showAll = function(type, oncancel) {
         if (type === undefined) {
             type = 'player';
         }
@@ -1158,7 +1158,7 @@ var _debug = false;
     chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
         if (msg === '_player_') {
             sendResponse('ok');
-            window._focus_all();
+            window._focusAll();
         } else
         if (msg === '_player_window_') {
             chrome.runtime.getBackgroundPage(function(bg) {
@@ -1219,7 +1219,6 @@ var _debug = false;
         }
         chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
     };
-    engine.get_filename = player.get_filename;
     engine.open = function(files, info) {
         if (files.length === 0) {
             return;
@@ -1252,7 +1251,7 @@ var _debug = false;
             my_playlist.push({id: my_playlist.length, file: files[i], tags: undefined, duration: undefined});
         }
         if (my_playlist.length > 0) {
-            reset_player();
+            resetPlayer();
             playlist = my_playlist;
             playlist_order = my_playlist_order;
             playlist_info = info;
@@ -1265,12 +1264,12 @@ var _debug = false;
                 id = getRandomInt(0, playlist.length - 1);
             }
             player.open(id);
-            add_in_ctx_menu(playlist_info);
+            addInCtxMenu(playlist_info);
         }
     };
     engine.play = player.play;
     engine.playToggle = player.playToggle;
-    engine.open_id = player.open;
+    engine.openById = player.open;
     engine.pause = player.pause;
     engine.next = player.next;
     engine.preview = player.preview;
@@ -1375,11 +1374,11 @@ var _debug = false;
             window.viz.randomPreset();
         });
     };
-    engine.get_allow_ext = function() {
+    engine.getAllowExt = function() {
         return allow_ext;
     };
     engine.canPlay = player.canPlay;
-    engine.set_hotkeys = function(_document) {
+    engine.setHotkeys = function(_document) {
         $(_document).keydown(function(event) {
             if (event.ctrlKey || event.metaKey) {
                 if (event.keyCode === 38) {
@@ -1444,7 +1443,7 @@ var _debug = false;
             }
         });
     };
-    engine.select_playlist = function(id) {
+    engine.selectPlaylist = function(id) {
         var filePlaylists = engine.getM3UPlaylists();
         if (filePlaylists === undefined) {
             return;
@@ -1475,9 +1474,9 @@ var _debug = false;
         }
     };
     engine.showMenu = function() {
-        engine.window_manager({type: 'dialog', config: {type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: webui.active()}});
+        engine.windowManager({type: 'dialog', config: {type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: webui.active()}});
     };
-    engine.window_manager = function(options) {
+    engine.windowManager = function(options) {
         var create_window = function(url, args, oncreate) {
             if ((options.toggle || options.only) && _windows[options.type] !== undefined && _windows[options.type].contentWindow.window !== null) {
                 _windows[options.type].contentWindow.window.close();
@@ -1490,7 +1489,7 @@ var _debug = false;
         if (options.type === 'playlist') {
             options.toggle = true;
             chrome.storage.local.get(['pl_pos_left', 'pl_pos_top', 'pl_w', 'pl_h'], function(storage) {
-                var position = check_window_position({
+                var position = checkWindowPosition({
                     width: storage.pl_w || 335,
                     height: storage.pl_h || 400,
                     left: storage.pl_pos_left,
@@ -1512,7 +1511,7 @@ var _debug = false;
         if (options.type === 'viz') {
             options.toggle = true;
             chrome.storage.local.get(['viz_pos_left', 'viz_pos_top', 'viz_w', 'viz_h'], function(storage) {
-                var position = check_window_position({
+                var position = checkWindowPosition({
                     width: storage.viz_w || 1024,
                     height: storage.viz_h || 768,
                     left: storage.viz_pos_left,
@@ -1577,7 +1576,7 @@ var _debug = false;
                 }
                 options.config.h = len * 19 + 40;
             }
-            var position = check_window_position({
+            var position = checkWindowPosition({
                 width: options.config.w,
                 height: options.config.h,
                 left: undefined,
@@ -1599,7 +1598,7 @@ var _debug = false;
         } else
         if (options.type === 'options') {
             options.only = true;
-            var position = check_window_position({
+            var position = checkWindowPosition({
                 width: 820,
                 height: 600,
                 left: undefined,

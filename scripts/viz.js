@@ -55,7 +55,7 @@ var viz = function() {
             _send('player', function(window) {
                 audio = window.engine.getAudio();
                 setTags(window.engine.getTagBody());
-                window.engine.set_hotkeys(document);
+                window.engine.setHotkeys(document);
             });
         },
         audio_state: function(key, value) {

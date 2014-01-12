@@ -1,5 +1,5 @@
 var bg = function() {
-    var check_window_position = function(position) {
+    var checkWindowPosition = function(position) {
         var screen_width = screen.width,
                 screen_height = screen.height,
                 dpr = window.devicePixelRatio;
@@ -27,7 +27,7 @@ var bg = function() {
     };
     var create_player = function() {
         chrome.storage.local.get(['pos_left', 'pos_top', 'lang'], function(storage) {
-            var position = check_window_position({
+            var position = checkWindowPosition({
                 width: 335,
                 height: 116,
                 left: storage.pos_left,

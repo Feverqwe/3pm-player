@@ -167,10 +167,10 @@
             });
             engine.setM3UPlaylists({list: playlist});
             if (playlist.length === 1) {
-                engine.select_playlist(playlist[0].id);
+                engine.selectPlaylist(playlist[0].id);
             } else
             if (playlist.length > 0) {
-                engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
+                engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
             }
         };
         var readM3U = function(content, name) {
@@ -452,10 +452,10 @@
                 });
                 engine.setM3UPlaylists({list: playlist});
                 if (playlist.length === 1) {
-                    engine.select_playlist(playlist[0].id);
+                    engine.selectPlaylist(playlist[0].id);
                 } else
                 if (playlist.length > 0) {
-                    engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
+                    engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
                 }
             };
             list_dir.forEach(function(item) {
@@ -660,7 +660,7 @@
                 title: _lang.ctx_open_url,
                 contexts: ['page', 'launcher'],
                 action: function() {
-                    engine.window_manager({type: 'dialog', config: {type: "url", h: 60}});
+                    engine.windowManager({type: 'dialog', config: {type: "url", h: 60}});
                 }
             }, 'select_playlist': {
                 id: "select_playlist",
@@ -673,7 +673,7 @@
                     }
                     var list = playlists.list;
                     if (list.length > 0) {
-                        engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
+                        engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                     }
                 }
             }, 'ws': {
@@ -694,7 +694,7 @@
                 title: _lang.ctx_viz,
                 contexts: ['page', 'launcher'],
                 action: function() {
-                    engine.window_manager({type: 'viz'});
+                    engine.windowManager({type: 'viz'});
                 }
             }, 'cloud': {
                 id: "cloud",
@@ -709,10 +709,10 @@
                     cloud.vk.makeAlbums(function(list) {
                         engine.setM3UPlaylists({list: list});
                         if (list.length === 1) {
-                            engine.select_playlist(list[0].id);
+                            engine.selectPlaylist(list[0].id);
                         } else
                         if (list.length > 0) {
-                            engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
+                            engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                         }
                     });
                 }
@@ -725,10 +725,10 @@
                     cloud.sc.makeAlbums(function(list) {
                         engine.setM3UPlaylists({list: list});
                         if (list.length === 1) {
-                            engine.select_playlist(list[0].id);
+                            engine.selectPlaylist(list[0].id);
                         } else
                         if (list.length > 0) {
-                            engine.window_manager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
+                            engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                         }
                     });
                 }
@@ -739,7 +739,7 @@
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.gd.getFilelist(undefined, function(list) {
-                        engine.window_manager({type: 'dialog', config: {type: "gd", h: 315, w: 350, r: true, filelist: list}});
+                        engine.windowManager({type: 'dialog', config: {type: "gd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'db': {
@@ -749,7 +749,7 @@
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.db.getFilelist(function(list) {
-                        engine.window_manager({type: 'dialog', config: {type: "db", h: 315, w: 350, r: true, filelist: list}});
+                        engine.windowManager({type: 'dialog', config: {type: "db", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'box': {
@@ -759,7 +759,7 @@
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.box.getFilelist(function(list) {
-                        engine.window_manager({type: 'dialog', config: {type: "box", h: 315, w: 350, r: true, filelist: list}});
+                        engine.windowManager({type: 'dialog', config: {type: "box", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'sd': {
@@ -769,7 +769,7 @@
                 contexts: ['page', 'launcher'],
                 action: function() {
                     cloud.sd.getFilelist(undefined, function(list) {
-                        engine.window_manager({type: 'dialog', config: {type: "sd", h: 315, w: 350, r: true, filelist: list}});
+                        engine.windowManager({type: 'dialog', config: {type: "sd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
             }, 'p_play_pause': {
@@ -798,7 +798,7 @@
                 title: _lang.ctx_options,
                 contexts: ['page', 'launcher'],
                 action: function() {
-                    engine.window_manager({type: 'options'});
+                    engine.windowManager({type: 'options'});
                 }
             }, 'save_vk': {
                 id: "save_vk",
@@ -1080,7 +1080,7 @@
             dom_cache.focus_state = true;
             if (!dom_cache.disable_focusing_all) {
                 dom_cache.focusing_all = true;
-                window._show_all(undefined, function() {
+                window._showAll(undefined, function() {
                     dom_cache.focusing_all = false;
                 });
             }
@@ -1123,7 +1123,7 @@
             $('<div>', {'class': "w_kHz", text: 44}),
             $('<div>', {'class': "stereo"}),
             $('<div>', {'class': "w_playlist"}).on('click', function() {
-                engine.window_manager({type: 'playlist'});
+                engine.windowManager({type: 'playlist'});
             }));
             dom_cache.time = function() {
                 var obj = $('.info > .time');
@@ -1245,7 +1245,7 @@
             }
             engine.volume(storage.volume);
         });
-        engine.set_hotkeys(document);
+        engine.setHotkeys(document);
         chrome.contextMenus.onClicked.addListener(function(info) {
             if (context_menu[info.menuItemId] !== undefined && context_menu[info.menuItemId].action !== undefined) {
                 context_menu[info.menuItemId].action(info);
@@ -1330,7 +1330,7 @@
             }
         };
         dom_cache.btnPlaylist.on('click', function() {
-            engine.window_manager({type: 'playlist'});
+            engine.windowManager({type: 'playlist'});
         });
         $('div.loop').on('click', function() {
             engine.loop();
