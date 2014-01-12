@@ -1515,7 +1515,7 @@ var _debug = false;
         engine.windowManager({type: 'dialog', config: {type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: webui.active()}});
     };
     engine.setPinPosition = function(type, pos) {
-        if (_windows[type] === undefined || _windows[type].contentWindow.window === null) {
+        if (_windows[type] === undefined || _windows[type].contentWindow.window === null || _windows[type].isMinimized() || _windows[type].isMaximized()) { //isFullscreen?
             return;
         }
         var pb = _windows.player.getBounds();
