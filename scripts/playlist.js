@@ -350,7 +350,6 @@ var playlist = function() {
         setPlaylist: function(a) {
             writePlaylist(a);
         },
-        setPlaylistInfo: setInfo,
         updPlaylistItem: function(id, item) {
             update_playlist_item(id, item);
         },
