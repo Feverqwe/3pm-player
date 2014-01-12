@@ -274,6 +274,10 @@ var webui = function() {
     };
     var acceptConnection_ = function(socketId) {
         chrome.socket.accept(socketId, function(acceptInfo) {
+            if (acceptInfo.socketId === undefined) {
+                webui.stop();
+                return;
+            }
             onConnection_(acceptInfo);
             acceptConnection_(socketId);
         });
