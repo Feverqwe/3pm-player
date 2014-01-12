@@ -1224,9 +1224,7 @@ var _debug = false;
             return;
         }
         var my_playlist = [];
-        var my_playlist_order = {0: []};
         for (var i = 0; i < files.length; i++) {
-            my_playlist_order[0].push(i);
             if (files[i].tags !== undefined && files[i].tags.picture !== undefined) {
                 /*
                  * Возможны конфиликты, если в облаке
@@ -1250,6 +1248,10 @@ var _debug = false;
             }
             my_playlist.push({id: my_playlist.length, file: files[i], tags: undefined, duration: undefined});
         }
+        var my_playlist_order = {0: []};
+        $.each(my_playlist, function(k, track) {
+            my_playlist_order[0].push(track.id);
+        });
         if (my_playlist.length > 0) {
             resetPlayer();
             playlist = my_playlist;

@@ -91,7 +91,7 @@ var playlist = function() {
             dom_cache.body.append($('<style>', {'class': 'cover pic_' + id, text: '.pic_' + id + '{background-image:url(' + url + ');}'}));
         });
     };
-    var write_playlist = function(obj) {
+    var writePlaylist = function(obj) {
         /*
          * Выводит плэйлист на страницу.
          */
@@ -242,7 +242,7 @@ var playlist = function() {
                         );
             }
             _send('player', function(window) {
-                write_playlist(window.engine.getPlaylist());
+                writePlaylist(window.engine.getPlaylist());
                 window.engine.shuffle(null);
                 window.engine.loop(null);
                 window.engine.setHotkeys(document);
@@ -298,19 +298,19 @@ var playlist = function() {
                         }
                     }
                     if (next === 0 || next === -1) {
-                        write_playlist(window.engine.setPlaylistOrder(next));
+                        writePlaylist(window.engine.setPlaylistOrder(next));
                     } else
                     if (next === 1) {
                         var new_playlist_order = playlist_order[0].slice();
                         var new_order_index = 1;
                         new_playlist_order = textSort(new_playlist_order);
-                        write_playlist(window.engine.setSortedList(new_playlist_order, new_order_index));
+                        writePlaylist(window.engine.setSortedList(new_playlist_order, new_order_index));
                     } else
                     if (next === 2) {
                         var new_playlist_order = playlist_order[0].slice();
                         var new_order_index = 2;
                         new_playlist_order = numberSort(new_playlist_order);
-                        write_playlist(window.engine.setSortedList(new_playlist_order, new_order_index));
+                        writePlaylist(window.engine.setSortedList(new_playlist_order, new_order_index));
                     }
                 });
             });
@@ -348,7 +348,7 @@ var playlist = function() {
             });
         },
         setPlaylist: function(a) {
-            write_playlist(a);
+            writePlaylist(a);
         },
         setPlaylistInfo: setInfo,
         updPlaylistItem: function(id, item) {
