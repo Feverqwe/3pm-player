@@ -624,7 +624,7 @@ var dialog = function() {
                 return 1;
             }
             var dom_item = $('<li>', {'class': 'item', 'data-id': key, text: item.title});
-            if (item.id === 'ws' && webui_state) {
+            if (item.id === 'webUI' && webui_state) {
                 dom_item.addClass('is_active');
             }
             pl.append(dom_item);

@@ -338,13 +338,13 @@ var webui = function() {
     return {
         start: function() {
             start(function() {
-                chrome.contextMenus.update("ws", {checked: active});
+                chrome.contextMenus.update("webUI", {checked: active});
             });
         },
         info: Info,
         stop: function() {
             stop(function() {
-                chrome.contextMenus.update("ws", {checked: active});
+                chrome.contextMenus.update("webUI", {checked: active});
             });
         },
         active: function() {

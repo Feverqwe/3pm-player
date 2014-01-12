@@ -624,15 +624,17 @@
         /*
          * Формирует контекстное меню
          */
-        context_menu = {'1': {
-                id: "1",
+        context_menu = {
+            OpenFiles: {
+                id: "openFiles",
                 title: _lang.ctx_open_files,
                 contexts: ['page', 'launcher'],
                 action: function() {
                     $('.click_for_open').trigger('click');
                 }
-            }, '3': {
-                id: "3",
+            }, 
+            openDirectory: {
+                id: "openDirectory",
                 title: _lang.ctx_open_folder,
                 contexts: ['page', 'launcher'],
                 action: function() {
@@ -643,8 +645,9 @@
                         readDirectory(entry);
                     });
                 }
-            }, 'o_f_sub': {
-                id: "o_f_sub",
+            }, 
+            openFolderWithSubfolders: {
+                id: "openFolderWithSubfolders",
                 title: _lang.ctx_open_folder_sub,
                 contexts: ['page', 'launcher'],
                 action: function() {
@@ -655,15 +658,17 @@
                         readDirectoryWithSub(entry);
                     });
                 }
-            }, '2': {
-                id: "2",
+            }, 
+            openURL: {
+                id: "openURL",
                 title: _lang.ctx_open_url,
                 contexts: ['page', 'launcher'],
                 action: function() {
                     engine.windowManager({type: 'dialog', config: {type: "url", h: 60}});
                 }
-            }, 'select_playlist': {
-                id: "select_playlist",
+            }, 
+            selectPlaylist: {
+                id: "selectPlaylist",
                 title: _lang.playlist_select,
                 contexts: ['page', 'launcher'],
                 action: function() {
@@ -676,9 +681,10 @@
                         engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                     }
                 }
-            }, 'ws': {
+            }, 
+            webUI: {
                 type: "checkbox",
-                id: "ws",
+                id: "webUI",
                 title: _lang.ctx_webui,
                 contexts: ['page', 'launcher'],
                 action: function(info) {
@@ -689,18 +695,21 @@
                         webui.stop();
                     }
                 }
-            }, 'viz': {
+            }, 
+            viz: {
                 id: "viz",
                 title: _lang.ctx_viz,
                 contexts: ['page', 'launcher'],
                 action: function() {
                     engine.windowManager({type: 'viz'});
                 }
-            }, 'cloud': {
+            }, 
+            cloud: {
                 id: "cloud",
                 title: _lang.ctx_cloud,
                 contexts: ['page', 'launcher']
-            }, 'vk': {
+            }, 
+            vk: {
                 id: "vk",
                 parentId: "cloud",
                 title: "vk.com",
@@ -716,7 +725,8 @@
                         }
                     });
                 }
-            }, 'sc': {
+            }, 
+            sc: {
                 id: "sc",
                 parentId: "cloud",
                 title: "soundcloud.com",
@@ -732,7 +742,8 @@
                         }
                     });
                 }
-            }, 'gd': {
+            }, 
+            gd: {
                 id: "gd",
                 parentId: "cloud",
                 title: "drive.google.com",
@@ -742,7 +753,8 @@
                         engine.windowManager({type: 'dialog', config: {type: "gd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
-            }, 'db': {
+            }, 
+            db: {
                 id: "db",
                 parentId: "cloud",
                 title: "dropbox.com",
@@ -752,7 +764,8 @@
                         engine.windowManager({type: 'dialog', config: {type: "db", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
-            }, 'box': {
+            }, 
+            box: {
                 id: "box",
                 parentId: "cloud",
                 title: "box.com",
@@ -762,7 +775,8 @@
                         engine.windowManager({type: 'dialog', config: {type: "box", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
-            }, 'sd': {
+            }, 
+            sd: {
                 id: "sd",
                 parentId: "cloud",
                 title: "skydrive.com",
@@ -772,35 +786,40 @@
                         engine.windowManager({type: 'dialog', config: {type: "sd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
-            }, 'p_play_pause': {
+            }, 
+            p_play_pause: {
                 id: "p_play_pause",
                 title: _lang.play_pause,
                 contexts: ['launcher'],
                 action: function() {
                     engine.playToggle();
                 }
-            }, 'p_next': {
+            }, 
+            p_next: {
                 id: "p_next",
                 title: _lang.next,
                 contexts: ['launcher'],
                 action: function() {
                     engine.next();
                 }
-            }, 'p_previous': {
+            }, 
+            p_previous: {
                 id: "p_previous",
                 title: _lang.prev,
                 contexts: ['launcher'],
                 action: function() {
                     engine.preview();
                 }
-            }, 'options': {
+            }, 
+            options: {
                 id: "options",
                 title: _lang.ctx_options,
                 contexts: ['page', 'launcher'],
                 action: function() {
                     engine.windowManager({type: 'options'});
                 }
-            }, 'save_vk': {
+            }, 
+            save_vk: {
                 id: "save_vk",
                 title: _lang.ctx_save_vk_track,
                 contexts: ['page', 'launcher'],
@@ -831,7 +850,7 @@
                 }
                 chrome.contextMenus.create(item);
             });
-            chrome.contextMenus.update("ws", {checked: webui.active()});
+            chrome.contextMenus.update("webUI", {checked: webui.active()});
         });
     };
     var make_extend_volume = function(extend_volume_scroll) {
