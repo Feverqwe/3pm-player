@@ -178,6 +178,9 @@ var _debug = false;
         });
     };
     var check_cover = function(len, checksum) {
+        /*
+         * Проверяет наличие уже обложке в массиве обложек по некой checksum
+         */
         var id;
         covers.forEach(function(item) {
             if (item.len === len && item.chk === checksum) {
@@ -190,7 +193,6 @@ var _debug = false;
     var add_cover = function(len, bin, chk) {
         /*
          * Добавляет обложку в массив обложек.
-         * Проверяет на наличие уже существующей в списке, уберает дубли.
          */
         var id = covers.length;
         covers.push({id: id, len: len, data: bin, chk: chk});
