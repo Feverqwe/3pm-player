@@ -1224,7 +1224,9 @@ var _debug = false;
             return;
         }
         var my_playlist = [];
+        var my_playlist_order = {0: []};
         for (var i = 0; i < files.length; i++) {
+            var id = my_playlist.length;
             if (files[i].tags !== undefined && files[i].tags.picture !== undefined) {
                 /*
                  * Возможны конфиликты, если в облаке
@@ -1235,23 +1237,22 @@ var _debug = false;
                 files[i].tags = undefined;
             }
             if (files[i].id !== undefined && files[i].file !== undefined) {
-                files[i].id = my_playlist.length;
+                files[i].id = id;
+                my_playlist_order[0].push(id);
                 my_playlist.push(files[i]);
                 continue;
             }
             if (files[i].url !== undefined) {
-                my_playlist.push({id: my_playlist.length, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
+                my_playlist_order[0].push(id);
+                my_playlist.push({id: id, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
                 continue;
             }
             if (canFilePlay(files[i]) === false) {
                 continue;
             }
-            my_playlist.push({id: my_playlist.length, file: files[i], tags: undefined, duration: undefined});
+            my_playlist_order[0].push(id);
+            my_playlist.push({id: id, file: files[i], tags: undefined, duration: undefined});
         }
-        var my_playlist_order = {0: []};
-        $.each(my_playlist, function(k, track) {
-            my_playlist_order[0].push(track.id);
-        });
         if (my_playlist.length > 0) {
             resetPlayer();
             playlist = my_playlist;
