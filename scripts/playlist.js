@@ -233,6 +233,14 @@ var playlist = function() {
             settings.pined_playlist = 1;
             settings.pin_position = 1;
         } else
+        if (inRang(pl_r, p_l - 10, p_l) && inRang(pl_b, p_t, p_b)) {
+            settings.pined_playlist = 1;
+            settings.pin_position = 5;
+        } else
+        if (inRang(pl_l, p_r, p_r + 10) && inRang(pl_b, p_t, p_b)) {
+            settings.pined_playlist = 1;
+            settings.pin_position = 6;
+        } else
         if (inRang(pl_b, p_t - 10, p_t) && inRang(pl_l, p_l, p_r)) {
             settings.pined_playlist = 1;
             settings.pin_position = 4;

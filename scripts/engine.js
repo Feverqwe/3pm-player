@@ -1533,6 +1533,14 @@ var _debug = false;
         if (pos === 4) {
             plb = _windows[type].getBounds();
             params = {left: pb.left, top: pb.top - plb.height, width: pb.width};
+        } else
+        if (pos === 5) {
+            plb = _windows[type].getBounds();
+            params = {left: pb.left - plb.width, top: pb.top + pb.height - plb.height};
+        } else
+        if (pos === 6) {
+            plb = _windows[type].getBounds();
+            params = {left: pb.left + pb.width, top: pb.top + pb.height - plb.height};
         }
         _windows[type].setBounds(params);
     };
