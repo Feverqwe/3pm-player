@@ -625,7 +625,7 @@
          * Формирует контекстное меню
          */
         context_menu = {
-            OpenFiles: {
+            openFiles: {
                 id: "openFiles",
                 title: _lang.ctx_open_files,
                 contexts: ['page', 'launcher'],
