@@ -208,6 +208,7 @@ var playlist = function() {
         $('.btn.loop').attr('title', _lang.loop);
         $('.btn.sort').attr('title', _lang.sort);
         $('.btn.read_tags').attr('title', _lang.read_tags);
+        $('div.drop > span').text(_lang.drop_append);
     };
     return {
         preload: function() {
@@ -220,6 +221,7 @@ var playlist = function() {
         show: function() {
             dom_cache = {
                 body: $('body'),
+                drop: $('div.drop'),
                 playlist: $('div.playlist'),
                 playlist_ul: $('div.playlist ul'),
                 shuffle: $('.shuffle.btn'),
@@ -328,6 +330,25 @@ var playlist = function() {
                     window.engine.selectPlaylist(id);
                 });
                 $(this).parent().hide();
+            });
+            dom_cache.body.on('drop', function(event) {
+                event.preventDefault();
+                var files = event.originalEvent.dataTransfer.files;
+                var entrys = event.originalEvent.dataTransfer.items;
+                _send('player', function(window) {
+                    window.view.readFileArray(files, entrys, true, function(files) {
+                        window.engine.append(files);
+                    });
+                });
+            });
+            var drag_timeout = undefined;
+            dom_cache.body.on('dragover', function(event) {
+                event.preventDefault();
+                dom_cache.drop.css({"display": "block"});
+                clearTimeout(drag_timeout);
+                drag_timeout = setTimeout(function() {
+                    dom_cache.drop.css({"display": "none"});
+                }, 300);
             });
             chrome.app.window.current().onBoundsChanged.addListener(function() {
                 if (document.webkitHidden || chrome.app.window.current().isMaximized()) {

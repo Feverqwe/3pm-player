@@ -1279,12 +1279,12 @@ var _debug = false;
         if (files.length === 0) {
             return;
         }
-        var tracks = readTrackList(files)[0];
-        if (tracks.length === 0) {
-            return;
-        }
         if (playlist.length === 0) {
             engine.open(files);
+            return;
+        }
+        var tracks = readTrackList(files)[0];
+        if (tracks.length === 0) {
             return;
         }
         var id = playlist.slice(-1)[0].id;

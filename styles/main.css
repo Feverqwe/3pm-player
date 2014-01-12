@@ -265,12 +265,14 @@ div.drop {
 }
 div.drop > span {
     display: block;
-    margin-top: 36px;
-    border: 2px dashed #fff;
+    margin-top: 35px;
+    border: 1px dashed #fff;
     width: 210px;
     margin-left: 15%;
     padding: 10px;
     border-radius: 5px;
+    font-size: 16px;
+    padding-top: 8px;
 }
 div.engine {
     display: none;
@@ -325,20 +327,20 @@ div.loading {
 .click_for_open {
     position: absolute;
     left: 90px;
-    top: 29px;
+    top: 20px;
+    font-size: 18px;
+    color: #ccc;
+    border: 1px dashed #ccc;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    -webkit-app-region: no-drag;
+    width: 218px;
+    padding-top: 6px;
+    padding-bottom: 8px;
 }
 .click_for_open input {
     display: none;
-}
-.click_for_open span {
-    font-size: 18px;
-    font-weight: bolder;
-    color: #ccc;
-    border: 2px dashed #ccc;
-    padding: 6px;
-    border-radius: 5px;
-    cursor: pointer;
-    -webkit-app-region: no-drag;
 }
 div.volume_scroll {
     -webkit-app-region: no-drag;

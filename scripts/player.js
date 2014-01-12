@@ -297,7 +297,7 @@
             });
         }
     };
-    var readFileArray = function(files, entry) {
+    var readFileArray = function(files, entry, files_only, cb) {
         /*
          * Читает массив файлов
          * Если есть entry - использут его, если нету - то files.
@@ -320,11 +320,17 @@
                     continue;
                 }
                 if (item.isDirectory) {
+                    if (files_only) {
+                        continue;
+                    }
                     readDirectory(item);
                     return;
                 } else {
                     var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
                     if (ext === 'm3u') {
+                        if (files_only) {
+                            continue;
+                        }
                         readDirectoryWithM3U(item);
                         return;
                     }
@@ -332,7 +338,11 @@
                 }
             }
             entry2files(entrys, function(files) {
-                engine.open(files, {name: undefined});
+                if (cb === undefined) {
+                    engine.open(files, {name: undefined});
+                } else {
+                    cb(files, {name: undefined});
+                }
             });
         } else {
             var files_length = files.length;
@@ -340,11 +350,18 @@
                 var item = files[i];
                 var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
                 if (ext === 'm3u') {
+                    if (!files_only) {
+                        continue;
+                    }
                     readDirectoryWithM3U(item);
                     return;
                 }
             }
-            engine.open(files, {name: undefined});
+            if (cb === undefined) {
+                engine.open(files, {name: undefined});
+            } else {
+                cb(files, {name: undefined});
+            }
         }
     };
     var readDirectory = function(entry) {
@@ -1529,6 +1546,7 @@
     view.getContextMenu = function() {
         return context_menu;
     };
+    view.readFileArray = readFileArray;
 })(this);
 (function() {
     var settings_ready = false;
