@@ -22,7 +22,9 @@ var _debug = false;
         webui_port: 9898,
         webui_interface: 'Any',
         webui_run_onboot: 0,
-        vk_tag_update: 0
+        vk_tag_update: 0,
+        pined_playlist: 0,
+        pin_position: 2
     };
     chrome.storage.local.get(function(obj) {
         engine.loadSettings(obj);
@@ -1512,6 +1514,28 @@ var _debug = false;
     engine.showMenu = function() {
         engine.windowManager({type: 'dialog', config: {type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: webui.active()}});
     };
+    engine.setPinPosition = function(type, pos) {
+        if (_windows[type] === undefined || _windows[type].contentWindow.window === null) {
+            return;
+        }
+        var pb = _windows.player.getBounds();
+        var params, plb;
+        if (pos === 2) {
+            params = {left: pb.left, top: pb.top + pb.height, width: pb.width};
+        } else
+        if (pos === 1) {
+            params = {left: pb.left + pb.width, top: pb.top};
+        } else
+        if (pos === 3) {
+            plb = _windows[type].getBounds();
+            params = {left: pb.left - plb.width, top: pb.top};
+        } else
+        if (pos === 4) {
+            plb = _windows[type].getBounds();
+            params = {left: pb.left, top: pb.top - plb.height, width: pb.width};
+        }
+        _windows[type].setBounds(params);
+    };
     engine.windowManager = function(options) {
         var create_window = function(url, args, oncreate) {
             if ((options.toggle || options.only) && _windows[options.type] !== undefined && _windows[options.type].contentWindow.window !== null) {
@@ -1536,9 +1560,13 @@ var _debug = false;
                     frame: "none"
                 }, function(window) {
                     _windows[options.type] = window;
+                    if (settings.pined_playlist) {
+                        engine.setPinPosition(options.type, settings.pin_position);
+                    }
                     window.onClosed.addListener(function() {
                         delete _windows[options.type];
                     });
+                    window.contentWindow._windows = _windows;
                     window.contentWindow._lang = _lang;
                     window.contentWindow._send = _send;
                 });

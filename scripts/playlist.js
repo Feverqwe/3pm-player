@@ -210,6 +210,46 @@ var playlist = function() {
         $('.btn.read_tags').attr('title', _lang.read_tags);
         $('div.drop > span').text(_lang.drop_append);
     };
+    var inRang = function(value, a, b) {
+        return (value >= a && value <= b);
+    };
+    var checkPin = function() {
+        var window_left = window.screenLeft;
+        var window_top = window.screenTop;
+        var pb = _windows.player.getBounds();
+        var pl_l = window_left;
+        var pl_t = window_top;
+        var pl_r = window_left + window.innerWidth;
+        var pl_b = window_top + window.innerHeight;
+        var p_b = pb.top + pb.height;
+        var p_r = pb.left + pb.width;
+        var p_t = pb.top;
+        var p_l = pb.left;
+        if (inRang(pl_r, p_l - 10, p_l) && inRang(pl_t, p_t, p_b)) {
+            settings.pined_playlist = 1;
+            settings.pin_position = 3;
+        } else
+        if (inRang(pl_l, p_r, p_r + 10) && inRang(pl_t, p_t, p_b)) {
+            settings.pined_playlist = 1;
+            settings.pin_position = 1;
+        } else
+        if (inRang(pl_b, p_t - 10, p_t) && inRang(pl_l, p_l, p_r)) {
+            settings.pined_playlist = 1;
+            settings.pin_position = 4;
+        } else
+        if (inRang(pl_t, p_b, p_b + 10) && inRang(pl_l, p_l, p_r)) {
+            settings.pined_playlist = 1;
+            settings.pin_position = 2;
+        } else {
+            settings.pined_playlist = 0;
+        }
+        chrome.storage.local.set({pined_playlist: settings.pined_playlist, pin_position: settings.pin_position});
+        if (settings.pined_playlist) {
+            _send('player', function(window) {
+                window.engine.setPinPosition('playlist', settings.pin_position);
+            });
+        }
+    };
     return {
         preload: function() {
             write_language();
@@ -350,6 +390,7 @@ var playlist = function() {
                     dom_cache.drop.css({"display": "none"});
                 }, 300);
             });
+            var pin_timer;
             chrome.app.window.current().onBoundsChanged.addListener(function() {
                 if (document.webkitHidden || chrome.app.window.current().isMaximized()) {
                     return;
@@ -366,6 +407,10 @@ var playlist = function() {
                     var_cache.window_width = window_width;
                     chrome.storage.local.set({pl_pos_left: window_left, pl_pos_top: window_top, pl_w: window_width, pl_h: window_height});
                 }
+                clearTimeout(pin_timer);
+                pin_timer = setTimeout(function() {
+                    checkPin();
+                }, 200);
             });
         },
         setPlaylist: function(a) {

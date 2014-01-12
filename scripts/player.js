@@ -1369,6 +1369,9 @@
                 var_cache.window_top = window_top;
                 chrome.storage.local.set({'pos_left': window_left, 'pos_top': window_top});
             }
+            if (settings.pined_playlist) {
+                engine.setPinPosition('playlist', settings.pin_position);
+            }
         });
     };
     view.setTags = function(tb) {
