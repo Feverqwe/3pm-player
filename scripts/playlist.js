@@ -399,6 +399,13 @@ var playlist = function() {
                     dom_cache.drop.css({"display": "none"});
                 }, 300);
             });
+            chrome.app.window.current().onRestored.addListener(function() {
+                if (settings.pined_playlist) {
+                    _send('player', function(window) {
+                        window._focusAll();
+                    });
+                }
+            });
             var pin_timer;
             chrome.app.window.current().onBoundsChanged.addListener(function() {
                 if (document.webkitHidden || chrome.app.window.current().isMaximized()) {
