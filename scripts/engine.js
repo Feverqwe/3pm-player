@@ -1135,11 +1135,10 @@ var _debug = false;
         if (type === undefined) {
             type = 'player';
         }
-        var mini_check = !_windows.player.isMinimized();
         var _windows = window._windows;
         var n = 0;
         for (var i in _windows) {
-            if (i === type || (mini_check && _windows[i].isMinimized())) {
+            if (i === type || _windows[i].isMinimized()) {
                 continue;
             }
             _windows[i].focus();
