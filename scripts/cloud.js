@@ -707,10 +707,45 @@ var cloud = function() {
                             }
                             list.push({name: item.title, id: list.length, tracks: tracks, cloud: {type: "sc"}});
                         });
-                        if (list.length === 0) {
+                        cb(list);
+                    }
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
+                }
+            });
+        };
+        var getFavorited = function(cb) {
+            var url = 'http://api.soundcloud.com/users/' + user_id + '/favorites.json?client_id=' + client_id;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        scAuth(function() {
+                            if (user_id === undefined) {
+                                scUserId(function() {
+                                    getFavorited(cb);
+                                });
+                            } else {
+                                getFavorited(cb);
+                            }
+                        });
+                    },
+                    200: function(data) {
+                        var tracks = [];
+                        for (var i = 0, track; track = data[i]; i++) {
+                            if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
+                                continue;
+                            }
+                            tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, duration: track.duration, cloud: {type: 'sc', meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}}});
+                        }
+                        if (tracks.length === 0) {
                             return;
                         }
-                        cb(list);
+                        cb(tracks);
                     }
                 },
                 error: function(jqXHR) {
@@ -752,7 +787,15 @@ var cloud = function() {
             makeAlbums: function(cb) {
                 getToken(function() {
                     getUserId(function() {
-                        getAlbums(cb);
+                        getAlbums(function(albums) {
+                            var list = [];
+                            list.push({name: 'Favorite', id: list.length, cloud: {type: "sc", isFavorite: true}});
+                            albums.forEach(function(item) {
+                                item.id = list.length;
+                                list.push(item);
+                            });
+                            cb(list);
+                        });
                     });
                 });
             },
@@ -779,7 +822,17 @@ var cloud = function() {
                 xhr.send(null);
             },
             on_select_list: function(list, cb) {
-                cb(list.tracks, {name: list.name, id: list.id, cloud: {type: "sc"}});
+                if (list.cloud.isFavorite) {
+                    getToken(function() {
+                        getUserId(function() {
+                            getFavorited(function(tracks) {
+                                cb(tracks, {name: list.name, id: list.id, cloud: {type: "sc"}});
+                            });
+                        });
+                    });
+                } else {
+                    cb(list.tracks, {name: list.name, id: list.id, cloud: {type: "sc"}});
+                }
             },
             preload: function(options, cb) {
                 options.url = options.track.file.url;
@@ -1160,14 +1213,14 @@ var cloud = function() {
                 sd.onplay(options.track, undefined, function(url) {
                     options.url = url;
                     getTrack(options, function(blob) {
-                    if (blob !== undefined) {
-                        options.track.cloud.tag_config = 'blob';
-                        if (options.track.blob === undefined && options.track.tags !== undefined) {
-                            delete options.track.tags.reader_state;
+                        if (blob !== undefined) {
+                            options.track.cloud.tag_config = 'blob';
+                            if (options.track.blob === undefined && options.track.tags !== undefined) {
+                                delete options.track.tags.reader_state;
+                            }
                         }
-                    }
-                    cb(blob);
-                });
+                        cb(blob);
+                    });
                 });
             }
         };
