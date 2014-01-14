@@ -215,31 +215,29 @@
             url: url,
             dataType: 'JSON',
             data: param,
-            statusCode: {
-                200: function(data) {
-                    if (data.error === 4 || data.error === 15 || data.error === 14) {
-                        console.log('getSessionKey', 'data.error 4 / 15 / 14', data);
-                        clear_data();
-                    }
-                    if (data.error === 9) {
-                        console.log('getSessionKey', 'data.error 9', data);
-                        session_key = undefined;
-                        chrome.storage.local.remove('lastfm_session_key');
-                    }
-                    if (data.error === 26) {
-                        console.log('getSessionKey', 'data.error 26', data);
-                        suspand = true;
-                    }
-                    if (data.error !== undefined) {
-                        console.log('getSessionKey', 'data.error!', data);
-                        return;
-                    }
-                    if (data.session === undefined || data.session.key === undefined) {
-                        console.log('getSessionKey error!', data);
-                        return;
-                    }
-                    cb(data.session.key);
+            success: function(data) {
+                if (data.error === 4 || data.error === 15 || data.error === 14) {
+                    console.log('getSessionKey', 'data.error 4 / 15 / 14', data);
+                    clear_data();
                 }
+                if (data.error === 9) {
+                    console.log('getSessionKey', 'data.error 9', data);
+                    session_key = undefined;
+                    chrome.storage.local.remove('lastfm_session_key');
+                }
+                if (data.error === 26) {
+                    console.log('getSessionKey', 'data.error 26', data);
+                    suspand = true;
+                }
+                if (data.error !== undefined) {
+                    console.log('getSessionKey', 'data.error!', data);
+                    return;
+                }
+                if (data.session === undefined || data.session.key === undefined) {
+                    console.log('getSessionKey error!', data);
+                    return;
+                }
+                cb(data.session.key);
             },
             error: function() {
                 clear_data();
@@ -291,41 +289,39 @@
             url: 'http://ws.audioscrobbler.com/2.0/?' + $.param(data) + '&api_sig=' + api_sig,
             dataType: 'JSON',
             data: data,
-            statusCode: {
-                200: function(data) {
-                    if (data.error === 9) {
-                        console.log('updateNowPlaying', 'data.error 9', data);
-                        session_key = undefined;
-                        chrome.storage.local.remove('lastfm_session_key');
-                    }
-                    if (data.error === 4) {
-                        console.log('updateNowPlaying', 'data.error 4', data);
-                        clear_data();
-                    }
-                    if (data.error === 26) {
-                        console.log('updateNowPlaying', 'data.error 26', data);
-                        suspand = true;
-                    }
-                    if (data.error !== undefined) {
-                        console.log('updateNowPlaying', 'data.error!', data);
-                        return;
-                    }
-                    var start_timer = function() {
-                        scrobler_timer = setTimeout(function() {
-                            var audio = engine.getAudio();
-                            var pos = parseInt(audio.currentTime);
-                            if (isNaN(pos)) {
-                                return;
-                            }
-                            if (pos > 30 && (pos > audio.duration / 2 || pos > 60 * 3)) {
-                                lastfm.trackScrobble(artist, track, album, duration);
-                            } else {
-                                start_timer();
-                            }
-                        }, 35000);
-                    };
-                    start_timer();
+            success: function(data) {
+                if (data.error === 9) {
+                    console.log('updateNowPlaying', 'data.error 9', data);
+                    session_key = undefined;
+                    chrome.storage.local.remove('lastfm_session_key');
                 }
+                if (data.error === 4) {
+                    console.log('updateNowPlaying', 'data.error 4', data);
+                    clear_data();
+                }
+                if (data.error === 26) {
+                    console.log('updateNowPlaying', 'data.error 26', data);
+                    suspand = true;
+                }
+                if (data.error !== undefined) {
+                    console.log('updateNowPlaying', 'data.error!', data);
+                    return;
+                }
+                var start_timer = function() {
+                    scrobler_timer = setTimeout(function() {
+                        var audio = engine.getAudio();
+                        var pos = parseInt(audio.currentTime);
+                        if (isNaN(pos)) {
+                            return;
+                        }
+                        if (pos > 30 && (pos > audio.duration / 2 || pos > 60 * 3)) {
+                            lastfm.trackScrobble(artist, track, album, duration);
+                        } else {
+                            start_timer();
+                        }
+                    }, 35000);
+                };
+                start_timer();
             },
             error: function() {
                 clear_data();
@@ -361,25 +357,23 @@
             url: 'http://ws.audioscrobbler.com/2.0/?' + $.param(data) + '&api_sig=' + api_sig,
             dataType: 'JSON',
             data: data,
-            statusCode: {
-                200: function(data) {
-                    if (data.error === 9) {
-                        console.log('trackScrobble', 'data.error 9', data);
-                        session_key = undefined;
-                        chrome.storage.local.remove('lastfm_session_key');
-                    }
-                    if (data.error === 4) {
-                        console.log('trackScrobble', 'data.error 4', data);
-                        clear_data();
-                    }
-                    if (data.error === 26) {
-                        console.log('trackScrobble', 'data.error 26', data);
-                        suspand = true;
-                    }
-                    if (data.error !== undefined) {
-                        console.log('trackScrobble', 'data.error', data);
-                        return;
-                    }
+            success: function(data) {
+                if (data.error === 9) {
+                    console.log('trackScrobble', 'data.error 9', data);
+                    session_key = undefined;
+                    chrome.storage.local.remove('lastfm_session_key');
+                }
+                if (data.error === 4) {
+                    console.log('trackScrobble', 'data.error 4', data);
+                    clear_data();
+                }
+                if (data.error === 26) {
+                    console.log('trackScrobble', 'data.error 26', data);
+                    suspand = true;
+                }
+                if (data.error !== undefined) {
+                    console.log('trackScrobble', 'data.error', data);
+                    return;
                 }
             }
         });
@@ -425,64 +419,65 @@
             url: 'http://ws.audioscrobbler.com/2.0/?' + $.param(data),
             dataType: 'JSON',
             data: data,
-            statusCode: {
-                200: function(data) {
-                    if (data.error === 26) {
-                        console.log('getCover', 'data.error 26', data);
-                        suspand = true;
-                    }
-                    track_cache[cn].info = {};
-                    if (data.error === 6) {
-                        //track not found
-                        iDB.add(cn, track_cache[cn]);
-                        cb();
-                        return;
-                    }
-                    if (data.error !== undefined) {
-                        console.log('getCover', 'data.error!', data);
-                        cb();
-                        return;
-                    }
-                    if (data.track === undefined) {
-                        cb();
-                        return;
-                    }
-                    if (data.track.name !== undefined
-                            && data.track.name.length > 0) {
-                        track_cache[cn].info.title = data.track.name;
-                    }
-                    if (data.track.artist !== undefined
-                            && data.track.artist.name !== undefined
-                            && data.track.artist.name.length > 0) {
-                        track_cache[cn].info.artist = data.track.artist.name;
-                    }
-                    if (data.track.album !== undefined
-                            && data.track.album.title !== undefined
-                            && data.track.album.title.length > 0) {
-                        track_cache[cn].info.album = data.track.album.title;
-                    }
-                    if (track_cache[cn].info.artist !== undefined && track_cache[cn].info.title !== undefined) {
-                        var _cn = (track_cache[cn].info.artist + track_cache[cn].info.title).toLowerCase();
-                        track_cache[_cn] = track_cache[cn];
-                    }
-                    if (data.track.album === undefined
-                            || data.track.album.image === undefined
-                            || data.track.album.image.length === 0) {
-                        iDB.add(cn, track_cache[cn]);
-                        cb(track_cache[cn].info);
-                        return;
-                    }
-                    var item = data.track.album.image.slice(-1)[0];
-                    var url = item['#text'];
-                    if (url === undefined || url.indexOf('noimage') !== -1) {
-                        iDB.add(cn, track_cache[cn]);
-                        cb(track_cache[cn].info);
-                        return;
-                    }
-                    track_cache[cn].url = url;
-                    iDB.add(cn, track_cache[cn]);
-                    getImage(cn, cb);
+            success: function(data) {
+                if (data.error === 26) {
+                    console.log('getCover', 'data.error 26', data);
+                    suspand = true;
                 }
+                track_cache[cn].info = {};
+                if (data.error === 6) {
+                    //track not found
+                    iDB.add(cn, track_cache[cn]);
+                    cb();
+                    return;
+                }
+                if (data.error !== undefined) {
+                    console.log('getCover', 'data.error!', data);
+                    cb();
+                    return;
+                }
+                if (data.track === undefined) {
+                    cb();
+                    return;
+                }
+                if (data.track.name !== undefined
+                        && data.track.name.length > 0) {
+                    track_cache[cn].info.title = data.track.name;
+                }
+                if (data.track.artist !== undefined
+                        && data.track.artist.name !== undefined
+                        && data.track.artist.name.length > 0) {
+                    track_cache[cn].info.artist = data.track.artist.name;
+                }
+                if (data.track.album !== undefined
+                        && data.track.album.title !== undefined
+                        && data.track.album.title.length > 0) {
+                    track_cache[cn].info.album = data.track.album.title;
+                }
+                if (track_cache[cn].info.artist !== undefined && track_cache[cn].info.title !== undefined) {
+                    var _cn = (track_cache[cn].info.artist + track_cache[cn].info.title).toLowerCase();
+                    track_cache[_cn] = track_cache[cn];
+                }
+                if (data.track.album === undefined
+                        || data.track.album.image === undefined
+                        || data.track.album.image.length === 0) {
+                    iDB.add(cn, track_cache[cn]);
+                    cb(track_cache[cn].info);
+                    return;
+                }
+                var item = data.track.album.image.slice(-1)[0];
+                var url = item['#text'];
+                if (url === undefined || url.indexOf('noimage') !== -1) {
+                    iDB.add(cn, track_cache[cn]);
+                    cb(track_cache[cn].info);
+                    return;
+                }
+                track_cache[cn].url = url;
+                iDB.add(cn, track_cache[cn]);
+                getImage(cn, cb);
+            },
+            error: function() {
+                cb();
             }
         });
     };

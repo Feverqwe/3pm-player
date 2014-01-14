@@ -306,26 +306,24 @@ var cloud = function() {
                 url: url,
                 data: data,
                 dataType: 'JSON',
-                statusCode: {
-                    200: function(data) {
-                        if (data.error !== undefined) {
-                            if (data.error.error_code === 15) {
-                                _settings.vk_tag_update = 0;
-                                return;
-                            }
-                            clear_data();
-                            if (data.error.error_code === 5) {
-                                vkAuth(function() {
-                                    updateTags(owner_id, audio_id, artist, title);
-                                });
-                            }
-                            console.log("VK", "addInLibrarty", "API error", data);
+                success: function(data) {
+                    if (data.error !== undefined) {
+                        if (data.error.error_code === 15) {
+                            _settings.vk_tag_update = 0;
                             return;
                         }
-                        if (data.response === undefined) {
-                            console.log("VK", "addInLibrarty", "API error", data);
-                            return;
+                        clear_data();
+                        if (data.error.error_code === 5) {
+                            vkAuth(function() {
+                                updateTags(owner_id, audio_id, artist, title);
+                            });
                         }
+                        console.log("VK", "addInLibrarty", "API error", data);
+                        return;
+                    }
+                    if (data.response === undefined) {
+                        console.log("VK", "addInLibrarty", "API error", data);
+                        return;
                     }
                 }
             });
@@ -603,7 +601,8 @@ var cloud = function() {
                         success: function() {
                             track.cloud.head = true;
                             cb(url);
-                        }, error: function() {
+                        },
+                        error: function() {
                             track.cloud.head = false;
                             cb('');
                         }
@@ -725,20 +724,18 @@ var cloud = function() {
             $.ajax({
                 url: url,
                 dataType: 'JSON',
-                statusCode: {
-                    200: function(data) {
-                        var tracks = [];
-                        for (var i = 0, track; track = data[i]; i++) {
-                            if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
-                                continue;
-                            }
-                            tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, duration: track.duration, cloud: {type: 'sc', meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}}});
+                success: function(data) {
+                    var tracks = [];
+                    for (var i = 0, track; track = data[i]; i++) {
+                        if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
+                            continue;
                         }
-                        if (tracks.length === 0) {
-                            return;
-                        }
-                        cb(tracks);
+                        tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, duration: track.duration, cloud: {type: 'sc', meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}}});
                     }
+                    if (tracks.length === 0) {
+                        return;
+                    }
+                    cb(tracks);
                 }
             });
         };
@@ -747,26 +744,24 @@ var cloud = function() {
             $.ajax({
                 url: url,
                 dataType: 'JSON',
-                statusCode: {
-                    200: function(data) {
-                        var albums = [];
-                        if (data.categories === undefined) {
-                            cb(albums);
-                            return;
-                        }
-                        var cats = [];
-                        for (var key in data.categories) {
-                            cats.push(data.categories[key]);
-                        }
-                        cats.reverse();
-                        cats.forEach(function(subitem) {
-                            subitem.forEach(function(item) {
-                                var name = item.replace(/\+/g, ' ').replace(/\%26/g, '&');
-                                albums.push({name: '[ ' + name + ' ]', id: albums.length, cloud: {type: "sc", isExplore: true, name: name}});
-                            });
-                        });
+                success: function(data) {
+                    var albums = [];
+                    if (data.categories === undefined) {
                         cb(albums);
+                        return;
                     }
+                    var cats = [];
+                    for (var key in data.categories) {
+                        cats.push(data.categories[key]);
+                    }
+                    cats.reverse();
+                    cats.forEach(function(subitem) {
+                        subitem.forEach(function(item) {
+                            var name = item.replace(/\+/g, ' ').replace(/\%26/g, '&');
+                            albums.push({name: '[ ' + name + ' ]', id: albums.length, cloud: {type: "sc", isExplore: true, name: name}});
+                        });
+                    });
+                    cb(albums);
                 },
                 error: function(jqXHR) {
                     cb([]);
@@ -778,21 +773,19 @@ var cloud = function() {
             $.ajax({
                 url: url,
                 dataType: 'JSON',
-                statusCode: {
-                    200: function(data) {
-                        var tracks = [];
-                        if (data.tracks === undefined) {
-                            cb(tracks);
-                            return;
-                        }
-                        for (var i = 0, track; track = data.tracks[i]; i++) {
-                            if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
-                                continue;
-                            }
-                            tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, duration: track.duration, cloud: {type: 'sc', meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}, track_id: track.id}});
-                        }
+                success: function(data) {
+                    var tracks = [];
+                    if (data.tracks === undefined) {
                         cb(tracks);
+                        return;
                     }
+                    for (var i = 0, track; track = data.tracks[i]; i++) {
+                        if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
+                            continue;
+                        }
+                        tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, duration: track.duration, cloud: {type: 'sc', meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}, track_id: track.id}});
+                    }
+                    cb(tracks);
                 }
             });
         };
