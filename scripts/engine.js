@@ -264,10 +264,9 @@ var _debug = false;
         });
     };
     var postTagReader = function(id, cb) {
+        cb(id);
         if (settings.lastfm_info) {
-            player.lfmTagReader(id, cb);
-        } else {
-            cb(id);
+            player.lfmTagReader(id);
         }
     };
     var tagReader = function(id, cb) {
@@ -527,6 +526,7 @@ var _debug = false;
         var tagsLoaded = function(id, state) {
             // 1 - playlist only
             // 2 - player, lfm, viz
+            // 3 - player, playlist, viz, notifi
             // other - all
             var tb;
             playlist[id].state = "dune";
@@ -575,6 +575,13 @@ var _debug = false;
                 lfm();
                 viz();
                 return;
+            } else
+            if (state === 3) {
+                player();
+                plist();
+                notifi();
+                viz();
+                return;
             }
             player();
             plist();
@@ -612,7 +619,14 @@ var _debug = false;
                 cb(id);
             });
         };
-        player.lfmTagReader = function(id, cb) {
+        player.lfmTagReader = function(id) {
+            var cb = function(id) {
+                if (id === current_id) {
+                    tagsLoaded(id, 3);
+                } else {
+                    tagsLoaded(id, 1);
+                }
+            };
             var track = playlist[id];
             if (track.lfm === undefined) {
                 track.lfm = {};
@@ -952,13 +966,11 @@ var _debug = false;
                 tagReader(current_id, function(id) {
                     tagsLoaded(id);
                 });
-            } else
-            if (settings.lastfm_info && (track.lfm === undefined || track.lfm.lastfm !== true)) {
-                player.lfmTagReader(current_id, function(id) {
-                    tagsLoaded(id);
-                });
             } else {
                 tagsLoaded(current_id, 2);
+                if (settings.lastfm_info && (track.lfm === undefined || track.lfm.lastfm !== true)) {
+                    player.lfmTagReader(current_id);
+                }
             }
             view.state("loadeddata");
         });

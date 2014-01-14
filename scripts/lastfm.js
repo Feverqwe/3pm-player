@@ -411,7 +411,6 @@
             return;
         }
         if (suspand) {
-            cb();
             return;
         }
         $.ajax({
@@ -428,16 +427,13 @@
                 if (data.error === 6) {
                     //track not found
                     iDB.add(cn, track_cache[cn]);
-                    cb();
                     return;
                 }
                 if (data.error !== undefined) {
                     console.log('getCover', 'data.error!', data);
-                    cb();
                     return;
                 }
                 if (data.track === undefined) {
-                    cb();
                     return;
                 }
                 if (data.track.name !== undefined
@@ -475,15 +471,11 @@
                 track_cache[cn].url = url;
                 iDB.add(cn, track_cache[cn]);
                 getImage(cn, cb);
-            },
-            error: function() {
-                cb();
             }
         });
     };
     lastfm.getInfo = function(artist, title, cb, cache_only) {
         if (artist === undefined || title === undefined || artist.length === 0 || title.length === 0) {
-            cb();
             return;
         }
         var cn = (artist + title).toLowerCase();
@@ -498,7 +490,6 @@
                 track_cache[cn] = item.data;
             } else
             if (cache_only || navigator.onLine === false) {
-                cb();
                 return;
             }
             getInfo(cn, artist, title, cb);
