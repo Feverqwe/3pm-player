@@ -851,7 +851,7 @@ var cloud = function() {
                         getAlbums(function(albums) {
                             getExploreCategory(function(explore) {
                                 var list = [];
-                                list.push({name: 'Favorite', id: list.length, cloud: {type: "sc", isFavorite: true}});
+                                list.push({name: _lang.sc_favorite, id: list.length, cloud: {type: "sc", isFavorite: true}});
                                 albums.forEach(function(item) {
                                     item.id = list.length;
                                     list.push(item);

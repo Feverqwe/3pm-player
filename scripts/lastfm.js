@@ -432,6 +432,12 @@
                         suspand = true;
                     }
                     track_cache[cn].info = {};
+                    if (data.error === 6) {
+                        //track not found
+                        iDB.add(cn, track_cache[cn]);
+                        cb();
+                        return;
+                    }
                     if (data.error !== undefined) {
                         console.log('getCover', 'data.error!', data);
                         cb();
