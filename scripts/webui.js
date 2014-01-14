@@ -343,6 +343,11 @@ var webui = function() {
             console.log(e);
         });
     };
+    chrome.app.window.current().onClosed.addListener(function() {
+        if (active) {
+            stop();
+        }
+    });
     return {
         start: function() {
             start(function() {
