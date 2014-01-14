@@ -642,7 +642,7 @@ var _debug = false;
                     || track.tags.title === undefined) {
                 return;
             }
-            lastfm.getInfo(track.tags.artist, track.tags.title, function(lfm_tags, blob) {
+            lastfm.getInfo(track.tags.artist, track.tags.title, track.tags.album, function(lfm_tags, blob) {
                 if (lfm_tags === undefined) {
                     return;
                 }
