@@ -1369,17 +1369,21 @@
         $('div.shuffle').on('click', function() {
             engine.shuffle();
         });
+        var bounds_timer;
         chrome.app.window.current().onBoundsChanged.addListener(function() {
             if (document.webkitHidden) {
                 return;
             }
-            var window_left = window.screenLeft;
-            var window_top = window.screenTop;
-            if (var_cache.window_left !== window_left || var_cache.window_top !== window_top) {
-                var_cache.window_left = window_left;
-                var_cache.window_top = window_top;
-                chrome.storage.local.set({'pos_left': window_left, 'pos_top': window_top});
-            }
+            clearTimeout(bounds_timer);
+            bounds_timer = setTimeout(function() {
+                var window_left = window.screenLeft;
+                var window_top = window.screenTop;
+                if (var_cache.window_left !== window_left || var_cache.window_top !== window_top) {
+                    var_cache.window_left = window_left;
+                    var_cache.window_top = window_top;
+                    chrome.storage.local.set({'pos_left': window_left, 'pos_top': window_top});
+                }
+            }, 500);
             if (settings.pined_playlist) {
                 engine.setPinPosition('playlist', settings.pin_position);
             }

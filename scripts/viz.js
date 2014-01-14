@@ -33,22 +33,26 @@ var viz = function() {
                     document.webkitCancelFullScreen();
                 }
             });
+            var bounds_timer;
             chrome.app.window.current().onBoundsChanged.addListener(function() {
-                if (document.webkitIsFullScreen || document.webkitHidden || chrome.app.window.current().isMaximized()) {
-                    return;
-                }
-                var window_left = window.screenLeft;
-                var window_top = window.screenTop;
-                var window_width = window.innerWidth;
-                var window_height = window.innerHeight;
-                if (var_cache.window_left !== window_left || var_cache.window_top !== window_top
-                        || var_cache.window_width !== window_width || var_cache.window_height !== window_height) {
-                    var_cache.window_left = window_left;
-                    var_cache.window_top = window_top;
-                    var_cache.window_height = window_height;
-                    var_cache.window_width = window_width;
-                    chrome.storage.local.set({viz_pos_left: window_left, viz_pos_top: window_top, viz_w: window_width, viz_h: window_height});
-                }
+                clearTimeout(bounds_timer);
+                bounds_timer = setTimeout(function() {
+                    if (document.webkitIsFullScreen || document.webkitHidden || chrome.app.window.current().isMaximized()) {
+                        return;
+                    }
+                    var window_left = window.screenLeft;
+                    var window_top = window.screenTop;
+                    var window_width = window.innerWidth;
+                    var window_height = window.innerHeight;
+                    if (var_cache.window_left !== window_left || var_cache.window_top !== window_top
+                            || var_cache.window_width !== window_width || var_cache.window_height !== window_height) {
+                        var_cache.window_left = window_left;
+                        var_cache.window_top = window_top;
+                        var_cache.window_height = window_height;
+                        var_cache.window_width = window_width;
+                        chrome.storage.local.set({viz_pos_left: window_left, viz_pos_top: window_top, viz_w: window_width, viz_h: window_height});
+                    }
+                }, 500);
             });
         },
         run: function() {

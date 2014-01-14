@@ -406,24 +406,28 @@ var playlist = function() {
                     });
                 }
             });
+            var bounds_timer;
             var pin_timer;
             chrome.app.window.current().onBoundsChanged.addListener(function() {
-                if (document.webkitHidden || chrome.app.window.current().isMaximized()) {
-                    return;
-                }
-                var window_left = window.screenLeft;
-                var window_top = window.screenTop;
-                var window_width = window.innerWidth;
-                var window_height = window.innerHeight;
-                if (var_cache.window_left !== window_left || var_cache.window_top !== window_top
-                        || var_cache.window_width !== window_width || var_cache.window_height !== window_height) {
-                    var_cache.window_left = window_left;
-                    var_cache.window_top = window_top;
-                    var_cache.window_height = window_height;
-                    var_cache.window_width = window_width;
-                    chrome.storage.local.set({pl_pos_left: window_left, pl_pos_top: window_top, pl_w: window_width, pl_h: window_height});
-                }
                 clearTimeout(pin_timer);
+                clearTimeout(bounds_timer);
+                bounds_timer = setTimeout(function() {
+                    if (document.webkitHidden || chrome.app.window.current().isMaximized()) {
+                        return;
+                    }
+                    var window_left = window.screenLeft;
+                    var window_top = window.screenTop;
+                    var window_width = window.innerWidth;
+                    var window_height = window.innerHeight;
+                    if (var_cache.window_left !== window_left || var_cache.window_top !== window_top
+                            || var_cache.window_width !== window_width || var_cache.window_height !== window_height) {
+                        var_cache.window_left = window_left;
+                        var_cache.window_top = window_top;
+                        var_cache.window_height = window_height;
+                        var_cache.window_width = window_width;
+                        chrome.storage.local.set({pl_pos_left: window_left, pl_pos_top: window_top, pl_w: window_width, pl_h: window_height});
+                    }
+                }, 500);
                 pin_timer = setTimeout(function() {
                     checkPin();
                 }, 200);

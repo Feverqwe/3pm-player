@@ -378,6 +378,15 @@
             }
         });
     };
+    var hashCode = function(s) {
+        return s.split('').reduce(function(a, b) {
+            a = ((a << 5) - a) + b.charCodeAt(0);
+            return a & a;
+        }, 0);
+    };
+    var makeCN = function(artist, title) {
+        return ('INDEX_' + hashCode(title + artist) + '_').replace('-', '_');
+    };
     var getImage = function(cn, cb) {
         var url = track_cache[cn].url;
         if (url === undefined || !_settings.lastfm_cover) {
@@ -451,7 +460,7 @@
                     track_cache[cn].info.album = data.track.album.title;
                 }
                 if (track_cache[cn].info.artist !== undefined && track_cache[cn].info.title !== undefined) {
-                    var _cn = (track_cache[cn].info.artist + track_cache[cn].info.title).toLowerCase();
+                    var _cn = makeCN(track_cache[cn].info.artist, track_cache[cn].info.title);
                     track_cache[_cn] = track_cache[cn];
                 }
                 if (data.track.album === undefined
@@ -478,7 +487,7 @@
         if (artist === undefined || title === undefined || artist.length === 0 || title.length === 0) {
             return;
         }
-        var cn = (artist + title).toLowerCase();
+        var cn = makeCN(artist, title);
         if (track_cache[cn] !== undefined) {
             return getInfo(cn, artist, title, cb);
         }
