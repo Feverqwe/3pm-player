@@ -199,7 +199,7 @@
                 continue;
             o = o + keys[i] + params[keys[i]];
         }
-        return MD5(o + secret);
+        return SparkMD5.hash(o + secret);
     };
     var getSessionKey = function(cb) {
         var param = {
@@ -378,14 +378,8 @@
             }
         });
     };
-    var hashCode = function(s) {
-        return s.split('').reduce(function(a, b) {
-            a = ((a << 5) - a) + b.charCodeAt(0);
-            return a & a;
-        }, 0);
-    };
     var makeCN = function(artist, title) {
-        return ('INDEX_' + hashCode(title + artist) + '_').replace('-', '_');
+        return SparkMD5.hash(title + artist);
     };
     var getImage = function(cn, cb) {
         var url = track_cache[cn].url;

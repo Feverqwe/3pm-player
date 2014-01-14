@@ -35,8 +35,8 @@ java -jar compiler.jar --js ./scripts/viz.js --js_output_file ./build/scripts/vi
 java -jar compiler.jar --js ./scripts/lang.js --js_output_file ./build/scripts/lang.js
 #make options.js
 java -jar compiler.jar --js ./scripts/options.js --js_output_file ./build/scripts/options.js
-#make md5.js
-java -jar compiler.jar --js ./scripts/md5.js --js_output_file ./build/scripts/md5.js
+#make spark-md5.js
+java -jar compiler.jar --js ./scripts/spark-md5.js --js_output_file ./build/scripts/spark-md5.js
 #make lastfm.js
 java -jar compiler.jar --js ./scripts/lastfm.js --js_output_file ./build/scripts/lastfm.js
 
