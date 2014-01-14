@@ -313,6 +313,7 @@ var webui = function() {
                 cb();
             }
             server_socketId = createInfo.socketId;
+            chrome.storage.local.set({wabui_socket: server_socketId});
             try {
                 chrome.socket.getNetworkList(function(items) {
                     var addr;
@@ -343,15 +344,17 @@ var webui = function() {
             console.log(e);
         });
     };
-    chrome.app.window.current().onClosed.addListener(function() {
-        if (active) {
-            stop();
-        }
-    });
     return {
         start: function() {
-            start(function() {
-                chrome.contextMenus.update("webUI", {checked: active});
+            chrome.storage.local.get('wabui_socket', function(obj) {
+                if (obj.wabui_socket !== undefined) {
+                    chrome.socket.disconnect(obj.wabui_socket);
+                    chrome.socket.destroy(obj.wabui_socket);
+                    chrome.storage.local.remove('wabui_socket');
+                }
+                start(function() {
+                    chrome.contextMenus.update("webUI", {checked: active});
+                });
             });
         },
         info: Info,
