@@ -398,7 +398,7 @@
         };
         xhr.send(null);
     };
-    var getInfo = function(cn, artist, title, cb) {
+    var getTrackInfo = function(cn, artist, title, cb) {
         var data = {
             method: 'track.getInfo',
             artist: artist,
@@ -477,13 +477,81 @@
             }
         });
     };
-    lastfm.getInfo = function(artist, title, cb, cache_only) {
-        if (artist === undefined || title === undefined || artist.length === 0 || title.length === 0) {
+    var getAlbumInfo = function(cn, artist, album, cb) {
+        var data = {
+            method: 'album.getInfo',
+            artist: artist,
+            album: album,
+            api_key: api_key,
+            format: 'json',
+            autocorrect: 1
+        };
+        if (track_cache[cn] === undefined) {
+            track_cache[cn] = {};
+        } else {
+            getImage(cn, cb);
             return;
         }
-        var cn = makeCN(artist, title);
+        if (suspand) {
+            return;
+        }
+        $.ajax({
+            type: "GET",
+            url: 'http://ws.audioscrobbler.com/2.0/?' + $.param(data),
+            dataType: 'JSON',
+            data: data,
+            success: function(data) {
+                if (data.error === 26) {
+                    console.log('getAlbumInfo', 'data.error 26', data);
+                    suspand = true;
+                }
+                track_cache[cn].info = {};
+                if (data.error === 6) {
+                    //track not found
+                    iDB.add(cn, track_cache[cn]);
+                    return;
+                }
+                if (data.error !== undefined) {
+                    console.log('getAlbumInfo', 'data.error!', data);
+                    return;
+                }
+                if (data.album === undefined) {
+                    return;
+                }
+                if (data.album.name !== undefined
+                        && data.album.name.length > 0) {
+                    track_cache[cn].info.title = data.album.name;
+                }
+                if (data.album.artist !== undefined
+                        && data.album.artist.length > 0) {
+                    track_cache[cn].info.artist = data.album.artist;
+                }
+                if (data.album.image === undefined
+                        && data.album.image.length === 0) {
+                    iDB.add(cn, track_cache[cn]);
+                    cb(track_cache[cn].info);
+                    return;
+                }
+                var item = data.album.image.slice(-1)[0];
+                var url = item['#text'];
+                if (url === undefined || url.indexOf('noimage') !== -1) {
+                    iDB.add(cn, track_cache[cn]);
+                    cb(track_cache[cn].info);
+                    return;
+                }
+                track_cache[cn].url = url;
+                iDB.add(cn, track_cache[cn]);
+                getImage(cn, cb);
+            }
+        });
+    };
+    lastfm.getAlbumInfo = function(artist, album, cb, cache_only) {
+        if (artist === undefined || album === undefined || artist.length === 0 || album.length === 0) {
+            return;
+        }
+        var cn = makeCN(artist, album);
         if (track_cache[cn] !== undefined) {
-            return getInfo(cn, artist, title, cb);
+            return getAlbumInfo(cn, artist, album, cb);
         }
         iDB.get(cn, function(item) {
             if (item !== undefined) {
@@ -495,7 +563,28 @@
             if (cache_only || navigator.onLine === false) {
                 return;
             }
-            getInfo(cn, artist, title, cb);
+            getAlbumInfo(cn, artist, album, cb);
+        });
+    };
+    lastfm.getInfo = function(artist, title, cb, cache_only) {
+        if (artist === undefined || title === undefined || artist.length === 0 || title.length === 0) {
+            return;
+        }
+        var cn = makeCN(artist, title);
+        if (track_cache[cn] !== undefined) {
+            return getTrackInfo(cn, artist, title, cb);
+        }
+        iDB.get(cn, function(item) {
+            if (item !== undefined) {
+                if (item.timeStamp < today_date - 2 * 24 * 60 * 60 * 1000) {
+                    iDB.add(cn, item.data);
+                }
+                track_cache[cn] = item.data;
+            } else
+            if (cache_only || navigator.onLine === false) {
+                return;
+            }
+            getTrackInfo(cn, artist, title, cb);
         });
     };
     lastfm.updateNowPlaying = function(a, b, c, d) {
