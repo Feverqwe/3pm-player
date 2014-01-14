@@ -713,8 +713,9 @@ var cloud = function() {
                     }
                 },
                 error: function(jqXHR) {
-                    if (jqXHR.status === 401)
+                    if (jqXHR.status === 401) {
                         return;
+                    }
                     clear_data();
                 }
             });
@@ -725,17 +726,6 @@ var cloud = function() {
                 url: url,
                 dataType: 'JSON',
                 statusCode: {
-                    401: function() {
-                        scAuth(function() {
-                            if (user_id === undefined) {
-                                scUserId(function() {
-                                    getFavorited(cb);
-                                });
-                            } else {
-                                getFavorited(cb);
-                            }
-                        });
-                    },
                     200: function(data) {
                         var tracks = [];
                         for (var i = 0, track; track = data[i]; i++) {
@@ -749,11 +739,6 @@ var cloud = function() {
                         }
                         cb(tracks);
                     }
-                },
-                error: function(jqXHR) {
-                    if (jqXHR.status === 401)
-                        return;
-                    clear_data();
                 }
             });
         };
@@ -763,11 +748,6 @@ var cloud = function() {
                 url: url,
                 dataType: 'JSON',
                 statusCode: {
-                    401: function() {
-                        scAuth(function() {
-                            getExploreCategory(cb);
-                        });
-                    },
                     200: function(data) {
                         var albums = [];
                         if (data.categories === undefined) {
@@ -789,9 +769,7 @@ var cloud = function() {
                     }
                 },
                 error: function(jqXHR) {
-                    if (jqXHR.status === 401)
-                        return;
-                    clear_data();
+                    cb([]);
                 }
             });
         };
@@ -801,11 +779,6 @@ var cloud = function() {
                 url: url,
                 dataType: 'JSON',
                 statusCode: {
-                    401: function() {
-                        scAuth(function() {
-                            getExploreTracks(cb);
-                        });
-                    },
                     200: function(data) {
                         var tracks = [];
                         if (data.tracks === undefined) {
@@ -820,20 +793,14 @@ var cloud = function() {
                         }
                         cb(tracks);
                     }
-                },
-                error: function(jqXHR) {
-                    if (jqXHR.status === 401)
-                        return;
-                    clear_data();
                 }
             });
         };
         var addInFavorite = function(track_id) {
-            var url = 'https://api.soundcloud.com/users/' + user_id + '/favorites/' + track_id + '.json?client_id='+client_id+'&oauth_token='+token;
+            var url = 'https://api.soundcloud.com/users/' + user_id + '/favorites/' + track_id + '.json?client_id=' + client_id + '&oauth_token=' + token;
             $.ajax({
                 type: 'PUT',
                 url: url,
-                dataType: 'JSON',
                 statusCode: {
                     401: function() {
                         scAuth(function() {
@@ -846,11 +813,6 @@ var cloud = function() {
                             }
                         });
                     }
-                },
-                error: function(jqXHR) {
-                    if (jqXHR.status === 401)
-                        return;
-                    clear_data();
                 }
             });
         };
