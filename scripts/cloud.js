@@ -765,7 +765,7 @@ var cloud = function() {
                 statusCode: {
                     401: function() {
                         scAuth(function() {
-                            getAlbums(cb);
+                            getExploreCategory(cb);
                         });
                     },
                     200: function(data) {
