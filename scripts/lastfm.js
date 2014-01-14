@@ -193,8 +193,8 @@
 
         // params has to be ordered alphabetically
         keys.sort();
-
-        for (var i = 0; i < keys.length; i++) {
+        var keys_len = keys.length;
+        for (var i = 0; i < keys_len; i++) {
             if (keys[i] === 'format' || keys[i] === 'api_sig' || keys[i] === 'callback')
                 continue;
             o = o + keys[i] + params[keys[i]];
