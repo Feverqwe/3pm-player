@@ -591,7 +591,6 @@ var _debug = false;
         };
         var lastfmTagReady = function(id, new_tags, blob, cb) {
             if (new_tags === undefined) {
-                cb(id);
                 return;
             }
             var track = playlist[id];
@@ -620,25 +619,16 @@ var _debug = false;
             });
         };
         player.lfmTagReader = function(id) {
-            var cb = function(id) {
-                if (id === current_id) {
-                    tagsLoaded(id, 3);
-                } else {
-                    tagsLoaded(id, 1);
-                }
-            };
             var track = playlist[id];
             if (track.lfm === undefined) {
                 track.lfm = {};
             }
             if (!settings.lastfm_info || track.lfm.lastfm) {
-                cb(id);
                 return;
             }
             var cache = current_id !== id;
             if (cache) {
                 if (track.lfm.lastfm_cache) {
-                    cb(id);
                     return;
                 } else {
                     track.lfm.lastfm_cache = true;
@@ -650,14 +640,19 @@ var _debug = false;
                     || track.tags.picture !== undefined
                     || track.tags.artist === undefined
                     || track.tags.title === undefined) {
-                cb(id);
                 return;
             }
             lastfm.getInfo(track.tags.artist, track.tags.title, function(lfm_tags, blob) {
                 if (lfm_tags === undefined) {
-                    cb(id);
+                    return;
                 }
-                lastfmTagReady(id, lfm_tags, blob, cb);
+                lastfmTagReady(id, lfm_tags, blob, function(id) {
+                    if (id === current_id) {
+                        tagsLoaded(id, 3);
+                    } else {
+                        tagsLoaded(id, 1);
+                    }
+                });
             }, cache);
         };
         player.discAdapters = function(name) {
