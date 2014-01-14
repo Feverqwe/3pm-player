@@ -434,9 +434,11 @@
                     track_cache[cn].info = {};
                     if (data.error !== undefined) {
                         console.log('getCover', 'data.error!', data);
+                        cb();
                         return;
                     }
                     if (data.track === undefined) {
+                        cb();
                         return;
                     }
                     if (data.track.name !== undefined

@@ -3,7 +3,7 @@
     "name": "__MSG_appName__",
     "description": "__MSG_appDesc__",
     "default_locale": "en",
-    "version": "0.7.49",
+    "version": "0.7.50",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "icon_16.png",
@@ -32,6 +32,7 @@
         "http://userserve-ak.last.fm/*",
         "http://cdn.last.fm/*",
         "http://chart.apis.google.com/*",
-        "http://images.amazon.com/*"
+        "http://images.amazon.com/*",
+        "https://api-web.soundcloud.com/explore/*"
     ]
 }

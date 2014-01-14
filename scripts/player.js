@@ -828,6 +828,17 @@
                         cloud.vk.addInLibrarty(track.cloud.track_id, track.cloud.owner_id);
                     }
                 }
+            },
+            save_sc: {
+                title: _lang.ctx_save_sc_track,
+                contexts: ['page', 'launcher'],
+                hide: 1,
+                action: function() {
+                    var track = engine.getCurrentTrack();
+                    if (track !== undefined && track.cloud.track_id !== undefined) {
+                        cloud.sc.addInFavorite(track.cloud.track_id);
+                    }
+                }
             }
         };
         for (var key in context_menu) {

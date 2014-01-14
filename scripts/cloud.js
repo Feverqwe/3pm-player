@@ -84,6 +84,7 @@ var cloud = function() {
                 } else {
                     var obj = {};
                     obj[type + '_token'] = token;
+                    chrome.storage.local.remove(type + '_token_expire');
                     chrome.storage.local.set(obj);
                 }
                 cb(token);
@@ -283,7 +284,7 @@ var cloud = function() {
                         }
                         var albums = [];
                         data.response.items.forEach(function(item) {
-                            albums.push({id: albums.length, name: item.title, cloud: {vk_save: false, album_id: item.album_id, type: 'vk'}});
+                            albums.push({id: albums.length, name: item.title, cloud: {save_vk: false, album_id: item.album_id, type: 'vk'}});
                         });
                         cb(albums);
                     }
@@ -386,30 +387,30 @@ var cloud = function() {
         };
         var makeAlbums = function(cb) {
             getAlbums(function(all_albums) {
-                all_albums.push({name: _lang.vk_all, cloud: {vk_save: false, type: 'vk', album_id: "nogroup"}});
-                all_albums.push({name: _lang.vk_rec, cloud: {vk_save: true, type: 'vk', album_id: "recommendations"}});
-                all_albums.push({name: _lang.vk_pop, cloud: {vk_save: true, type: 'vk', album_id: "popular0"}});
-                all_albums.push({name: "[ Rock ]", cloud: {vk_save: true, type: 'vk', album_id: "popular1"}});
-                all_albums.push({name: "[ Pop ]", cloud: {vk_save: true, type: 'vk', album_id: "popular2"}});
-                all_albums.push({name: "[ Rap & Hip-Hop ]", cloud: {vk_save: true, type: 'vk', album_id: "popular3"}});
-                all_albums.push({name: "[ Easy Listening ]", cloud: {vk_save: true, type: 'vk', album_id: "popular4"}});
-                all_albums.push({name: "[ Dance & House ]", cloud: {vk_save: true, type: 'vk', album_id: "popular5"}});
-                all_albums.push({name: "[ Instrumental ]", cloud: {vk_save: true, type: 'vk', album_id: "popular6"}});
-                all_albums.push({name: "[ Metal ]", cloud: {vk_save: true, type: 'vk', album_id: "popular7"}});
-                all_albums.push({name: "[ Alternative ]", cloud: {vk_save: true, type: 'vk', album_id: "popular21"}});
-                all_albums.push({name: "[ Dubstep ]", cloud: {vk_save: true, type: 'vk', album_id: "popular8"}});
-                all_albums.push({name: "[ Jazz & Blues ]", cloud: {vk_save: true, type: 'vk', album_id: "popular9"}});
-                all_albums.push({name: "[ Drum & Bass ]", cloud: {vk_save: true, type: 'vk', album_id: "popular10"}});
-                all_albums.push({name: "[ Trance ]", cloud: {vk_save: true, type: 'vk', album_id: "popular11"}});
-                all_albums.push({name: "[ Chanson ]", cloud: {vk_save: true, type: 'vk', album_id: "popular12"}});
-                all_albums.push({name: "[ Ethnic ]", cloud: {vk_save: true, type: 'vk', album_id: "popular13"}});
-                all_albums.push({name: "[ Acoustic & Vocal ]", cloud: {vk_save: true, type: 'vk', album_id: "popular14"}});
-                all_albums.push({name: "[ Reggae ]", cloud: {vk_save: true, type: 'vk', album_id: "popular15"}});
-                all_albums.push({name: "[ Classical ]", cloud: {vk_save: true, type: 'vk', album_id: "popular16"}});
-                all_albums.push({name: "[ Indie Pop ]", cloud: {vk_save: true, type: 'vk', album_id: "popular17"}});
-                all_albums.push({name: "[ Speech ]", cloud: {vk_save: true, type: 'vk', album_id: "popular19"}});
-                all_albums.push({name: "[ Electropop & Disco ]", cloud: {vk_save: true, type: 'vk', album_id: "popular22"}});
-                all_albums.push({name: "[ Other ]", cloud: {vk_save: true, type: 'vk', album_id: "popular18"}});
+                all_albums.push({name: _lang.vk_all, cloud: {save_vk: false, type: 'vk', album_id: "nogroup"}});
+                all_albums.push({name: _lang.vk_rec, cloud: {save_vk: true, type: 'vk', album_id: "recommendations"}});
+                all_albums.push({name: _lang.vk_pop, cloud: {save_vk: true, type: 'vk', album_id: "popular0"}});
+                all_albums.push({name: "[ Rock ]", cloud: {save_vk: true, type: 'vk', album_id: "popular1"}});
+                all_albums.push({name: "[ Pop ]", cloud: {save_vk: true, type: 'vk', album_id: "popular2"}});
+                all_albums.push({name: "[ Rap & Hip-Hop ]", cloud: {save_vk: true, type: 'vk', album_id: "popular3"}});
+                all_albums.push({name: "[ Easy Listening ]", cloud: {save_vk: true, type: 'vk', album_id: "popular4"}});
+                all_albums.push({name: "[ Dance & House ]", cloud: {save_vk: true, type: 'vk', album_id: "popular5"}});
+                all_albums.push({name: "[ Instrumental ]", cloud: {save_vk: true, type: 'vk', album_id: "popular6"}});
+                all_albums.push({name: "[ Metal ]", cloud: {save_vk: true, type: 'vk', album_id: "popular7"}});
+                all_albums.push({name: "[ Alternative ]", cloud: {save_vk: true, type: 'vk', album_id: "popular21"}});
+                all_albums.push({name: "[ Dubstep ]", cloud: {save_vk: true, type: 'vk', album_id: "popular8"}});
+                all_albums.push({name: "[ Jazz & Blues ]", cloud: {save_vk: true, type: 'vk', album_id: "popular9"}});
+                all_albums.push({name: "[ Drum & Bass ]", cloud: {save_vk: true, type: 'vk', album_id: "popular10"}});
+                all_albums.push({name: "[ Trance ]", cloud: {save_vk: true, type: 'vk', album_id: "popular11"}});
+                all_albums.push({name: "[ Chanson ]", cloud: {save_vk: true, type: 'vk', album_id: "popular12"}});
+                all_albums.push({name: "[ Ethnic ]", cloud: {save_vk: true, type: 'vk', album_id: "popular13"}});
+                all_albums.push({name: "[ Acoustic & Vocal ]", cloud: {save_vk: true, type: 'vk', album_id: "popular14"}});
+                all_albums.push({name: "[ Reggae ]", cloud: {save_vk: true, type: 'vk', album_id: "popular15"}});
+                all_albums.push({name: "[ Classical ]", cloud: {save_vk: true, type: 'vk', album_id: "popular16"}});
+                all_albums.push({name: "[ Indie Pop ]", cloud: {save_vk: true, type: 'vk', album_id: "popular17"}});
+                all_albums.push({name: "[ Speech ]", cloud: {save_vk: true, type: 'vk', album_id: "popular19"}});
+                all_albums.push({name: "[ Electropop & Disco ]", cloud: {save_vk: true, type: 'vk', album_id: "popular22"}});
+                all_albums.push({name: "[ Other ]", cloud: {save_vk: true, type: 'vk', album_id: "popular18"}});
                 all_albums.forEach(function(item, b) {
                     item.id = b;
                 });
@@ -649,7 +650,7 @@ var cloud = function() {
         };
         var scAuth = function(cb) {
             var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
-            var url = 'https://soundcloud.com/connect?client_id=' + client_id + '&response_type=token&redirect_uri=' + redirect_uri;
+            var url = 'https://soundcloud.com/connect?client_id=' + client_id + '&response_type=token&scope=non-expiring&redirect_uri=' + redirect_uri;
             auth_getToken(type, url, function(tkn) {
                 token = tkn;
                 cb(token);
@@ -668,6 +669,7 @@ var cloud = function() {
                     },
                     200: function(data) {
                         user_id = data.id;
+                        chrome.storage.local.set({sc_user_id: user_id});
                         cb(data.id);
                     }
                 },
@@ -679,7 +681,7 @@ var cloud = function() {
             });
         };
         var getAlbums = function(cb) {
-            var url = 'http://api.soundcloud.com/users/' + user_id + '/playlists.json?client_id=' + client_id;
+            var url = 'https://api.soundcloud.com/users/' + user_id + '/playlists.json?client_id=' + client_id;
             $.ajax({
                 url: url,
                 dataType: 'JSON',
@@ -718,7 +720,7 @@ var cloud = function() {
             });
         };
         var getFavorited = function(cb) {
-            var url = 'http://api.soundcloud.com/users/' + user_id + '/favorites.json?client_id=' + client_id;
+            var url = 'https://api.soundcloud.com/users/' + user_id + '/favorites.json?client_id=' + client_id;
             $.ajax({
                 url: url,
                 dataType: 'JSON',
@@ -746,6 +748,103 @@ var cloud = function() {
                             return;
                         }
                         cb(tracks);
+                    }
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
+                }
+            });
+        };
+        var getExploreCategory = function(cb) {
+            var url = 'https://api.soundcloud.com/explore/v2?client_id=' + client_id;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        scAuth(function() {
+                            getAlbums(cb);
+                        });
+                    },
+                    200: function(data) {
+                        var albums = [];
+                        if (data.categories === undefined) {
+                            cb(albums);
+                            return;
+                        }
+                        var cats = [];
+                        for (var key in data.categories) {
+                            cats.push(data.categories[key]);
+                        }
+                        cats.reverse();
+                        cats.forEach(function(subitem) {
+                            subitem.forEach(function(item) {
+                                var name = item.replace(/\+/g, ' ').replace(/\%26/g, '&');
+                                albums.push({name: '[ ' + name + ' ]', id: albums.length, cloud: {type: "sc", isExplore: true, name: name}});
+                            });
+                        });
+                        cb(albums);
+                    }
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
+                }
+            });
+        };
+        var getExploreTracks = function(category, cb) {
+            var url = 'https://api-web.soundcloud.com/explore/' + encodeURIComponent(category) + '?limit=100&offset=0&client_id=' + client_id;
+            $.ajax({
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        scAuth(function() {
+                            getExploreTracks(cb);
+                        });
+                    },
+                    200: function(data) {
+                        var tracks = [];
+                        if (data.tracks === undefined) {
+                            cb(tracks);
+                            return;
+                        }
+                        for (var i = 0, track; track = data.tracks[i]; i++) {
+                            if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
+                                continue;
+                            }
+                            tracks.push({id: 0, file: {name: track.title, url: track.stream_url + '?client_id=' + client_id}, tags: undefined, duration: track.duration, cloud: {type: 'sc', meta: {title: track.title, artist: track.user.username, artwork: track.artwork_url}, track_id: track.id}});
+                        }
+                        cb(tracks);
+                    }
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 401)
+                        return;
+                    clear_data();
+                }
+            });
+        };
+        var addInFavorite = function(track_id) {
+            var url = 'https://api.soundcloud.com/users/' + user_id + '/favorites/' + track_id + '.json?client_id='+client_id+'&oauth_token='+token;
+            $.ajax({
+                type: 'PUT',
+                url: url,
+                dataType: 'JSON',
+                statusCode: {
+                    401: function() {
+                        scAuth(function() {
+                            if (user_id === undefined) {
+                                scUserId(function() {
+                                    addInFavorite(track_id);
+                                });
+                            } else {
+                                addInFavorite(track_id);
+                            }
+                        });
                     }
                 },
                 error: function(jqXHR) {
@@ -788,13 +887,19 @@ var cloud = function() {
                 getToken(function() {
                     getUserId(function() {
                         getAlbums(function(albums) {
-                            var list = [];
-                            list.push({name: 'Favorite', id: list.length, cloud: {type: "sc", isFavorite: true}});
-                            albums.forEach(function(item) {
-                                item.id = list.length;
-                                list.push(item);
+                            getExploreCategory(function(explore) {
+                                var list = [];
+                                list.push({name: 'Favorite', id: list.length, cloud: {type: "sc", isFavorite: true}});
+                                albums.forEach(function(item) {
+                                    item.id = list.length;
+                                    list.push(item);
+                                });
+                                explore.forEach(function(item) {
+                                    item.id = list.length;
+                                    list.push(item);
+                                });
+                                cb(list);
                             });
-                            cb(list);
                         });
                     });
                 });
@@ -822,6 +927,13 @@ var cloud = function() {
                 xhr.send(null);
             },
             on_select_list: function(list, cb) {
+                if (list.cloud.isExplore) {
+                    getToken(function() {
+                        getExploreTracks(list.cloud.name, function(tracks) {
+                            cb(tracks, {name: list.name, id: list.id, cloud: {type: "sc", save_sc: true}});
+                        });
+                    });
+                } else
                 if (list.cloud.isFavorite) {
                     getToken(function() {
                         getUserId(function() {
@@ -837,6 +949,13 @@ var cloud = function() {
             preload: function(options, cb) {
                 options.url = options.track.file.url;
                 getTrack(options, cb);
+            },
+            addInFavorite: function(track_id) {
+                getToken(function() {
+                    getUserId(function() {
+                        addInFavorite(track_id);
+                    });
+                });
             }
         };
     }();

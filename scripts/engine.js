@@ -1057,21 +1057,23 @@ var _debug = false;
     })();
     var addInCtxMenu = function(playlist_info) {
         var context_menu = view.getContextMenu();
-        if (playlist_info !== undefined && playlist_info.cloud !== undefined && playlist_info.cloud.vk_save === true) {
-            if (context_menu.save_vk.hide === 0) {
-                return;
+        ['save_vk', 'save_sc'].forEach(function(type) {
+            if (playlist_info !== undefined && playlist_info.cloud !== undefined && playlist_info.cloud[type] === true) {
+                if (context_menu[type].hide === 0) {
+                    return;
+                }
+                var item = {};
+                item.id = context_menu[type].id;
+                item.title = context_menu[type].title;
+                item.contexts = context_menu[type].contexts;
+                chrome.contextMenus.create(item);
+                context_menu[type].hide = 0;
+            } else
+            if (context_menu[type].hide === 0) {
+                chrome.contextMenus.remove(type);
+                context_menu[type].hide = 1;
             }
-            var item = {};
-            item.id = context_menu.save_vk.id;
-            item.title = context_menu.save_vk.title;
-            item.contexts = context_menu.save_vk.contexts;
-            chrome.contextMenus.create(item);
-            context_menu.save_vk.hide = 0;
-        } else
-        if (context_menu.save_vk.hide === 0) {
-            chrome.contextMenus.remove('save_vk');
-            context_menu.save_vk.hide = 1;
-        }
+        });
     };
     var checkWindowPosition = function(position) {
         var screen_width = screen.width,
