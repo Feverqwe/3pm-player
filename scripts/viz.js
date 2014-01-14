@@ -34,7 +34,13 @@ var viz = function() {
                 }
             });
             var bounds_timer;
+            var next_step;
             chrome.app.window.current().onBoundsChanged.addListener(function() {
+                var time = (new Date).getTime();
+                if (next_step > time) {
+                    return;
+                }
+                next_step = time + 450;
                 clearTimeout(bounds_timer);
                 bounds_timer = setTimeout(function() {
                     if (document.webkitIsFullScreen || document.webkitHidden || chrome.app.window.current().isMaximized()) {

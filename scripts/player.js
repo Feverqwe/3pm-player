@@ -1370,10 +1370,19 @@
             engine.shuffle();
         });
         var bounds_timer;
+        var next_step;
         chrome.app.window.current().onBoundsChanged.addListener(function() {
             if (document.webkitHidden) {
                 return;
             }
+            if (settings.pined_playlist) {
+                engine.setPinPosition('playlist', settings.pin_position);
+            }
+            var time = (new Date).getTime();
+            if (next_step > time) {
+                return;
+            }
+            next_step = time + 450;
             clearTimeout(bounds_timer);
             bounds_timer = setTimeout(function() {
                 var window_left = window.screenLeft;
@@ -1384,9 +1393,6 @@
                     chrome.storage.local.set({'pos_left': window_left, 'pos_top': window_top});
                 }
             }, 500);
-            if (settings.pined_playlist) {
-                engine.setPinPosition('playlist', settings.pin_position);
-            }
         });
     };
     view.setTags = function(tb) {

@@ -408,8 +408,22 @@ var playlist = function() {
             });
             var bounds_timer;
             var pin_timer;
+            var next_step;
+            var next_step_pin;
             chrome.app.window.current().onBoundsChanged.addListener(function() {
+                var time = (new Date).getTime();
+                if (next_step_pin > time) {
+                    return;
+                }
+                next_step_pin = time + 150;
                 clearTimeout(pin_timer);
+                pin_timer = setTimeout(function() {
+                    checkPin();
+                }, 200);
+                if (next_step > time) {
+                    return;
+                }
+                next_step = time + 450;
                 clearTimeout(bounds_timer);
                 bounds_timer = setTimeout(function() {
                     if (document.webkitHidden || chrome.app.window.current().isMaximized()) {
@@ -428,9 +442,6 @@ var playlist = function() {
                         chrome.storage.local.set({pl_pos_left: window_left, pl_pos_top: window_top, pl_w: window_width, pl_h: window_height});
                     }
                 }, 500);
-                pin_timer = setTimeout(function() {
-                    checkPin();
-                }, 200);
             });
         },
         setPlaylist: function(a) {
