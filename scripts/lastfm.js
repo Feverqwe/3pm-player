@@ -604,7 +604,7 @@
             album_hash = makeCN(artist, album);
         }
         _getAlbumInfo(album_hash, artist, album, function(a_info, a_blob) {
-            var no_cover = a_blob !== undefined;
+            var _no_cover = (no_cover === true) ? no_cover : a_blob !== undefined;
             _getTrackInfo(track_hash, artist, title, function(t_info, t_blob) {
                 if (t_info === undefined) {
                     cb(a_info, a_blob);
@@ -617,7 +617,7 @@
                     t_blob = a_blob;
                 }
                 cb(t_info, t_blob);
-            }, cache_only, no_cover);
+            }, cache_only, _no_cover);
         }, cache_only, no_cover);
     };
     lastfm.updateNowPlaying = function(a, b, c, d) {
