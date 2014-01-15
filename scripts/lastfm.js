@@ -383,22 +383,22 @@
     };
     var getImage = function(cn, cb) {
         var url = cache[cn].url;
-        if (url === undefined || !_settings.lastfm_cover) {
-            cb(cn, cache[cn].info);
+        if (url === undefined || url.length === 0 || !_settings.lastfm_cover) {
+            cb(cache[cn].info);
             return;
         }
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
         xhr.responseType = "blob";
         xhr.onload = function() {
-            cb(cn, cache[cn].info, xhr.response);
+            cb(cache[cn].info, xhr.response);
         };
         xhr.onerror = function() {
-            cb(cn, cache[cn].info, xhr.response);
+            cb(cache[cn].info);
         };
         xhr.send(null);
     };
-    var getTrackInfo = function(cn, artist, title, cb) {
+    var getTrackInfo = function(cn, artist, title, cb, no_cover) {
         var data = {
             method: 'track.getInfo',
             artist: artist,
@@ -410,12 +410,14 @@
         if (cache[cn] === undefined) {
             cache[cn] = {};
         } else {
-            getImage(cn, cb);
+            if (no_cover === true) {
+                cb(cache[cn].info);
+            } else {
+                getImage(cn, cb);
+            }
             return;
         }
-        if (suspand) {
-            return;
-        }
+        var _cache = cache[cn];
         $.ajax({
             type: "GET",
             url: 'http://ws.audioscrobbler.com/2.0/?' + $.param(data),
@@ -423,57 +425,62 @@
             data: data,
             success: function(data) {
                 if (data.error === 26) {
-                    console.log('getCover', 'data.error 26', data);
+                    console.log('getTrackInfo', 'data.error 26', data);
                     suspand = true;
                 }
-                cache[cn].info = {};
+                _cache.info = {};
                 if (data.error === 6) {
-                    //track not found
-                    iDB.add(cn, cache[cn]);
+                    iDB.add(cn, _cache);
+                    cb();
                     return;
                 }
                 if (data.error !== undefined) {
-                    console.log('getCover', 'data.error!', data);
+                    console.log('getTrackInfo', 'data.error!', data);
+                    cb();
                     return;
                 }
                 if (data.track === undefined) {
+                    cb();
                     return;
                 }
                 if (data.track.name !== undefined
                         && data.track.name.length > 0) {
-                    cache[cn].info.title = data.track.name;
+                    _cache.info.title = data.track.name;
                 }
                 if (data.track.artist !== undefined
                         && data.track.artist.name !== undefined
                         && data.track.artist.name.length > 0) {
-                    cache[cn].info.artist = data.track.artist.name;
+                    _cache.info.artist = data.track.artist.name;
                 }
                 if (data.track.album !== undefined
                         && data.track.album.title !== undefined
                         && data.track.album.title.length > 0) {
-                    cache[cn].info.album = data.track.album.title;
-                }
-                if (cache[cn].info.artist !== undefined && cache[cn].info.title !== undefined) {
-                    var _cn = makeCN(cache[cn].info.artist, cache[cn].info.title);
-                    cache[_cn] = cache[cn];
+                    _cache.info.album = data.track.album.title;
                 }
                 if (data.track.album === undefined
                         || data.track.album.image === undefined
                         || data.track.album.image.length === 0) {
-                    iDB.add(cn, cache[cn]);
-                    cb(cn, cache[cn].info);
+                    iDB.add(cn, _cache);
+                    cb(_cache.info);
                     return;
                 }
                 var item = data.track.album.image.slice(-1)[0];
                 var url = item['#text'];
                 if (url === undefined || url.indexOf('noimage') !== -1) {
-                    iDB.add(cn, cache[cn]);
-                    cb(cn, cache[cn].info);
+                    iDB.add(cn, _cache);
+                    cb(_cache.info);
                     return;
                 }
-                cache[cn].url = url;
-                iDB.add(cn, cache[cn]);
-                getImage(cn, cb);
+                _cache.url = url;
+                iDB.add(cn, _cache);
+                if (no_cover === true) {
+                    cb(_cache.info);
+                } else {
+                    getImage(cn, cb);
+                }
+            },
+            error: function() {
+                cb();
             }
         });
     };
@@ -492,9 +499,7 @@
             getImage(cn, cb);
             return;
         }
-        if (suspand) {
-            return;
-        }
+        var _cache = cache[cn];
         $.ajax({
             type: "GET",
             url: 'http://ws.audioscrobbler.com/2.0/?' + $.param(data),
@@ -505,47 +510,56 @@
                     console.log('getAlbumInfo', 'data.error 26', data);
                     suspand = true;
                 }
-                cache[cn].info = {};
+                _cache.info = {};
                 if (data.error === 6) {
-                    //track not found
-                    iDB.add(cn, cache[cn]);
+                    iDB.add(cn, _cache);
+                    cb();
                     return;
                 }
                 if (data.error !== undefined) {
                     console.log('getAlbumInfo', 'data.error!', data);
+                    cb();
                     return;
                 }
                 if (data.album === undefined) {
+                    cb();
                     return;
                 }
                 if (data.album.name !== undefined
                         && data.album.name.length > 0) {
-                    cache[cn].info.album = data.album.name;
+                    _cache.info.album = data.album.name;
                 }
                 if (data.album.artist !== undefined
                         && data.album.artist.length > 0) {
-                    cache[cn].info.artist = data.album.artist;
+                    _cache.info.artist = data.album.artist;
                 }
                 if (data.album.image === undefined
                         && data.album.image.length === 0) {
-                    iDB.add(cn, cache[cn]);
-                    cb(cn, cache[cn].info);
+                    iDB.add(cn, _cache);
+                    cb(_cache.info);
                     return;
                 }
                 var item = data.album.image.slice(-1)[0];
                 var url = item['#text'];
                 if (url === undefined || url.indexOf('noimage') !== -1) {
-                    iDB.add(cn, cache[cn]);
-                    cb(cn, cache[cn].info);
+                    iDB.add(cn, _cache);
+                    cb(_cache.info);
                     return;
                 }
-                cache[cn].url = url;
-                iDB.add(cn, cache[cn]);
+                _cache.url = url;
+                iDB.add(cn, _cache);
                 getImage(cn, cb);
+            },
+            error: function() {
+                cb();
             }
         });
     };
-    _getAlbumInfo = function(cn, artist, album, cb, cache_only) {
+    _getAlbumInfo = function(cn, artist, album, cb, cache_only, no_cover) {
+        if (cn === undefined || no_cover === true || !_settings.lastfm_cover) {
+            cb();
+            return;
+        }
         if (cache[cn] !== undefined) {
             return getAlbumInfo(cn, artist, album, cb);
         }
@@ -557,14 +571,15 @@
                 cache[cn] = item.data;
             } else
             if (cache_only || navigator.onLine === false) {
+                cb();
                 return;
             }
             getAlbumInfo(cn, artist, album, cb);
         });
     };
-    _getTrackInfo = function(cn, artist, title, cb, cache_only) {
-        if (cache[cn] !== undefined) {
-            return getTrackInfo(cn, artist, title, cb);
+    _getTrackInfo = function(cn, artist, title, cb, cache_only, no_cover) {
+        if (cache[cn] !== undefined || !_settings.lastfm_info) {
+            return getTrackInfo(cn, artist, title, cb, no_cover);
         }
         iDB.get(cn, function(item) {
             if (item !== undefined) {
@@ -574,55 +589,36 @@
                 cache[cn] = item.data;
             } else
             if (cache_only || navigator.onLine === false) {
+                cb();
                 return;
             }
-            getTrackInfo(cn, artist, title, cb);
+            getTrackInfo(cn, artist, title, cb, no_cover);
         });
     };
-    lastfm.getInfo = function(artist, title, album, cb, cache_only) {
+    lastfm.getInfo = function(artist, title, album, cb, cache_only, no_cover) {
         var track_hash, album_hash;
         if (artist.length !== 0 && title.length !== 0) {
             track_hash = makeCN(artist, title);
         }
-        if (album !== undefined && artist.length === 0 && album.length === 0) {
+        if (album !== undefined && artist.length !== 0 && album.length !== 0) {
             album_hash = makeCN(artist, album);
         }
-        var album_cb = false;
-        var track_cb = false;
-        var album_blob;
-        var _cb = function(cn, a, b) {
-            if (cn === album_hash) {
-                album_cb = true;
-                album_blob = b;
-                if (track_cb) {
-                    if (cache[album_hash].info.album !== undefined) {
-                        cache[track_hash].info.album = cache[album_hash].info.album;
-                    }
-                    if (cache[album_hash].info.url !== undefined) {
-                        cache[track_hash].info.url = cache[album_hash].info.url;
-                    }
-                    iDB.add(track_hash, cache[track_hash]);
+        _getAlbumInfo(album_hash, artist, album, function(a_info, a_blob) {
+            var no_cover = a_blob !== undefined;
+            _getTrackInfo(track_hash, artist, title, function(t_info, t_blob) {
+                if (t_info === undefined) {
+                    cb(a_info, a_blob);
+                    return;
                 }
-            }
-            if (cn === track_hash) {
-                track_cb = true;
-                if (album_cb) {
-                    if (cache[album_hash].info.album !== undefined) {
-                        cache[track_hash].info.album = cache[album_hash].info.album;
-                    }
-                    if (cache[album_hash].info.url !== undefined) {
-                        cache[track_hash].info.url = cache[album_hash].info.url;
-                    }
-                    iDB.add(track_hash, cache[track_hash]);
-                    if (album_blob !== undefined) {
-                        b = album_blob;
-                    }
+                if (a_info !== undefined) {
+                    t_info.album = a_info.album;
                 }
-            }
-            cb(a, b);
-        };
-        _getAlbumInfo(album_hash, artist, album, _cb, cache_only);
-        _getTrackInfo(track_hash, artist, title, _cb, cache_only);
+                if (a_blob !== undefined) {
+                    t_blob = a_blob;
+                }
+                cb(t_info, t_blob);
+            }, cache_only, no_cover);
+        }, cache_only, no_cover);
     };
     lastfm.updateNowPlaying = function(a, b, c, d) {
         if (navigator.onLine === false) {

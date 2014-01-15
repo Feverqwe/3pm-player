@@ -78,11 +78,11 @@ var get_lang = function(language) {
             30: 'Only foreign tracks',
             31: 'Pre-load track',
             32: 'Last.fm scrobbling',
-            33: 'Download album cover',
+            33: 'Download album cover from Last.fm',
             34: 'WebUI',
             35: 'Port: ',
             36: 'Interface: ',
-            37: 'Receive information about the track Last.fm',
+            37: 'Receive information about the track from Last.fm',
             38: 'Rewrite incorrect tags',
             39: 'Run at startup the player.'
         }
@@ -166,7 +166,7 @@ var get_lang = function(language) {
             30: 'Только зарубежные треки',
             31: 'Предзагружать трек',
             32: 'Last.fm скробблинг',
-            33: 'Загружать обложки альбомов',
+            33: 'Загружать обложки альбомов с Last.fm',
             34: 'Веб-интерфейс',
             35: 'Порт: ',
             36: 'Интерфейс: ',

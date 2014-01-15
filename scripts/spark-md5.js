@@ -1,6 +1,3 @@
-/*jshint bitwise:false*/
-/*global unescape*/
-
 (function (factory) {
     if (typeof exports === 'object') {
         // Node/CommonJS

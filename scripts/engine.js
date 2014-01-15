@@ -265,7 +265,7 @@ var _debug = false;
     };
     var postTagReader = function(id, cb) {
         cb(id);
-        if (settings.lastfm_info) {
+        if (settings.lastfm_info || settings.lastfm_cover) {
             player.lfmTagReader(id);
         }
     };
@@ -623,11 +623,11 @@ var _debug = false;
             if (track.lfm === undefined) {
                 track.lfm = {};
             }
-            if (!settings.lastfm_info || track.lfm.lastfm) {
+            if (!settings.lastfm_info && !settings.lastfm_cover || track.lfm.lastfm) {
                 return;
             }
-            var cache = current_id !== id;
-            if (cache) {
+            var use_cache = current_id !== id;
+            if (use_cache) {
                 if (track.lfm.lastfm_cache) {
                     return;
                 } else {
@@ -637,11 +637,11 @@ var _debug = false;
                 track.lfm.lastfm = true;
             }
             if (track.tags === undefined
-                    || track.tags.picture !== undefined
                     || track.tags.artist === undefined
                     || track.tags.title === undefined) {
                 return;
             }
+            var no_cover = track.tags.picture !== undefined;
             lastfm.getInfo(track.tags.artist, track.tags.title, track.tags.album, function(lfm_tags, blob) {
                 if (lfm_tags === undefined) {
                     return;
@@ -653,7 +653,7 @@ var _debug = false;
                         tagsLoaded(id, 1);
                     }
                 });
-            }, cache);
+            }, use_cache, no_cover);
         };
         player.discAdapters = function(name) {
             var rmlist = [];
@@ -963,7 +963,7 @@ var _debug = false;
                 });
             } else {
                 tagsLoaded(current_id, 2);
-                if (settings.lastfm_info && (track.lfm === undefined || track.lfm.lastfm !== true)) {
+                if ((settings.lastfm_info || settings.lastfm_cover) && (track.lfm === undefined || track.lfm.lastfm !== true)) {
                     player.lfmTagReader(current_id);
                 }
             }
