@@ -32,15 +32,15 @@ var _debug = false;
     //<<<<<<<
     //allow_ext - only for files without mime.
     var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
-    var playlist = [];
-    var playlist_info = undefined;
-    var playlist_order = {};
-    var order_index = 0;
-    var covers = [];
-    var playedlist = [];
+    engine.playlist = [];
+    engine.playlist_order = {};
+    engine.playlist_info = undefined;
+    engine.order_index = 0;
+    engine.covers = [];
+    engine.playedlist = [];
+    engine.current_played_pos = -1;
     var shuffle = false;
     var loop = false;
-    var current_played_pos = -1;
     var M3UPlaylists = undefined;
     var var_cache = {};
     var resetPlayer = function() {
@@ -50,19 +50,19 @@ var _debug = false;
         //останавливает воспроизведение
         player.stop();
         //массив плэйлиста
-        playlist = [];
+        engine.playlist = [];
         //название плэйлиста
-        playlist_info = undefined;
+        engine.playlist_info = undefined;
         //индекс сортировки
-        order_index = 0;
+        engine.order_index = 0;
         //порядок сортровки
-        playlist_order = {};
+        engine.playlist_order = {};
         //кэш изображений альбомов
-        covers = [];
+        engine.covers = [];
         //список проигранных компазиций
-        playedlist = [];
+        engine.playedlist = [];
         //если трек уже был проигран похиция не -1;
-        current_played_pos = -1;
+        engine.current_played_pos = -1;
         //отправляет команду на очистку плэйлиста
         _send('playlist', function(window) {
             window.playlist.empty();
@@ -74,11 +74,11 @@ var _debug = false;
          * Если такой ID уже есть в списке - он удаляется.
          * ID добавляется в конец списка.
          */
-        var ex_id = playedlist.indexOf(id);
+        var ex_id = engine.playedlist.indexOf(id);
         if (ex_id !== -1) {
-            playedlist.splice(ex_id, 1);
+            engine.playedlist.splice(ex_id, 1);
         }
-        playedlist.push(id);
+        engine.playedlist.push(id);
     };
     var str2blob = function(byteCharacters, contentType, sliceSize) {
         contentType = contentType || '';
@@ -184,7 +184,7 @@ var _debug = false;
          * Проверяет наличие уже обложке в массиве обложек по некой checksum
          */
         var id;
-        covers.forEach(function(item) {
+        engine.covers.forEach(function(item) {
             if (item.len === len && item.chk === checksum) {
                 id = item.id;
                 return 0;
@@ -196,12 +196,12 @@ var _debug = false;
         /*
          * Добавляет обложку в массив обложек.
          */
-        var id = covers.length;
-        covers.push({id: id, len: len, data: bin, chk: chk});
+        var id = engine.covers.length;
+        engine.covers.push({id: id, len: len, data: bin, chk: chk});
         return id;
     };
     var fileTagReader = function(id, cb) {
-        var track = playlist[id];
+        var track = engine.playlist[id];
         var file = track.blob || track.file;
         /*
          if (window.time_log === undefined) {
@@ -243,7 +243,7 @@ var _debug = false;
         }, params);
     };
     var cloudTagReader = function(id, cb) {
-        var track = playlist[id];
+        var track = engine.playlist[id];
         cloud[track.cloud.type].read_tags(track, function(new_tags) {
             ['title', 'artist', 'album'].forEach(function(key) {
                 var item = new_tags[key];
@@ -276,7 +276,7 @@ var _debug = false;
                 window.playlist.updPlaylistItem(id, track);
             });
         };
-        var track = playlist[id];
+        var track = engine.playlist[id];
         if (track.tags === undefined) {
             track.tags = {};
         }
@@ -337,12 +337,12 @@ var _debug = false;
         if (id === undefined) {
             id = player.current_id;
         }
-        if (playlist[id] === undefined) {
+        if (engine.playlist[id] === undefined) {
             return {title: '3pm-player'};
         }
-        var tags = playlist[id].tags;
+        var tags = engine.playlist[id].tags;
         if (tags === undefined) {
-            return {title: playlist[id].file.name};
+            return {title: engine.playlist[id].file.name};
         }
         var title = "";
         var album = "";
@@ -351,7 +351,7 @@ var _debug = false;
         if (tags.title !== undefined && tags.title.length > 0) {
             title = tags.title;
         } else {
-            title = playlist[id].file.name;
+            title = engine.playlist[id].file.name;
         }
         if (tags.artist !== undefined && tags.artist.length > 0) {
             artist = tags.artist;
@@ -449,10 +449,10 @@ var _debug = false;
             // 3 - player, playlist, viz, notifi
             // other - all
             var tb;
-            playlist[id].state = "dune";
+            engine.playlist[id].state = "dune";
             var plist = function() {
                 _send('playlist', function(window) {
-                    window.playlist.updPlaylistItem(id, playlist[id]);
+                    window.playlist.updPlaylistItem(id, engine.playlist[id]);
                 });
             };
             var _player = function() {
@@ -513,7 +513,7 @@ var _debug = false;
             if (new_tags === undefined) {
                 return;
             }
-            var track = playlist[id];
+            var track = engine.playlist[id];
             readImage(blob, function(cover_id) {
                 if (cover_id !== undefined) {
                     track.tags.picture = cover_id;
@@ -572,8 +572,8 @@ var _debug = false;
             player.discAdapters();
         });
         $(audio).on('loadedmetadata', function(e) {
-            if (playlist[player.current_id].duration === undefined) {
-                playlist[player.current_id].duration = this.duration;
+            if (engine.playlist[player.current_id].duration === undefined) {
+                engine.playlist[player.current_id].duration = this.duration;
             }
             view.state("loadedmetadata");
             _send('viz', function(window) {
@@ -585,7 +585,7 @@ var _debug = false;
             if (settings.next_track_notification) {
                 chrome.runtime.sendMessage({notification: 'show'});
             }
-            var track = playlist[player.current_id];
+            var track = engine.playlist[player.current_id];
             if (track.tags === undefined || track.tags.reader_state !== true) {
                 tagReader(player.current_id, function(id) {
                     tagsLoaded(id);
@@ -623,12 +623,12 @@ var _debug = false;
         });
         $(audio).on('ended', function(e) {
             if (shuffle) {
-                if (playedlist.length !== playlist.length || loop) {
+                if (engine.playedlist.length !== engine.playlist.length || loop) {
                     player.next();
                 }
             } else {
-                var pos = playlist_order[order_index].indexOf(player.current_id);
-                if (loop || pos !== playlist_order[order_index].length - 1) {
+                var pos = engine.playlist_order[engine.order_index].indexOf(player.current_id);
+                if (loop || pos !== engine.playlist_order[engine.order_index].length - 1) {
                     player.next();
                 }
             }
@@ -646,7 +646,7 @@ var _debug = false;
         });
         return {
             lfmTagReader: function(id) {
-                var track = playlist[id];
+                var track = engine.playlist[id];
                 if (track.lfm === undefined) {
                     track.lfm = {};
                 }
@@ -707,7 +707,7 @@ var _debug = false;
             },
             open: function(id) {
                 id = parseInt(id);
-                var item = playlist[id];
+                var item = engine.playlist[id];
                 if (item === undefined) {
                     return;
                 }
@@ -724,7 +724,7 @@ var _debug = false;
                 }
             },
             getFilename: function() {
-                return playlist[player.current_id].file.name;
+                return engine.playlist[player.current_id].file.name;
             },
             playToggle: function() {
                 if (audio.paused) {
@@ -734,14 +734,14 @@ var _debug = false;
                 }
             },
             play: function() {
-                if (player.current_id === undefined || playlist[player.current_id] === undefined) {
+                if (player.current_id === undefined || engine.playlist[player.current_id] === undefined) {
                     return;
                 }
-                if (playedlist.length === playlist.length) {
-                    playedlist = [];
+                if (engine.playedlist.length === engine.playlist.length) {
+                    engine.playedlist = [];
                 }
-                if (playlist[player.current_id].file.url !== undefined && audio.src.split(':')[0] === "chrome-extension") {
-                    var item = playlist[player.current_id];
+                if (engine.playlist[player.current_id].file.url !== undefined && audio.src.split(':')[0] === "chrome-extension") {
+                    var item = engine.playlist[player.current_id];
                     if (!audioPreload(item)) {
                         audio.src = item.file.url;
                     }
@@ -750,10 +750,10 @@ var _debug = false;
                 }
             },
             pause: function() {
-                if (player.current_id === undefined || playlist[player.current_id] === undefined) {
+                if (player.current_id === undefined || engine.playlist[player.current_id] === undefined) {
                     return;
                 }
-                if (playlist[player.current_id].file.url !== undefined && (audio.duration === Infinity || audio.currentTime === 0)) {
+                if (engine.playlist[player.current_id].file.url !== undefined && (audio.duration === Infinity || audio.currentTime === 0)) {
                     audio.pause();
                     audio.src = "";
                 } else {
@@ -769,30 +769,30 @@ var _debug = false;
                 player.current_id = undefined;
             },
             next: function() {
-                current_played_pos = -1;
+                engine.current_played_pos = -1;
                 var id = player.current_id + 1;
                 if (shuffle) {
-                    if (playedlist.length === playlist.length) {
-                        playedlist = [];
+                    if (engine.playedlist.length === engine.playlist.length) {
+                        engine.playedlist = [];
                     }
-                    id = getRandomInt(0, playlist.length - 1);
+                    id = getRandomInt(0, engine.playlist.length - 1);
                     var n = 2000;
-                    while (playedlist.indexOf(id) !== -1 && n > 0) {
-                        id = getRandomInt(0, playlist.length - 1);
+                    while (engine.playedlist.indexOf(id) !== -1 && n > 0) {
+                        id = getRandomInt(0, engine.playlist.length - 1);
                         n--;
                     }
                 } else {
-                    if (playlist_order[order_index] === undefined) {
+                    if (engine.playlist_order[engine.order_index] === undefined) {
                         return;
                     }
-                    var pos = playlist_order[order_index].indexOf(player.current_id);
+                    var pos = engine.playlist_order[engine.order_index].indexOf(player.current_id);
                     if (pos < 0) {
                         return;
                     }
-                    if (pos === playlist_order[order_index].length - 1) {
-                        id = playlist_order[order_index][0];
+                    if (pos === engine.playlist_order[engine.order_index].length - 1) {
+                        id = engine.playlist_order[engine.order_index][0];
                     } else {
-                        id = playlist_order[order_index][pos + 1];
+                        id = engine.playlist_order[engine.order_index][pos + 1];
                     }
                 }
                 player.open(id);
@@ -801,28 +801,28 @@ var _debug = false;
                 var id = player.current_id - 1;
                 if (shuffle) {
                     var pos = null;
-                    if (current_played_pos === -1) {
-                        pos = playedlist.indexOf(player.current_id);
+                    if (engine.current_played_pos === -1) {
+                        pos = engine.playedlist.indexOf(player.current_id);
                     } else {
-                        pos = current_played_pos;
+                        pos = engine.current_played_pos;
                     }
                     if (pos <= 0) {
-                        pos = playedlist.length;
+                        pos = engine.playedlist.length;
                     }
-                    current_played_pos = pos - 1;
-                    id = playedlist[current_played_pos];
+                    engine.current_played_pos = pos - 1;
+                    id = engine.playedlist[engine.current_played_pos];
                 } else {
-                    if (playlist_order[order_index] === undefined) {
+                    if (engine.playlist_order[engine.order_index] === undefined) {
                         return;
                     }
-                    var pos = playlist_order[order_index].indexOf(player.current_id);
+                    var pos = engine.playlist_order[engine.order_index].indexOf(player.current_id);
                     if (pos < 0) {
                         return;
                     }
                     if (pos === 0) {
-                        id = playlist_order[order_index].slice(-1)[0];
+                        id = engine.playlist_order[engine.order_index].slice(-1)[0];
                     } else {
-                        id = playlist_order[order_index][pos - 1];
+                        id = engine.playlist_order[engine.order_index][pos - 1];
                     }
                 }
                 player.open(id);
@@ -843,7 +843,7 @@ var _debug = false;
                 status.loop = loop;
                 status.shuffle = shuffle;
                 status.current_id = player.current_id;
-                status.playlist_count = playlist.length;
+                status.playlist_count = engine.playlist.length;
                 var tb = getTagBody(player.current_id);
                 if (tb.aa !== undefined) {
                     status.title = encode_name(tb.title + ' – ' + tb.aa);
@@ -940,7 +940,7 @@ var _debug = false;
                 return audio;
             },
             getCurrentTrack: function() {
-                return playlist[player.current_id];
+                return engine.playlist[player.current_id];
             },
             getCurrentTrackID: function() {
                 return player.current_id;
@@ -1159,25 +1159,25 @@ var _debug = false;
             return;
         }
         resetPlayer();
-        playlist = trackList[0];
-        playlist_order = trackList[1];
-        playlist_info = info;
+        engine.playlist = trackList[0];
+        engine.playlist_order = trackList[1];
+        engine.playlist_info = info;
         _send('playlist', function(window) {
             window.playlist.setPlaylist(engine.getPlaylist());
         });
         view.state("playlist_not_empty");
         var id = 0;
         if (shuffle) {
-            id = getRandomInt(0, playlist.length - 1);
+            id = getRandomInt(0, engine.playlist.length - 1);
         }
         player.open(id);
-        addInCtxMenu(playlist_info);
+        addInCtxMenu(engine.playlist_info);
     };
     engine.append = function(files) {
         if (files.length === 0) {
             return;
         }
-        if (playlist.length === 0) {
+        if (engine.playlist.length === 0) {
             engine.open(files);
             return;
         }
@@ -1185,12 +1185,12 @@ var _debug = false;
         if (tracks.length === 0) {
             return;
         }
-        var id = playlist.slice(-1)[0].id;
+        var id = engine.playlist.slice(-1)[0].id;
         for (var i = 0, track; track = tracks[i]; i++) {
             id++;
             track.id = id;
-            playlist.push(track);
-            $.each(playlist_order, function(key, value) {
+            engine.playlist.push(track);
+            $.each(engine.playlist_order, function(key, value) {
                 value.push(id);
             });
         }
@@ -1216,7 +1216,7 @@ var _debug = false;
          return 'images/no-cover.png';
          }
          */
-        return covers[id].data;
+        return engine.covers[id].data;
     };
     engine.shuffle = function(c) {
         if (c === undefined) {
@@ -1239,21 +1239,21 @@ var _debug = false;
         view.setLoop(loop);
     };
     engine.getPlaylist = function() {
-        return {order_index: order_index, playlist_ordered: playlist_order[order_index], playlist: playlist, info: playlist_info};
+        return {order_index: engine.order_index, playlist_ordered: engine.playlist_order[engine.order_index], playlist: engine.playlist, info: engine.playlist_info};
     };
     engine.getCurrentTrackID = player.getCurrentTrackID;
     engine.APIstatus = function() {
         return JSON.stringify(player.status());
     };
     engine.APIplaylist = function() {
-        var playlist_ordered = playlist_order[order_index];
+        var playlist_ordered = engine.playlist_order[engine.order_index];
         var playlist_order_len = 0;
         if (playlist_ordered !== undefined) {
             playlist_order_len = playlist_ordered.length;
         }
         var list = new Array(playlist_order_len);
         for (var i = 0; i < playlist_order_len; i++) {
-            var track = playlist[playlist_ordered[i]];
+            var track = engine.playlist[playlist_ordered[i]];
             var tb = getTagBody(track.id);
             var title = tb.title;
             if (tb.aa !== undefined) {
@@ -1268,8 +1268,8 @@ var _debug = false;
             });
         }
         var pl_i = {name: _lang.playlist_title};
-        if (playlist_info !== undefined) {
-            pl_i = {name: playlist_info.name, id: playlist_info.id};
+        if (engine.playlist_info !== undefined) {
+            pl_i = {name: engine.playlist_info.name, id: engine.playlist_info.id};
         }
         var rez = player.status();
         rez.playlist = list;
@@ -1288,15 +1288,15 @@ var _debug = false;
         return M3UPlaylists;
     };
     engine.setSortedList = function(new_playlist_order, new_order_index, no_update_pl) {
-        playlist_order[new_order_index] = new_playlist_order;
-        order_index = new_order_index;
+        engine.playlist_order[new_order_index] = new_playlist_order;
+        engine.order_index = new_order_index;
         return engine.getPlaylist();
     };
     engine.getPlaylistOrder = function() {
-        return playlist_order;
+        return engine.playlist_order;
     };
     engine.setPlaylistOrder = function(new_order_index) {
-        order_index = new_order_index;
+        engine.order_index = new_order_index;
         return engine.getPlaylist();
     };
     engine.readAllTags = readAllTags = function() {
@@ -1305,7 +1305,7 @@ var _debug = false;
          */
         var thread = 0;
         var item_id = -1;
-        var item_len = playlist.length;
+        var item_len = engine.playlist.length;
         var next_item = function() {
             if (thread < 5) {
                 item_id++;
@@ -1317,7 +1317,7 @@ var _debug = false;
                      */
                     return;
                 }
-                var track = playlist[item_id];
+                var track = engine.playlist[item_id];
                 if (track.tags !== undefined && track.tags.reader_state === true) {
                     thread--;
                     next_item();
