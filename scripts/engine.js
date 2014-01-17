@@ -805,7 +805,7 @@ var _debug = false;
                 return window.btoa(unescape(encodeURIComponent(title)));
             };
             var status = {};
-            status['paused'] = audio.paused;
+            status.paused = audio.paused;
             //status['muted'] = audio.muted;
             //status['volume'] = audio.volume;
             //status['duration'] = audio.duration;
@@ -813,15 +813,15 @@ var _debug = false;
             //status['ended'] = audio.ended;
             //status['seeking'] = audio.seeking;
             //status['seekable'] = audio.seekable;
-            status['loop'] = loop;
-            status['shuffle'] = shuffle;
-            status['current_id'] = current_id;
-            status['playlist_count'] = playlist.length;
+            status.loop = loop;
+            status.shuffle = shuffle;
+            status.current_id = current_id;
+            status.playlist_count = playlist.length;
             var tb = getTagBody(current_id);
             if (tb.aa !== undefined) {
-                status['title'] = encode_name(tb.title + ' – ' + tb.aa);
+                status.title = encode_name(tb.title + ' – ' + tb.aa);
             } else {
-                status['title'] = encode_name(tb.title);
+                status.title = encode_name(tb.title);
             }
             if (_debug) {
                 console.log(status);
