@@ -20,6 +20,9 @@ var engine_webui = function(mySettings, myEngine) {
             if (socketId === undefined) {
                 return;
             }
+            /**
+             * @namespace chrome.socket
+             */
             chrome.socket.disconnect(socketId);
             chrome.socket.destroy(socketId);
             var index = socket_list.indexOf(socketId);
@@ -165,7 +168,7 @@ var engine_webui = function(mySettings, myEngine) {
                     'css': 'text/css',
                     'html': 'text/html; charset=UTF-8'
                 };
-                var ext = (ext_content_type[ext] !== undefined) ? 'Content-Type: ' + ext_content_type[ext] : '';
+                ext = (ext_content_type[ext] !== undefined) ? 'Content-Type: ' + ext_content_type[ext] : '';
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', '/www' + headerMap.url, true);
                 xhr.responseType = 'arraybuffer';
@@ -205,7 +208,13 @@ var engine_webui = function(mySettings, myEngine) {
                 var header = head + '\n\n';
                 var header_ab = stringToArrayBuffer(header);
                 var header_ab_len = header_ab.byteLength;
+                /**
+                 * @namespace chrome.socket.write
+                 */
                 chrome.socket.write(socketId, header_ab, function(writeInfo) {
+                    /**
+                     * @namespace writeInfo.bytesWritten
+                     */
                     if (writeInfo.bytesWritten === header_ab_len) {
                         if (isKeepAlive) {
                             reset_server_socket();
@@ -248,6 +257,9 @@ var engine_webui = function(mySettings, myEngine) {
             var requestData = '';
             var endIndex = 0;
             var onDataRead = function(readInfo) {
+                /**
+                 * @namespace readInfo.resultCode
+                 */
                 if (readInfo.resultCode <= 0) {
                     socket_close(socketId);
                     reset_server_socket();
@@ -258,6 +270,9 @@ var engine_webui = function(mySettings, myEngine) {
                 endIndex = requestData.indexOf('\n\n', endIndex);
                 if (endIndex === -1) {
                     endIndex = requestData.length - 1;
+                    /**
+                     * @namespace chrome.socket.read
+                     */
                     chrome.socket.read(socketId, onDataRead);
                     return;
                 }
@@ -277,9 +292,15 @@ var engine_webui = function(mySettings, myEngine) {
                 }
                 readUrl(headerMap, socketId);
             };
+            /**
+             * @namesace chrome.socket.read
+             */
             chrome.socket.read(socketId, onDataRead);
         };
         var onConnection_ = function(acceptInfo) {
+            /**
+             * @namespace acceptInfo.socketId
+             */
             socket_open(acceptInfo.socketId);
             readRequestFromSocket_(acceptInfo.socketId);
         };
@@ -289,6 +310,9 @@ var engine_webui = function(mySettings, myEngine) {
                     e_webui.stop();
                     return;
                 }
+                /**
+                 * @namespace chrome.socket.setKeepAlive
+                 */
                 chrome.socket.setKeepAlive(acceptInfo.socketId, true, 5, function(e) {
                     if (e) {
                         onConnection_(acceptInfo);
@@ -326,10 +350,16 @@ var engine_webui = function(mySettings, myEngine) {
                 server_socketId = createInfo.socketId;
                 chrome.storage.local.set({wabui_socket: server_socketId});
                 try {
+                    /**
+                     * @namespace chrome.socket.getNetworkList
+                     */
                     chrome.socket.getNetworkList(function(items) {
                         var addr;
                         var n = 0;
                         items.forEach(function(item) {
+                            /**
+                             * @namespace item.address
+                             */
                             if (item.address.indexOf(':') !== -1) {
                                 item.name += ' (IPv6)';
                             }
@@ -341,7 +371,7 @@ var engine_webui = function(mySettings, myEngine) {
                         if (n > 1 || n === 0) {
                             addr = '0.0.0.0';
                         }
-                        chrome.socket.listen(server_socketId, addr, settings.webui_port, function(e) {
+                        chrome.socket.listen(server_socketId, addr, settings.webui_port, function() {
                             acceptConnection_(server_socketId);
                         });
                     });
