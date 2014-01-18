@@ -422,9 +422,7 @@ var _debug = false;
             return _ad;
         }();
         var current_id = undefined;
-        var notification;
-        (function(ns) {
-            notification = {};
+        var notification = function() {
             var timeout = 3000;
             var timer = undefined;
             var starTimer = function() {
@@ -439,7 +437,8 @@ var _debug = false;
                 var opt = {
                     type: 'basic',
                     title: tb.title,
-                    message: ''
+                    message: '',
+                    iconUrl: 'images/no-cover.png'
                 };
                 if (tb.aa !== undefined) {
                     opt.message = tb.aa;
@@ -468,12 +467,12 @@ var _debug = false;
                     window._focusAll();
                 });
             });
-            notification.show = function() {
+            var show = function() {
                 var opt = getOpt();
                 if (settings.notifi_buttons) {
                     opt.buttons = [
-                        {title: _lang.next, iconUrl: '/images/playback_next.png'},
-                        {title: _lang.prev, iconUrl: '/images/playback_prev.png'}
+                        {title: _lang.next, iconUrl: 'images/playback_next.png'},
+                        {title: _lang.prev, iconUrl: 'images/playback_prev.png'}
                     ];
                 }
                 //отображаем уведомление о воспроизведении
@@ -488,7 +487,7 @@ var _debug = false;
                     });
                 });
             };
-            notification.update = function() {
+            var update = function() {
                 chrome.notifications.getAll(function(obj) {
                     if (obj.current_track === undefined) {
                         return;
@@ -498,7 +497,11 @@ var _debug = false;
                     });
                 });
             };
-        })();
+            return {
+                show: show,
+                update: update
+            };
+        }();
         var audioPreload = function(track) {
             if (track.cloud === undefined) {
                 return false;
