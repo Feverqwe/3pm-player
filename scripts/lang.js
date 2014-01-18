@@ -181,6 +181,9 @@ var get_lang = function(language) {
     var lang = language || window._language;
     if (lang === undefined) {
         lang = 'en';
+        /**
+         * @namespace chrome.i18n.getMessage
+         */
         if (chrome.i18n.getMessage("lang") === 'ru') {
             lang = 'ru';
         }

@@ -51,6 +51,9 @@ var dialog = function() {
         }
         var n = -1;
         list.contents.forEach(function(item) {
+            /**
+             * @namespace item.is_dir
+             */
             n++;
             var filename = item.path.split('/').slice(-1)[0];
             var action = '';
@@ -189,6 +192,9 @@ var dialog = function() {
         var n = -1;
         list.items.reverse();
         list.items.forEach(function(item) {
+            /**
+             * @namespace item.downloadUrl
+             */
             n++;
             var filename = item.title;
             var is_dir = (item.mimeType.indexOf('.folder') !== -1);
@@ -328,6 +334,9 @@ var dialog = function() {
             }
         }
         var n = -1;
+        /**
+         * @namespace  list.entries
+         */
         list.entries.forEach(function(item) {
             n++;
             var action = '';
@@ -484,6 +493,9 @@ var dialog = function() {
             if (item.album !== undefined && item.album !== null) {
                 tags.album = item.album;
             }
+            /**
+             * @namespace item.album_artist
+             */
             if ((item.artist !== undefined && item.artist !== null) || (item.album_artist !== undefined && item.album_artist !== null)) {
                 tags.artist = item.artist || item.album_artist;
             }
@@ -564,7 +576,6 @@ var dialog = function() {
                         if (is_dir || item.type !== 'audio') {
                             return 1;
                         }
-                        var filename = item.name;
                         var tags = read_tags(item);
                         playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, duration: 0, cloud: {meta: tags, type: 'sd'}});
                     });
@@ -591,7 +602,6 @@ var dialog = function() {
                 if (is_dir) {
                     return 1;
                 }
-                var filename = item.name;
                 var tags = read_tags(item);
                 playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, duration: 0, cloud: {meta: tags, type: 'sd'}});
             });
@@ -631,7 +641,7 @@ var dialog = function() {
         });
         $('body').on('click', 'li.item', function() {
             var id = $(this).data("id");
-            _send('player', function(window) {
+            _send('player', function() {
                 context_menu[id].action();
             });
             window.close();

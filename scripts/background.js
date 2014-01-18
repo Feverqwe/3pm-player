@@ -33,6 +33,9 @@ var bg = function() {
                 left: storage.pos_left,
                 top: storage.pos_top
             });
+            /**
+             * @namespace chrome.app.window.create
+             */
             chrome.app.window.create('index.html', {
                 bounds: position,
                 frame: "none",
@@ -55,10 +58,13 @@ var bg = function() {
         }
     };
 }();
+/**
+ * @namespace chrome.app.runtime.onLaunched
+ */
 chrome.app.runtime.onLaunched.addListener(function() {
     bg.run_player();
 });
-chrome.runtime.onMessageExternal.addListener(function(msg, sender, resp) {
+chrome.runtime.onMessageExternal.addListener(function(msg) {
     if (msg === 'stop') {
         bg.run_player();
     }

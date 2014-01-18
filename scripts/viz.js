@@ -27,8 +27,13 @@ var viz = function() {
                 chrome.app.window.current().minimize();
             });
             $('.full').on('click', function() {
+                /**
+                 * @namespace document.webkitIsFullScreen
+                 * @namespace document.documentElement.webkitRequestFullScreen
+                 * @namespace document.webkitCancelFullScreen
+                 */
                 if (!document.webkitIsFullScreen) {
-                    document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                    document.documentElement.webkitRequestFullScreen();
                 } else {
                     document.webkitCancelFullScreen();
                 }
