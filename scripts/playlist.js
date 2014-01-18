@@ -190,7 +190,7 @@ var playlist = function() {
         /*
          * Выставляет заголовок плэйлистуы
          */
-        if (info === undefined) {
+        if (info === undefined || info.name === undefined) {
             info = {name: _lang.playlist_title};
         }
         dom_cache.title.text(info.name).attr('title', info.name);
