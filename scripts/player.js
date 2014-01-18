@@ -1,3 +1,9 @@
+/**
+ * @namespace chrome.fileSystem.chooseEntry
+ * @namespace chrome.contextMenus.removeAll
+ * @namespace document.webkitHidden
+ * @namespace chrome.app.window.current.onBoundsChanged
+ */
 (function(ns) {
     var view = ns.view = {};
     var dom_cache = {};
@@ -80,6 +86,11 @@
         return time;
     };
     var getEntryFromDir = function(entry, cb) {
+        /**
+         * @namespace entry.isDirectory
+         * @namespace entry.createReader
+         * @namespace dir.readEntries
+         */
         /*
          * Получает массив файлов - Entry из Entry дирректории.
          */
@@ -204,6 +215,10 @@
                 dune();
             };
             var readEntry = function(entry, file_tree) {
+                /**
+                 * @namespace sub_entry.isDirectory
+                 * @namespace sub_entry.fullPath
+                 */
                 /*
                  * ищет внутри всех папок, в соответствие с {} file_tree, и если внутри есть файлы из [] file_arr добавляет из в массив.
                  */
@@ -305,6 +320,9 @@
          * Есди найдет зоть один m3u открывает как плэйлист
          * Остальное - читает как массив файлов
          */
+        /**
+         * @namespace entry.webkitGetAsEntry
+         */
         if (!entry) {
             entry = [];
         }
@@ -313,7 +331,7 @@
         if (entry_length !== 0) {
             for (var i = 0; i < entry_length; i++) {
                 var item = entry[i];
-                if (entry[i].webkitGetAsEntry !== undefined) {
+                if (item.webkitGetAsEntry !== undefined) {
                     item = item.webkitGetAsEntry();
                 }
                 if (!item) {
@@ -597,11 +615,6 @@
             clearInterval(interval);
         };
         return {
-            reset_state: function() {
-                if (obj === undefined) {
-                    return;
-                }
-            },
             clear: function() {
                 if (obj === undefined) {
                     return;
@@ -698,7 +711,7 @@
                 type: "checkbox",
                 title: _lang.ctx_webui,
                 contexts: ['page', 'launcher'],
-                action: function(info) {
+                action: function() {
                     var state = webui.active();
                     if (state === false) {
                         webui.start();
@@ -842,6 +855,9 @@
             }
         };
         for (var key in context_menu) {
+            if (!context_menu.hasOwnProperty(key)) {
+                continue;
+            }
             context_menu[key].id = key;
         }
         chrome.contextMenus.removeAll(function() {
@@ -1145,6 +1161,9 @@
             var dpr = window.devicePixelRatio;
             var win_w = parseInt(275 * dpr);
             var win_h = parseInt(116 * dpr);
+            /**
+             * @namespace win.resizeTo
+             */
             win.resizeTo(win_w, win_h);
             $('.player').append(
                     $('<div>', {'class': "shuffle"}),
@@ -1277,6 +1296,9 @@
             engine.volume(storage.volume);
         });
         engine.setHotkeys(document);
+        /**
+         * @namespace info.menuItemId
+         */
         chrome.contextMenus.onClicked.addListener(function(info) {
             if (context_menu[info.menuItemId] !== undefined && context_menu[info.menuItemId].action !== undefined) {
                 context_menu[info.menuItemId].action(info);
@@ -1284,6 +1306,10 @@
         });
         dom_cache.body.on('drop', function(event) {
             event.preventDefault();
+            /**
+             * @namespace event.originalEvent.dataTransfer
+             * @namespace event.originalEvent.dataTransfer.files
+             */
             var files = event.originalEvent.dataTransfer.files;
             var entrys = event.originalEvent.dataTransfer.items;
             readFileArray(files, entrys);
@@ -1575,11 +1601,14 @@
         return context_menu;
     };
     view.readFileArray = readFileArray;
-})(this);
+})(window);
 (function() {
     var settings_ready = false;
     var dom_ready = false;
-    chrome.runtime.onMessage.addListener(function(msg, sender, resp) {
+    chrome.runtime.onMessage.addListener(function(msg) {
+        if (msg.settings !== undefined) {
+            view.updateSettings(msg.settings);
+        } eles
         if (msg === 'settings_ready') {
             settings_ready = true;
             if (dom_ready) {
@@ -1587,9 +1616,6 @@
                 settings_ready = undefined;
                 dom_ready = undefined;
             }
-        } else
-        if (msg.settings !== undefined) {
-            view.updateSettings(msg.settings);
         }
     });
     $(function() {
