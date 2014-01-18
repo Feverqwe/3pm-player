@@ -72,7 +72,7 @@ var playlist = function() {
                 var item = id[i];
                 _send('player', function(window) {
                     if (item !== 'none') {
-                        url = window.engine.getCover(item);
+                        url = window.engine.tags.getCover(item);
                     }
                     dom_list[i] = $('<style>', {'class': 'cover pic_' + item, text: '.pic_' + item + '{background-image:url(' + url + ');}'});
                 });
@@ -87,7 +87,7 @@ var playlist = function() {
             return;
         }
         _send('player', function(window) {
-            var url = window.engine.getCover(id);
+            var url = window.engine.tags.getCover(id);
             dom_cache.body.append($('<style>', {'class': 'cover pic_' + id, text: '.pic_' + id + '{background-image:url(' + url + ');}'}));
         });
     };
@@ -130,7 +130,7 @@ var playlist = function() {
         add_image(pic_list);
         dom_cache.playlist_ul.empty().append(dom_list);
         _send('player', function(window) {
-            playlist.selected(window.engine.getCurrentTrackID());
+            playlist.selected(window.engine.player.getCurrentTrackID());
         });
     };
     var update_playlist_item = function(id, item) {
@@ -293,11 +293,11 @@ var playlist = function() {
                         );
             }
             _send('player', function(window) {
-                writePlaylist(window.engine.getPlaylist());
-                window.engine.shuffle(null);
-                window.engine.loop(null);
+                writePlaylist(window.engine.playlist.getPlaylist());
+                window.engine.playlist.setShuffle(null);
+                window.engine.playlist.setLoop(null);
                 window.engine.setHotkeys(document);
-                selectPL(window.engine.getM3UPlaylists());
+                selectPL(window.engine.playlist.getM3UPlaylists());
             });
             $('.close').on('click', function() {
                 window.close();
@@ -308,7 +308,7 @@ var playlist = function() {
             dom_cache.playlist_ul.on('click', 'li', function() {
                 var id = $(this).attr('data-id');
                 _send('player', function(window) {
-                    window.engine.openById(id);
+                    window.engine.player.open(id);
                 });
             });
             dom_cache.playlist_ul.sortable({handle: ".move", axis: "y", stop: function() {
@@ -320,23 +320,23 @@ var playlist = function() {
                             var id = parseInt($(item).attr('data-id'));
                             new_playlist_order.push(id);
                         });
-                        window.engine.setSortedList(new_playlist_order, new_order_index);
+                        window.engine.playlist.setSortedList(new_playlist_order, new_order_index);
                     });
                 }
             });
             dom_cache.shuffle.on('click', function() {
                 _send('player', function(window) {
-                    window.engine.shuffle();
+                    window.engine.playlist.setShuffle();
                 });
             });
             dom_cache.loop.on('click', function() {
                 _send('player', function(window) {
-                    window.engine.loop();
+                    window.engine.playlist.setLoop();
                 });
             });
             dom_cache.order.on('click', function() {
                 _send('player', function(window) {
-                    var playlist_order = window.engine.getPlaylistOrder();
+                    var playlist_order = window.engine.playlist.getPlaylistOrder();
                     if (playlist_order[0] === undefined) {
                         return;
                     }
@@ -349,19 +349,19 @@ var playlist = function() {
                         }
                     }
                     if (next === 0 || next === -1) {
-                        writePlaylist(window.engine.setPlaylistOrder(next));
+                        writePlaylist(window.engine.playlist.setPlaylistOrder(next));
                     } else
                     if (next === 1) {
                         var new_playlist_order = playlist_order[0].slice();
                         var new_order_index = 1;
                         new_playlist_order = textSort(new_playlist_order);
-                        writePlaylist(window.engine.setSortedList(new_playlist_order, new_order_index));
+                        writePlaylist(window.engine.playlist.setSortedList(new_playlist_order, new_order_index));
                     } else
                     if (next === 2) {
                         var new_playlist_order = playlist_order[0].slice();
                         var new_order_index = 2;
                         new_playlist_order = numberSort(new_playlist_order);
-                        writePlaylist(window.engine.setSortedList(new_playlist_order, new_order_index));
+                        writePlaylist(window.engine.playlist.setSortedList(new_playlist_order, new_order_index));
                     }
                 });
             });
@@ -370,13 +370,13 @@ var playlist = function() {
             });
             $('.read_tags.btn').on('click', function() {
                 _send('player', function(window) {
-                    window.engine.readAllTags();
+                    window.engine.player.readAllTags();
                 });
             });
             dom_cache.pl_list.on('click', 'li', function() {
                 var id = $(this).data('id');
                 _send('player', function(window) {
-                    window.engine.selectPlaylist(id);
+                    window.engine.playlist.selectPlaylist(id);
                 });
                 $(this).parent().hide();
             });
@@ -386,7 +386,7 @@ var playlist = function() {
                 var entrys = event.originalEvent.dataTransfer.items;
                 _send('player', function(window) {
                     window.view.readFileArray(files, entrys, true, function(files) {
-                        window.engine.append(files);
+                        window.engine.playlist.append(files);
                     });
                 });
             });

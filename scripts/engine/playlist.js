@@ -128,7 +128,7 @@ var engine_playlist = function(mySettings, myEngine) {
             },
             setPlaylistOrder: function (new_order_index) {
                 e_playlist.order_index = new_order_index;
-                return engine.getPlaylist();
+                return e_playlist.getPlaylist();
             },
             getPlaylistOrder: function () {
                 return e_playlist.playlist_order;
@@ -136,7 +136,7 @@ var engine_playlist = function(mySettings, myEngine) {
             setSortedList: function (new_playlist_order, new_order_index) {
                 e_playlist.playlist_order[new_order_index] = new_playlist_order;
                 e_playlist.order_index = new_order_index;
-                return engine.getPlaylist();
+                return e_playlist.getPlaylist();
             },
             getM3UPlaylists: function () {
                 return M3UPlaylists;
@@ -156,7 +156,7 @@ var engine_playlist = function(mySettings, myEngine) {
                 var list = new Array(playlist_order_len);
                 for (var i = 0; i < playlist_order_len; i++) {
                     var track = e_playlist.playlist[playlist_ordered[i]];
-                    var tb = engine.getTagBody(track.id);
+                    var tb = engine.tags.getTagBody(track.id);
                     var title = tb.title;
                     if (tb.aa !== undefined) {
                         title += ' - ' + tb.aa;
@@ -257,7 +257,7 @@ var engine_playlist = function(mySettings, myEngine) {
                     });
                 }
                 _send('playlist', function (window) {
-                    window.playlist.setPlaylist(engine.getPlaylist());
+                    window.playlist.setPlaylist(e_playlist.getPlaylist());
                 });
             },
             selectPlaylist : function (id) {

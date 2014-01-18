@@ -27,8 +27,8 @@ var _debug = false;
  * @namespace window.webkitAudioContext
  * @namespace window.devicePixelRatio
  */
-(function (ns) {
-    var engine = ns.engine = {};
+(function () {
+    var engine = window.engine = {};
     //options
     var boot = true;
     var settings = window._settings = {
@@ -135,21 +135,9 @@ var _debug = false;
         }
         chrome.runtime.sendMessage({settings: changes});
     };
-    engine.play = engine.player.play;
-    engine.playToggle = engine.player.playToggle;
-    engine.openById = engine.player.open;
-    engine.pause = engine.player.pause;
-    engine.position = engine.player.position;
-    engine.volume = engine.player.volume;
-    engine.mute = engine.player.mute;
-    engine.getMute = engine.player.getMute;
-    engine.getAudio = engine.player.getAudio;
-    engine.getCover = engine.tags.getCover;
-    engine.getCurrentTrackID = engine.player.getCurrentTrackID;
     engine.APIstatus = function () {
         return JSON.stringify(engine.player.status());
     };
-    engine.getCurrentTrack = engine.playlist.getCurrentTrack;
     engine.open = function (files, info) {
         if (files.length === 0) {
             return;
@@ -165,7 +153,7 @@ var _debug = false;
             engine.playlist.playlist_info = info;
         }
         _send('playlist', function (window) {
-            window.playlist.setPlaylist(engine.getPlaylist());
+            window.playlist.setPlaylist(engine.playlist.getPlaylist());
         });
         view.state("playlist_not_empty");
         var id = 0;
@@ -175,76 +163,56 @@ var _debug = false;
         engine.player.open(id);
         engine.addInCtxMenu(engine.playlist.playlist_info);
     };
-    engine.append = engine.playlist.append;
-    engine.next = engine.playlist.next;
-    engine.preview = engine.playlist.preview;
-    engine.shuffle = engine.playlist.setShuffle;
-    engine.loop = engine.playlist.setLoop;
-    engine.getPlaylist = engine.playlist.getPlaylist;
-    engine.APIplaylist = engine.playlist.APIplaylist;
-    engine.setM3UPlaylists = engine.playlist.setM3UPlaylists;
-    engine.getM3UPlaylists = engine.playlist.getM3UPlaylists;
-    engine.setSortedList = engine.playlist.setSortedList;
-    engine.getPlaylistOrder = engine.playlist.getPlaylistOrder;
-    engine.setPlaylistOrder = engine.playlist.setPlaylistOrder;
-    engine.readAllTags = engine.player.readAllTags;
-    engine.getAdapter = engine.player.getAdapter;
-    engine.discAdapters = engine.player.discAdapters;
-    engine.getTagBody = engine.tags.getTagBody;
     engine.vizRandomPreset = function () {
         _send('viz', function (window) {
             window.viz.randomPreset();
         });
     };
-    engine.getAllowExt = function () {
-        return engine.player.allow_ext;
-    };
-    engine.canPlay = engine.player.canPlay;
     engine.setHotkeys = function (_document) {
         var progress_keydown_timer;
         $(_document).keydown(function (event) {
             if (event.ctrlKey || event.metaKey) {
                 if (event.keyCode === 38) {
                     event.preventDefault();
-                    engine.volume("+10");
+                    engine.player.volume("+10");
                 } else if (event.keyCode === 40) {
                     event.preventDefault();
-                    engine.volume("-10");
+                    engine.player.volume("-10");
                 } else if (event.keyCode === 39) {
                     event.preventDefault();
                     clearTimeout(progress_keydown_timer);
                     progress_keydown_timer = setTimeout(function () {
-                        engine.position("+10");
+                        engine.player.position("+10");
                     }, 25);
                 } else if (event.keyCode === 37) {
                     event.preventDefault();
                     clearTimeout(progress_keydown_timer);
                     progress_keydown_timer = setTimeout(function () {
-                        engine.position("-10");
+                        engine.player.position("-10");
                     }, 25);
                 }
             } else {
                 if (event.keyCode === 32 || event.keyCode === 179) {
                     event.preventDefault();
-                    engine.playToggle();
+                    engine.player.playToggle();
                 } else if (event.keyCode === 178) {
                     event.preventDefault();
-                    engine.pause();
+                    engine.player.pause();
                 } else if (event.keyCode === 86) {
                     event.preventDefault();
-                    engine.mute();
+                    engine.player.mute();
                 } else if (event.keyCode === 83) {
                     event.preventDefault();
-                    engine.shuffle();
+                    engine.playlist.setShuffle();
                 } else if (event.keyCode === 82) {
                     event.preventDefault();
-                    engine.loop();
+                    engine.playlist.setLoop();
                 } else if (event.keyCode === 113 || event.keyCode === 176) {
                     event.preventDefault();
-                    engine.next();
+                    engine.playlist.next();
                 } else if (event.keyCode === 112 || event.keyCode === 177) {
                     event.preventDefault();
-                    engine.preview();
+                    engine.playlist.preview();
                 } else if (event.keyCode === 78) {
                     event.preventDefault();
                     engine.vizRandomPreset();
@@ -255,7 +223,6 @@ var _debug = false;
             }
         });
     };
-    engine.selectPlaylist = engine.playlist.selectPlaylist;
     engine.showMenu = function () {
         engine.windowManager({type: 'dialog', config: {type: "menu", h: 290, w: 250, r: true, list: view.getContextMenu(), webui_state: engine.webui.active()}});
     };
@@ -293,4 +260,4 @@ var _debug = false;
         _windows[type].setBounds(params);
     };
     engine.windowManager = engine_wm(settings, engine);
-})(window);
+})();

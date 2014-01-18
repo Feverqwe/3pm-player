@@ -24,7 +24,7 @@ var engine_notification = function (mySettings,myEngine) {
                 opt.message = tb.aa;
             }
             if (tb.picture !== undefined) {
-                opt.iconUrl = engine.getCover(tb.picture);
+                opt.iconUrl = engine.tags.getCover(tb.picture);
             }
             return opt;
         };

@@ -68,8 +68,8 @@ var viz = function() {
         },
         run: function() {
             _send('player', function(window) {
-                audio = window.engine.getAudio();
-                setTags(window.engine.getTagBody());
+                audio = window.engine.player.getAudio();
+                setTags(window.engine.tags.getTagBody());
                 window.engine.setHotkeys(document);
             });
         },
@@ -90,7 +90,7 @@ var viz = function() {
         },
         getAdapter: function(cb) {
             _send('player', function(window) {
-                cb(window.engine.getAdapter());
+                cb(window.engine.player.getAdapter());
             });
         },
         dancerInit: function(val) {

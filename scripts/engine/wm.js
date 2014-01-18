@@ -11,25 +11,25 @@ var engine_wm = function(mySettings,myEngine) {
              Слушает глобальные горячие клавишь
              */
             if (msg === 'prev') {
-                engine.preview();
+                engine.playlist.preview();
             } else if (msg === 'next') {
-                engine.next();
+                engine.playlist.next();
             } else if (msg === 'pp') {
-                engine.playToggle();
+                engine.player.playToggle();
             } else if (msg === 'volu') {
-                engine.volume("+10");
+                engine.player.volume("+10");
             } else if (msg === 'vold') {
-                engine.volume("-10");
+                engine.player.volume("-10");
             } else if (msg === 'scru') {
-                engine.position("+10");
+                engine.player.position("+10");
             } else if (msg === 'scrd') {
-                engine.position("-10");
+                engine.player.position("-10");
             } else if (msg === 'shuffle') {
-                engine.shuffle();
+                engine.playlist.setShuffle();
             } else if (msg === 'loop') {
-                engine.loop();
+                engine.playlist.setLoop();
             } else if (msg === 'mute') {
-                engine.mute();
+                engine.player.mute();
             } else if (msg === 'menu') {
                 engine.showMenu();
             }
