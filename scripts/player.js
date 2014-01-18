@@ -707,11 +707,11 @@
                 title: _lang.ctx_webui,
                 contexts: ['page', 'launcher'],
                 action: function () {
-                    var state = webui.active();
+                    var state = engine.webui.active();
                     if (state === false) {
-                        webui.start();
+                        engine.webui.start();
                     } else {
-                        webui.stop();
+                        engine.webui.stop();
                     }
                 }
             },
@@ -731,7 +731,7 @@
                 title: "vk.com",
                 contexts: ['page', 'launcher'],
                 action: function () {
-                    cloud.vk.makeAlbums(function (list) {
+                    engine.cloud.vk.makeAlbums(function (list) {
                         engine.setM3UPlaylists({list: list});
                         if (list.length === 1) {
                             engine.selectPlaylist(list[0].id);
@@ -746,7 +746,7 @@
                 title: "soundcloud.com",
                 contexts: ['page', 'launcher'],
                 action: function () {
-                    cloud.sc.makeAlbums(function (list) {
+                    engine.cloud.sc.makeAlbums(function (list) {
                         engine.setM3UPlaylists({list: list});
                         if (list.length === 1) {
                             engine.selectPlaylist(list[0].id);
@@ -761,7 +761,7 @@
                 title: "drive.google.com",
                 contexts: ['page', 'launcher'],
                 action: function () {
-                    cloud.gd.getFilelist(undefined, function (list) {
+                    engine.cloud.gd.getFilelist(undefined, function (list) {
                         engine.windowManager({type: 'dialog', config: {type: "gd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
@@ -771,7 +771,7 @@
                 title: "dropbox.com",
                 contexts: ['page', 'launcher'],
                 action: function () {
-                    cloud.db.getFilelist(function (list) {
+                    engine.cloud.db.getFilelist(function (list) {
                         engine.windowManager({type: 'dialog', config: {type: "db", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
@@ -781,7 +781,7 @@
                 title: "box.com",
                 contexts: ['page', 'launcher'],
                 action: function () {
-                    cloud.box.getFilelist(function (list) {
+                    engine.cloud.box.getFilelist(function (list) {
                         engine.windowManager({type: 'dialog', config: {type: "box", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
@@ -791,7 +791,7 @@
                 title: "skydrive.com",
                 contexts: ['page', 'launcher'],
                 action: function () {
-                    cloud.sd.getFilelist(undefined, function (list) {
+                    engine.cloud.sd.getFilelist(undefined, function (list) {
                         engine.windowManager({type: 'dialog', config: {type: "sd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
@@ -831,7 +831,7 @@
                 action: function () {
                     var track = engine.getCurrentTrack();
                     if (track !== undefined && track.cloud.track_id !== undefined) {
-                        cloud.vk.addInLibrarty(track.cloud.track_id, track.cloud.owner_id);
+                        engine.cloud.vk.addInLibrarty(track.cloud.track_id, track.cloud.owner_id);
                     }
                 }
             },
@@ -842,7 +842,7 @@
                 action: function () {
                     var track = engine.getCurrentTrack();
                     if (track !== undefined && track.cloud.track_id !== undefined) {
-                        cloud.sc.addInFavorite(track.cloud.track_id);
+                        engine.cloud.sc.addInFavorite(track.cloud.track_id);
                     }
                 }
             }
@@ -871,7 +871,7 @@
                 }
                 chrome.contextMenus.create(item);
             });
-            chrome.contextMenus.update("webUI", {checked: webui.active()});
+            chrome.contextMenus.update("webUI", {checked: engine.webui.active()});
         });
     };
     var make_extend_volume = function (extend_volume_scroll) {

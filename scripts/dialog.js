@@ -99,7 +99,7 @@ var dialog = function() {
                 }
             }
             _send('player', function(window) {
-                window.cloud.db.getFilelist(function(list) {
+                window.engine.cloud.db.getFilelist(function(list) {
                     db_writefilelist(list);
                 }, root, path);
             });
@@ -132,7 +132,7 @@ var dialog = function() {
             var root = item.root;
             var _window = window;
             _send('player', function(window) {
-                window.cloud.db.getFilelist(function(list) {
+                window.engine.cloud.db.getFilelist(function(list) {
                     var pl_name = list.path.split('/').slice(-1)[0] || "Dropbox";
                     var playlist = {name: pl_name, id: 0, type: "db", tracks: []};
                     list.contents.forEach(function(item) {
@@ -236,7 +236,7 @@ var dialog = function() {
                 }
             }
             _send('player', function(window) {
-                window.cloud.gd.getFilelist(folder_id, function(list) {
+                window.engine.cloud.gd.getFilelist(folder_id, function(list) {
                     gd_writefilelist(list, folder_id);
                 });
             });
@@ -270,7 +270,7 @@ var dialog = function() {
             var _window = window;
             var pl_name = item.title || "Google Drive";
             _send('player', function(window) {
-                window.cloud.gd.getFilelist(folder_id, function(list) {
+                window.engine.cloud.gd.getFilelist(folder_id, function(list) {
                     var playlist = {name: pl_name, id: 0, type: "gd", tracks: []};
                     list.items.reverse();
                     list.items.forEach(function(item) {
@@ -376,7 +376,7 @@ var dialog = function() {
                 }
             }
             _send('player', function(window) {
-                window.cloud.box.getFilelist(function(list) {
+                window.engine.cloud.box.getFilelist(function(list) {
                     box_writefilelist(list);
                 }, folder_id);
             });
@@ -409,7 +409,7 @@ var dialog = function() {
             var folder_name = item.name;
             var _window = window;
             _send('player', function(window) {
-                window.cloud.box.getFilelist(function(list) {
+                window.engine.cloud.box.getFilelist(function(list) {
                     var playlist = {name: folder_name, id: 0, type: "box", tracks: []};
                     list.entries.forEach(function(item) {
                         var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
@@ -523,7 +523,7 @@ var dialog = function() {
                 }
             }
             _send('player', function(window) {
-                window.cloud.sd.getFilelist(folder_id, function(list) {
+                window.engine.cloud.sd.getFilelist(folder_id, function(list) {
                     sd_writefilelist(list, folder_id);
                 });
             });
@@ -557,7 +557,7 @@ var dialog = function() {
             var _window = window;
             var pl_name = item.name || "SkyDrive";
             _send('player', function(window) {
-                window.cloud.sd.getFilelist(folder_id, function(list) {
+                window.engine.cloud.sd.getFilelist(folder_id, function(list) {
                     var playlist = {name: pl_name, id: 0, type: "sd", tracks: []};
                     list.data.forEach(function(item) {
                         var is_dir = (item.type === 'folder');
@@ -607,7 +607,7 @@ var dialog = function() {
     };
     var menuChiser = function() {
         /*
-         * Создает форму выбора m3u файла
+         * Создает форму меню
          */
         var context_menu = window.options.list;
         var webui_state = window.options.webui_state;
