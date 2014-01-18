@@ -292,5 +292,5 @@ var _debug = false;
         }
         _windows[type].setBounds(params);
     };
-    engine.windowManager = engine_windows(settings, engine);
+    engine.windowManager = engine_wm(settings, engine);
 })(window);

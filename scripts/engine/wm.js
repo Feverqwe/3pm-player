@@ -1,8 +1,8 @@
-var engine_windows = function(mySettings,myEngine) {
-    delete window.engine_windows;
+var engine_wm = function(mySettings,myEngine) {
+    delete window.engine_wm;
     var settings = mySettings;
     var engine = myEngine;
-    var e_windows = function () {
+    var e_wm = function () {
         /*
          Все что связано с окнами и их взаимодействием
          */
@@ -302,5 +302,5 @@ var engine_windows = function(mySettings,myEngine) {
             }
         }
     }();
-    return e_windows;
+    return e_wm;
 };

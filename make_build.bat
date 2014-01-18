@@ -15,12 +15,24 @@ copy .\*.png .\build\.
 java -jar compiler.jar --js .\www\js\main.js --js_output_file .\build\www\js\main.js
 :: make background.js
 java -jar compiler.jar --js .\scripts\background.js --js_output_file .\build\scripts\background.js
-:: make webui.js
-java -jar compiler.jar --js .\scripts\webui.js --js_output_file .\build\scripts\webui.js
 :: make engine.js
 java -jar compiler.jar --js .\scripts\engine.js --js_output_file .\build\scripts\engine.js
-:: make cloud.js
-java -jar compiler.jar --js .\scripts\cloud.js --js_output_file .\build\scripts\cloud.js
+:: make engine/cloud.js
+java -jar compiler.jar --js .\scripts\engine\cloud.js --js_output_file .\build\scripts\engine\cloud.js
+:: make engine/lastfm.js
+java -jar compiler.jar --js .\scripts\engine\lastfm.js --js_output_file .\build\scripts\engine\lastfm.js
+:: make engine/notification.js
+java -jar compiler.jar --js .\scripts\engine\notification.js --js_output_file .\build\scripts\engine\notification.js
+:: make engine/player.js
+java -jar compiler.jar --js .\scripts\engine\player.js --js_output_file .\build\scripts\engine\player.js
+:: make engine/playlist.js
+java -jar compiler.jar --js .\scripts\engine\playlist.js --js_output_file .\build\scripts\engine\playlist.js
+:: make engine/tags.js
+java -jar compiler.jar --js .\scripts\engine\tags.js --js_output_file .\build\scripts\engine\tags.js
+:: make engine/webui.js
+java -jar compiler.jar --js .\scripts\engine\webui.js --js_output_file .\build\scripts\engine\webui.js
+:: make engine/wm.js
+java -jar compiler.jar --js .\scripts\engine\wm.js --js_output_file .\build\scripts\engine\wm.js
 :: make id3-minimized.js
 java -jar compiler.jar --js .\scripts\id3-minimized.js --js_output_file .\build\scripts\id3-minimized.js
 :: make player.js
@@ -37,8 +49,6 @@ java -jar compiler.jar --js .\scripts\lang.js --js_output_file .\build\scripts\l
 java -jar compiler.jar --js .\scripts\options.js --js_output_file .\build\scripts\options.js
 :: make spark-md5.js
 java -jar compiler.jar --js .\scripts\spark-md5.js --js_output_file .\build\scripts\spark-md5.js
-:: make lastfm.js
-java -jar compiler.jar --js .\scripts\lastfm.js --js_output_file .\build\scripts\lastfm.js
 
 :: make dancer.js
 java -jar compiler.jar --js .\scripts\dancer\dancer.js --js_output_file .\build\scripts\dancer\dancer.js
