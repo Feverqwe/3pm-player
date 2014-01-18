@@ -179,7 +179,7 @@ var playlist = function() {
         /*
          * Показывает скрываает кнопку отображения скписка плэйлстов.
          */
-        if (playlist !== undefined) {
+        if (playlist.list !== undefined) {
             makeSelectList(playlist.list);
             $('.playlist_select').show();
         } else {

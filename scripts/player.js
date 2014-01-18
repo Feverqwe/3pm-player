@@ -685,7 +685,7 @@
                 contexts: ['page', 'launcher'],
                 action: function() {
                     var playlists = engine.getM3UPlaylists();
-                    if (playlists === undefined) {
+                    if (playlists.list === undefined) {
                         return;
                     }
                     var list = playlists.list;
