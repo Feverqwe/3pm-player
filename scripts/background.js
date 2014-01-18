@@ -47,7 +47,7 @@ var bg = function() {
     };
     return {
         run_player: function() {
-            chrome.runtime.sendMessage(chrome.runtime.id, '_player_', function(res) {
+            chrome.runtime.sendMessage('_player_', function(res) {
                 if (res === undefined) {
                     create_player();
                 }

@@ -1542,9 +1542,13 @@
             engine.play();
         }
     };
-    view.updateSettings = function() {
-        make_extend_volume(_settings.extend_volume_scroll);
-        writeWinampFFT();
+    view.updateSettings = function(changes) {
+        if (changes.extend_volume_scroll !== undefined) {
+            make_extend_volume(changes.extend_volume_scroll);
+        }
+        if (changes.visual_type !== undefined) {
+            writeWinampFFT();
+        }
         if (_lang.t !== window._language) {
             window._language = _lang.t;
             write_language();
@@ -1584,8 +1588,8 @@
                 dom_ready = undefined;
             }
         } else
-        if (msg === 'settings_changed') {
-            view.updateSettings();
+        if (msg.settings !== undefined) {
+            view.updateSettings(msg.settings);
         }
     });
     $(function() {

@@ -26,9 +26,33 @@ var _debug = false;
         pined_playlist: 0,
         pin_position: 2
     };
-    chrome.storage.local.get(function(obj) {
-        engine.loadSettings(obj);
-    });
+    (function() {
+        var list = [];
+        for (var key in settings) {
+            list.push(key);
+        }
+        chrome.storage.local.get(list, function(obj) {
+            engine.loadSettings(obj);
+        });
+    })();
+    engine.loadSettings = function(obj) {
+        var changes = {};
+        for (var key in settings) {
+            if (obj[key] !== undefined && settings[key] !== obj[key]) {
+                settings[key] = obj[key];
+                changes[key] = obj[key];
+            }
+        }
+        if (boot) {
+            chrome.runtime.sendMessage('settings_ready');
+            boot = false;
+            return;
+        }
+        if ((changes.webui_port !== undefined || changes.webui_interface !== undefined) && webui.active()) {
+            webui.start();
+        }
+        chrome.runtime.sendMessage({settings: changes});
+    };
     //<<<<<<<
     //allow_ext - only for files without mime.
     var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
@@ -1213,23 +1237,6 @@ var _debug = false;
             engine.showMenu();
         }
     });
-    engine.loadSettings = function(obj) {
-        var _old_settings = JSON.parse(JSON.stringify(settings));
-        $.each(settings, function(k) {
-            if (obj[k] !== undefined) {
-                settings[k] = obj[k];
-            }
-        });
-        if (boot) {
-            chrome.runtime.sendMessage(chrome.runtime.id, 'settings_ready');
-            boot = undefined;
-            return;
-        }
-        if ((settings.webui_port !== _old_settings.webui_port || settings.webui_interface !== _old_settings.webui_interface) && webui.active()) {
-            webui.start();
-        }
-        chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
-    };
     var readTrackList = function(files) {
         var my_playlist = [];
         var my_playlist_order = {0: []};
