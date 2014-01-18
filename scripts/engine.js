@@ -66,6 +66,11 @@ var _debug = false;
             engine.loadSettings(obj);
         });
     })();
+    //<<<<<<<
+    //allow_ext - only for files without mime.
+    var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
+    var covers = [];
+    var var_cache = {};
     engine.loadSettings = function (obj) {
         var changes = {};
         for (var key in settings) {
@@ -87,9 +92,31 @@ var _debug = false;
         }
         chrome.runtime.sendMessage({settings: changes});
     };
-    //<<<<<<<
-    //allow_ext - only for files without mime.
-    var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
+    chrome.runtime.onMessageExternal.addListener(function (msg) {
+        if (msg === 'prev') {
+            engine.preview();
+        } else if (msg === 'next') {
+            engine.next();
+        } else if (msg === 'pp') {
+            engine.playToggle();
+        } else if (msg === 'volu') {
+            engine.volume("+10");
+        } else if (msg === 'vold') {
+            engine.volume("-10");
+        } else if (msg === 'scru') {
+            engine.position("+10");
+        } else if (msg === 'scrd') {
+            engine.position("-10");
+        } else if (msg === 'shuffle') {
+            engine.shuffle();
+        } else if (msg === 'loop') {
+            engine.loop();
+        } else if (msg === 'mute') {
+            engine.mute();
+        } else if (msg === 'menu') {
+            engine.showMenu();
+        }
+    });
     var e_pl = engine._playlist = {
         playlist: [],
         playlist_info: {name: '3pm-player'},
@@ -277,8 +304,6 @@ var _debug = false;
             view.setShuffle(e_pl.shuffle);
         }
     };
-    var covers = [];
-    var var_cache = {};
     var resetPlayer = function () {
         /*
          * Функция сброса плеера.
@@ -1223,31 +1248,6 @@ var _debug = false;
             }
         });
     };
-    chrome.runtime.onMessageExternal.addListener(function (msg) {
-        if (msg === 'prev') {
-            engine.preview();
-        } else if (msg === 'next') {
-            engine.next();
-        } else if (msg === 'pp') {
-            engine.playToggle();
-        } else if (msg === 'volu') {
-            engine.volume("+10");
-        } else if (msg === 'vold') {
-            engine.volume("-10");
-        } else if (msg === 'scru') {
-            engine.position("+10");
-        } else if (msg === 'scrd') {
-            engine.position("-10");
-        } else if (msg === 'shuffle') {
-            engine.shuffle();
-        } else if (msg === 'loop') {
-            engine.loop();
-        } else if (msg === 'mute') {
-            engine.mute();
-        } else if (msg === 'menu') {
-            engine.showMenu();
-        }
-    });
     var readTrackList = function (files) {
         var my_playlist = [];
         var my_playlist_order = {0: []};
