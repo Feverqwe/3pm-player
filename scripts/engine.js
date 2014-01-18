@@ -535,10 +535,11 @@ var _debug = false;
         }
     });
     engine.loadSettings = function(obj) {
-        var _old_settings = JSON.parse(JSON.stringify(settings));
+        var changes = {};
         $.each(settings, function(k) {
-            if (obj[k] !== undefined) {
+            if (obj[k] !== undefined && settings[k] !== obj[k]) {
                 settings[k] = obj[k];
+                changes[k] = obj[k];
             }
         });
         if (boot) {
@@ -546,7 +547,7 @@ var _debug = false;
             boot = undefined;
             return;
         }
-        if ((settings.webui_port !== _old_settings.webui_port || settings.webui_interface !== _old_settings.webui_interface) && webui.active()) {
+        if ((changes.webui_port !== undefined || changes.webui_interface !== undefined) && webui.active()) {
             webui.start();
         }
         chrome.runtime.sendMessage(chrome.runtime.id, 'settings_changed');
