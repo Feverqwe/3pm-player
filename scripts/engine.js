@@ -143,7 +143,7 @@ var _debug = false;
             //массив плэйлиста
             e_pl.playlist = [];
             //название плэйлиста
-            e_pl.playlist_info = undefined;
+            e_pl.playlist_info = {name: '3pm-player'};
             //индекс сортировки
             e_pl.order_index = 0;
             //порядок сортровки
