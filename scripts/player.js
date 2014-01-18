@@ -4,7 +4,7 @@
  * @namespace document.webkitHidden
  * @namespace chrome.app.window.current.onBoundsChanged
  */
-(function(ns) {
+(function (ns) {
     var view = ns.view = {};
     var dom_cache = {};
     var var_cache = {};
@@ -13,7 +13,7 @@
     var is_winamp = true;
     var visual_cache = {};
     var context_menu = undefined;
-    var isPlaying = function() {
+    var isPlaying = function () {
         /*
          * Выставляет статус - проигрывается.
          */
@@ -22,7 +22,7 @@
         }
         dom_cache.btnPlayPause.removeClass('play').addClass('pause');
     };
-    var isPause = function() {
+    var isPause = function () {
         /*
          * Выставляет статус - пауза.
          */
@@ -31,7 +31,7 @@
         }
         dom_cache.btnPlayPause.removeClass('pause').addClass('play');
     };
-    var showImage = function(id) {
+    var showImage = function (id) {
         /*
          * Отображает изображение, получает картинку из engine
          */
@@ -40,12 +40,12 @@
         if (dom_cache.picture_url !== url) {
             dom_cache.picture_url = url;
             clearTimeout(dom_cache.picture_timer);
-            dom_cache.picture_timer = setTimeout(function() {
+            dom_cache.picture_timer = setTimeout(function () {
                 dom_cache.picture.css('background-image', img_url);
             }, 50);
         }
     };
-    var hideImage = function() {
+    var hideImage = function () {
         /*
          * Выставляет статус - без обложки.
          */
@@ -54,12 +54,12 @@
         if (dom_cache.picture_url !== url) {
             dom_cache.picture_url = url;
             clearTimeout(dom_cache.picture_timer);
-            dom_cache.picture_timer = setTimeout(function() {
+            dom_cache.picture_timer = setTimeout(function () {
                 dom_cache.picture.css('background-image', img_url);
             }, 50);
         }
     };
-    var toHHMMSS = function(val) {
+    var toHHMMSS = function (val) {
         /*
          * Выводит время трека.
          */
@@ -85,7 +85,7 @@
         }
         return time;
     };
-    var getEntryFromDir = function(entry, cb) {
+    var getEntryFromDir = function (entry, cb) {
         /**
          * @namespace entry.isDirectory
          * @namespace entry.createReader
@@ -99,11 +99,11 @@
             return;
         }
         var dir = entry.createReader();
-        dir.readEntries(function(a) {
+        dir.readEntries(function (a) {
             cb(a);
         });
     };
-    var entry2files = function(entry, cb) {
+    var entry2files = function (entry, cb) {
         /*
          * Переводит массив entry в массива file
          */
@@ -114,29 +114,29 @@
             return;
         }
         var dune_count = 0;
-        var dune = function() {
+        var dune = function () {
             dune_count++;
             if (dune_count === entry_len) {
                 cb(files);
             }
         };
-        entry.forEach(function(item) {
+        entry.forEach(function (item) {
             if (item.isDirectory) {
                 dune();
                 return 1;
             }
-            item.file(function(file) {
+            item.file(function (file) {
                 files.push(file);
                 dune();
             });
         });
     };
-    var readDirectoryWithM3U = function(entrys, entry) {
+    var readDirectoryWithM3U = function (entrys, entry) {
         var playlists = {};
         var playlist_count = entrys.length;
         var playlist_dune_count = 0;
         var fileMede = false;
-        var dune = function() {
+        var dune = function () {
             /*
              * Получает команду готово как только один из плэйлистов будет заполнен.
              * Когла получит все плэйлисты - отдает диалог выбора их.
@@ -146,13 +146,13 @@
                 return;
             }
             var playlist = [];
-            $.each(playlists, function(key, item) {
+            $.each(playlists, function (key, item) {
                 if (item.length === 0) {
                     return 1;
                 }
                 var urls = [];
                 var ent = [];
-                item.forEach(function(itm) {
+                item.forEach(function (itm) {
                     if (typeof (itm) === 'string') {
                         urls.push({url: itm});
                     } else {
@@ -173,18 +173,17 @@
                     playlist.push({name: name, entrys: item, id: playlist.length, type: "m3u"});
                 }
             });
-            playlist.sort(function(a, b) {
+            playlist.sort(function (a, b) {
                 return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
             });
             engine.setM3UPlaylists({list: playlist});
             if (playlist.length === 1) {
                 engine.selectPlaylist(playlist[0].id);
-            } else
-            if (playlist.length > 0) {
+            } else if (playlist.length > 0) {
                 engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
             }
         };
-        var readM3U = function(content, name) {
+        var readM3U = function (content, name) {
             /*
              * Читает m3u файл и строит дерево каталогов
              */
@@ -192,7 +191,7 @@
             var stream_count = 0;
             var stream_got = 0;
             var file_list = [];
-            var file_getter = function(files) {
+            var file_getter = function (files) {
                 /*
                  * Получает файлы в плэйлисте, как только находит все - говорит что готово
                  */
@@ -214,7 +213,7 @@
                 playlists[name] = arr;
                 dune();
             };
-            var readEntry = function(entry, file_tree) {
+            var readEntry = function (entry, file_tree) {
                 /**
                  * @namespace sub_entry.isDirectory
                  * @namespace sub_entry.fullPath
@@ -223,12 +222,12 @@
                  * ищет внутри всех папок, в соответствие с {} file_tree, и если внутри есть файлы из [] file_arr добавляет из в массив.
                  */
                 stream_count++;
-                getEntryFromDir(entry, function(sub_entry) {
+                getEntryFromDir(entry, function (sub_entry) {
                     var len = sub_entry.length;
                     var files = [];
                     for (var n = 0; n < len; n++) {
                         if (sub_entry[n].isDirectory) {
-                            $.each(file_tree, function(item) {
+                            $.each(file_tree, function (item) {
                                 if (sub_entry[n].fullPath === item) {
                                     readEntry(sub_entry[n], file_tree);
                                 }
@@ -274,8 +273,7 @@
                 for (var n = 0; n < path_len; n++) {
                     if (file_tree[path] === undefined) {
                         file_tree[path] = {files: [path_arr[n]]};
-                    } else
-                    if (file_tree[path].files.indexOf(path_arr[n]) === -1) {
+                    } else if (file_tree[path].files.indexOf(path_arr[n]) === -1) {
                         file_tree[path].files.push(path_arr[n]);
                     }
                     path += "/" + path_arr[n];
@@ -287,12 +285,12 @@
                 readEntry(entry, file_tree);
             }
         };
-        var openM3U = function(file) {
+        var openM3U = function (file) {
             /*
              * Получает контент m3u
              */
             var r = new FileReader();
-            r.onload = function() {
+            r.onload = function () {
                 var playlist_name = file.name.substr(0, file.name.length - 1 - 3);
                 readM3U(r.result, playlist_name);
             };
@@ -301,18 +299,18 @@
         if (entrys.file !== undefined) {
             fileMede = true;
             playlist_count = 1;
-            entrys.file(function(file) {
+            entrys.file(function (file) {
                 openM3U(file);
             });
         } else {
-            entry2files(entrys, function(files) {
-                files.forEach(function(file) {
+            entry2files(entrys, function (files) {
+                files.forEach(function (file) {
                     openM3U(file);
                 });
             });
         }
     };
-    var readFileArray = function(files, entry, files_only, cb) {
+    var readFileArray = function (files, entry, files_only, cb) {
         /*
          * Читает массив файлов
          * Если есть entry - использут его, если нету - то files.
@@ -355,7 +353,7 @@
                     entrys.push(item);
                 }
             }
-            entry2files(entrys, function(files) {
+            entry2files(entrys, function (files) {
                 if (cb === undefined) {
                     engine.open(files, {name: undefined});
                 } else {
@@ -382,11 +380,11 @@
             }
         }
     };
-    var readDirectory = function(entry) {
+    var readDirectory = function (entry) {
         /*
          * Читает открытую дирректорию, аналиpирует куда направить работу с дирректорией - в m3u или в чтение подкаталогов
          */
-        getEntryFromDir(entry, function(sub_entry) {
+        getEntryFromDir(entry, function (sub_entry) {
             var sub_entry_len = sub_entry.length;
             var dir_count = 0;
             var file_count = 0;
@@ -406,21 +404,20 @@
             }
             if (file_count === 0 && dir_count === 0 && m3u.length === 0) {
                 return;
-            } else
-            if (m3u.length > 0) {
+            } else if (m3u.length > 0) {
                 readDirectoryWithM3U(m3u, entry);
             } else {
                 readDirectoryWithSub(entry);
             }
         });
     };
-    var findMusicInFolder = function(entry, cb) {
+    var findMusicInFolder = function (entry, cb) {
         /*
          * Проверяет наличие хотя бы одного файла в каталоге.
          */
-        getEntryFromDir(entry, function(sub_entry) {
+        getEntryFromDir(entry, function (sub_entry) {
             var sub_entry_len = sub_entry.length;
-            var next = function(i) {
+            var next = function (i) {
                 if (i >= sub_entry_len) {
                     cb(false);
                     return;
@@ -430,7 +427,7 @@
                     next(i + 1);
                     return;
                 }
-                item.file(function(file) {
+                item.file(function (file) {
                     if (engine.canPlay(file.type)) {
                         cb(true);
                     } else {
@@ -441,26 +438,26 @@
             next(0);
         });
     };
-    var getFilesFromFolder = function(entry, cb) {
+    var getFilesFromFolder = function (entry, cb) {
         /*
          * Отдает список файлов в папке
          */
-        getEntryFromDir(entry, function(sub_entry) {
-            sub_entry.sort(function(a, b) {
+        getEntryFromDir(entry, function (sub_entry) {
+            sub_entry.sort(function (a, b) {
                 return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
             });
-            entry2files(sub_entry, function(files) {
+            entry2files(sub_entry, function (files) {
                 cb(files);
             });
         });
     };
-    var readDirectoryWithSub = function(entry) {
+    var readDirectoryWithSub = function (entry) {
         /*
          * Читает дирректорию и дирректории внутри их..
          * Уровень вложенности - 1.
          * Формирует плэйлисты из вложенных папок.
          */
-        getEntryFromDir(entry, function(sub_entry) {
+        getEntryFromDir(entry, function (sub_entry) {
             var list_dir = [];
             var add_root = false;
             var sub_entry_len = sub_entry.length;
@@ -477,24 +474,23 @@
             var playlist = [];
             var list_dir_len = list_dir.length;
             var dune_count = 0;
-            var dune = function() {
+            var dune = function () {
                 dune_count++;
                 if (dune_count !== list_dir_len || playlist.length === 0) {
                     return;
                 }
-                playlist.sort(function(a, b) {
+                playlist.sort(function (a, b) {
                     return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
                 });
                 engine.setM3UPlaylists({list: playlist});
                 if (playlist.length === 1) {
                     engine.selectPlaylist(playlist[0].id);
-                } else
-                if (playlist.length > 0) {
+                } else if (playlist.length > 0) {
                     engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
                 }
             };
-            list_dir.forEach(function(item) {
-                findMusicInFolder(item, function(canplay) {
+            list_dir.forEach(function (item) {
+                findMusicInFolder(item, function (canplay) {
                     if (canplay) {
                         playlist.push({name: item.name, entry: item, id: playlist.length, type: "subfiles"});
                     }
@@ -503,7 +499,7 @@
             });
         });
     };
-    var preBufferingController = function() {
+    var preBufferingController = function () {
         /*
          * Управляет полоской буферизации
          */
@@ -511,7 +507,7 @@
         var interval = undefined;
         var state = "";
         var obj = undefined;
-        var state_download = function(width) {
+        var state_download = function (width) {
             if (state !== "download") {
                 reset_state();
                 state = "download";
@@ -524,7 +520,7 @@
             cache.width = width;
             obj.css({width: width + "%"});
         };
-        var state_pos = function(left, width) {
+        var state_pos = function (left, width) {
             if (state !== "pos") {
                 reset_state();
                 state = "pos";
@@ -536,7 +532,7 @@
             cache.width = width;
             obj.css({"left": left + "%", "width": width + "%"});
         };
-        var state_hide = function() {
+        var state_hide = function () {
             if (state === "hide") {
                 stop();
                 return;
@@ -546,7 +542,7 @@
             stop();
             state = "hide";
         };
-        var state_loading = function() {
+        var state_loading = function () {
             if (state === "loading") {
                 stop();
                 return;
@@ -556,7 +552,7 @@
             stop();
             state = "loading";
         };
-        var state_inf = function() {
+        var state_inf = function () {
             if (state === "inf") {
                 stop();
                 return;
@@ -566,18 +562,17 @@
             stop();
             state = "inf";
         };
-        var reset_state = function() {
+        var reset_state = function () {
             cache = {};
             obj.css({left: 0, width: "100%", display: "block"}).attr('class', 'loaded');
             if (state === "inf" || state === "loading") {
                 obj.parent().removeClass("stream");
-            } else
-            if (state === "download") {
+            } else if (state === "download") {
                 obj.parent().removeClass("download");
             }
             state = "";
         };
-        var update = function() {
+        var update = function () {
             if (obj === undefined) {
                 return;
             }
@@ -611,46 +606,46 @@
             var pr = r_p - l_p;
             state_pos(l_p, pr);
         };
-        var stop = function() {
+        var stop = function () {
             clearInterval(interval);
         };
         return {
-            clear: function() {
+            clear: function () {
                 if (obj === undefined) {
                     return;
                 }
             },
-            setObj: function(progress) {
+            setObj: function (progress) {
                 obj = progress;
             },
-            start: function() {
+            start: function () {
                 if (obj === undefined) {
                     return;
                 }
                 stop();
-                interval = setInterval(function() {
+                interval = setInterval(function () {
                     update();
                 }, 1000);
             },
-            stop: function() {
+            stop: function () {
                 stop();
             },
-            update: function() {
+            update: function () {
                 update();
             },
-            hide: function() {
+            hide: function () {
                 state_hide();
             },
-            loading: function() {
+            loading: function () {
                 state_loading();
             },
             obj: obj,
-            download: function(value) {
+            download: function (value) {
                 state_download(value);
             }
         };
     }();
-    var makeCtxMenu = function() {
+    var makeCtxMenu = function () {
         /*
          * Формирует контекстное меню
          */
@@ -658,15 +653,15 @@
             openFiles: {
                 title: _lang.ctx_open_files,
                 contexts: ['page', 'launcher'],
-                action: function() {
+                action: function () {
                     $('.click_for_open').trigger('click');
                 }
             },
             openDirectory: {
                 title: _lang.ctx_open_folder,
                 contexts: ['page', 'launcher'],
-                action: function() {
-                    chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
+                action: function () {
+                    chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function (entry) {
                         if (!entry) {
                             return;
                         }
@@ -677,8 +672,8 @@
             openFolderWithSubfolders: {
                 title: _lang.ctx_open_folder_sub,
                 contexts: ['page', 'launcher'],
-                action: function() {
-                    chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function(entry) {
+                action: function () {
+                    chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function (entry) {
                         if (!entry) {
                             return;
                         }
@@ -689,14 +684,14 @@
             openURL: {
                 title: _lang.ctx_open_url,
                 contexts: ['page', 'launcher'],
-                action: function() {
+                action: function () {
                     engine.windowManager({type: 'dialog', config: {type: "url", h: 60}});
                 }
             },
             selectPlaylist: {
                 title: _lang.playlist_select,
                 contexts: ['page', 'launcher'],
-                action: function() {
+                action: function () {
                     var playlists = engine.getM3UPlaylists();
                     if (playlists.list === undefined) {
                         return;
@@ -711,7 +706,7 @@
                 type: "checkbox",
                 title: _lang.ctx_webui,
                 contexts: ['page', 'launcher'],
-                action: function() {
+                action: function () {
                     var state = webui.active();
                     if (state === false) {
                         webui.start();
@@ -723,7 +718,7 @@
             viz: {
                 title: _lang.ctx_viz,
                 contexts: ['page', 'launcher'],
-                action: function() {
+                action: function () {
                     engine.windowManager({type: 'viz'});
                 }
             },
@@ -735,13 +730,12 @@
                 parentId: "cloud",
                 title: "vk.com",
                 contexts: ['page', 'launcher'],
-                action: function() {
-                    cloud.vk.makeAlbums(function(list) {
+                action: function () {
+                    cloud.vk.makeAlbums(function (list) {
                         engine.setM3UPlaylists({list: list});
                         if (list.length === 1) {
                             engine.selectPlaylist(list[0].id);
-                        } else
-                        if (list.length > 0) {
+                        } else if (list.length > 0) {
                             engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                         }
                     });
@@ -751,13 +745,12 @@
                 parentId: "cloud",
                 title: "soundcloud.com",
                 contexts: ['page', 'launcher'],
-                action: function() {
-                    cloud.sc.makeAlbums(function(list) {
+                action: function () {
+                    cloud.sc.makeAlbums(function (list) {
                         engine.setM3UPlaylists({list: list});
                         if (list.length === 1) {
                             engine.selectPlaylist(list[0].id);
-                        } else
-                        if (list.length > 0) {
+                        } else if (list.length > 0) {
                             engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
                         }
                     });
@@ -767,8 +760,8 @@
                 parentId: "cloud",
                 title: "drive.google.com",
                 contexts: ['page', 'launcher'],
-                action: function() {
-                    cloud.gd.getFilelist(undefined, function(list) {
+                action: function () {
+                    cloud.gd.getFilelist(undefined, function (list) {
                         engine.windowManager({type: 'dialog', config: {type: "gd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
@@ -777,8 +770,8 @@
                 parentId: "cloud",
                 title: "dropbox.com",
                 contexts: ['page', 'launcher'],
-                action: function() {
-                    cloud.db.getFilelist(function(list) {
+                action: function () {
+                    cloud.db.getFilelist(function (list) {
                         engine.windowManager({type: 'dialog', config: {type: "db", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
@@ -787,8 +780,8 @@
                 parentId: "cloud",
                 title: "box.com",
                 contexts: ['page', 'launcher'],
-                action: function() {
-                    cloud.box.getFilelist(function(list) {
+                action: function () {
+                    cloud.box.getFilelist(function (list) {
                         engine.windowManager({type: 'dialog', config: {type: "box", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
@@ -797,8 +790,8 @@
                 parentId: "cloud",
                 title: "skydrive.com",
                 contexts: ['page', 'launcher'],
-                action: function() {
-                    cloud.sd.getFilelist(undefined, function(list) {
+                action: function () {
+                    cloud.sd.getFilelist(undefined, function (list) {
                         engine.windowManager({type: 'dialog', config: {type: "sd", h: 315, w: 350, r: true, filelist: list}});
                     });
                 }
@@ -806,28 +799,28 @@
             p_play_pause: {
                 title: _lang.play_pause,
                 contexts: ['launcher'],
-                action: function() {
+                action: function () {
                     engine.playToggle();
                 }
             },
             p_next: {
                 title: _lang.next,
                 contexts: ['launcher'],
-                action: function() {
+                action: function () {
                     engine.next();
                 }
             },
             p_previous: {
                 title: _lang.prev,
                 contexts: ['launcher'],
-                action: function() {
+                action: function () {
                     engine.preview();
                 }
             },
             options: {
                 title: _lang.ctx_options,
                 contexts: ['page', 'launcher'],
-                action: function() {
+                action: function () {
                     engine.windowManager({type: 'options'});
                 }
             },
@@ -835,7 +828,7 @@
                 title: _lang.ctx_save_vk_track,
                 contexts: ['page', 'launcher'],
                 hide: 1,
-                action: function() {
+                action: function () {
                     var track = engine.getCurrentTrack();
                     if (track !== undefined && track.cloud.track_id !== undefined) {
                         cloud.vk.addInLibrarty(track.cloud.track_id, track.cloud.owner_id);
@@ -846,7 +839,7 @@
                 title: _lang.ctx_save_sc_track,
                 contexts: ['page', 'launcher'],
                 hide: 1,
-                action: function() {
+                action: function () {
                     var track = engine.getCurrentTrack();
                     if (track !== undefined && track.cloud.track_id !== undefined) {
                         cloud.sc.addInFavorite(track.cloud.track_id);
@@ -860,8 +853,8 @@
             }
             context_menu[key].id = key;
         }
-        chrome.contextMenus.removeAll(function() {
-            $.each(context_menu, function(k, v) {
+        chrome.contextMenus.removeAll(function () {
+            $.each(context_menu, function (k, v) {
                 if (v.hide === 1) {
                     return 1;
                 }
@@ -881,14 +874,14 @@
             chrome.contextMenus.update("webUI", {checked: webui.active()});
         });
     };
-    var make_extend_volume = function(extend_volume_scroll) {
+    var make_extend_volume = function (extend_volume_scroll) {
         /*
          * Расширяет область изменения громкости колесиком мыши.
          */
         var box = $('body > .player > .box');
         var boxState = box.hasClass('volume_scroll');
         if (extend_volume_scroll && !boxState) {
-            box.unbind('mousewheel').addClass('volume_scroll').on('mousewheel', function(e) {
+            box.unbind('mousewheel').addClass('volume_scroll').on('mousewheel', function (e) {
                 if (e.target.className === 'image') {
                     return;
                 }
@@ -898,12 +891,11 @@
                     engine.volume("-10");
                 }
             });
-        } else
-        if (!extend_volume_scroll && boxState) {
+        } else if (!extend_volume_scroll && boxState) {
             box.unbind('mousewheel').removeClass('volume_scroll');
         }
     };
-    var write_language = function() {
+    var write_language = function () {
         /*
          * Локализация
          */
@@ -921,7 +913,7 @@
         $('div.loop').attr('title', _lang.loop);
         makeCtxMenu();
     };
-    var getVolumeColor = function(value) {
+    var getVolumeColor = function (value) {
         /*
          * Генерирует цвет прогресс бара Winamp
          */
@@ -938,7 +930,7 @@
         }
         return 'rgba(' + a + ', ' + b + ', ' + c + ', 1)';
     };
-    var calculateMoveble = function(selectors, size, classname) {
+    var calculateMoveble = function (selectors, size, classname) {
         /*
          * Расчитывает стиль прокрутки длиных имен. для Winmap.
          */
@@ -967,23 +959,22 @@
             var time_calc = Math.round(parseInt(str_w) / parseInt(str_s) * 3.5);
             var move_name = 'moveble' + '_' + str_s + '_' + str_w;
             if (dom_cache.body.children('.' + move_name).length === 0) {
-                dom_cache.body.append($('<style>', {'class': move_name, text:
-                            '@-webkit-keyframes a_' + move_name
-                            + '{'
-                            + '0%{margin-left:2px;}'
-                            + '50%{margin-left:-' + (str_w - str_s) + 'px;}'
-                            + '90%{margin-left:6px;}'
-                            + '100%{margin-left:2px;}'
-                            + '}'
-                            + 'div.' + move_name + ':hover > span {'
-                            + 'overflow: visible;'
-                            + '-webkit-animation:a_' + move_name + ' ' + time_calc + 's;'
-                            + '}'}));
+                dom_cache.body.append($('<style>', {'class': move_name, text: '@-webkit-keyframes a_' + move_name
+                    + '{'
+                    + '0%{margin-left:2px;}'
+                    + '50%{margin-left:-' + (str_w - str_s) + 'px;}'
+                    + '90%{margin-left:6px;}'
+                    + '100%{margin-left:2px;}'
+                    + '}'
+                    + 'div.' + move_name + ':hover > span {'
+                    + 'overflow: visible;'
+                    + '-webkit-animation:a_' + move_name + ' ' + time_calc + 's;'
+                    + '}'}));
             }
             titles.eq(i).parent().attr('class', classname + ' ' + move_name);
         }
     };
-    var writeWinampFFT = function() {
+    var writeWinampFFT = function () {
         /*
          * Действие при отключении engine адаптера Dance (происходит когда закрывается визуализация).
          */
@@ -993,14 +984,12 @@
                 return;
             }
             if (convas.length === 0) {
-                convas = $('<canvas>', {'class': 'winamp_fft'}).on('click', function() {
+                convas = $('<canvas>', {'class': 'winamp_fft'}).on('click',function () {
                     if (settings.visual_type === '0') {
                         settings.visual_type = '1';
-                    } else
-                    if (settings.visual_type === '1') {
+                    } else if (settings.visual_type === '1') {
                         settings.visual_type = '2';
-                    } else
-                    if (settings.visual_type === '2') {
+                    } else if (settings.visual_type === '2') {
                         settings.visual_type = '0';
                     }
                     chrome.storage.local.set({'visual_type': settings.visual_type});
@@ -1020,10 +1009,10 @@
             var ctx = convas.getContext('2d');
             convas.width = 80;
             visual_cache.winamp_dancer.createKick({
-                onKick: function() {
+                onKick: function () {
                     ctx.fillStyle = '#ff0077';
                 },
-                offKick: function() {
+                offKick: function () {
                     ctx.fillStyle = '#54D100';
                 },
                 threshold: 0.2
@@ -1031,20 +1020,20 @@
             if (settings.visual_type === '2') {
                 convas.height = 20;
                 visual_cache.winamp_dancer.waveform(convas,
-                        {strokeStyle: '#fff', strokeWidth: 1, count: 40}
+                    {strokeStyle: '#fff', strokeWidth: 1, count: 40}
                 );
             } else {
                 convas.height = 37;
                 visual_cache.winamp_dancer.fft(convas,
-                        {fillStyle: '#666', count: 20, width: 3, spacing: 1}
+                    {fillStyle: '#666', count: 20, width: 3, spacing: 1}
                 );
             }
-            visual_cache.winamp_dancer.bind('loaded', function() {
+            visual_cache.winamp_dancer.bind('loaded',function () {
                 visual_cache.winamp_dancer.play();
             }).load(engine.getAudio(), 'winamp');
         }
     };
-    var setTrueText = function(title, album) {
+    var setTrueText = function (title, album) {
         if (is_winamp) {
             return;
         }
@@ -1106,10 +1095,10 @@
             dom_cache.trackname.parent().attr('class', 'name');
         }
     };
-    view.show = function() {
+    view.show = function () {
         write_language();
         settings = window._settings;
-        window.onfocus = function() {
+        window.onfocus = function () {
             if (dom_cache.focusing_all && dom_cache.focus_state === false) {
                 dom_cache.focusing_all = false;
                 dom_cache.focus_state = true;
@@ -1127,12 +1116,12 @@
             dom_cache.focus_state = true;
             if (!dom_cache.disable_focusing_all) {
                 dom_cache.focusing_all = true;
-                window._showAll(undefined, function() {
+                window._showAll(undefined, function () {
                     dom_cache.focusing_all = false;
                 });
             }
         };
-        window.onblur = function() {
+        window.onblur = function () {
             dom_cache.focus_state = false;
         };
         dom_cache = {
@@ -1166,16 +1155,16 @@
              */
             win.resizeTo(win_w, win_h);
             $('.player').append(
-                    $('<div>', {'class': "shuffle"}),
-            $('<div>', {'class': "loop"}),
-            $('<div>', {'class': "state"}),
-            $('<div>', {'class': "w_kbps", text: 320}),
-            $('<div>', {'class': "w_kHz", text: 44}),
-            $('<div>', {'class': "stereo"}),
-            $('<div>', {'class': "w_playlist"}).on('click', function() {
-                engine.windowManager({type: 'playlist'});
-            }));
-            dom_cache.time = function() {
+                $('<div>', {'class': "shuffle"}),
+                $('<div>', {'class': "loop"}),
+                $('<div>', {'class': "state"}),
+                $('<div>', {'class': "w_kbps", text: 320}),
+                $('<div>', {'class': "w_kHz", text: 44}),
+                $('<div>', {'class': "stereo"}),
+                $('<div>', {'class': "w_playlist"}).on('click', function () {
+                    engine.windowManager({type: 'playlist'});
+                }));
+            dom_cache.time = function () {
                 var obj = $('.info > .time');
                 var back = false;
                 obj.empty();
@@ -1185,16 +1174,16 @@
                 var s_10 = $('<div>', {'class': 'wmp s_10'});
                 var s_0 = $('<div>', {'class': 'wmp s_0'});
                 obj.append(mm, m_10, m_0, s_10, s_0);
-                var setVal = function(num, obj) {
+                var setVal = function (num, obj) {
                     num = parseInt(num);
                     var val = 9 * num;
                     obj.css('background-position-x', '-' + val + 'px');
                 };
                 return {
-                    on: function(a, b) {
+                    on: function (a, b) {
                         obj.on(a, b);
                     },
-                    text: function(value) {
+                    text: function (value) {
                         var val = value.split(':');
                         if (val[0].length === 2) {
                             if (back) {
@@ -1214,7 +1203,7 @@
                         setVal(val[1][0], s_10);
                         setVal(val[1][1], s_0);
                     },
-                    empty: function() {
+                    empty: function () {
                         setVal(0, m_10);
                         setVal(0, m_0);
                         setVal(0, s_10);
@@ -1228,7 +1217,7 @@
             range: "min",
             min: 0,
             max: 1000,
-            change: function(event, ui) {
+            change: function (event, ui) {
                 if (event.which === undefined) {
                     return;
                 }
@@ -1238,7 +1227,7 @@
                     dom_cache.progress_ui_a.css('margin-left', lp + 'px');
                 }
             },
-            slide: function(event, ui) {
+            slide: function (event, ui) {
                 if (event.which === undefined) {
                     return;
                 }
@@ -1248,7 +1237,7 @@
                     dom_cache.progress_ui_a.css('margin-left', lp + 'px');
                 }
             },
-            create: function() {
+            create: function () {
                 var div_loaded = $('<div>', {'class': 'loaded'});
                 dom_cache.progress.append(div_loaded);
                 preBufferingController.setObj(div_loaded);
@@ -1259,7 +1248,7 @@
             range: "min",
             min: 0,
             max: 100,
-            change: function(event, ui) {
+            change: function (event, ui) {
                 if (event.which === undefined) {
                     return;
                 }
@@ -1268,7 +1257,7 @@
                     dom_cache.volume.css('background', getVolumeColor(ui.value));
                 }
             },
-            slide: function(event, ui) {
+            slide: function (event, ui) {
                 if (event.which === undefined) {
                     return;
                 }
@@ -1280,7 +1269,7 @@
         });
         view.state('emptied');
         view.state("playlist_is_empty");
-        chrome.storage.local.get(['time_tipe', 'extend_volume_scroll', 'volume', 'shuffle', 'loop'], function(storage) {
+        chrome.storage.local.get(['time_tipe', 'extend_volume_scroll', 'volume', 'shuffle', 'loop'], function (storage) {
             if (storage.time_tipe !== undefined) {
                 time_tipe = storage.time_tipe;
             }
@@ -1299,12 +1288,12 @@
         /**
          * @namespace info.menuItemId
          */
-        chrome.contextMenus.onClicked.addListener(function(info) {
+        chrome.contextMenus.onClicked.addListener(function (info) {
             if (context_menu[info.menuItemId] !== undefined && context_menu[info.menuItemId].action !== undefined) {
                 context_menu[info.menuItemId].action(info);
             }
         });
-        dom_cache.body.on('drop', function(event) {
+        dom_cache.body.on('drop', function (event) {
             event.preventDefault();
             /**
              * @namespace event.originalEvent.dataTransfer
@@ -1315,89 +1304,90 @@
             readFileArray(files, entrys);
         });
         var drag_timeout = undefined;
-        dom_cache.body.on('dragover', function(event) {
+        dom_cache.body.on('dragover', function (event) {
             event.preventDefault();
             dom_cache.drop.css({"display": "block"});
             clearTimeout(drag_timeout);
-            drag_timeout = setTimeout(function() {
+            drag_timeout = setTimeout(function () {
                 dom_cache.drop.css({"display": "none"});
             }, 300);
         });
-        dom_cache.btnPlayPause.on('click', function() {
+        dom_cache.btnPlayPause.on('click', function () {
             if ($(this).hasClass('play')) {
                 engine.play();
-            } else
-            if ($(this).hasClass('pause')) {
+            } else if ($(this).hasClass('pause')) {
                 engine.pause();
             }
         });
-        dom_cache.btnNext.on('click', function() {
+        dom_cache.btnNext.on('click', function () {
             engine.next();
         });
-        dom_cache.btnPrev.on('click', function() {
+        dom_cache.btnPrev.on('click', function () {
             engine.preview();
         });
-        $('.close').on('click', function() {
+        $('.close').on('click', function () {
             window.close();
         });
-        $('.mini').on('click', function() {
+        $('.mini').on('click', function () {
             chrome.app.window.current().minimize();
         });
-        $('.t_btn.menu').on('click', function() {
+        $('.t_btn.menu').on('click', function () {
             engine.showMenu();
         });
-        dom_cache.time.on('click', function() {
+        dom_cache.time.on('click', function () {
             time_tipe = (time_tipe) ? 0 : 1;
             chrome.storage.local.set({'time_tipe': time_tipe});
             var audio = engine.getAudio();
             view.setProgress(audio.duration, audio.currentTime);
         });
-        $('.click_for_open').on('click', function() {
-            var accepts = [{
+        $('.click_for_open').on('click', function () {
+            var accepts = [
+                {
                     mimeTypes: ['audio/*']
-                }];
-            chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function(entry) {
+                }
+            ];
+            chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function (entry) {
                 if (!entry) {
                     return;
                 }
                 readFileArray(undefined, entry);
             });
         });
-        dom_cache.mute.on('click', function() {
+        dom_cache.mute.on('click', function () {
             engine.mute();
         });
-        dom_cache.volume.parent().get(0).onmousewheel = function(e) {
+        dom_cache.volume.parent().get(0).onmousewheel = function (e) {
             if (e.wheelDelta > 0) {
                 engine.volume("+10");
             } else {
                 engine.volume("-10");
             }
         };
-        dom_cache.progress.get(0).onmousewheel = function(e) {
+        dom_cache.progress.get(0).onmousewheel = function (e) {
             if (e.wheelDelta > 0) {
                 clearTimeout(var_cache.progress_timer);
-                var_cache.progress_timer = setTimeout(function() {
+                var_cache.progress_timer = setTimeout(function () {
                     engine.position("+5");
                 }, 25);
             } else {
                 clearTimeout(var_cache.progress_timer);
-                var_cache.progress_timer = setTimeout(function() {
+                var_cache.progress_timer = setTimeout(function () {
                     engine.position("-5");
                 }, 25);
             }
         };
-        dom_cache.btnPlaylist.on('click', function() {
+        dom_cache.btnPlaylist.on('click', function () {
             engine.windowManager({type: 'playlist'});
         });
-        $('div.loop').on('click', function() {
+        $('div.loop').on('click', function () {
             engine.loop();
         });
-        $('div.shuffle').on('click', function() {
+        $('div.shuffle').on('click', function () {
             engine.shuffle();
         });
         var bounds_timer;
         var next_step;
-        chrome.app.window.current().onBoundsChanged.addListener(function() {
+        chrome.app.window.current().onBoundsChanged.addListener(function () {
             if (document.webkitHidden) {
                 return;
             }
@@ -1410,7 +1400,7 @@
             }
             next_step = time + 450;
             clearTimeout(bounds_timer);
-            bounds_timer = setTimeout(function() {
+            bounds_timer = setTimeout(function () {
                 var window_left = window.screenLeft;
                 var window_top = window.screenTop;
                 if (var_cache.window_left !== window_left || var_cache.window_top !== window_top) {
@@ -1421,7 +1411,7 @@
             }, 500);
         });
     };
-    view.setTags = function(tb) {
+    view.setTags = function (tb) {
         if (is_winamp) {
             var trackalbum = '';
             if (tb.aa !== undefined) {
@@ -1441,7 +1431,7 @@
         setTrueText(tb.title, tb.aa || '');
         //console.log(tags)
     };
-    view.setProgress = function(max, pos) {
+    view.setProgress = function (max, pos) {
         var width_persent = pos / max * 100;
         dom_cache.progress.slider("value", width_persent * 10);
         if (is_winamp) {
@@ -1460,7 +1450,7 @@
         dom_cache.time_cache = time;
         dom_cache.time.text(time);
     };
-    view.setVolume = function(pos) {
+    view.setVolume = function (pos) {
         if (engine.getMute()) {
             if (var_cache.volume_image === -1) {
                 return;
@@ -1481,22 +1471,19 @@
             }
             var_cache.volume_image = 1;
             dom_cache.volume.parent().children('.pic').attr('class', 'pic high');
-        } else
-        if (pos === 0) {
+        } else if (pos === 0) {
             if (var_cache.volume_image === 2) {
                 return;
             }
             var_cache.volume_image = 2;
             dom_cache.volume.parent().children('.pic').attr('class', 'pic zero');
-        } else
-        if (width_persent < 40) {
+        } else if (width_persent < 40) {
             if (var_cache.volume_image === 3) {
                 return;
             }
             var_cache.volume_image = 3;
             dom_cache.volume.parent().children('.pic').attr('class', 'pic low');
-        } else
-        if (width_persent < 70) {
+        } else if (width_persent < 70) {
             if (var_cache.volume_image === 4) {
                 return;
             }
@@ -1504,7 +1491,7 @@
             dom_cache.volume.parent().children('.pic').attr('class', 'pic medium');
         }
     };
-    view.state = function(type) {
+    view.state = function (type) {
         if (_debug) {
             console.log(type);
         }
@@ -1568,7 +1555,7 @@
             engine.play();
         }
     };
-    view.updateSettings = function(changes) {
+    view.updateSettings = function (changes) {
         if (changes.extend_volume_scroll !== undefined) {
             make_extend_volume(changes.extend_volume_scroll);
         }
@@ -1583,32 +1570,33 @@
     view.getFilesFromFolder = getFilesFromFolder;
     view.entry2files = entry2files;
     view.preBufferingController = preBufferingController;
-    view.setShuffle = function(shuffle) {
+    view.setShuffle = function (shuffle) {
         if (shuffle) {
             $('div.shuffle').addClass('on');
         } else {
             $('div.shuffle').removeClass('on');
         }
     };
-    view.setLoop = function(loop) {
+    view.setLoop = function (loop) {
         if (loop) {
             $('div.loop').addClass('on');
         } else {
             $('div.loop').removeClass('on');
         }
     };
-    view.getContextMenu = function() {
+    view.getContextMenu = function () {
         return context_menu;
     };
     view.readFileArray = readFileArray;
 })(window);
-(function() {
+(function () {
     var settings_ready = false;
     var dom_ready = false;
-    chrome.runtime.onMessage.addListener(function(msg) {
+    chrome.runtime.onMessage.addListener(function (msg) {
         if (msg.settings !== undefined) {
             view.updateSettings(msg.settings);
-        } eles
+        }
+        eles
         if (msg === 'settings_ready') {
             settings_ready = true;
             if (dom_ready) {
@@ -1618,7 +1606,7 @@
             }
         }
     });
-    $(function() {
+    $(function () {
         dom_ready = true;
         if (settings_ready) {
             view.show();
