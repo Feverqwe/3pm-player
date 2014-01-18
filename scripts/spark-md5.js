@@ -22,7 +22,7 @@
 
     ////////////////////////////////////////////////////////////////////////////
 
-    /*
+    /**
      * Fastest md5 implementation around (JKM md5)
      * Credits: Joseph Myers
      *
