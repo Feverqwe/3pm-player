@@ -67,8 +67,6 @@ var _debug = false;
         });
     })();
     //<<<<<<<
-    //allow_ext - only for files without mime.
-    var allow_ext = ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'];
     var covers = [];
     var var_cache = {};
     engine.loadSettings = function (obj) {
@@ -117,193 +115,253 @@ var _debug = false;
             engine.showMenu();
         }
     });
-    var e_pl = engine._playlist = {
-        playlist: [],
-        playlist_info: {name: '3pm-player'},
-        playlist_order: {},
-        order_index: 0,
-        playedlist: [],
-        shuffle: false,
-        loop: false,
-        current_played_pos: -1,
-        M3UPlaylists: {},
-        addPlayed: function (id) {
-            /*
-             * Добавляет трек в список програнного.
-             * Если такой ID уже есть в списке - он удаляется.
-             * ID добавляется в конец списка.
-             */
-            var ex_id = e_pl.playedlist.indexOf(id);
-            if (ex_id !== -1) {
-                e_pl.playedlist.splice(ex_id, 1);
-            }
-            e_pl.playedlist.push(id);
-        },
-        reset: function () {
-            //массив плэйлиста
-            e_pl.playlist = [];
-            //название плэйлиста
-            e_pl.playlist_info = {name: '3pm-player'};
-            //индекс сортировки
-            e_pl.order_index = 0;
-            //порядок сортровки
-            e_pl.playlist_order = {};
-            //список проигранных компазиций
-            e_pl.playedlist = [];
-            //если трек уже был проигран похиция не -1;
-            e_pl.current_played_pos = -1;
-        },
-        next: function () {
-            e_pl.current_played_pos = -1;
-            var id = player.current_id + 1;
-            if (e_pl.shuffle) {
-                if (e_pl.playedlist.length === e_pl.playlist.length) {
-                    e_pl.playedlist = [];
+    var e_pl = engine._playlist = function () {
+        var current_played_pos = -1,
+            M3UPlaylists = {};
+        return {
+            playlist: [],
+            playlist_info: {name: '3pm-player'},
+            playlist_order: {},
+            order_index: 0,
+            playedlist: [],
+            shuffle: false,
+            loop: false,
+            addPlayed: function (id) {
+                /*
+                 * Добавляет трек в список програнного.
+                 * Если такой ID уже есть в списке - он удаляется.
+                 * ID добавляется в конец списка.
+                 */
+                var ex_id = e_pl.playedlist.indexOf(id);
+                if (ex_id !== -1) {
+                    e_pl.playedlist.splice(ex_id, 1);
                 }
-                id = getRandomInt(0, e_pl.playlist.length - 1);
-                var n = 2000;
-                while (e_pl.playedlist.indexOf(id) !== -1 && n > 0) {
+                e_pl.playedlist.push(id);
+            },
+            reset: function () {
+                //массив плэйлиста
+                e_pl.playlist = [];
+                //название плэйлиста
+                e_pl.playlist_info = {name: '3pm-player'};
+                //индекс сортировки
+                e_pl.order_index = 0;
+                //порядок сортровки
+                e_pl.playlist_order = {};
+                //список проигранных компазиций
+                e_pl.playedlist = [];
+                //если трек уже был проигран похиция не -1;
+                current_played_pos = -1;
+            },
+            next: function () {
+                current_played_pos = -1;
+                var id = player.current_id + 1;
+                if (e_pl.shuffle) {
+                    if (e_pl.playedlist.length === e_pl.playlist.length) {
+                        e_pl.playedlist = [];
+                    }
                     id = getRandomInt(0, e_pl.playlist.length - 1);
-                    n--;
-                }
-            } else {
-                if (e_pl.playlist_order[e_pl.order_index] === undefined) {
-                    return;
-                }
-                var pos = e_pl.playlist_order[e_pl.order_index].indexOf(player.current_id);
-                if (pos < 0) {
-                    return;
-                }
-                if (pos === e_pl.playlist_order[e_pl.order_index].length - 1) {
-                    id = e_pl.playlist_order[e_pl.order_index][0];
+                    var n = 2000;
+                    while (e_pl.playedlist.indexOf(id) !== -1 && n > 0) {
+                        id = getRandomInt(0, e_pl.playlist.length - 1);
+                        n--;
+                    }
                 } else {
-                    id = e_pl.playlist_order[e_pl.order_index][pos + 1];
+                    if (e_pl.playlist_order[e_pl.order_index] === undefined) {
+                        return;
+                    }
+                    var pos = e_pl.playlist_order[e_pl.order_index].indexOf(player.current_id);
+                    if (pos < 0) {
+                        return;
+                    }
+                    if (pos === e_pl.playlist_order[e_pl.order_index].length - 1) {
+                        id = e_pl.playlist_order[e_pl.order_index][0];
+                    } else {
+                        id = e_pl.playlist_order[e_pl.order_index][pos + 1];
+                    }
                 }
-            }
-            player.open(id);
-        },
-        preview: function () {
-            var id = player.current_id - 1;
-            var pos = null;
-            if (e_pl.shuffle) {
-                if (e_pl.current_played_pos === -1) {
-                    pos = e_pl.playedlist.indexOf(player.current_id);
+                player.open(id);
+            },
+            preview: function () {
+                var id = player.current_id - 1;
+                var pos = null;
+                if (e_pl.shuffle) {
+                    if (current_played_pos === -1) {
+                        pos = e_pl.playedlist.indexOf(player.current_id);
+                    } else {
+                        pos = current_played_pos;
+                    }
+                    if (pos <= 0) {
+                        pos = e_pl.playedlist.length;
+                    }
+                    current_played_pos = pos - 1;
+                    id = e_pl.playedlist[current_played_pos];
                 } else {
-                    pos = e_pl.current_played_pos;
+                    if (e_pl.playlist_order[e_pl.order_index] === undefined) {
+                        return;
+                    }
+                    pos = e_pl.playlist_order[e_pl.order_index].indexOf(player.current_id);
+                    if (pos < 0) {
+                        return;
+                    }
+                    if (pos === 0) {
+                        id = e_pl.playlist_order[e_pl.order_index].slice(-1)[0];
+                    } else {
+                        id = e_pl.playlist_order[e_pl.order_index][pos - 1];
+                    }
                 }
-                if (pos <= 0) {
-                    pos = e_pl.playedlist.length;
+                player.open(id);
+            },
+            getCurrentTrack: function () {
+                return e_pl.playlist[player.current_id];
+            },
+            player_ended: function () {
+                if (e_pl.shuffle) {
+                    if (e_pl.playedlist.length !== e_pl.playlist.length || e_pl.loop) {
+                        e_pl.next();
+                    }
+                } else {
+                    var pos = e_pl.playlist_order[e_pl.order_index].indexOf(player.current_id);
+                    if (e_pl.loop || pos !== e_pl.playlist_order[e_pl.order_index].length - 1) {
+                        e_pl.next();
+                    }
                 }
-                e_pl.current_played_pos = pos - 1;
-                id = e_pl.playedlist[e_pl.current_played_pos];
-            } else {
-                if (e_pl.playlist_order[e_pl.order_index] === undefined) {
+            },
+            setPlaylistOrder: function (new_order_index) {
+                e_pl.order_index = new_order_index;
+                return engine.getPlaylist();
+            },
+            getPlaylistOrder: function () {
+                return e_pl.playlist_order;
+            },
+            setSortedList: function (new_playlist_order, new_order_index) {
+                e_pl.playlist_order[new_order_index] = new_playlist_order;
+                e_pl.order_index = new_order_index;
+                return engine.getPlaylist();
+            },
+            getM3UPlaylists: function () {
+                return M3UPlaylists;
+            },
+            setM3UPlaylists: function (m3u) {
+                M3UPlaylists = m3u;
+                _send('playlist', function (window) {
+                    window.playlist.setSelectList(M3UPlaylists);
+                });
+            },
+            APIplaylist: function () {
+                var playlist_ordered = e_pl.playlist_order[e_pl.order_index];
+                var playlist_order_len = 0;
+                if (playlist_ordered !== undefined) {
+                    playlist_order_len = playlist_ordered.length;
+                }
+                var list = new Array(playlist_order_len);
+                for (var i = 0; i < playlist_order_len; i++) {
+                    var track = e_pl.playlist[playlist_ordered[i]];
+                    var tb = engine.getTagBody(track.id);
+                    var title = tb.title;
+                    if (tb.aa !== undefined) {
+                        title += ' - ' + tb.aa;
+                    }
+                    list[i] = {id: track.id, title: title};
+                }
+                var pls = [];
+                if (M3UPlaylists.list !== undefined) {
+                    M3UPlaylists.list.forEach(function (item) {
+                        pls.push({name: item.name, id: item.id});
+                    });
+                }
+                var pl_i = {name: _lang.playlist_title};
+                if (e_pl.playlist_info.id !== undefined) {
+                    pl_i = {name: e_pl.playlist_info.name, id: e_pl.playlist_info.id};
+                }
+                var rez = player.status();
+                rez.playlist = list;
+                rez.playlists = pls;
+                rez.playlist_info = pl_i;
+                return window.btoa(encodeURIComponent(JSON.stringify(rez)));
+            },
+            getPlaylist: function () {
+                return {order_index: e_pl.order_index, playlist_ordered: e_pl.playlist_order[e_pl.order_index], playlist: e_pl.playlist, info: e_pl.playlist_info};
+            },
+            setLoop: function (c) {
+                if (c === undefined) {
+                    e_pl.loop = !e_pl.loop;
+                }
+                chrome.storage.local.set({'loop': e_pl.loop});
+                _send('playlist', function (window) {
+                    window.playlist.setLoop(e_pl.loop);
+                });
+                view.setLoop(e_pl.loop);
+            },
+            setShuffle: function (c) {
+                if (c === undefined) {
+                    e_pl.shuffle = !e_pl.shuffle;
+                }
+                chrome.storage.local.set({'shuffle': e_pl.shuffle});
+                _send('playlist', function (window) {
+                    window.playlist.setShuffle(e_pl.shuffle);
+                });
+                view.setShuffle(e_pl.shuffle);
+            },
+            readTrackList: function (files) {
+                var my_playlist = [];
+                var my_playlist_order = {0: []};
+                for (var i = 0; i < files.length; i++) {
+                    var id = my_playlist.length;
+                    if (files[i].tags !== undefined && files[i].tags.picture !== undefined) {
+                        /*
+                         * Возможны конфиликты, если в облаке
+                         *  не переписываетс список треков при выборе
+                         *  или нету read_tags который получает тэги не из track.tags
+                         */
+                        delete files[i].lfm;
+                        files[i].tags = undefined;
+                    }
+                    if (files[i].id !== undefined && files[i].file !== undefined) {
+                        files[i].id = id;
+                        my_playlist_order[0].push(id);
+                        my_playlist.push(files[i]);
+                        continue;
+                    }
+                    if (files[i].url !== undefined) {
+                        my_playlist_order[0].push(id);
+                        my_playlist.push({id: id, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
+                        continue;
+                    }
+                    if (canFilePlay(files[i]) === false) {
+                        continue;
+                    }
+                    my_playlist_order[0].push(id);
+                    my_playlist.push({id: id, file: files[i], tags: undefined, duration: undefined});
+                }
+                return [my_playlist, my_playlist_order];
+            },
+            append: function (files) {
+                if (files.length === 0) {
                     return;
                 }
-                pos = e_pl.playlist_order[e_pl.order_index].indexOf(player.current_id);
-                if (pos < 0) {
+                if (e_pl.playlist.length === 0) {
+                    engine.open(files);
                     return;
                 }
-                if (pos === 0) {
-                    id = e_pl.playlist_order[e_pl.order_index].slice(-1)[0];
-                } else {
-                    id = e_pl.playlist_order[e_pl.order_index][pos - 1];
+                var tracks = e_pl.readTrackList(files)[0];
+                if (tracks.length === 0) {
+                    return;
                 }
-            }
-            player.open(id);
-        },
-        getCurrentTrack: function () {
-            return e_pl.playlist[player.current_id];
-        },
-        player_ended: function () {
-            if (e_pl.shuffle) {
-                if (e_pl.playedlist.length !== e_pl.playlist.length || e_pl.loop) {
-                    e_pl.next();
+                var id = e_pl.playlist.slice(-1)[0].id;
+                for (var i = 0, track; track = tracks[i]; i++) {
+                    id++;
+                    track.id = id;
+                    e_pl.playlist.push(track);
+                    $.each(e_pl.playlist_order, function (key, value) {
+                        value.push(id);
+                    });
                 }
-            } else {
-                var pos = e_pl.playlist_order[e_pl.order_index].indexOf(player.current_id);
-                if (e_pl.loop || pos !== e_pl.playlist_order[e_pl.order_index].length - 1) {
-                    e_pl.next();
-                }
-            }
-        },
-        setPlaylistOrder: function (new_order_index) {
-            e_pl.order_index = new_order_index;
-            return engine.getPlaylist();
-        },
-        getPlaylistOrder: function () {
-            return e_pl.playlist_order;
-        },
-        setSortedList: function (new_playlist_order, new_order_index) {
-            e_pl.playlist_order[new_order_index] = new_playlist_order;
-            e_pl.order_index = new_order_index;
-            return engine.getPlaylist();
-        },
-        getM3UPlaylists: function () {
-            return e_pl.M3UPlaylists;
-        },
-        setM3UPlaylists: function (m3u) {
-            e_pl.M3UPlaylists = m3u;
-            _send('playlist', function (window) {
-                window.playlist.setSelectList(e_pl.M3UPlaylists);
-            });
-        },
-        APIplaylist: function () {
-            var playlist_ordered = e_pl.playlist_order[e_pl.order_index];
-            var playlist_order_len = 0;
-            if (playlist_ordered !== undefined) {
-                playlist_order_len = playlist_ordered.length;
-            }
-            var list = new Array(playlist_order_len);
-            for (var i = 0; i < playlist_order_len; i++) {
-                var track = e_pl.playlist[playlist_ordered[i]];
-                var tb = engine.getTagBody(track.id);
-                var title = tb.title;
-                if (tb.aa !== undefined) {
-                    title += ' - ' + tb.aa;
-                }
-                list[i] = {id: track.id, title: title};
-            }
-            var pls = [];
-            if (e_pl.M3UPlaylists.list !== undefined) {
-                e_pl.M3UPlaylists.list.forEach(function (item) {
-                    pls.push({name: item.name, id: item.id});
+                _send('playlist', function (window) {
+                    window.playlist.setPlaylist(engine.getPlaylist());
                 });
             }
-            var pl_i = {name: _lang.playlist_title};
-            if (e_pl.playlist_info.id !== undefined) {
-                pl_i = {name: e_pl.playlist_info.name, id: e_pl.playlist_info.id};
-            }
-            var rez = player.status();
-            rez.playlist = list;
-            rez.playlists = pls;
-            rez.playlist_info = pl_i;
-            return window.btoa(encodeURIComponent(JSON.stringify(rez)));
-        },
-        getPlaylist: function () {
-            return {order_index: e_pl.order_index, playlist_ordered: e_pl.playlist_order[e_pl.order_index], playlist: e_pl.playlist, info: e_pl.playlist_info};
-        },
-        setLoop: function (c) {
-            if (c === undefined) {
-                e_pl.loop = !e_pl.loop;
-            }
-            chrome.storage.local.set({'loop': e_pl.loop});
-            _send('playlist', function (window) {
-                window.playlist.setLoop(e_pl.loop);
-            });
-            view.setLoop(e_pl.loop);
-        },
-        setShuffle: function (c) {
-            if (c === undefined) {
-                e_pl.shuffle = !e_pl.shuffle;
-            }
-            chrome.storage.local.set({'shuffle': e_pl.shuffle});
-            _send('playlist', function (window) {
-                window.playlist.setShuffle(e_pl.shuffle);
-            });
-            view.setShuffle(e_pl.shuffle);
         }
-    };
+    }();
     var resetPlayer = function () {
         /*
          * Функция сброса плеера.
@@ -956,6 +1014,7 @@ var _debug = false;
             view.setVolume(audio.volume);
         });
         return {
+            allow_ext: ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'],
             current_id: undefined,
             lfmTagReader: function (id) {
                 var track = e_pl.playlist[id];
@@ -1176,7 +1235,7 @@ var _debug = false;
             canPlay: function (mime) {
                 if (mime[0] === '.') {
                     var ext = mime.substr(1);
-                    return (allow_ext.indexOf(ext) > 0);
+                    return (player.allow_ext.indexOf(ext) > 0);
                 }
                 if (type_list[mime] !== undefined) {
                     return type_list[mime];
@@ -1248,39 +1307,6 @@ var _debug = false;
             }
         });
     };
-    var readTrackList = function (files) {
-        var my_playlist = [];
-        var my_playlist_order = {0: []};
-        for (var i = 0; i < files.length; i++) {
-            var id = my_playlist.length;
-            if (files[i].tags !== undefined && files[i].tags.picture !== undefined) {
-                /*
-                 * Возможны конфиликты, если в облаке
-                 *  не переписываетс список треков при выборе
-                 *  или нету read_tags который получает тэги не из track.tags
-                 */
-                delete files[i].lfm;
-                files[i].tags = undefined;
-            }
-            if (files[i].id !== undefined && files[i].file !== undefined) {
-                files[i].id = id;
-                my_playlist_order[0].push(id);
-                my_playlist.push(files[i]);
-                continue;
-            }
-            if (files[i].url !== undefined) {
-                my_playlist_order[0].push(id);
-                my_playlist.push({id: id, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
-                continue;
-            }
-            if (canFilePlay(files[i]) === false) {
-                continue;
-            }
-            my_playlist_order[0].push(id);
-            my_playlist.push({id: id, file: files[i], tags: undefined, duration: undefined});
-        }
-        return [my_playlist, my_playlist_order];
-    };
     engine.play = player.play;
     engine.playToggle = player.playToggle;
     engine.openById = player.open;
@@ -1307,7 +1333,7 @@ var _debug = false;
         if (files.length === 0) {
             return;
         }
-        var trackList = readTrackList(files);
+        var trackList = e_pl.readTrackList(files);
         if (trackList[0].length === 0) {
             return;
         }
@@ -1328,31 +1354,7 @@ var _debug = false;
         player.open(id);
         addInCtxMenu(e_pl.playlist_info);
     };
-    engine.append = function (files) {
-        if (files.length === 0) {
-            return;
-        }
-        if (e_pl.playlist.length === 0) {
-            engine.open(files);
-            return;
-        }
-        var tracks = readTrackList(files)[0];
-        if (tracks.length === 0) {
-            return;
-        }
-        var id = e_pl.playlist.slice(-1)[0].id;
-        for (var i = 0, track; track = tracks[i]; i++) {
-            id++;
-            track.id = id;
-            e_pl.playlist.push(track);
-            $.each(e_pl.playlist_order, function (key, value) {
-                value.push(id);
-            });
-        }
-        _send('playlist', function (window) {
-            window.playlist.setPlaylist(engine.getPlaylist());
-        });
-    };
+    engine.append = e_pl.append;
     engine.next = e_pl.next;
     engine.preview = e_pl.preview;
     engine.shuffle = e_pl.setShuffle;
@@ -1375,7 +1377,7 @@ var _debug = false;
         });
     };
     engine.getAllowExt = function () {
-        return allow_ext;
+        return player.allow_ext;
     };
     engine.canPlay = player.canPlay;
     engine.setHotkeys = function (_document) {
@@ -1621,7 +1623,7 @@ var _debug = false;
             }
             chrome.app.window.create(url, args, oncreate);
         };
-        return function(options) {
+        return function (options) {
             if (options.type === 'playlist') {
                 options.toggle = true;
                 chrome.storage.local.get(['pl_pos_left', 'pl_pos_top', 'pl_w', 'pl_h'], function (storage) {
