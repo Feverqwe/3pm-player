@@ -100,7 +100,6 @@ var engine_cloud = function(mySettings, myEngine) {
         var vk = function() {
             var type = 'vk';
             var token = undefined;
-            var timeout = 500;
             var saved_tracks = [];
             var clear_data = function() {
                 token = undefined;
@@ -145,6 +144,9 @@ var engine_cloud = function(mySettings, myEngine) {
                         200: function(data) {
                             if (data.error !== undefined) {
                                 clear_data();
+                                /**
+                                 * @namespace data.error.error_code
+                                 */
                                 if (data.error.error_code === 5) {
                                     vkAuth(function() {
                                         getPopular(cb, genre_id);
@@ -379,6 +381,9 @@ var engine_cloud = function(mySettings, myEngine) {
                     return;
                 }
                 cookie.get('vk_token', function(obj) {
+                    /**
+                     * @namespace obj.vk_token
+                     */
                     if (obj.vk_token !== undefined) {
                         token = obj['vk_token'];
                         cb(token);
@@ -580,6 +585,9 @@ var engine_cloud = function(mySettings, myEngine) {
                     return;
                 }
                 chrome.storage.local.get('db_token', function(obj) {
+                    /**
+                     * @namespace obj.db_token
+                     */
                     if (obj.db_token !== undefined) {
                         token = obj.db_token;
                         cb(token);
@@ -705,6 +713,14 @@ var engine_cloud = function(mySettings, myEngine) {
                             data.forEach(function(item) {
                                 var tracks = [];
                                 for (var i = 0, track; track = item.tracks[i]; i++) {
+                                    /**
+                                     * @namespace track.streamable
+                                     * @namespace track.original_format
+                                     * @namespace track.track_type
+                                     * @namespace track.stream_url
+                                     * @namespace track.user.username
+                                     * @namespace track.artwork_url
+                                     */
                                     if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
                                         continue;
                                     }
@@ -750,24 +766,30 @@ var engine_cloud = function(mySettings, myEngine) {
                     dataType: 'JSON',
                     success: function(data) {
                         var albums = [];
+                        /**
+                         * @namespace data.categories
+                         */
                         if (data.categories === undefined) {
                             cb(albums);
                             return;
                         }
                         var cats = [];
                         for (var key in data.categories) {
+                            if (!data.categories.hasOwnProperty(key)){
+                                continue;
+                            }
                             cats.push(data.categories[key]);
                         }
                         cats.reverse();
                         cats.forEach(function(subitem) {
                             subitem.forEach(function(item) {
-                                var name = item.replace(/\+/g, ' ').replace(/\%26/g, '&');
+                                var name = item.replace(/\+/g, ' ').replace(/%26/g, '&');
                                 albums.push({name: '[ ' + name + ' ]', id: albums.length, cloud: {type: "sc", isExplore: true, name: name}});
                             });
                         });
                         cb(albums);
                     },
-                    error: function(jqXHR) {
+                    error: function() {
                         cb([]);
                     }
                 });
@@ -833,6 +855,9 @@ var engine_cloud = function(mySettings, myEngine) {
                     return;
                 }
                 chrome.storage.local.get('sc_token', function(obj) {
+                    /**
+                     * @namespace obj.sc_token
+                     */
                     if (obj.sc_token !== undefined) {
                         token = obj.sc_token;
                         cb(token);
@@ -976,6 +1001,9 @@ var engine_cloud = function(mySettings, myEngine) {
                     return;
                 }
                 cookie.get('gd_token', function(obj) {
+                    /**
+                     * @namespace obj.gd_token
+                     */
                     if (obj.gd_token !== undefined) {
                         token = obj.gd_token;
                         cb(token);
@@ -1054,6 +1082,10 @@ var engine_cloud = function(mySettings, myEngine) {
                         redirect_uri: redirect_uri
                     },
                     success: function(data) {
+                        /**
+                         * @namespace data.expires_in
+                         * @namespace data.refresh_token
+                         */
                         if (data.access_token === undefined || data.expires_in === undefined || data.refresh_token === undefined) {
                             console.log('boxAuth data problem', data);
                             return;
@@ -1104,6 +1136,9 @@ var engine_cloud = function(mySettings, myEngine) {
                     return;
                 }
                 cookie.get('box_token', function(obj) {
+                    /**
+                     * @namespace obj.box_token
+                     */
                     if (obj.box_token !== undefined) {
                         token = obj.box_token;
                         cb(token);
@@ -1142,7 +1177,6 @@ var engine_cloud = function(mySettings, myEngine) {
             };
             var getMedia = function(cb, id) {
                 var url = 'https://api.box.com/2.0/files/' + id;
-                var parems = '{"shared_link": {"access": "open"}}';
                 $.ajax({
                     url: url,
                     dataType: 'JSON',
@@ -1157,6 +1191,9 @@ var engine_cloud = function(mySettings, myEngine) {
                             });
                         },
                         200: function(data) {
+                            /**
+                             * @namespace data.shared_link.download_url
+                             */
                             if (data.shared_link !== undefined && data.shared_link.download_url !== undefined) {
                                 cb(data.shared_link.download_url);
                             }
@@ -1246,6 +1283,9 @@ var engine_cloud = function(mySettings, myEngine) {
                 }
                 cookie.get('sd_token', function(obj) {
                     if (obj.sd_token !== undefined) {
+                        /**
+                         * @namespace obj.sd_token
+                         */
                         token = obj.sd_token;
                         cb(token);
                     } else {
