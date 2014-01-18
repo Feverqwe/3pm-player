@@ -14,7 +14,7 @@ var view = function() {
     };
     var getPlaylist = function(cb) {
         $.get('/playlist', function(data) {
-            data = JSON.parse(decodeURIComponent(escape(window.atob(data))));
+            data = JSON.parse(decodeURIComponent(window.atob(data)));
             read_status(data);
             if (cb) {
                 cb();
@@ -54,7 +54,7 @@ var view = function() {
             }
         }
         if (data.title !== undefined) {
-            dom_cache.title.text(decodeURIComponent(escape(window.atob(data.title))));
+            dom_cache.title.text(decodeURIComponent(window.atob(data.title)));
         }
         if (data.shuffle !== undefined) {
             if (data.shuffle) {
