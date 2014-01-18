@@ -19,6 +19,15 @@ var engine_lastfm = function(mySettings, myEngine) {
             open: function() {
                 iDB.db_open = true;
                 var version = 1;
+                /**
+                 * @namespace indexedDB.open
+                 * @namespace db.objectStoreNames
+                 * @namespace db.deleteObjectStore
+                 * @namespace db.createObjectStore
+                 * @namespace request.onupgradeneeded
+                 * @namespace request.onsuccess
+                 * @namespace request.onerror
+                 */
                 var request = indexedDB.open(iDB.db_name, version);
                 request.onupgradeneeded = function(e) {
                     var db = e.target.result;
@@ -42,6 +51,11 @@ var engine_lastfm = function(mySettings, myEngine) {
                 console.log('indexedDB', 'error!', e);
             },
             add: function(key, data) {
+                /**
+                 * @namespace db.transaction
+                 * @namespace trans.objectStore
+                 * @namespace store.put
+                 */
                 //add new or update if cn exists
                 var db = iDB.db;
                 var trans = db.transaction(["cache"], "readwrite");
@@ -66,6 +80,11 @@ var engine_lastfm = function(mySettings, myEngine) {
                 console.log('indexedDB', 'success!', e);
             },
             getAll: function(cb) {
+                /**
+                 * @namespace IDBKeyRange.lowerBound
+                 * @namespace store.openCursor
+                 * @namespace result.continue
+                 */
                 var items = [];
                 var db = iDB.db;
                 var trans = db.transaction(["cache"], "readonly");
@@ -86,6 +105,10 @@ var engine_lastfm = function(mySettings, myEngine) {
             },
             rm: function(cn) {
                 //remove by key (in keyPath)
+                /**
+                 * @namespace db.transaction
+                 * @namespace store.delete
+                 */
                 var db = iDB.db;
                 var trans = db.transaction(["cache"], "readwrite");
                 var store = trans.objectStore("cache");
@@ -136,6 +159,9 @@ var engine_lastfm = function(mySettings, myEngine) {
                 return;
             }
             dialog_count++;
+            /**
+             * @namespace chrome.identity.launchWebAuthFlow
+             */
             chrome.identity.launchWebAuthFlow({url: url, interactive: true},
             function(responseURL) {
                 dialog_count--;
@@ -173,6 +199,9 @@ var engine_lastfm = function(mySettings, myEngine) {
                 return;
             }
             chrome.storage.local.get('lastfm_token', function(obj) {
+                /**
+                 * @namespace obj.lastfm_token
+                 */
                 if (obj.lastfm_token !== undefined) {
                     token = obj.lastfm_token;
                     cb(token);
@@ -236,6 +265,9 @@ var engine_lastfm = function(mySettings, myEngine) {
                         console.log('getSessionKey', 'data.error!', data);
                         return;
                     }
+                    /**
+                     * @namespace data.session
+                     */
                     if (data.session === undefined || data.session.key === undefined) {
                         console.log('getSessionKey error!', data);
                         return;
