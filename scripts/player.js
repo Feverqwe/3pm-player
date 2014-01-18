@@ -1595,9 +1595,7 @@
     chrome.runtime.onMessage.addListener(function (msg) {
         if (msg.settings !== undefined) {
             view.updateSettings(msg.settings);
-        }
-        eles
-        if (msg === 'settings_ready') {
+        } else if (msg === 'settings_ready') {
             settings_ready = true;
             if (dom_ready) {
                 view.show();

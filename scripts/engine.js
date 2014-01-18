@@ -1760,4 +1760,4 @@ var _debug = false;
             });
         }
     };
-})(this);
+})(window);
