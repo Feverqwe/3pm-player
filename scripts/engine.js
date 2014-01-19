@@ -130,6 +130,9 @@ var _debug = false;
             boot = false;
             return;
         }
+        if (changes.is_winamp !== undefined) {
+            chrome.runtime.reload();
+        }
         if ((changes.webui_port !== undefined || changes.webui_interface !== undefined) && engine.webui.active()) {
             engine.webui.start();
         }
