@@ -7,7 +7,7 @@
         this.audio = new Audio();
         this._viz = undefined;
         if (window.viz === undefined && window.engine !== undefined) {
-            this._viz = engine;
+            this._viz = engine.player;
         } else {
             this._viz = viz;
         }
