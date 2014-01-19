@@ -76,7 +76,7 @@ var engine_files = function(mySettings, myEngine) {
                 next(0);
             });
         };
-        var readDirectoryWithM3U = function (entrys, entry) {
+        var readDirectoryWithM3U = function (entrys, entry, cb) {
             var playlists = {};
             var playlist_count = entrys.length;
             var playlist_dune_count = 0;
@@ -98,8 +98,8 @@ var engine_files = function(mySettings, myEngine) {
                     var urls = [];
                     var ent = [];
                     item.forEach(function (itm) {
-                        if (typeof (itm) === 'string') {
-                            urls.push({url: itm});
+                        if (itm.url !== undefined) {
+                            urls.push({url: itm.url, name: itm.name});
                         } else {
                             ent.push(itm);
                         }
@@ -115,12 +115,22 @@ var engine_files = function(mySettings, myEngine) {
                         if (urls.length > 0) {
                             name = key + ' files';
                         }
-                        playlist.push({name: name, entrys: item, id: playlist.length, type: "m3u"});
+                        playlist.push({name: name, entrys: ent, id: playlist.length, type: "m3u"});
                     }
                 });
+                if (playlist.length === 0) {
+                    if (cb !== undefined) {
+                        cb();
+                    }
+                    return;
+                }
                 playlist.sort(function (a, b) {
                     return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
                 });
+                if (cb !== undefined) {
+                    cb({list: playlist});
+                    return;
+                }
                 engine.playlist.setM3UPlaylists({list: playlist});
                 if (playlist.length === 1) {
                     engine.playlist.selectPlaylist(playlist[0].id);
@@ -155,7 +165,11 @@ var engine_files = function(mySettings, myEngine) {
                             }
                         }
                     }
-                    playlists[name] = arr;
+                    if (playlists[name] !== undefined) {
+                        playlists[name] = playlists[name].concat(arr);
+                    } else {
+                        playlists[name] = arr;
+                    }
                     dune();
                 };
                 var readEntry = function (entry, file_tree) {
@@ -193,10 +207,16 @@ var engine_files = function(mySettings, myEngine) {
                 var file_tree = {};
                 var lines = content.split("\n");
                 var len = lines.length;
-                var url_list = false;
+                var extinfo = '';
                 for (var i = 0; i < len; i++) {
                     var line = lines[i].trim();
-                    if (line.length < 1 || line.substr(0, 1) === "#") {
+                    if (line.length < 1 || (line.substr(0, 1) === "#")) {
+                        extinfo = line.substr(0,8);
+                        if (extinfo === '#EXTINF:') {
+                            extinfo = line.substr(8).trim();
+                        } else {
+                            extinfo = '';
+                        }
                         continue;
                     }
                     var proto_url = line.substr(0, 7).toLowerCase();
@@ -204,8 +224,8 @@ var engine_files = function(mySettings, myEngine) {
                         if (playlists[name] === undefined) {
                             playlists[name] = [];
                         }
-                        playlists[name].push(line);
-                        url_list = true;
+                        playlists[name].push({url: line, name: (extinfo.length > 0)?extinfo:undefined});
+                        extinfo = '';
                         continue;
                     }
                     if (fileMede) {
@@ -224,7 +244,7 @@ var engine_files = function(mySettings, myEngine) {
                         path += "/" + path_arr[n];
                     }
                 }
-                if (url_list || fileMede) {
+                if (fileMede) {
                     dune();
                 } else {
                     readEntry(entry, file_tree);
@@ -325,7 +345,7 @@ var engine_files = function(mySettings, myEngine) {
                 }
             }
         };
-        var readDirectory = function (entry) {
+        var readDirectory = function (entry, cb) {
             /*
              * Читает открытую дирректорию, аналиpирует куда направить работу с дирректорией - в m3u или в чтение подкаталогов
              */
@@ -348,12 +368,15 @@ var engine_files = function(mySettings, myEngine) {
                     }
                 }
                 if (file_count === 0 && dir_count === 0 && m3u.length === 0) {
+                    if (cb !== undefined) {
+                        cb();
+                    }
                     return;
                 }
                 if (m3u.length > 0) {
-                    readDirectoryWithM3U(m3u, entry);
+                    readDirectoryWithM3U(m3u, entry, cb);
                 } else {
-                    readDirectoryWithSub(entry);
+                    readDirectoryWithSub(entry, cb);
                 }
             });
         };
@@ -370,7 +393,7 @@ var engine_files = function(mySettings, myEngine) {
                 });
             });
         };
-        var readDirectoryWithSub = function (entry) {
+        var readDirectoryWithSub = function (entry, cb) {
             /*
              * Читает дирректорию и дирректории внутри их..
              * Уровень вложенности - 1.
@@ -395,12 +418,22 @@ var engine_files = function(mySettings, myEngine) {
                 var dune_count = 0;
                 var dune = function () {
                     dune_count++;
-                    if (dune_count !== list_dir_len || playlist.length === 0) {
+                    if (dune_count !== list_dir_len) {
+                        return;
+                    }
+                    if (playlist.length === 0) {
+                        if (cb !== undefined) {
+                            cb();
+                        }
                         return;
                     }
                     playlist.sort(function (a, b) {
                         return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
                     });
+                    if (cb !== undefined) {
+                        cb({list: playlist});
+                        return;
+                    }
                     engine.playlist.setM3UPlaylists({list: playlist});
                     if (playlist.length === 1) {
                         engine.playlist.selectPlaylist(playlist[0].id);
@@ -408,6 +441,10 @@ var engine_files = function(mySettings, myEngine) {
                         engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
                     }
                 };
+                if (list_dir_len === 0) {
+                    dune();
+                    return;
+                }
                 list_dir.forEach(function (item) {
                     findMusicInFolder(item, function (canplay) {
                         if (canplay) {
@@ -418,71 +455,76 @@ var engine_files = function(mySettings, myEngine) {
                 });
             });
         };
-
-/*
-        var readFileArrayCb = function (files, entry, cb) {
+        var readAnyFiles = function (entry, cb) {
             /*
-             * Читает массив файлов
-             * Если есть entry - использут его, если нету - то files.
-             * Если найдет хоть одну дирректорию - открывает как категорию.
-             * Есди найдет зоть один m3u открывает как плэйлист
-             * Остальное - читает как массив файлов
-             *//*
+             * Читает любой массив файлов
+             * Что найдет все откроет и создаст соответствующие плейлисты.
+             * Если есть папка - пошлет на чтение папок, где если найдет внутри m3u - пошлет на чтение m3u дирректории, если не найдет - пошлет на чтение папки с подпапками.
+             * Если найдет m3u - пошлет на чтение m3u как только файл (только url) и создаст одноименный плейлист если найдет что то.
+             * Если просто файл - создаст плейлист Root, в который все это и добавит
+             */
             if (!entry) {
                 entry = [];
             }
-            var entry_length = entry.length;
-            var entrys = [];
-            if (entry_length !== 0) {
-                for (var i = 0; i < entry_length; i++) {
-                    var item = entry[i];
-                    if (item.webkitGetAsEntry !== undefined) {
-                        item = item.webkitGetAsEntry();
-                    }
-                    if (!item) {
-                        continue;
-                    }
-                    if (item.isDirectory) {
-                        if (files_only) {
-                            continue;
-                        }
-                        readDirectory(item);
-                        return;
-                    } else {
-                        var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
-                        if (ext === 'm3u') {
-                            if (files_only) {
-                                continue;
-                            }
-                            readDirectoryWithM3U(item);
-                            return;
-                        }
-                        entrys.push(item);
-                    }
+            var cb_count = 0;
+            var dune_count = 0;
+            var playlist = [];
+            var dune = function(new_playlist) {
+                dune_count++;
+                if (new_playlist === undefined) {
+                    return;
                 }
-                entry2files(entrys, function (files) {
-                    cb(files);
+                playlist = playlist.concat(new_playlist.list);
+                if (cb_count !== dune_count) {
+                    return;
+                }
+                playlist.forEach(function(item, n) {
+                    item.id = n;
                 });
-            } else {
-                var files_length = files.length;
-                for (var i = 0; i < files_length; i++) {
-                    var item = files[i];
+                if (cb !== undefined) {
+                    cb({list:playlist});
+                    return;
+                }
+                engine.playlist.setM3UPlaylists({list: playlist});
+                if (playlist.length === 1) {
+                    engine.playlist.selectPlaylist(playlist[0].id);
+                } else if (playlist.length > 0) {
+                    engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlist}});
+                }
+            };
+            var just_files = [];
+            for (var i = 0, item; item = entry[i]; i++) {
+                if (item.webkitGetAsEntry !== undefined) {
+                    item = item.webkitGetAsEntry();
+                }
+                if (!item) {
+                    continue;
+                }
+                if (item.isDirectory) {
+                    cb_count++;
+                    readDirectory(item, function(playlist) {
+                        dune(playlist);
+                    });
+                } else {
                     var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
                     if (ext === 'm3u') {
-                        if (!files_only) {
-                            continue;
-                        }
-                        readDirectoryWithM3U(item);
-                        return;
+                        cb_count++;
+                        readDirectoryWithM3U(item,undefined,function(playlist) {
+                            dune(playlist);
+                        });
+                        continue;
                     }
+                    just_files.push(item);
                 }
-                cb(files);
+            }
+            if (just_files.length > 0) {
+                cb_count++;
+                dune({list: {type: 'm3u', entrys: just_files, name: _lang.playlist_title}});
             }
         };
-    */
         return {
             entry2files: entry2files,
-            //readFileArrayCb: readFileArrayCb,
+            readAnyFiles: readAnyFiles,
             readFileArray: readFileArray,
             readDirectory: readDirectory,
             getFilesFromFolder: getFilesFromFolder,

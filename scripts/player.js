@@ -883,9 +883,8 @@
              * @namespace event.originalEvent.dataTransfer
              * @namespace event.originalEvent.dataTransfer.files
              */
-            var files = event.originalEvent.dataTransfer.files;
             var entrys = event.originalEvent.dataTransfer.items;
-            engine.files.readFileArray(files, entrys);
+            engine.files.readAnyFiles(entrys);
         });
         var drag_timeout = undefined;
         dom_cache.body.on('dragover', function (event) {
@@ -934,7 +933,7 @@
                 if (!entry) {
                     return;
                 }
-                engine.files.readFileArray(undefined, entry);
+                engine.files.readAnyFiles(entry);
             });
         });
         dom_cache.mute.on('click', function () {

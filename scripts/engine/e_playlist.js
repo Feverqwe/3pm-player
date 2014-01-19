@@ -217,7 +217,8 @@ var engine_playlist = function(mySettings, myEngine) {
                     }
                     if (files[i].url !== undefined) {
                         my_playlist_order[0].push(id);
-                        my_playlist.push({id: id, file: {name: files[i].url, url: files[i].url}, tags: {}, duration: 0});
+                        var item_name = (files[i].name === undefined)?files[i].url:files[i].name;
+                        my_playlist.push({id: id, file: {name: item_name, url: files[i].url}, tags: {}, duration: 0});
                         continue;
                     }
                     if (canFilePlay(files[i]) === false) {
