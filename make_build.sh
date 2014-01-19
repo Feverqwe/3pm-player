@@ -1,3 +1,4 @@
+#!/bin/sh
 rm  ./build.zip
 rm -r ./build
 mkdir ./build
