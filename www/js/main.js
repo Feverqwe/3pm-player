@@ -22,6 +22,7 @@ var view = function() {
         });
     };
     var read_status = function(data) {
+        var pl_get = false;
         if (data.paused) {
             dom_cache.btnPlayPause.removeClass('pause').addClass('play');
         } else {
@@ -29,6 +30,7 @@ var view = function() {
         }
         if (data.playlist !== undefined) {
             //если получен список треков в плейлисте
+            var_cache.playlist_count = data.playlist_count;
             var items = data.playlist;
             dom_cache.playlist.empty();
             for (var i = 0; i < items.length; i++) {
@@ -57,6 +59,17 @@ var view = function() {
                     new_selected_id.prop('selected', true);
                 }
             }
+        } else
+        if (data.playlist_info !== undefined) {
+            if (data.playlist_info.id === undefined) {
+                dom_cache.playlists.children('option:selected').prop('selected', false);
+            } else {
+                var selected_pl = parseInt(dom_cache.playlists.children('option:selected').val());
+                if ( selected_pl !== data.playlist_info.id && !pl_get) {
+                    getPlaylist();
+                    pl_get = true;
+                }
+            }
         }
         if (data.title !== undefined) {
             dom_cache.title.text(decodeURIComponent(window.atob(data.title)));
@@ -79,25 +92,15 @@ var view = function() {
             $('a.active').removeClass('active');
             $('a[data-id=' + data.current_id + ']').addClass('active');
         }
-        var pl_get = false;
         if (data.playlist_count !== undefined) {
             if (var_cache.playlist_count === undefined) {
                 var_cache.playlist_count = data.playlist_count;
             } else
             if (data.playlist_count !== var_cache.playlist_count) {
-                getPlaylist();
-                pl_get = true;
-                var_cache.playlist_count = data.playlist_count;
-            }
-        }
-        if (data.playlist_info !== undefined) {
-            if (data.playlist_info.id === undefined) {
-                dom_cache.playlists.children('option:selected').prop('selected', false);
-            } else {
-                var selected_pl = parseInt(dom_cache.playlists.children('option:selected').val());
-                if ( selected_pl !== data.playlist_info.id && !pl_get) {
+                if (!pl_get) {
                     getPlaylist();
                 }
+                var_cache.playlist_count = data.playlist_count;
             }
         }
 //console.log(data);
