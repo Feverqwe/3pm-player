@@ -428,19 +428,20 @@ var engine_tags = function(mySettings,myEngine) {
                  */
                 var thread = 0;
                 var item_id = -1;
-                var item_len = engine.playlist.playlist.length;
+                var items = engine.playlist.playlist;
+                var items_len = engine.playlist.playlist.length;
                 var next_item = function () {
                     if (thread < 5) {
                         item_id++;
                         thread++;
-                        if (item_id >= item_len) {
+                        if (item_id >= items_len) {
                             /*
                              var endDate = new Date().getTime();
                              console.log("Time: " + ((endDate - startDate) / 1000) + "s");
                              */
                             return;
                         }
-                        var track = engine.playlist.playlist[item_id];
+                        var track = items[item_id];
                         if (track.tags !== undefined && track.tags.reader_state === true) {
                             thread--;
                             next_item();
