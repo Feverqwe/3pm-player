@@ -376,6 +376,9 @@ var dialog = function() {
                 var item = var_cache.box_list.entries[id];
                 if (item.type === "folder") {
                     folder_id = item.id;
+                    /**
+                     * @namespace item.path_collection
+                     */
                     var_cache.box_parent = item.path_collection.entries;
                 } else {
                     var ch_box = $(this).children('input');

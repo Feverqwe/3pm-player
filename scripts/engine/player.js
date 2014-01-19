@@ -434,9 +434,6 @@ var engine_player = function(mySettings, myEngine) {
                     });
                 };
                 next_item();
-            },
-            getCurrentTrackID: function () {
-                return e_player.current_id;
             }
         }
     }();

@@ -217,11 +217,15 @@ var engine_lastfm = function(mySettings, myEngine) {
         };
         var apiCallSignature = function(params) {
             var secret = 'e7599b43e138572644a2c49a629af6b2';
-            var keys = new Array();
+            var keys = [];
             var o = '';
 
-            for (var x in params)
+            for (var x in params) {
+                if (!params.hasOwnProperty(x)) {
+                    continue;
+                }
                 keys.push(x);
+            }
 
             // params has to be ordered alphabetically
             keys.sort();

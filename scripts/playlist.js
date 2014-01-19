@@ -130,7 +130,7 @@ var playlist = function() {
         add_image(pic_list);
         dom_cache.playlist_ul.empty().append(dom_list);
         _send('player', function(window) {
-            playlist.selected(window.engine.player.getCurrentTrackID());
+            playlist.selected(window.engine.player.current_id);
         });
     };
     var update_playlist_item = function(id, item) {
@@ -294,8 +294,8 @@ var playlist = function() {
             }
             _send('player', function(window) {
                 writePlaylist(window.engine.playlist.getPlaylist());
-                window.engine.playlist.setShuffle(null);
-                window.engine.playlist.setLoop(null);
+                view.setShuffle(window.engine.playlist.shuffle);
+                view.setLoop(window.engine.playlist.loop);
                 window.engine.setHotkeys(document);
                 selectPL(window.engine.playlist.getM3UPlaylists());
             });
@@ -336,7 +336,7 @@ var playlist = function() {
             });
             dom_cache.order.on('click', function() {
                 _send('player', function(window) {
-                    var playlist_order = window.engine.playlist.getPlaylistOrder();
+                    var playlist_order = window.engine.playlist.playlist_order;
                     if (playlist_order[0] === undefined) {
                         return;
                     }

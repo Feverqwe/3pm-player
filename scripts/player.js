@@ -930,11 +930,10 @@
         }
         return 'rgba(' + a + ', ' + b + ', ' + c + ', 1)';
     };
-    var calculateMoveble = function (selectors, size, classname) {
+    var calculateMoveble = function (titles, size, classname) {
         /*
          * Расчитывает стиль прокрутки длиных имен. для Winmap.
          */
-        var titles = selectors;
         var titles_l = titles.length;
 
         for (var i = 0; i < titles_l; i++) {
@@ -955,14 +954,13 @@
                     str_w = str_w * 10;
             } else
                 str_w = str_w * 10;
-            var str_s = size;
-            var time_calc = Math.round(parseInt(str_w) / parseInt(str_s) * 3.5);
-            var move_name = 'moveble' + '_' + str_s + '_' + str_w;
+            var time_calc = Math.round(parseInt(str_w) / parseInt(size) * 3.5);
+            var move_name = 'moveble' + '_' + size + '_' + str_w;
             if (dom_cache.body.children('.' + move_name).length === 0) {
                 dom_cache.body.append($('<style>', {'class': move_name, text: '@-webkit-keyframes a_' + move_name
                     + '{'
                     + '0%{margin-left:2px;}'
-                    + '50%{margin-left:-' + (str_w - str_s) + 'px;}'
+                    + '50%{margin-left:-' + (str_w - size) + 'px;}'
                     + '90%{margin-left:6px;}'
                     + '100%{margin-left:2px;}'
                     + '}'

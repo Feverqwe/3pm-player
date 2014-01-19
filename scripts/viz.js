@@ -82,7 +82,6 @@ var viz = function() {
             }
             if (key === "track") {
                 setTags(value);
-                return;
             }
         },
         getAudio: function() {

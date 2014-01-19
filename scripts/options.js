@@ -71,7 +71,7 @@ var options = function() {
                     }
                 }
                 var name = item.name + ' (' + item.address + ')';
-                interfaces.append($('<option>', {value: item.name, text: name, selected: (interface_ === item.name) ? true : false}));
+                interfaces.append($('<option>', {value: item.name, text: name, selected: (interface_ === item.name)}));
             });
             interface_ = interfaces.val();
             items.forEach(function(item) {
@@ -97,9 +97,8 @@ var options = function() {
             });
         });
     };
-    var set_place_holder = function(settings) {
+    var set_place_holder = function(set) {
         $.each(def_settings, function(k, v) {
-            var set = settings;
             if (v.t === "text" || v.t === "number" || v.t === "password") {
                 $('input[name="' + k + '"]').removeAttr("value");
                 if (set[k] !== undefined && set[k] != v.v) {
@@ -124,7 +123,7 @@ var options = function() {
                 }
             }
         });
-        write_qrcodes(settings);
+        write_qrcodes(set);
     };
     var write_language = function(language) {
         if (language === undefined) {

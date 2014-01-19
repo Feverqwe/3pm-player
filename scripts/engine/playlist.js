@@ -5,7 +5,7 @@ var engine_playlist = function(mySettings, myEngine) {
     var e_playlist = function () {
         var current_played_pos = -1,
             M3UPlaylists = {};
-        canFilePlay = function (file) {
+        var canFilePlay = function (file) {
             /*
              * Определяет может ли плеер проигрывать файл, возвращает true / false.
              */
@@ -129,9 +129,6 @@ var engine_playlist = function(mySettings, myEngine) {
             setPlaylistOrder: function (new_order_index) {
                 e_playlist.order_index = new_order_index;
                 return e_playlist.getPlaylist();
-            },
-            getPlaylistOrder: function () {
-                return e_playlist.playlist_order;
             },
             setSortedList: function (new_playlist_order, new_order_index) {
                 e_playlist.playlist_order[new_order_index] = new_playlist_order;
