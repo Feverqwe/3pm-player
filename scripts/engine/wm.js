@@ -162,10 +162,11 @@ var engine_wm = function(mySettings,myEngine) {
             chrome.app.window.create(url, args, oncreate);
         };
         return function (options) {
+            var position;
             if (options.type === 'playlist') {
                 options.toggle = true;
                 chrome.storage.local.get(['pl_pos_left', 'pl_pos_top', 'pl_w', 'pl_h'], function (storage) {
-                    var position = checkWindowPosition({
+                    position = checkWindowPosition({
                         width: storage.pl_w || 335,
                         height: storage.pl_h || 400,
                         left: storage.pl_pos_left,
@@ -190,7 +191,7 @@ var engine_wm = function(mySettings,myEngine) {
             } else if (options.type === 'viz') {
                 options.toggle = true;
                 chrome.storage.local.get(['viz_pos_left', 'viz_pos_top', 'viz_w', 'viz_h'], function (storage) {
-                    var position = checkWindowPosition({
+                    position = checkWindowPosition({
                         width: storage.viz_w || 1024,
                         height: storage.viz_h || 768,
                         left: storage.viz_pos_left,
@@ -236,6 +237,9 @@ var engine_wm = function(mySettings,myEngine) {
                     if (options.config.list !== undefined) {
                         len = 0;
                         for (var index in options.config.list) {
+                            /**
+                             * @namespace options.config.list.hasOwnProperty
+                             */
                             if (!options.config.list.hasOwnProperty(index)) {
                                 continue;
                             }
@@ -260,7 +264,7 @@ var engine_wm = function(mySettings,myEngine) {
                     }
                     options.config.h = len * 19 + 40;
                 }
-                var position = checkWindowPosition({
+                position = checkWindowPosition({
                     width: options.config.w,
                     height: options.config.h,
                     left: undefined,
@@ -281,7 +285,7 @@ var engine_wm = function(mySettings,myEngine) {
                 });
             } else if (options.type === 'options') {
                 options.only = true;
-                var position = checkWindowPosition({
+                position = checkWindowPosition({
                     width: 820,
                     height: 600,
                     left: undefined,
