@@ -4,8 +4,8 @@
  * @namespace document.webkitHidden
  * @namespace chrome.app.window.current.onBoundsChanged
  */
-(function (ns) {
-    var view = ns.view = {};
+(function () {
+    var view = window.view = {};
     var dom_cache = {};
     var var_cache = {};
     var time_tipe = 0;
@@ -1169,7 +1169,7 @@
     view.getContextMenu = function () {
         return context_menu;
     };
-})(window);
+})();
 (function () {
     var settings_ready = false;
     var dom_ready = false;
