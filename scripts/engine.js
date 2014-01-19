@@ -114,6 +114,7 @@ var _debug = false;
     engine.player = engine_player(settings, engine);
     engine.tags = engine_tags(settings, engine);
     engine.playlist = engine_playlist(settings, engine);
+    engine.files = engine_files(settings, engine);
     engine.loadSettings = function (obj) {
         var changes = {};
         for (var key in settings) {

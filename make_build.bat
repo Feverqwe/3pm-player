@@ -17,22 +17,24 @@ java -jar compiler.jar --js .\www\js\main.js --js_output_file .\build\www\js\mai
 java -jar compiler.jar --js .\scripts\background.js --js_output_file .\build\scripts\background.js
 :: make engine.js
 java -jar compiler.jar --js .\scripts\engine.js --js_output_file .\build\scripts\engine.js
-:: make engine/cloud.js
-java -jar compiler.jar --js .\scripts\engine\cloud.js --js_output_file .\build\scripts\engine\cloud.js
-:: make engine/lastfm.js
-java -jar compiler.jar --js .\scripts\engine\lastfm.js --js_output_file .\build\scripts\engine\lastfm.js
-:: make engine/notification.js
-java -jar compiler.jar --js .\scripts\engine\notification.js --js_output_file .\build\scripts\engine\notification.js
-:: make engine/player.js
-java -jar compiler.jar --js .\scripts\engine\player.js --js_output_file .\build\scripts\engine\player.js
-:: make engine/playlist.js
-java -jar compiler.jar --js .\scripts\engine\playlist.js --js_output_file .\build\scripts\engine\playlist.js
-:: make engine/tags.js
-java -jar compiler.jar --js .\scripts\engine\tags.js --js_output_file .\build\scripts\engine\tags.js
-:: make engine/webui.js
-java -jar compiler.jar --js .\scripts\engine\webui.js --js_output_file .\build\scripts\engine\webui.js
-:: make engine/wm.js
-java -jar compiler.jar --js .\scripts\engine\wm.js --js_output_file .\build\scripts\engine\wm.js
+:: make engine/e_cloud.js
+java -jar compiler.jar --js .\scripts\engine\e_cloud.js --js_output_file .\build\scripts\engine\e_cloud.js
+:: make engine/e_lastfm.js
+java -jar compiler.jar --js .\scripts\engine\e_lastfm.js --js_output_file .\build\scripts\engine\e_lastfm.js
+:: make engine/e_notification.js
+java -jar compiler.jar --js .\scripts\engine\e_notification.js --js_output_file .\build\scripts\engine\e_notification.js
+:: make engine/e_player.js
+java -jar compiler.jar --js .\scripts\engine\e_player.js --js_output_file .\build\scripts\engine\e_player.js
+:: make engine/e_playlist.js
+java -jar compiler.jar --js .\scripts\engine\e_playlist.js --js_output_file .\build\scripts\engine\e_playlist.js
+:: make engine/e_tags.js
+java -jar compiler.jar --js .\scripts\engine\e_tags.js --js_output_file .\build\scripts\engine\e_tags.js
+:: make engine/e_webui.js
+java -jar compiler.jar --js .\scripts\engine\e_webui.js --js_output_file .\build\scripts\engine\e_webui.js
+:: make engine/e_wm.js
+java -jar compiler.jar --js .\scripts\engine\e_wm.js --js_output_file .\build\scripts\engine\e_wm.js
+:: make engine/e_files.js
+java -jar compiler.jar --js .\scripts\engine\e_files.js --js_output_file .\build\scripts\engine\e_files.js
 :: make id3-minimized.js
 java -jar compiler.jar --js .\scripts\id3-minimized.js --js_output_file .\build\scripts\id3-minimized.js
 :: make player.js

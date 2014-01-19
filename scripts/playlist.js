@@ -385,7 +385,7 @@ var playlist = function() {
                 var files = event.originalEvent.dataTransfer.files;
                 var entrys = event.originalEvent.dataTransfer.items;
                 _send('player', function(window) {
-                    window.view.readFileArray(files, entrys, true, function(files) {
+                    window.engine.files.readFileArray(files, entrys, true, function(files) {
                         window.engine.playlist.append(files);
                     });
                 });

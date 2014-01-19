@@ -272,11 +272,11 @@ var engine_playlist = function(mySettings, myEngine) {
                 }
                 engine.cloud.abort();
                 if (album.type === 'subfiles') {
-                    view.getFilesFromFolder(album.entry, function (files) {
+                    engine.files.getFilesFromFolder(album.entry, function (files) {
                         engine.open(files, {name: album.name, id: id});
                     });
                 } else if (album.type === 'm3u') {
-                    view.entry2files(album.entrys, function (files) {
+                    engine.files.entry2files(album.entrys, function (files) {
                         engine.open(files, {name: album.name, id: id});
                     });
                 } else if (album.cloud !== undefined && engine.cloud[album.cloud.type] !== undefined && engine.cloud[album.cloud.type].on_select_list !== undefined) {
