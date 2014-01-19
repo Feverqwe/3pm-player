@@ -294,8 +294,8 @@ var playlist = function() {
             }
             _send('player', function(window) {
                 writePlaylist(window.engine.playlist.getPlaylist());
-                view.setShuffle(window.engine.playlist.shuffle);
-                view.setLoop(window.engine.playlist.loop);
+                playlist.setShuffle(window.engine.playlist.shuffle);
+                playlist.setLoop(window.engine.playlist.loop);
                 window.engine.setHotkeys(document);
                 selectPL(window.engine.playlist.getM3UPlaylists());
             });
