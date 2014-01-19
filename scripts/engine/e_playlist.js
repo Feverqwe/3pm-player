@@ -20,7 +20,8 @@ var engine_playlist = function(mySettings, myEngine) {
         };
         return {
             playlist: [],
-            playlist_info: {name: '3pm-player'},
+            //playlist_info - это объект. Обязательно должен иметь id едля отображения акой либо информации - в простивном случае плэйлист не имеющий id - не будет иметь инфмаци о себе.
+            playlist_info: {},
             playlist_order: {},
             order_index: 0,
             playedlist: [],
@@ -41,8 +42,8 @@ var engine_playlist = function(mySettings, myEngine) {
             reset: function () {
                 //массив плэйлиста
                 e_playlist.playlist = [];
-                //название плэйлиста
-                e_playlist.playlist_info = {name: '3pm-player'};
+                //сбрасываем инфу о плейлисте
+                e_playlist.playlist_info = {};
                 //индекс сортировки
                 e_playlist.order_index = 0;
                 //порядок сортровки
@@ -166,14 +167,9 @@ var engine_playlist = function(mySettings, myEngine) {
                         pls.push({name: item.name, id: item.id});
                     });
                 }
-                var pl_i = {name: _lang.playlist_title};
-                if (e_playlist.playlist_info.id !== undefined) {
-                    pl_i = {name: e_playlist.playlist_info.name, id: e_playlist.playlist_info.id};
-                }
                 var rez = engine.player.status();
                 rez.playlist = list;
                 rez.playlists = pls;
-                rez.playlist_info = pl_i;
                 return window.btoa(encodeURIComponent(JSON.stringify(rez)));
             },
             getPlaylist: function () {

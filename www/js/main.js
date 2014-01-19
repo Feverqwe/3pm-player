@@ -28,6 +28,7 @@ var view = function() {
             dom_cache.btnPlayPause.removeClass('play').addClass('pause');
         }
         if (data.playlist !== undefined) {
+            //если получен список треков в плейлисте
             var items = data.playlist;
             dom_cache.playlist.empty();
             for (var i = 0; i < items.length; i++) {
@@ -35,21 +36,25 @@ var view = function() {
                 dom_cache.playlist.append($('<a>', {href: '#', 'class': 'list-group-item', 'data-id': item.id, text: item.title}));
             }
         }
-        if (data.playlists !== undefined && data.playlist_info !== undefined) {
-            var current_pl = dom_cache.playlists.val();
+        if (data.playlists !== undefined) {
+            //если получен список плейлистов
             var item_count = dom_cache.playlists.children('option').length;
-            if (data.playlist_info.id === undefined) {
-                if (item_count !== 0) {
-                    dom_cache.playlists.empty();
-                }
+            if (data.playlists.length === 0) {
+                //если список плейлистов пуст, то очищаем и скрываем его
+                dom_cache.playlists.empty();
                 dom_cache.playlists.parent().hide();
             } else {
                 dom_cache.playlists.parent().show();
-                if (current_pl !== data.playlist_info.name || item_count !== data.playlists.length) {
+                var new_selected_id = dom_cache.playlists.children('option[value='+data.playlist_info.id+']');
+                if (data.playlists.length !== item_count || (data.playlist_info.id !== undefined && new_selected_id.length !== 1)) {
+                    //если кол-во элементов не совпало - переписываем список
                     dom_cache.playlists.empty();
                     data.playlists.forEach(function(item) {
-                        dom_cache.playlists.append($('<option>', {text: item.name, value: item.id, selected: (data.playlist_info.id === item.id) ? true : false}));
+                        dom_cache.playlists.append($('<option>', {text: item.name, value: item.id, selected: (data.playlist_info.id === item.id)}));
                     });
+                } else if (new_selected_id.prop('selected') === false) {
+                    dom_cache.playlists.children('option:selected').prop('selected', false);
+                    new_selected_id.prop('selected', true);
                 }
             }
         }
@@ -74,13 +79,25 @@ var view = function() {
             $('a.active').removeClass('active');
             $('a[data-id=' + data.current_id + ']').addClass('active');
         }
+        var pl_get = false;
         if (data.playlist_count !== undefined) {
             if (var_cache.playlist_count === undefined) {
                 var_cache.playlist_count = data.playlist_count;
             } else
             if (data.playlist_count !== var_cache.playlist_count) {
                 getPlaylist();
+                pl_get = true;
                 var_cache.playlist_count = data.playlist_count;
+            }
+        }
+        if (data.playlist_info !== undefined) {
+            if (data.playlist_info.id === undefined) {
+                dom_cache.playlists.children('option:selected').prop('selected', false);
+            } else {
+                var selected_pl = parseInt(dom_cache.playlists.children('option:selected').val());
+                if ( selected_pl !== data.playlist_info.id && !pl_get) {
+                    getPlaylist();
+                }
             }
         }
 //console.log(data);
@@ -104,12 +121,9 @@ var view = function() {
             };
             dom_cache.playlists.on('change', function() {
                 var id = this.value;
-                var_cache.playlist_count = null;
                 $.get('/set_playlist/' + id, function(data) {
+                    data = JSON.parse(decodeURIComponent(window.atob(data)));
                     read_status(data);
-                    setTimeout(function() {
-                        getStatus();
-                    }, 200);
                 });
             });
             dom_cache.title.on('click', function(e) {

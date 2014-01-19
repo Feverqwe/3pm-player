@@ -153,7 +153,7 @@ var _debug = false;
         engine.resetPlayer();
         engine.playlist.playlist = trackList[0];
         engine.playlist.playlist_order = trackList[1];
-        if (info !== undefined) {
+        if (info !== undefined && info.name !== undefined) {
             engine.playlist.playlist_info = info;
         }
         _send('playlist', function (window) {

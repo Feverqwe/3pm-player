@@ -268,6 +268,8 @@ var engine_player = function(mySettings, myEngine) {
                 status.loop = engine.playlist.loop;
                 status.shuffle = engine.playlist.shuffle;
                 status.current_id = e_player.current_id;
+                var pl_info = {name:engine.playlist.playlist_info.name, id:engine.playlist.playlist_info.id};
+                status.playlist_info = pl_info;
                 status.playlist_count = engine.playlist.playlist.length;
                 var tb = engine.tags.getTagBody(e_player.current_id);
                 if (tb.aa !== undefined) {

@@ -69,7 +69,25 @@ var engine_webui = function(mySettings, myEngine) {
             }
             return str;
         };
-
+        var waitPlChange = function(id,cb) {
+            //ждем изменения плэйлиста в течении 30 секунд, проверка каждые 500мс
+            var counter = 60;
+            var startTimer = function() {
+                if (id !== engine.playlist.playlist_info.id) {
+                    setTimeout(function(){
+                        counter--;
+                        if (counter === 0) {
+                            cb();
+                            return;
+                        }
+                        startTimer();
+                    }, 500);
+                } else {
+                    cb();
+                }
+            };
+            startTimer();
+        };
         var readUrl = function(headerMap, socketId) {
             if (headerMap.url === '/') {
                 headerMap.url = '/index.html';
@@ -104,7 +122,10 @@ var engine_webui = function(mySettings, myEngine) {
             if (headerMap.url.substr(0, 14) === '/set_playlist/') {
                 var id = parseInt(headerMap.url.substr(14));
                 engine.playlist.selectPlaylist(id);
-                return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: : text/html']);
+                waitPlChange(id, function() {
+                    return response_(socketId, headerMap, engine.playlist.APIplaylist(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: : text/html']);
+                });
+                return;
             } else
             if (headerMap.url === '/playlist') {
                 return response_(socketId, headerMap, engine.playlist.APIplaylist(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: : text/html']);
