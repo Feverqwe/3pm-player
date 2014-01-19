@@ -284,7 +284,7 @@ var engine_files = function(mySettings, myEngine) {
                         if (files_only) {
                             continue;
                         }
-                        e_files.readDirectory(item);
+                        readDirectory(item);
                         return;
                     } else {
                         var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
@@ -353,7 +353,7 @@ var engine_files = function(mySettings, myEngine) {
                 if (m3u.length > 0) {
                     readDirectoryWithM3U(m3u, entry);
                 } else {
-                    e_files.readDirectoryWithSub(entry);
+                    readDirectoryWithSub(entry);
                 }
             });
         };
