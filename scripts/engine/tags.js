@@ -329,6 +329,7 @@ var engine_tags = function(mySettings,myEngine) {
                         return;
                     }
                     if (settings.lastfm && tb.artist !== undefined && tb.album !== undefined) {
+                        var audio = engine.player.getAudio();
                         engine.lastfm.updateNowPlaying(tb.artist, tb.title, tb.album, audio.duration);
                     }
                 };
