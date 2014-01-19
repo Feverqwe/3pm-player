@@ -189,7 +189,7 @@ var engine_tags = function(mySettings,myEngine) {
         var postTagReader = function (id, cb) {
             cb(id);
             if (settings.lastfm_info || settings.lastfm_cover) {
-                engine.player.lfmTagReader(id);
+                e_tags.lfmTagReader(id);
             }
         };
         return {
@@ -355,6 +355,43 @@ var engine_tags = function(mySettings,myEngine) {
                 notifi();
                 viz();
                 lfm();
+            },
+            lfmTagReader: function (id) {
+                var track = engine.playlist.playlist[id];
+                if (track.lfm === undefined) {
+                    track.lfm = {};
+                }
+                if (!settings.lastfm_info && !settings.lastfm_cover || track.lfm.lastfm) {
+                    return;
+                }
+                var use_cache = engine.player.current_id !== id;
+                if (use_cache) {
+                    if (track.lfm.lastfm_cache) {
+                        return;
+                    } else {
+                        track.lfm.lastfm_cache = true;
+                    }
+                } else {
+                    track.lfm.lastfm = true;
+                }
+                if (track.tags === undefined
+                    || track.tags.artist === undefined
+                    || track.tags.title === undefined) {
+                    return;
+                }
+                var no_cover = track.tags.picture !== undefined;
+                engine.lastfm.getInfo(track.tags.artist, track.tags.title, track.tags.album, function (lfm_tags, blob) {
+                    if (lfm_tags === undefined) {
+                        return;
+                    }
+                    e_tags.lastfmTagReady(id, lfm_tags, blob, function (id) {
+                        if (id === engine.player.current_id) {
+                            e_tags.tagsLoaded(id, 3);
+                        } else {
+                            e_tags.tagsLoaded(id, 1);
+                        }
+                    });
+                }, use_cache, no_cover);
             },
             lastfmTagReady : function (id, new_tags, blob, cb) {
                 if (new_tags === undefined) {

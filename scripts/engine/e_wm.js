@@ -304,7 +304,7 @@ var engine_wm = function(mySettings,myEngine) {
                     window.contentWindow._send = _send;
                 });
             }
-        }
+        };
     }();
     return e_wm;
 };

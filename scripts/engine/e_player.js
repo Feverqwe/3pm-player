@@ -98,7 +98,7 @@ var engine_player = function(mySettings, myEngine) {
             });
             $(audio).on('pause', function () {
                 view.state("pause");
-                e_player.discAdapters();
+                discAdapters();
             });
             $(audio).on('loadedmetadata', function () {
                 if (engine.playlist.playlist[e_player.current_id].duration === undefined) {
@@ -108,7 +108,7 @@ var engine_player = function(mySettings, myEngine) {
                 _send('viz', function (window) {
                     window.viz.audio_state('loadedmetadata');
                 });
-                e_player.discAdapters();
+                discAdapters();
             });
             $(audio).on('loadeddata', function () {
                 if (settings.next_track_notification) {
@@ -122,7 +122,7 @@ var engine_player = function(mySettings, myEngine) {
                 } else {
                     engine.tags.tagsLoaded(e_player.current_id, 2);
                     if ((settings.lastfm_info || settings.lastfm_cover) && (track.lfm === undefined || track.lfm.lastfm !== true)) {
-                        e_player.lfmTagReader(e_player.current_id);
+                        engine.tags.lfmTagReader(e_player.current_id);
                     }
                 }
                 view.state("loadeddata");
@@ -165,65 +165,29 @@ var engine_player = function(mySettings, myEngine) {
                 view.setVolume(audio.volume);
             });
         })();
+        var discAdapters = function (name) {
+            var rmlist = [];
+            if (name !== undefined && adapter.proc_list[name] !== undefined) {
+                /**
+                 * @namespace adapter.proc_list.disconnect(0
+                 */
+                adapter.proc_list[name].disconnect();
+                rmlist.push(name);
+            }
+            $.each(adapter.proc_list, function (key, proc) {
+                if (proc._window.window === null) {
+                    proc.disconnect();
+                    rmlist.push(key);
+                }
+            });
+            rmlist.forEach(function (name) {
+                delete adapter.proc_list[name];
+            });
+        };
         return {
             allow_ext: ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'],
             current_id: undefined,
-            lfmTagReader: function (id) {
-                var track = engine.playlist.playlist[id];
-                if (track.lfm === undefined) {
-                    track.lfm = {};
-                }
-                if (!settings.lastfm_info && !settings.lastfm_cover || track.lfm.lastfm) {
-                    return;
-                }
-                var use_cache = e_player.current_id !== id;
-                if (use_cache) {
-                    if (track.lfm.lastfm_cache) {
-                        return;
-                    } else {
-                        track.lfm.lastfm_cache = true;
-                    }
-                } else {
-                    track.lfm.lastfm = true;
-                }
-                if (track.tags === undefined
-                    || track.tags.artist === undefined
-                    || track.tags.title === undefined) {
-                    return;
-                }
-                var no_cover = track.tags.picture !== undefined;
-                engine.lastfm.getInfo(track.tags.artist, track.tags.title, track.tags.album, function (lfm_tags, blob) {
-                    if (lfm_tags === undefined) {
-                        return;
-                    }
-                    engine.tags.lastfmTagReady(id, lfm_tags, blob, function (id) {
-                        if (id === e_player.current_id) {
-                            engine.tags.tagsLoaded(id, 3);
-                        } else {
-                            engine.tags.tagsLoaded(id, 1);
-                        }
-                    });
-                }, use_cache, no_cover);
-            },
-            discAdapters: function (name) {
-                var rmlist = [];
-                if (name !== undefined && adapter.proc_list[name] !== undefined) {
-                    /**
-                     * @namespace adapter.proc_list.disconnect(0
-                     */
-                    adapter.proc_list[name].disconnect();
-                    rmlist.push(name);
-                }
-                $.each(adapter.proc_list, function (key, proc) {
-                    if (proc._window.window === null) {
-                        proc.disconnect();
-                        rmlist.push(key);
-                    }
-                });
-                rmlist.forEach(function (name) {
-                    delete adapter.proc_list[name];
-                });
-            },
+            discAdapters: discAdapters,
             getAdapter: function (cb) {
                 if (cb !== undefined) {
                     cb(adapter);
@@ -435,7 +399,7 @@ var engine_player = function(mySettings, myEngine) {
                 };
                 next_item();
             }
-        }
+        };
     }();
     return e_player;
 };

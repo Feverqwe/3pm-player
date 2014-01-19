@@ -62,7 +62,7 @@ var engine_notification = function (mySettings,myEngine) {
                  */
                 if (obj.current_track !== undefined) {
                     starTimer();
-                    e_notification.update();
+                    update();
                     return;
                 }
                 chrome.notifications.create('current_track', opt, function () {

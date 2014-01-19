@@ -685,7 +685,7 @@ var engine_lastfm = function(mySettings, myEngine) {
                     });
                 });
             }
-        }
+        };
     }();
     return e_lastfm;
 };
