@@ -117,7 +117,7 @@ var engine_webui = function(mySettings, myEngine) {
                 return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
             } else
             if (headerMap.url === '/readTags') {
-                engine.player.readAllTags();
+                engine.tags.readAllTags();
                 return response_(socketId, headerMap, engine.APIstatus(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
             } else
             if (headerMap.url === '/play') {

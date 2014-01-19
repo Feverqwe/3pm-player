@@ -421,6 +421,43 @@ var engine_tags = function(mySettings,myEngine) {
                     }
                     cb(id);
                 });
+            },
+            readAllTags: function () {
+                /*
+                 var startDate = new Date().getTime();
+                 */
+                var thread = 0;
+                var item_id = -1;
+                var item_len = engine.playlist.playlist.length;
+                var next_item = function () {
+                    if (thread < 5) {
+                        item_id++;
+                        thread++;
+                        if (item_id >= item_len) {
+                            /*
+                             var endDate = new Date().getTime();
+                             console.log("Time: " + ((endDate - startDate) / 1000) + "s");
+                             */
+                            return;
+                        }
+                        var track = engine.playlist.playlist[item_id];
+                        if (track.tags !== undefined && track.tags.reader_state === true) {
+                            thread--;
+                            next_item();
+                            return;
+                        }
+                        read_item(track);
+                    }
+                };
+                var read_item = function (item) {
+                    next_item();
+                    e_tags.tagReader(item.id, function (id) {
+                        e_tags.tagsLoaded(id, 1);
+                        thread--;
+                        next_item();
+                    });
+                };
+                next_item();
             }
         };
     }();

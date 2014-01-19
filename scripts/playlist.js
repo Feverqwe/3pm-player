@@ -370,7 +370,7 @@ var playlist = function() {
             });
             $('.read_tags.btn').on('click', function() {
                 _send('player', function(window) {
-                    window.engine.player.readAllTags();
+                    window.engine.tags.readAllTags();
                 });
             });
             dom_cache.pl_list.on('click', 'li', function() {
