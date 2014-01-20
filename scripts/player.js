@@ -279,12 +279,8 @@
                 contexts: ['page', 'launcher'],
                 action: function () {
                     var playlists = engine.playlist.getM3UPlaylists();
-                    if (playlists.list === undefined) {
-                        return;
-                    }
-                    var list = playlists.list;
-                    if (list.length > 0) {
-                        engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: list}});
+                    if (playlists.length > 0) {
+                        engine.windowManager({type: 'dialog', config: {type: "m3u", h: 200, w: 350, r: true, playlists: playlists}});
                     }
                 }
             },
@@ -318,7 +314,7 @@
                 contexts: ['page', 'launcher'],
                 action: function () {
                     engine.cloud.vk.makeAlbums(function (list) {
-                        engine.playlist.setM3UPlaylists({list: list});
+                        engine.playlist.setM3UPlaylists(list);
                         if (list.length === 1) {
                             engine.playlist.selectPlaylist(list[0].id);
                         } else if (list.length > 0) {
@@ -333,7 +329,7 @@
                 contexts: ['page', 'launcher'],
                 action: function () {
                     engine.cloud.sc.makeAlbums(function (list) {
-                        engine.playlist.setM3UPlaylists({list: list});
+                        engine.playlist.setM3UPlaylists(list);
                         if (list.length === 1) {
                             engine.playlist.selectPlaylist(list[0].id);
                         } else if (list.length > 0) {

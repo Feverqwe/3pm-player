@@ -150,7 +150,7 @@ var dialog = function() {
                         return;
                     }
                     _send('player', function(window) {
-                        window.engine.playlist.setM3UPlaylists({list: [playlist]});
+                        window.engine.playlist.setM3UPlaylists([playlist]);
                         window.engine.playlist.selectPlaylist(0);
                     });
                     _window.close();
@@ -175,7 +175,7 @@ var dialog = function() {
                 return;
             }
             _send('player', function(window) {
-                window.engine.playlist.setM3UPlaylists({list: [playlist]});
+                window.engine.playlist.setM3UPlaylists([playlist]);
                 window.engine.playlist.selectPlaylist(0);
             });
             window.close();
@@ -291,7 +291,7 @@ var dialog = function() {
                         return;
                     }
                     _send('player', function(window) {
-                        window.engine.playlist.setM3UPlaylists({list: [playlist]});
+                        window.engine.playlist.setM3UPlaylists([playlist]);
                         window.engine.playlist.selectPlaylist(0);
                     });
                     _window.close();
@@ -317,7 +317,7 @@ var dialog = function() {
                 return;
             }
             _send('player', function(window) {
-                window.engine.playlist.setM3UPlaylists({list: [playlist]});
+                window.engine.playlist.setM3UPlaylists([playlist]);
                 window.engine.playlist.selectPlaylist(0);
             });
             window.close();
@@ -434,7 +434,7 @@ var dialog = function() {
                         return;
                     }
                     _send('player', function(window) {
-                        window.engine.playlist.setM3UPlaylists({list: [playlist]});
+                        window.engine.playlist.setM3UPlaylists([playlist]);
                         window.engine.playlist.selectPlaylist(0);
                     });
                     _window.close();
@@ -458,7 +458,7 @@ var dialog = function() {
                 return;
             }
             _send('player', function(window) {
-                window.engine.playlist.setM3UPlaylists({list: [playlist]});
+                window.engine.playlist.setM3UPlaylists([playlist]);
                 window.engine.playlist.selectPlaylist(0);
             });
             window.close();
@@ -586,7 +586,7 @@ var dialog = function() {
                         return;
                     }
                     _send('player', function(window) {
-                        window.engine.playlist.setM3UPlaylists({list: [playlist]});
+                        window.engine.playlist.setM3UPlaylists([playlist]);
                         window.engine.playlist.selectPlaylist(0);
                     });
                     _window.close();
@@ -612,7 +612,7 @@ var dialog = function() {
                 return;
             }
             _send('player', function(window) {
-                window.engine.playlist.setM3UPlaylists({list: [playlist]});
+                window.engine.playlist.setM3UPlaylists([playlist]);
                 window.engine.playlist.selectPlaylist(0);
             });
             window.close();

@@ -4,7 +4,7 @@ var engine_playlist = function(mySettings, myEngine) {
     var engine = myEngine;
     var e_playlist = function () {
         var current_played_pos = -1,
-            M3UPlaylists = {};
+            M3UPlaylists = [];
         var canFilePlay = function (file) {
             /*
              * Определяет может ли плеер проигрывать файл, возвращает true / false.
@@ -146,18 +146,18 @@ var engine_playlist = function(mySettings, myEngine) {
                 });
             },
             appendPlaylists: function (m3u) {
-                if (M3UPlaylists.list === undefined) {
+                if (M3UPlaylists.length === 0) {
                     e_playlist.selectPlaylist(m3u);
                     return;
                 }
-                var id = M3UPlaylists.list.length;
+                var id = M3UPlaylists.length;
                 var append_list = [];
                 m3u.list.forEach(function(item) {
                     item.id = id;
                     id++;
                     append_list.push(item)
                 });
-                M3UPlaylists.list = M3UPlaylists.list.concat(append_list);
+                M3UPlaylists = M3UPlaylists.concat(append_list);
                 _send('playlist', function (window) {
                     window.playlist.setSelectList(M3UPlaylists);
                 });
@@ -179,11 +179,9 @@ var engine_playlist = function(mySettings, myEngine) {
                     list[i] = {id: track.id, title: title};
                 }
                 var pls = [];
-                if (M3UPlaylists.list !== undefined) {
-                    M3UPlaylists.list.forEach(function (item) {
-                        pls.push({name: item.name, id: item.id});
-                    });
-                }
+                M3UPlaylists.forEach(function (item) {
+                    pls.push({name: item.name, id: item.id});
+                });
                 var rez = engine.player.status();
                 rez.playlist = list;
                 rez.playlists = pls;
@@ -272,11 +270,11 @@ var engine_playlist = function(mySettings, myEngine) {
                 });
             },
             selectPlaylist : function (id) {
-                if (M3UPlaylists.list === undefined) {
+                if (M3UPlaylists.length === 0) {
                     return;
                 }
                 var album;
-                M3UPlaylists.list.forEach(function (item) {
+                M3UPlaylists.forEach(function (item) {
                     if (item.id === id) {
                         album = item;
                     }

@@ -179,8 +179,8 @@ var playlist = function() {
         /*
          * Показывает скрываает кнопку отображения скписка плэйлстов.
          */
-        if (playlist.list !== undefined) {
-            makeSelectList(playlist.list);
+        if (playlist.length !== 0) {
+            makeSelectList(playlist);
             $('.playlist_select').show();
         } else {
             $('.playlist_select').hide();

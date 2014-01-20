@@ -128,10 +128,10 @@ var engine_files = function(mySettings, myEngine) {
                     return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
                 });
                 if (cb !== undefined) {
-                    cb({list: playlist});
+                    cb(playlist);
                     return;
                 }
-                engine.playlist.setM3UPlaylists({list: playlist});
+                engine.playlist.setM3UPlaylists(playlist);
                 if (playlist.length === 1) {
                     engine.playlist.selectPlaylist(playlist[0].id);
                 } else if (playlist.length > 0) {
@@ -431,10 +431,10 @@ var engine_files = function(mySettings, myEngine) {
                         return (a.name === b.name) ? 0 : (a.name > b.name) ? 1 : -1;
                     });
                     if (cb !== undefined) {
-                        cb({list: playlist});
+                        cb(playlist);
                         return;
                     }
-                    engine.playlist.setM3UPlaylists({list: playlist});
+                    engine.playlist.setM3UPlaylists(playlist);
                     if (playlist.length === 1) {
                         engine.playlist.selectPlaylist(playlist[0].id);
                     } else if (playlist.length > 0) {
@@ -472,7 +472,7 @@ var engine_files = function(mySettings, myEngine) {
             var dune = function(new_playlist) {
                 dune_count++;
                 if (new_playlist !== undefined) {
-                    playlist = playlist.concat(new_playlist.list);
+                    playlist = playlist.concat(new_playlist);
                 }
                 if (cb_count !== dune_count) {
                     return;
@@ -487,10 +487,10 @@ var engine_files = function(mySettings, myEngine) {
                     return;
                 }
                 if (cb !== undefined) {
-                    cb({list:playlist});
+                    cb(playlist);
                     return;
                 }
-                engine.playlist.setM3UPlaylists({list: playlist});
+                engine.playlist.setM3UPlaylists(playlist);
                 if (playlist.length === 1) {
                     engine.playlist.selectPlaylist(playlist[0].id);
                 } else if (playlist.length > 0) {
@@ -524,7 +524,7 @@ var engine_files = function(mySettings, myEngine) {
             }
             if (just_files.length > 0) {
                 cb_count++;
-                dune({list: {type: 'm3u', entrys: just_files, name: _lang.playlist_title}});
+                dune({type: 'm3u', entrys: just_files, name: _lang.playlist_title});
             }
         };
         return {
