@@ -145,6 +145,23 @@ var engine_playlist = function(mySettings, myEngine) {
                     window.playlist.setSelectList(M3UPlaylists);
                 });
             },
+            appendPlaylists: function (m3u) {
+                if (M3UPlaylists.list === undefined) {
+                    e_playlist.selectPlaylist(m3u);
+                    return;
+                }
+                var id = M3UPlaylists.list.length;
+                var append_list = [];
+                m3u.list.forEach(function(item) {
+                    item.id = id;
+                    id++;
+                    append_list.push(item)
+                });
+                M3UPlaylists.list = M3UPlaylists.list.concat(append_list);
+                _send('playlist', function (window) {
+                    window.playlist.setSelectList(M3UPlaylists);
+                });
+            },
             APIplaylist: function () {
                 var playlist_ordered = e_playlist.playlist_order[e_playlist.order_index];
                 var playlist_order_len = 0;
