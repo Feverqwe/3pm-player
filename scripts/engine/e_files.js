@@ -471,10 +471,9 @@ var engine_files = function(mySettings, myEngine) {
             var playlist = [];
             var dune = function(new_playlist) {
                 dune_count++;
-                if (new_playlist === undefined) {
-                    return;
+                if (new_playlist !== undefined) {
+                    playlist = playlist.concat(new_playlist.list);
                 }
-                playlist = playlist.concat(new_playlist.list);
                 if (cb_count !== dune_count) {
                     return;
                 }
