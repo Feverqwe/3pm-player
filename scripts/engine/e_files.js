@@ -80,7 +80,7 @@ var engine_files = function(mySettings, myEngine) {
             var playlists = {};
             var playlist_count = entrys.length;
             var playlist_dune_count = 0;
-            var fileMede = false;
+            var fileMode = false;
             var dune = function () {
                 /*
                  * Получает команду готово как только один из плэйлистов будет заполнен.
@@ -228,7 +228,7 @@ var engine_files = function(mySettings, myEngine) {
                         extinfo = '';
                         continue;
                     }
-                    if (fileMede) {
+                    if (fileMode) {
                         continue;
                     }
                     var path_arr = line.split('/');
@@ -244,7 +244,7 @@ var engine_files = function(mySettings, myEngine) {
                         path += "/" + path_arr[n];
                     }
                 }
-                if (fileMede) {
+                if (fileMode) {
                     dune();
                 } else {
                     readEntry(entry, file_tree);
@@ -262,7 +262,7 @@ var engine_files = function(mySettings, myEngine) {
                 r.readAsText(file);
             };
             if (entrys.file !== undefined) {
-                fileMede = true;
+                fileMode = true;
                 playlist_count = 1;
                 entrys.file(function (file) {
                     openM3U(file);
