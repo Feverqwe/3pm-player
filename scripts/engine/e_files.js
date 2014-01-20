@@ -480,6 +480,12 @@ var engine_files = function(mySettings, myEngine) {
                 playlist.forEach(function(item, n) {
                     item.id = n;
                 });
+                if (playlist.length === 0) {
+                    if (cb !== undefined) {
+                        cb();
+                    }
+                    return;
+                }
                 if (cb !== undefined) {
                     cb({list:playlist});
                     return;
