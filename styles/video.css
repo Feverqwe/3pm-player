@@ -1,0 +1,48 @@
+html {
+    background-color:#000;
+    width: 100%;
+    height: 100%;
+}
+body {
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+    -webkit-app-region: drag;
+    margin: 0;
+}
+.t_btn {
+    background-size: 14px 14px;
+    height: 14px;
+    width: 14px;
+    float: right;
+    opacity: 0.9;
+    z-index: 50;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 2px;
+    -webkit-filter: invert(0.8);
+    -webkit-filter: brightness(1.1);
+    background-color: rgba(0, 0, 0, 0.51);
+    border-radius: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.t_btn:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.8);
+}
+.full {
+    background-image: url('../images/fullscreen.png');
+    right: 36px;
+    background-size: 9px;
+    background-position-y: 2px;
+}
+.mini {
+    background-image: url('../images/_.png');
+    right: 18px;
+}
+.close {
+    background-image: url('../images/x.png');
+    right: 2px;
+}

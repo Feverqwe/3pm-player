@@ -18,6 +18,11 @@ var engine_playlist = function(mySettings, myEngine) {
                 return engine.player.canPlay('.' + ext);
             }
         };
+        var isVideoFile = function (file) {
+            var filename = file.name;
+            var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
+            return engine.player.video_ext.indexOf(ext) !== -1;
+        };
         return {
             playlist: [],
             //playlist_info - это объект. Обязательно должен иметь id едля отображения акой либо информации - в простивном случае плэйлист не имеющий id - не будет иметь инфмаци о себе.
@@ -239,6 +244,9 @@ var engine_playlist = function(mySettings, myEngine) {
                     }
                     if (canFilePlay(files[i]) === false) {
                         continue;
+                    }
+                    if (isVideoFile(files[i])) {
+                        files[i].isVideo = true;
                     }
                     my_playlist_order[0].push(id);
                     my_playlist.push({id: id, file: files[i], tags: undefined, duration: undefined});

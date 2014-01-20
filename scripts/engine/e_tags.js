@@ -132,6 +132,10 @@ var engine_tags = function(mySettings,myEngine) {
              }
              var startDate = new Date().getTime();
              */
+            if (engine.player.mode === 'video') {
+                cb(id);
+                return;
+            }
             var params = {tags: ["artist", "title", "album", "picture"], file: file};
             ID3.loadTags(0, function () {
                 /*

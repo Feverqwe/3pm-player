@@ -297,6 +297,13 @@
                     }
                 }
             },
+            video: {
+                title: 'Video',
+                contexts: ['page', 'launcher'],
+                action: function () {
+                    engine.windowManager({type: 'video'});
+                }
+            },
             viz: {
                 title: _lang.ctx_viz,
                 contexts: ['page', 'launcher'],

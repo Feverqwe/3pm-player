@@ -210,6 +210,32 @@ var engine_wm = function(mySettings,myEngine) {
                         window.contentWindow._send = _send;
                     });
                 });
+            } else if (options.type === 'video') {
+                options.toggle = true;
+                chrome.storage.local.get(['video_pos_left', 'video_pos_top', 'video_w', 'video_w'], function (storage) {
+                    position = checkWindowPosition({
+                        width: storage.video_w || 720,
+                        height: storage.video_h || 480,
+                        left: storage.video_pos_left,
+                        top: storage.video_pos_top
+                    });
+                    create_window(options, 'video.html', {
+                        bounds: position,
+                        frame: "none"
+                    }, function (window) {
+                        _windows[options.type] = window;
+                        window.onClosed.addListener(function () {
+                            delete _windows[options.type];
+                            if (engine.player.mode === 'video') {
+                                view.state('emptied');
+                                engine.player.switchMedia();
+                            }
+                        });
+                        window.contentWindow._lang = _lang;
+                        window.contentWindow._send = _send;
+                        window.contentWindow.options = options.config;
+                    });
+                });
             } else if (options.type === 'dialog') {
                 options.only = true;
                 /**
