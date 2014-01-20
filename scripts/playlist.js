@@ -171,7 +171,7 @@ var playlist = function() {
          */
         var content = new Array(arr.length);
         for (var i = 0, item; item = arr[i]; i++) {
-            content[i] = $('<li>', {title: item.name, 'data-id': item.id, text: item.name});
+            content[i] = $('<li>', {'data-id': item.id, title: item.name, text: item.name}).append( $('<div>', {'class': 'rm_btn t_btn', title: _lang.remove_item}) );
         }
         dom_cache.pl_list.empty().append(content);
     };
@@ -373,12 +373,27 @@ var playlist = function() {
                     window.engine.tags.readAllTags();
                 });
             });
-            dom_cache.pl_list.on('click', 'li', function() {
+            dom_cache.pl_list.on('click', 'li', function(e) {
+                e.preventDefault();
                 var id = $(this).data('id');
                 _send('player', function(window) {
                     window.engine.playlist.selectPlaylist(id);
                 });
                 $(this).parent().hide();
+            });
+            dom_cache.pl_list.on('click', 'li > div.rm_btn', function(e) {
+                e.stopPropagation();
+                var item = $(this).parent();
+                var id = item.data('id');
+                _send('player', function(window) {
+                    window.engine.playlist.rmPlaylist(id);
+                });
+                var li_b = item.parent();
+                item.remove();
+                if ( li_b.children('li').length === 0 ) {
+                    $('.playlist_select').hide();
+                    li_b.hide();
+                }
             });
             dom_cache.body.on('drop', function(event) {
                 event.preventDefault();

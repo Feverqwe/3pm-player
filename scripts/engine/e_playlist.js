@@ -146,11 +146,12 @@ var engine_playlist = function(mySettings, myEngine) {
                 });
             },
             appendPlaylists: function (m3u) {
-                if (M3UPlaylists.length === 0) {
+                var m3upl_len = M3UPlaylists.length;
+                if (m3upl_len === 0) {
                     e_playlist.selectPlaylist(m3u);
                     return;
                 }
-                var id = M3UPlaylists.length;
+                var id = M3UPlaylists[m3upl_len-1].id + 1;
                 var append_list = [];
                 m3u.list.forEach(function(item) {
                     item.id = id;
@@ -298,6 +299,15 @@ var engine_playlist = function(mySettings, myEngine) {
                 } else {
                     engine.open(album.tracks, {name: album.name, id: id});
                 }
+            },
+            rmPlaylist: function (id) {
+                var item_num = -1;
+                M3UPlaylists.forEach(function (item, n) {
+                    if (item.id === id) {
+                        item_num = n;
+                    }
+                });
+                M3UPlaylists.splice(item_num, 1);
             }
         }
     }();

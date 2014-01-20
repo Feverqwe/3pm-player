@@ -231,6 +231,17 @@ ul.pl_list_select {
     color: #fff;
     overflow-x: hidden;
 }
+ul.pl_list_select > li > div.rm_btn {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    top: 2px;
+    background-image: url('../images/x.png');
+    right: 0px;
+    border: 0;
+    background-color: transparent;
+}
 ul.pl_list_select > li {
     position: relative;
     padding: 3px;
@@ -238,6 +249,7 @@ ul.pl_list_select > li {
     margin-bottom: 1px;
     border-bottom: 1px solid #585858;
     color: #C9C9C9;
+    padding-right: 16px;
 }
 ul.pl_list_select > li:last-child {
     border-bottom: 0;
