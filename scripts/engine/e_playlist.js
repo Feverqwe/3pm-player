@@ -148,12 +148,12 @@ var engine_playlist = function(mySettings, myEngine) {
             appendPlaylists: function (m3u) {
                 var m3upl_len = M3UPlaylists.length;
                 if (m3upl_len === 0) {
-                    e_playlist.selectPlaylist(m3u);
+                    e_playlist.setM3UPlaylists(m3u);
                     return;
                 }
                 var id = M3UPlaylists[m3upl_len-1].id + 1;
                 var append_list = [];
-                m3u.list.forEach(function(item) {
+                m3u.forEach(function(item) {
                     item.id = id;
                     id++;
                     append_list.push(item)

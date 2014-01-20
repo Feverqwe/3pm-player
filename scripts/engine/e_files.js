@@ -275,76 +275,6 @@ var engine_files = function(mySettings, myEngine) {
                 });
             }
         };
-        var readFileArray = function (files, entry, files_only, cb) {
-            /*
-             * Читает массив файлов
-             * Если есть entry - использут его, если нету - то files.
-             * Если найдет хоть одну дирректорию - открывает как категорию.
-             * Есди найдет зоть один m3u открывает как плэйлист
-             * Остальное - читает как массив файлов
-             */
-            /**
-             * @namespace entry.webkitGetAsEntry
-             */
-            if (!entry) {
-                entry = [];
-            }
-            var entry_length = entry.length;
-            var entrys = [];
-            if (entry_length !== 0) {
-                for (var i = 0; i < entry_length; i++) {
-                    var item = entry[i];
-                    if (item.webkitGetAsEntry !== undefined) {
-                        item = item.webkitGetAsEntry();
-                    }
-                    if (!item) {
-                        continue;
-                    }
-                    if (item.isDirectory) {
-                        if (files_only) {
-                            continue;
-                        }
-                        readDirectory(item);
-                        return;
-                    } else {
-                        var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
-                        if (ext === 'm3u') {
-                            if (files_only) {
-                                continue;
-                            }
-                            readDirectoryWithM3U(item);
-                            return;
-                        }
-                        entrys.push(item);
-                    }
-                }
-                entry2files(entrys, function (files) {
-                    if (cb === undefined) {
-                        engine.open(files, {name: undefined});
-                    } else {
-                        cb(files, {name: undefined});
-                    }
-                });
-            } else {
-                var files_length = files.length;
-                for (var i = 0; i < files_length; i++) {
-                    var item = files[i];
-                    var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
-                    if (ext === 'm3u') {
-                        if (!files_only) {
-                            continue;
-                        }
-                        readDirectoryWithM3U(item);
-                        return;
-                    }
-                }
-                if (cb === undefined) {
-                    engine.open(files, {name: undefined});
-                } else {
-                    cb(files, {name: undefined});
-                }
-            }
-        };
         var readDirectory = function (entry, cb) {
             /*
              * Читает открытую дирректорию, аналиpирует куда направить работу с дирректорией - в m3u или в чтение подкаталогов
@@ -524,15 +454,14 @@ var engine_files = function(mySettings, myEngine) {
             }
             if (just_files.length > 0) {
                 cb_count++;
-                dune({type: 'm3u', entrys: just_files, name: _lang.playlist_title});
+                dune({type: 'm3u', isDefault: true, entrys: just_files, name: _lang.playlist_title});
             }
         };
         return {
             entry2files: entry2files,
-            readAnyFiles: readAnyFiles,
-            readFileArray: readFileArray,
-            readDirectory: readDirectory,
             getFilesFromFolder: getFilesFromFolder,
+            readAnyFiles: readAnyFiles,
+            readDirectory: readDirectory,
             readDirectoryWithSub: readDirectoryWithSub
         };
     }();
