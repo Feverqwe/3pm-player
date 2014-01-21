@@ -67,6 +67,7 @@ var viz = function() {
             });
         },
         run: function() {
+            chrome.power.requestKeepAwake('display');
             _send('player', function(window) {
                 audio = window.engine.player.getAudio();
                 setTags(window.engine.tags.getTagBody());

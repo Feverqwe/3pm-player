@@ -121,6 +121,7 @@ var video = function() {
             dom_cache.progress = dom_cache.progress_body.children('.progress');
             dom_cache.info_left = dom_cache.progress_body.children('.info_left');
             dom_cache.info_right = dom_cache.progress_body.children('.info_right');
+            dom_cache.progress_popup = $('.progress_popup');
             dom_cache.video = $('video')[0];
             $(dom_cache.video).on('play', function () {
                 dom_cache.btnPlayPause.removeClass('play').addClass('pause');
@@ -129,6 +130,9 @@ var video = function() {
             $(dom_cache.video).on('pause', function () {
                 dom_cache.btnPlayPause.removeClass('pause').addClass('play');
                 chrome.power.releaseKeepAwake();
+            });
+            $(dom_cache.video).on('durationchange', function () {
+                var_cache.duration = dom_cache.video.duration;
             });
             dom_cache.btnPlayPause.on('click', function () {
                 _send('player', function (window) {
@@ -157,6 +161,44 @@ var video = function() {
             });
             _send('player', function(window) {
                 window.engine.setHotkeys(document);
+            });
+            var popup_timer;
+            dom_cache.progress.on('mousemove', function (e) {
+                if (var_cache.duration === undefined) {
+                    return;
+                }
+                if (var_cache.duration === Infinity) {
+                    return;
+                }
+                if (var_cache.window_width === undefined) {
+                    var_cache.window_width = window.innerWidth;
+                }
+                var persent = e.clientX * 100 / var_cache.window_width;
+                var sec = var_cache.duration / 100 * persent;
+                if (var_cache.popup_cache !== sec) {
+                    var_cache.popup_cache = sec;
+                } else {
+                    return;
+                }
+                _send('player', function (window) {
+                    dom_cache.progress_popup.text( window.view.toHHMMSS(sec) );
+                });
+                if (var_cache.popup_show !== true) {
+                    dom_cache.progress_popup.show();
+                    var_cache.popup_show = true;
+                }
+                var left = parseInt(persent * 100) / 100;
+                if (var_cache.popup_left !== left) {
+                    var_cache.popup_left = left;
+                } else {
+                    return;
+                }
+                dom_cache.progress_popup.css('left', left+'%');
+                clearTimeout(popup_timer);
+                popup_timer = setTimeout(function() {
+                    dom_cache.progress_popup.hide();
+                    var_cache.popup_show = false;
+                }, 800);
             });
             dom_cache.progress.slider({
                 range: "min",

@@ -64,7 +64,6 @@ video {
     width: 100%;
     -webkit-app-region: no-drag;
     z-index: 10;
-    overflow: hidden;
 }
 .top_panel.mouse_panel {
     top: 0;
@@ -78,6 +77,8 @@ video {
 }
 .mouse_panel .controls {
     display: none;
+    height: 30px;
+    overflow: hidden;
 }
 .mouse_panel.show .controls {
     display: block;
@@ -142,7 +143,7 @@ video {
 .progress_body {
     display: none;
     width: 100%;
-    background-color: rgba(128, 128, 128, 0.56);
+    background-color: rgba(0, 0, 0, 0.28);
     color: #BEBEBE;
 }
 .mouse_panel.show .progress_body {
@@ -170,11 +171,12 @@ video {
     border-top-color: rgba(0, 0, 0, 0.5);
 }
 .progress_body .progress > div {
-    background-color: rgba(255, 255, 255, 0.62);
+    background-color: rgba(207, 0, 0, 0.6);
     height: 5px;
     z-index: 1;
     position: absolute;
     top: 0;
+    box-shadow: 0px 0px 5px rgba(204, 0, 0, 0.7);
 }
 .progress_body .progress > a {
     background-color: rgb(255, 255, 255);
@@ -183,4 +185,17 @@ video {
     z-index: 2;
     position: absolute;
     top: 0;
+}
+.progress_body .progress > a:focus {
+    outline-color: #fff;
+}
+.progress_popup {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.28);
+    padding-left: 2px;
+    padding-right: 2px;
+    border-radius: 2px;
+    z-index: 5;
+    margin-top: -15px;
+    margin-left: -15px;
 }
