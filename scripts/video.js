@@ -5,6 +5,11 @@ var video = function() {
         $('.t_btn.full').attr('title', _lang.full);
         $('.t_btn.mini').attr('title', _lang.mini);
         $('.t_btn.close').attr('title', _lang.close);
+        $('.btn.prev').attr('title', _lang.prev);
+        $('.btn.playpause').attr('title', _lang.play_pause);
+        $('.btn.next').attr('title', _lang.next);
+        $('.btn.scroll_up').attr('title', _lang.scroll_up);
+        $('.btn.scroll_down').attr('title', _lang.scroll_down);
     };
     var setTags = function(tb) {
         if (dom_cache.track === undefined) {
