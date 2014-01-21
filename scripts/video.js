@@ -44,9 +44,44 @@ var video = function() {
         infoLeft(pos);
         infoRight(max);
     };
+    var show_panels = function(force) {
+        if (force) {
+            var_cache.bad_bump = 0;
+            var_cache.panel_hide = false;
+        }
+        if (var_cache.panel_hide === true) {
+            if (var_cache.bad_bump > 1) {
+                var_cache.bad_bump = 0;
+                var_cache.panel_hide = false;
+            } else {
+                var_cache.bad_bump++;
+                return;
+            }
+        }
+        var time = (new Date).getTime();
+        if (var_cache.mouse_step > time) {
+            return;
+        }
+        if (!uiIsShow) {
+            updateUi();
+            uiIsShow = true;
+            dom_cache.control_panels.addClass('show');
+        }
+        var_cache.mouse_step = time + 1000;
+        clearTimeout(var_cache.mouse_move_timer);
+        var_cache.mouse_move_timer = setTimeout(function() {
+            var_cache.bad_bump = 0;
+            var_cache.panel_hide = true;
+            dom_cache.control_panels.removeClass('show');
+            uiIsShow = false;
+        }, 3000);
+    };
     return {
         run: function () {
             dom_cache.control_panels = $('.mouse_panel');
+            dom_cache.bottom_panel = $('.bottom_panel');
+            dom_cache.top_panel = $('.top_panel');
+            var_cache.bad_bump = 0;
             write_language();
             $('.close').on('click', function() {
                 window.close();
@@ -61,29 +96,16 @@ var video = function() {
                     document.webkitCancelFullScreen();
                 }
             });
-            var mouse_move_timer;
-            var mouse_step;
-            dom_cache.control_panels.on('mousemove', function() {
-                var time = (new Date).getTime();
-                if (mouse_step > time) {
-                    return;
-                }
-                if (!uiIsShow) {
-                    updateUi();
-                    uiIsShow = true;
-                    dom_cache.control_panels.addClass('show');
-                }
-                mouse_step = time + 1000;
-                clearTimeout(mouse_move_timer);
-                mouse_move_timer = setTimeout(function() {
-                    dom_cache.control_panels.removeClass('show');
-                    uiIsShow = false;
-                }, 3000);
+            $('body').on('mousemove', '.mouse_panel', function () {
+                show_panels();
             });
-            dom_cache.control_panels.on('mouseup', function() {
-                $(dom_cache.control_panels[0]).trigger('mousemove');
+            $('body').on('mouseup', '.mouse_panel', function () {
+                show_panels(1);
             });
-            dom_cache.control_panels.trigger('mousemove');
+            $('body').on('mouseenter', '.mouse_panel', function () {
+                show_panels(1);
+            });
+            show_panels();
             var bounds_timer;
             var next_step;
             chrome.app.window.current().onBoundsChanged.addListener(function() {
@@ -116,8 +138,8 @@ var video = function() {
             dom_cache.btnNext = $('.controls .next.btn');
             dom_cache.btnScrolllUp = $('.controls .scroll_up.btn');
             dom_cache.btnScrolllDown = $('.controls .scroll_down.btn');
-            dom_cache.track = $('.top_panel > .track');
-            dom_cache.progress_body = $('.bottom_panel > .progress_body');
+            dom_cache.track = $('.top_panel .track');
+            dom_cache.progress_body = $('.bottom_panel .progress_body');
             dom_cache.progress = dom_cache.progress_body.children('.progress');
             dom_cache.info_left = dom_cache.progress_body.children('.info_left');
             dom_cache.info_right = dom_cache.progress_body.children('.info_right');
@@ -179,7 +201,17 @@ var video = function() {
                     return;
                 }
                 _send('player', function (window) {
-                    dom_cache.progress_popup.text( window.view.toHHMMSS(sec) );
+                    var text = window.view.toHHMMSS(sec);
+                    var text_len = text.length;
+                    if (dom_cache.progress_popup_len !== text_len) {
+                        dom_cache.progress_popup_len = text_len;
+                        if (text_len === 5) {
+                            dom_cache.progress_popup.css('margin-left', '-15px');
+                        } else {
+                            dom_cache.progress_popup.css('margin-left', '-24px');
+                        }
+                    }
+                    dom_cache.progress_popup.text( text );
                 });
                 if (var_cache.popup_show !== true) {
                     dom_cache.progress_popup.show();
