@@ -214,8 +214,8 @@ var engine_player = function(mySettings, myEngine) {
             });
         };
         return {
-            allow_ext: ['mp3', 'm4a', 'm4v', 'mp4', 'ogg', 'oga', 'spx', 'webm', 'webma', 'wav', 'fla', 'rtmpa', 'ogv', '3gp'],
-            video_ext: ['mp4', 'm4v'],
+            allow_ext: ['mp3', 'm4a', 'm4v', 'mp4', 'mkv', 'avi', 'mov', 'ogg', 'ogm', 'ogv', 'oga', 'webm', 'wav', '3gp'],
+            video_ext: ['mp4', 'm4v', 'mkv', 'avi', 'mov', 'ogv', 'webm'],
             current_id: undefined,
             discAdapters: discAdapters,
             getAdapter: function (cb) {
