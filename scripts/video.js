@@ -31,20 +31,20 @@ var video = function() {
             });
             var mouse_move_timer;
             var mouse_step;
-            $('.mouse_panel').on('mousemove', function() {
+            dom_cache.control_panels.on('mousemove', function() {
                 var time = (new Date).getTime();
                 if (mouse_step > time) {
                     return;
                 }
                 dom_cache.control_panels.addClass('show');
-                mouse_step = time + 2750;
+                mouse_step = time + 1000;
                 clearTimeout(mouse_move_timer);
                 mouse_move_timer = setTimeout(function() {
                     dom_cache.control_panels.removeClass('show');
                 }, 3000);
             });
-            $('.mouse_panel').on('mouseup', function() {
-                $('.mouse_panel').trigger('mousemove');
+            dom_cache.control_panels.on('mouseup', function() {
+                dom_cache.control_panels.trigger('mousemove');
             });
             var bounds_timer;
             var next_step;
