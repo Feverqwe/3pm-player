@@ -6,7 +6,7 @@ var engine_player = function(mySettings, myEngine) {
         var type_list = {};
         /** @namespace Audio **/
         var media_el = new Audio();
-        var adapter = function () {
+        var initAdapter = function () {
             var AC = window.AudioContext || window.webkitAudioContext;
             var _ad = {context: new AC(),
                 audio: media_el,
@@ -16,7 +16,8 @@ var engine_player = function(mySettings, myEngine) {
             _ad.source = _ad.context.createMediaElementSource(_ad.audio);
             _ad.source.connect(_ad.context.destination);
             return _ad;
-        }();
+        };
+        var adapter = initAdapter();
         var audioPreload = function (track) {
             if (track.cloud === undefined) {
                 return false;
@@ -423,12 +424,15 @@ var engine_player = function(mySettings, myEngine) {
                 $(media_el).off();
                 if (type !== undefined) {
                     discAdapters('Any');
+                    adapter.source.disconnect();
                     media_el = type;
                     e_player.mode = 'video';
                 } else {
                     discAdapters('Any');
                     media_el = new Audio();
                     e_player.mode = 'audio';
+                    adapter = initAdapter();
+                    view.updateSettings({visual_type: settings.visual_type});
                 }
                 media_el.volume = volume_state;
                 media_el.muted = mute_state;

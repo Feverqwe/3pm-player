@@ -10,7 +10,7 @@
     var var_cache = {};
     var time_tipe = 0;
     var settings = {};
-    var is_winamp = true;
+    var is_winamp = false;
     var visual_cache = {};
     var context_menu = undefined;
     var isPlaying = function () {
@@ -561,7 +561,10 @@
         if (is_winamp) {
             var convas = $('canvas.winamp_fft');
             if (convas.data('type') === settings.visual_type) {
-                return;
+                var adapter = engine.player.getAdapter();
+                if (adapter.proc_list.winamp !== undefined) {
+                    return;
+                }
             }
             if (convas.length === 0) {
                 convas = $('<canvas>', {'class': 'winamp_fft'}).on('click',function () {
