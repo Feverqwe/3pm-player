@@ -131,9 +131,6 @@ var video = function() {
                 dom_cache.btnPlayPause.removeClass('pause').addClass('play');
                 chrome.power.releaseKeepAwake();
             });
-            $(dom_cache.video).on('durationchange', function () {
-                var_cache.duration = dom_cache.video.duration;
-            });
             dom_cache.btnPlayPause.on('click', function () {
                 _send('player', function (window) {
                     window.engine.player.playToggle();
@@ -164,17 +161,12 @@ var video = function() {
             });
             var popup_timer;
             dom_cache.progress.on('mousemove', function (e) {
-                if (var_cache.duration === undefined) {
+                var duration = dom_cache.video.duration;
+                if (duration === Infinity) {
                     return;
                 }
-                if (var_cache.duration === Infinity) {
-                    return;
-                }
-                if (var_cache.window_width === undefined) {
-                    var_cache.window_width = window.innerWidth;
-                }
-                var persent = e.clientX * 100 / var_cache.window_width;
-                var sec = var_cache.duration / 100 * persent;
+                var persent = e.clientX * 100 / window.innerWidth;
+                var sec = duration / 100 * persent;
                 if (var_cache.popup_cache !== sec) {
                     var_cache.popup_cache = sec;
                 } else {
@@ -189,11 +181,9 @@ var video = function() {
                 }
                 var left = parseInt(persent * 100) / 100;
                 if (var_cache.popup_left !== left) {
+                    dom_cache.progress_popup.css('left', left+'%');
                     var_cache.popup_left = left;
-                } else {
-                    return;
                 }
-                dom_cache.progress_popup.css('left', left+'%');
                 clearTimeout(popup_timer);
                 popup_timer = setTimeout(function() {
                     dom_cache.progress_popup.hide();
