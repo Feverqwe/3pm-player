@@ -212,7 +212,7 @@ var engine_wm = function(mySettings,myEngine) {
                 });
             } else if (options.type === 'video') {
                 options.toggle = true;
-                chrome.storage.local.get(['video_pos_left', 'video_pos_top', 'video_w', 'video_w'], function (storage) {
+                chrome.storage.local.get(['video_pos_left', 'video_pos_top', 'video_w', 'video_h'], function (storage) {
                     position = checkWindowPosition({
                         width: storage.video_w || 720,
                         height: storage.video_h || 480,
