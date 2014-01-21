@@ -160,7 +160,6 @@ var video = function() {
                 window.engine.setHotkeys(document);
             });
             var popup_timer;
-
             var popup_step;
             dom_cache.progress.on('mousemove', function (e) {
                 var time = (new Date).getTime();
