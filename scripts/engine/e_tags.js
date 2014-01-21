@@ -132,7 +132,7 @@ var engine_tags = function(mySettings,myEngine) {
              }
              var startDate = new Date().getTime();
              */
-            if (engine.player.mode === 'video') {
+            if (track.file.isVideo) {
                 cb(id);
                 return;
             }
