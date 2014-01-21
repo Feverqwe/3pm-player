@@ -1,8 +1,17 @@
 var dialog = function() {
     var allow_ext = undefined;
+    var video_ext = undefined;
     var var_cache = {};
     var dom_cache = {};
     var settings = undefined;
+    var isAllowFile = function (filename) {
+        var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
+        return allow_ext.indexOf(ext) !== -1;
+    }
+    var isVideoFile = function (filename) {
+        var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
+        return video_ext.indexOf(ext) !== -1;
+    };
     var createURLform = function() {
         /*
          * Создает форму для ввода URL
@@ -62,8 +71,7 @@ var dialog = function() {
             } else {
                 action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
-            var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
-            if (item.is_dir === false && allow_ext.indexOf(ext) === -1) {
+            if (item.is_dir === false && isAllowFile(filename) === false) {
                 return 1;
             }
             fl.append($('<li>', {'class': 'db_file', 'data-id': n}).append($('<span>', {title: filename, text: filename}), action));
@@ -140,11 +148,11 @@ var dialog = function() {
                     var playlist = {name: pl_name, id: 0, type: "db", tracks: []};
                     list.contents.forEach(function(item) {
                         var filename = item.path.split('/').slice(-1)[0];
-                        var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
-                        if (item.is_dir || allow_ext.indexOf(ext) === -1) {
+                        if (item.is_dir || isAllowFile(filename) === false) {
                             return 1;
                         }
-                        playlist.tracks.push({id: -1, file: {name: filename, url: undefined}, tags: {}, duration: 0, cloud: {type: "db", root: item.root, path: item.path}});
+                        var isVideo = isVideoFile(filename);
+                        playlist.tracks.push({id: -1, file: {name: filename, url: undefined, isVideo: isVideo}, tags: {}, duration: 0, cloud: {type: "db", root: item.root, path: item.path}});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
@@ -169,7 +177,8 @@ var dialog = function() {
                     return 1;
                 }
                 var filename = item.path.split('/').slice(-1)[0];
-                playlist.tracks.push({id: -1, file: {name: filename, url: undefined}, tags: {}, duration: 0, cloud: {type: "db", root: item.root, path: item.path}});
+                var isVideo = isVideoFile(filename);
+                playlist.tracks.push({id: -1, file: {name: filename, url: undefined, isVideo: isVideo}, tags: {}, duration: 0, cloud: {type: "db", root: item.root, path: item.path}});
             });
             if (playlist.tracks.length === 0) {
                 return;
@@ -198,7 +207,7 @@ var dialog = function() {
             n++;
             var filename = item.title;
             var is_dir = (item.mimeType.indexOf('.folder') !== -1);
-            if (!is_dir && (item.downloadUrl === undefined || item.mimeType.indexOf('audio/') === -1)) {
+            if (!is_dir && (item.downloadUrl === undefined || (item.mimeType.indexOf('audio/') === -1 && item.mimeType.indexOf('video/') === -1))) {
                 return 1;
             }
             var action = '';
@@ -281,11 +290,12 @@ var dialog = function() {
                     list.items.reverse();
                     list.items.forEach(function(item) {
                         var is_dir = (item.mimeType.indexOf('.folder') !== -1);
-                        if (is_dir || item.downloadUrl === undefined || item.mimeType.indexOf('audio/') === -1) {
+                        if (is_dir || item.downloadUrl === undefined || (item.mimeType.indexOf('audio/') === -1 && item.mimeType.indexOf('video/') === -1)) {
                             return 1;
                         }
                         var filename = item.title;
-                        playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl}, tags: {}, duration: 0, cloud: {type: 'gd'}});
+                        var isVideo = isVideoFile(filename);
+                        playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl, isVideo: isVideo}, tags: {}, duration: 0, cloud: {type: 'gd'}});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
@@ -311,7 +321,8 @@ var dialog = function() {
                     return 1;
                 }
                 var filename = item.title;
-                playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl}, tags: {}, duration: 0, cloud: {type: 'gd'}});
+                var isVideo = isVideoFile(filename);
+                playlist.tracks.push({id: -1, file: {name: filename, url: item.downloadUrl, isVideo: isVideo}, tags: {}, duration: 0, cloud: {type: 'gd'}});
             });
             if (playlist.tracks.length === 0) {
                 return;
@@ -345,8 +356,7 @@ var dialog = function() {
             } else {
                 action = $('<input>', {name: 'id' + n, type: 'checkbox'});
             }
-            var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
-            if (item.type !== "folder" && allow_ext.indexOf(ext) === -1) {
+            if (item.type !== "folder" && isAllowFile(item.name) === false) {
                 return 1;
             }
             fl.append($('<li>', {'class': 'box_file', 'data-id': n}).append($('<span>', {title: item.name, text: item.name}), action));
@@ -424,11 +434,11 @@ var dialog = function() {
                 window.engine.cloud.box.getFilelist(function(list) {
                     var playlist = {name: folder_name, id: 0, type: "box", tracks: []};
                     list.entries.forEach(function(item) {
-                        var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
-                        if (item.type === "folder" || allow_ext.indexOf(ext) === -1) {
+                        if (item.type === "folder" || isAllowFile(item.name) === false) {
                             return 1;
                         }
-                        playlist.tracks.push({id: -1, file: {name: item.name, url: undefined}, tags: {}, duration: 0, cloud: {type: "box", file_id: item.id}});
+                        var isVideo = isVideoFile(item.name);
+                        playlist.tracks.push({id: -1, file: {name: item.name, url: undefined, isVideo: isVideo}, tags: {}, duration: 0, cloud: {type: "box", file_id: item.id}});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
@@ -452,7 +462,8 @@ var dialog = function() {
                 if (item.type === "folder") {
                     return 1;
                 }
-                playlist.tracks.push({id: -1, file: {name: item.name, url: undefined}, tags: {}, duration: 0, cloud: {type: "box", file_id: item.id}});
+                var isVideo = isVideoFile(item.name);
+                playlist.tracks.push({id: -1, file: {name: item.name, url: undefined, isVideo: isVideo}, tags: {}, duration: 0, cloud: {type: "box", file_id: item.id}});
             });
             if (playlist.tracks.length === 0) {
                 return;
@@ -476,8 +487,8 @@ var dialog = function() {
         list.data.forEach(function(item) {
             n++;
             var filename = item.name;
-            var is_dir = (item.type === 'folder');
-            if (!is_dir && item.type !== 'audio') {
+            var is_dir = (item.type === 'folder' || item.type === 'album');
+            if (!is_dir && isAllowFile(filename) === false) {
                 return 1;
             }
             var action = '';
@@ -527,7 +538,7 @@ var dialog = function() {
                 folder_id = var_cache.sd_path.splice(-2)[0];
             } else {
                 var item = var_cache.sd_list.data[id];
-                var is_dir = (item.type === 'folder');
+                var is_dir = (item.type === 'folder' || item.type === 'album');
                 if (is_dir) {
                     folder_id = item.id;
                 } else {
@@ -564,7 +575,7 @@ var dialog = function() {
             e.stopPropagation();
             var id = parseInt($(this).parent().data("id"));
             var item = var_cache.sd_list.data[id];
-            var is_dir = (item.type === 'folder');
+            var is_dir = (item.type === 'folder' || item.type === 'album');
             if (!is_dir) {
                 return;
             }
@@ -575,12 +586,13 @@ var dialog = function() {
                 window.engine.cloud.sd.getFilelist(folder_id, function(list) {
                     var playlist = {name: pl_name, id: 0, type: "sd", tracks: []};
                     list.data.forEach(function(item) {
-                        var is_dir = (item.type === 'folder');
-                        if (is_dir || item.type !== 'audio') {
+                        var is_dir = (item.type === 'folder' || item.type === 'album');
+                        var tags = read_tags(item);
+                        if (is_dir || isAllowFile(item.name) === false) {
                             return 1;
                         }
-                        var tags = read_tags(item);
-                        playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, duration: 0, cloud: {meta: tags, type: 'sd'}});
+                        var isVideo = isVideoFile(tags.title);
+                        playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.'), isVideo: isVideo}, tags: undefined, duration: 0, cloud: {meta: tags, type: 'sd'}});
                     });
                     if (playlist.tracks.length === 0) {
                         return;
@@ -601,12 +613,13 @@ var dialog = function() {
             items.forEach(function(item) {
                 var id = $(item).parent().data('id');
                 item = var_cache.sd_list.data[id];
-                var is_dir = (item.type === 'folder');
+                var is_dir = (item.type === 'folder' || item.type === 'album');
                 if (is_dir) {
                     return 1;
                 }
                 var tags = read_tags(item);
-                playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.')}, tags: undefined, duration: 0, cloud: {meta: tags, type: 'sd'}});
+                var isVideo = isVideoFile(tags.title);
+                playlist.tracks.push({id: -1, file: {name: tags.title, url: item.link.replace('/redir.', '/download.'), isVideo: isVideo}, tags: undefined, duration: 0, cloud: {meta: tags, type: 'sd'}});
             });
             if (playlist.tracks.length === 0) {
                 return;
@@ -680,6 +693,7 @@ var dialog = function() {
             _send('player', function(window) {
                 window.engine.setHotkeys(document);
                 allow_ext = window.engine.player.allow_ext;
+                video_ext = window.engine.player.video_ext;
             });
             $('.close').on('click', function() {
                 window.close();

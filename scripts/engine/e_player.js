@@ -30,7 +30,7 @@ var engine_player = function(mySettings, myEngine) {
                 if (track.blob !== undefined && track.blob.url !== undefined) {
                     engine.cloud.abort();
                     /** @namespace audio.src **/
-                    media_el.src = track.blob.url;
+                    setMediaUrl(track, track.blob.url);
                     return true;
                 }
                 view.state("preloading");
@@ -47,7 +47,7 @@ var engine_player = function(mySettings, myEngine) {
                     }
                     track.blob = blob;
                     track.blob.url = URL.createObjectURL(blob);
-                    media_el.src = track.blob.url;
+                    setMediaUrl(track, track.blob.url);
                 });
                 return true;
             } else if (engine.cloud[track_type].onplay !== undefined) {
@@ -61,7 +61,7 @@ var engine_player = function(mySettings, myEngine) {
                         console.log('No url');
                         return;
                     }
-                    media_el.src = url;
+                    setMediaUrl(track, url);
                 });
                 return true;
             }
@@ -214,6 +214,23 @@ var engine_player = function(mySettings, myEngine) {
                 delete adapter.proc_list[name];
             });
         };
+        var setMediaUrl = function (track, url) {
+            if (track.file.isVideo) {
+                if (_windows.video === undefined || _windows.video.contentWindow.window === null) {
+                    engine.windowManager({type: 'video', config: {src: url}});
+                    return;
+                } else
+                if (e_player.mode === 'audio') {
+                    _send('video', function(window) {
+                        e_player.switchMedia(window.video.getVideo());
+                    });
+                }
+            }
+            if (e_player.mode === 'video' && track.file.isVideo !== true) {
+                e_player.switchMedia();
+            }
+            media_el.src = url;
+        };
         return {
             allow_ext: ['mp3', 'm4a', 'm4v', 'mp4', 'mkv', 'avi', 'mov', 'ogg', 'ogm', 'ogv', 'oga', 'webm', 'wav', '3gp'],
             video_ext: ['mp4', 'm4v', 'mkv', 'avi', 'mov', 'ogv', 'ogm', 'webm'],
@@ -237,26 +254,12 @@ var engine_player = function(mySettings, myEngine) {
                 });
                 if ('url' in item.file) {
                     if (!audioPreload(item)) {
-                        media_el.src = item.file.url;
+                        setMediaUrl(item,item.file.url);
                     }
                     return;
                 }
                 var file_url = window.URL.createObjectURL(item.file);
-                if (item.file.isVideo) {
-                    if (_windows.video === undefined || _windows.video.contentWindow.window === null) {
-                        engine.windowManager({type: 'video', config: {src: file_url}});
-                        return;
-                    } else
-                    if (e_player.mode === 'audio') {
-                        _send('video', function(window) {
-                            e_player.switchMedia(window.video.getVideo());
-                        });
-                    }
-                }
-                if (e_player.mode === 'video' && item.file.isVideo !== true) {
-                    e_player.switchMedia();
-                }
-                media_el.src = file_url;
+                setMediaUrl(item,file_url);
             },
             playToggle: function () {
                 if (media_el.paused) {
@@ -275,7 +278,7 @@ var engine_player = function(mySettings, myEngine) {
                 if (engine.playlist.playlist[e_player.current_id].file.url !== undefined && media_el.src.split(':')[0] === "chrome-extension") {
                     var item = engine.playlist.playlist[e_player.current_id];
                     if (!audioPreload(item)) {
-                        media_el.src = item.file.url;
+                        setMediaUrl(item,item.file.url);
                     }
                 } else {
                     media_el.play();
