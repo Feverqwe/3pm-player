@@ -75,6 +75,9 @@ var engine_player = function(mySettings, myEngine) {
                 _send('viz', function (window) {
                     window.viz.audio_state('track', tb);
                 });
+                _send('video', function (window) {
+                    window.video.audio_state('track', tb);
+                });
             });
             $(media_el).on('progress', function () {
                 if (_debug) {

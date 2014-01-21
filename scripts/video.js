@@ -1,12 +1,20 @@
 var video = function() {
     var var_cache = {};
+    var dom_cache = {};
     var write_language = function() {
         $('.t_btn.full').attr('title', _lang.full);
         $('.t_btn.mini').attr('title', _lang.mini);
         $('.t_btn.close').attr('title', _lang.close);
     };
+    var setTags = function(tb) {
+        if (dom_cache.track === undefined) {
+            return;
+        }
+        dom_cache.track.empty().append($('<span>', {text: tb.title + ((tb.aa !== undefined)?' - '+tb.aa:'')}));
+    };
     return {
         run: function () {
+            dom_cache.control_panels = $('.mouse_panel');
             write_language();
             $('.close').on('click', function() {
                 window.close();
@@ -20,6 +28,23 @@ var video = function() {
                 } else {
                     document.webkitCancelFullScreen();
                 }
+            });
+            var mouse_move_timer;
+            var mouse_step;
+            $('.mouse_panel').on('mousemove', function() {
+                var time = (new Date).getTime();
+                if (mouse_step > time) {
+                    return;
+                }
+                dom_cache.control_panels.addClass('show');
+                mouse_step = time + 2750;
+                clearTimeout(mouse_move_timer);
+                mouse_move_timer = setTimeout(function() {
+                    dom_cache.control_panels.removeClass('show');
+                }, 3000);
+            });
+            $('.mouse_panel').on('mouseup', function() {
+                $('.mouse_panel').trigger('mousemove');
             });
             var bounds_timer;
             var next_step;
@@ -48,7 +73,46 @@ var video = function() {
                     }
                 }, 500);
             });
-            var_cache.video = $('video')[0];
+            dom_cache.btnPlayPause = $('.controls .playpause.btn');
+            dom_cache.btnPrev = $('.controls .prev.btn');
+            dom_cache.btnNext = $('.controls .next.btn');
+            dom_cache.btnScrolllUp = $('.controls .scroll_up.btn');
+            dom_cache.btnScrolllDown = $('.controls .scroll_down.btn');
+            dom_cache.track = $('.top_panel > .track');
+            dom_cache.video = $('video')[0];
+            $(dom_cache.video).on('play', function () {
+                dom_cache.btnPlayPause.removeClass('play').addClass('pause');
+                chrome.power.requestKeepAwake('display');
+            });
+            $(dom_cache.video).on('pause', function () {
+                dom_cache.btnPlayPause.removeClass('pause').addClass('play');
+                chrome.power.releaseKeepAwake();
+            });
+            dom_cache.btnPlayPause.on('click', function () {
+                _send('player', function (window) {
+                    window.engine.player.playToggle();
+                });
+            });
+            dom_cache.btnPrev.on('click', function () {
+                _send('player', function (window) {
+                    window.engine.playlist.preview();
+                });
+            });
+            dom_cache.btnNext.on('click', function () {
+                _send('player', function (window) {
+                    window.engine.playlist.next();
+                });
+            });
+            dom_cache.btnScrolllUp.on('click', function () {
+                _send('player', function (window) {
+                    window.engine.player.position('+10');
+                });
+            });
+            dom_cache.btnScrolllDown.on('click', function () {
+                _send('player', function (window) {
+                    window.engine.player.position('-10');
+                });
+            });
             _send('player', function(window) {
                 window.engine.setHotkeys(document);
             });
@@ -56,12 +120,17 @@ var video = function() {
                 return;
             }
             _send('player', function(window) {
-                window.engine.player.switchMedia(var_cache.video);
+                window.engine.player.switchMedia(dom_cache.video);
             });
-            var_cache.video.src = options.src;
+            dom_cache.video.src = options.src;
         },
         getVideo: function() {
-            return var_cache.video;
+            return dom_cache.video;
+        },
+        audio_state: function (key, value) {
+            if (key === "track") {
+                setTags(value);
+            }
         }
     };
 }();

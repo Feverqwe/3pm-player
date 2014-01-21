@@ -327,6 +327,9 @@ var engine_tags = function(mySettings,myEngine) {
                     _send('viz', function (window) {
                         window.viz.audio_state('track', tb);
                     });
+                    _send('video', function (window) {
+                        window.video.audio_state('track', tb);
+                    });
                 };
                 var lfm = function () {
                     if (id !== engine.player.current_id) {

@@ -226,6 +226,7 @@ var engine_wm = function(mySettings,myEngine) {
                         _windows[options.type] = window;
                         window.onClosed.addListener(function () {
                             delete _windows[options.type];
+                            chrome.power.releaseKeepAwake();
                             if (engine.player.mode === 'video') {
                                 view.state('emptied');
                                 engine.player.switchMedia();

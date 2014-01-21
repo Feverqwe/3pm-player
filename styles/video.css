@@ -10,7 +10,16 @@ body {
     -webkit-app-region: drag;
     margin: 0;
 }
+video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
 .t_btn {
+    display: none;
     background-size: 14px 14px;
     height: 14px;
     width: 14px;
@@ -45,4 +54,91 @@ body {
 .close {
     background-image: url('../images/x.png');
     right: 2px;
+}
+.top_panel.mouse_panel {
+    top: 0;
+}
+.bottom_panel.mouse_panel {
+    bottom: 0;
+}
+.mouse_panel.show {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.mouse_panel {
+    height: 5%;
+    min-height: 30px;
+    position: absolute;
+    width: 100%;
+    -webkit-app-region: no-drag;
+    z-index: 10;
+}
+.mouse_panel .controls {
+    width: 312px;
+    position: absolute;
+    left: calc(50% - 156px);
+    top: calc(50% - 12px);
+    display: none;
+    bottom: 0;
+}
+.mouse_panel.show .controls {
+    display: block;
+}
+.mouse_panel.show .t_btn {
+    display: block;
+}
+.mouse_panel .controls ul {
+    padding: 0;
+    margin: 0;
+}
+.mouse_panel .controls li {
+    display: inline-block;
+    height: 25px;
+    width: 60px;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding-top: 2px;
+    padding-bottom: 4px;
+}
+.mouse_panel .controls li.prev {
+    background-image: url(../images/playback_prev_w.png);
+    background-position-y: 6px;
+}
+.mouse_panel .controls li.scroll_down {
+    background-image: url(../images/playback_scroll_down_w.png);
+    background-position-y: 6px;
+}
+.mouse_panel .controls li.play {
+    background-image: url(../images/playback_play_w.png);
+    background-position-y: 6px;
+}
+.mouse_panel .controls li.pause {
+    background-image: url(../images/playback_pause_w.png);
+    background-position-y: 5px;
+}
+.mouse_panel .controls li.scroll_up {
+    background-image: url(../images/playback_scroll_up_w.png);
+    background-position-y: 6px;
+}
+.mouse_panel .controls li.next {
+    background-image: url(../images/playback_next_w.png);
+    background-position-y: 6px;
+}
+.mouse_panel .controls li.btn {
+    cursor: pointer;
+}
+.mouse_panel .controls li.btn:active {
+    background-color: rgba(22, 22, 22, 0.5);
+}
+.top_panel .track {
+    display: none;
+    color: #fff;
+    font-size: 130%;
+    font-weight: bolder;
+    opacity: 0.8;
+    top: calc(50% - 12px);
+    left: 1%;
+    position: absolute;
+}
+.top_panel.show .track {
+    display: block;
 }

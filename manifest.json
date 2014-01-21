@@ -3,7 +3,7 @@
     "name": "__MSG_appName__",
     "description": "__MSG_appDesc__",
     "default_locale": "en",
-    "version": "0.7.70",
+    "version": "0.7.71",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "icon_16.png",
@@ -19,7 +19,7 @@
         "app.runtime", "storage",
         "contextMenus", "fullscreen",
         "identity", "notifications",
-        "app.window",
+        "app.window","power",
         {"socket": ["tcp-listen:*:*"]},
         {"fileSystem": ["retainEntries", "directory"]},
         "https://api.vk.com/*",
