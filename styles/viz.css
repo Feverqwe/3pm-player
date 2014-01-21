@@ -57,8 +57,7 @@ body {
 .full {
     background-image: url('../images/fullscreen.png');
     right: 36px;
-    background-size: 9px;
-    background-position-y: 2px;
+    background-size: 10px;
 }
 .mini {
     background-image: url('../images/_.png');
