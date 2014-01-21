@@ -804,6 +804,9 @@
                 if (event.which === undefined) {
                     return;
                 }
+                if (isNaN(ui.value)) {
+                    return;
+                }
                 engine.player.position(ui.value / 10);
                 if (is_winamp) {
                     var lp = parseInt(ui.value / 1000 * -29) || 0;
@@ -812,6 +815,9 @@
             },
             slide: function (event, ui) {
                 if (event.which === undefined) {
+                    return;
+                }
+                if (isNaN(ui.value)) {
                     return;
                 }
                 engine.player.position(ui.value / 10);
@@ -835,6 +841,9 @@
                 if (event.which === undefined) {
                     return;
                 }
+                if (isNaN(ui.value)) {
+                    return;
+                }
                 engine.player.volume(ui.value);
                 if (is_winamp) {
                     dom_cache.volume.css('background', getVolumeColor(ui.value));
@@ -842,6 +851,9 @@
             },
             slide: function (event, ui) {
                 if (event.which === undefined) {
+                    return;
+                }
+                if (isNaN(ui.value)) {
                     return;
                 }
                 engine.player.volume(ui.value);
@@ -1167,6 +1179,7 @@
     view.getContextMenu = function () {
         return context_menu;
     };
+    view.toHHMMSS = toHHMMSS;
 })();
 (function () {
     var settings_ready = false;

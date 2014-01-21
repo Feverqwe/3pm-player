@@ -4,16 +4,22 @@
     <title>Video</title>
     <link href="styles/video.css" rel="stylesheet" type="text/css" />
     <script src="scripts/jquery-2.0.3.min.js"></script>
+    <script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="scripts/video.js"></script>
 </head>
 <body>
-    <div class="top_panel mouse_panel">
+    <div class="top_panel mouse_panel show">
         <div class="track"></div>
         <div class="full t_btn" title="Fullscreen"></div>
         <div class="mini t_btn" title="Minimize"></div>
         <div class="close t_btn" title="Close"></div>
     </div>
-    <div class="bottom_panel mouse_panel">
+    <div class="bottom_panel mouse_panel show">
+        <div class="progress_body">
+            <div class="progress"></div>
+            <span class="info_left">0:00</span>
+            <span class="info_right">0:00</span>
+        </div>
         <div class="controls">
             <ul>
                 <li class="btn prev" title="Previous"></li>
