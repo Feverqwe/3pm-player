@@ -50,6 +50,9 @@ java -jar compiler.jar --js ./scripts/viz.js --js_output_file ./build/scripts/vi
 java -jar compiler.jar --js ./scripts/lang.js --js_output_file ./build/scripts/lang.js
 #make options.js
 java -jar compiler.jar --js ./scripts/options.js --js_output_file ./build/scripts/options.js
+#make video.js
+java -jar compiler.jar --js ./scripts/video.js --js_output_file ./build/scripts/video.js
+
 #make spark-md5.js
 java -jar compiler.jar --js ./scripts/spark-md5.js --js_output_file ./build/scripts/spark-md5.js
 
@@ -80,6 +83,8 @@ java -jar yuicompressor-2.4.8.jar ./styles/dialog.css -o ./build/styles/dialog.c
 java -jar yuicompressor-2.4.8.jar ./styles/viz.css -o ./build/styles/viz.css
 #make options.css
 java -jar yuicompressor-2.4.8.jar ./styles/options.css -o ./build/styles/options.css
+#make video.css
+java -jar yuicompressor-2.4.8.jar ./styles/video.css -o ./build/styles/video.css
 
 java -jar htmlcompressor-1.5.3.jar -t html ./www/index.html -o ./build/www/index.html
 java -jar htmlcompressor-1.5.3.jar -t html ./playlist.html -o ./build/playlist.html
@@ -87,6 +92,7 @@ java -jar htmlcompressor-1.5.3.jar -t html ./index.html -o ./build/index.html
 java -jar htmlcompressor-1.5.3.jar -t html ./dialog.html -o ./build/dialog.html
 java -jar htmlcompressor-1.5.3.jar -t html ./viz.html -o ./build/viz.html
 java -jar htmlcompressor-1.5.3.jar -t html ./options.html -o ./build/options.html
+java -jar htmlcompressor-1.5.3.jar -t html ./video.html -o ./build/video.html
 
 cd ./build/
 zip -9 -r ../build.zip ./
