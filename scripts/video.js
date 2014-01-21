@@ -160,7 +160,14 @@ var video = function() {
                 window.engine.setHotkeys(document);
             });
             var popup_timer;
+
+            var popup_step;
             dom_cache.progress.on('mousemove', function (e) {
+                var time = (new Date).getTime();
+                if (popup_step > time) {
+                    return;
+                }
+                popup_step = time + 42;
                 var duration = dom_cache.video.duration;
                 if (duration === Infinity) {
                     return;
