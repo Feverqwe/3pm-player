@@ -937,7 +937,7 @@
         $('.click_for_open').on('click', function () {
             var accepts = [
                 {
-                    mimeTypes: ['audio/*']
+                    mimeTypes: ['audio/*', 'video/*']
                 }
             ];
             chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function (entry) {
