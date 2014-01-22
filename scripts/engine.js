@@ -265,32 +265,40 @@ var run_engine = function () {
     };
     engine.windowManager = engine_wm(settings, engine);
 };
-var engine_modules = ['e_cloud', 'e_notification', 'e_player', 'e_playlist', 'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm'];
-var engine_loading = function() {
-    var dune = true;
-    engine_modules.forEach(function(name) {
-        if ( window['engin'+name] === undefined ) {
-            dune = false;
-            return 0;
+(function() {
+    var loading_timer = 10;
+    var loading_timeout = loading_timer * 300;
+    var engine_modules = ['e_cloud', 'e_notification', 'e_player', 'e_playlist', 'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm'];
+    var engine_loading = function() {
+        var dune = true;
+        engine_modules.forEach(function(name) {
+            if ( window['engin'+name] === undefined ) {
+                dune = false;
+                return 0;
+            }
+        });
+        if (!dune) {
+            setTimeout(function() {
+                loading_timeout--;
+                if (loading_timeout === 0) {
+                    console.log('Loading timeout!');
+                    return;
+                }
+                engine_loading();
+            }, loading_timer);
+        } else {
+            run_engine();
         }
-    });
-    if (!dune) {
-        setTimeout(function() {
-            engine_loading();
-        }, 10);
-        console.log('waiting');
-    } else {
-        run_engine();
+    };
+    if (!window.minimize_mode) {
+        var s = document.getElementsByTagName('script')[0];
+        engine_modules.forEach(function(src) {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.async = true;
+            script.src = 'scripts/engine/'+src+'.js';
+            s.parentNode.insertBefore(script, s);
+        });
     }
-};
-if (!window.minimize_mode) {
-    var s = document.getElementsByTagName('script')[0];
-    engine_modules.forEach(function(src) {
-        var script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.async = true;
-        script.src = 'scripts/engine/'+src+'.js';
-        s.parentNode.insertBefore(script, s);
-    });
-}
-engine_loading();
+    engine_loading();
+})();
