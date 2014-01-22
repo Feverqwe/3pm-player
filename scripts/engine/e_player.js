@@ -205,7 +205,7 @@ var engine_player = function(mySettings, myEngine) {
                 rmlist.push(name);
             }
             $.each(adapter.proc_list, function (key, proc) {
-                if (proc._window.window === null || name === 'Any') {
+                if (proc._window.window === null) {
                     proc.disconnect();
                     rmlist.push(key);
                 }
@@ -426,15 +426,11 @@ var engine_player = function(mySettings, myEngine) {
                 media_el.src="";
                 $(media_el).off();
                 if (type !== undefined) {
-                    discAdapters('Any');
-                    adapter.source.disconnect();
                     media_el = type;
                     e_player.mode = 'video';
                 } else {
-                    discAdapters('Any');
-                    media_el = new Audio();
+                    media_el = adapter.audio;
                     e_player.mode = 'audio';
-                    adapter = initAdapter();
                     view.updateSettings({visual_type: settings.visual_type});
                 }
                 media_el.volume = volume_state;
