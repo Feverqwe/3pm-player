@@ -681,6 +681,7 @@
     view.show = function () {
         write_language();
         settings = window._settings;
+        $('body').removeClass('loading');
         window.onfocus = function () {
             if (dom_cache.focusing_all && dom_cache.focus_state === false) {
                 dom_cache.focusing_all = false;

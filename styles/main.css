@@ -8,6 +8,9 @@ body {
     color: #C9C9C9;
     height: 100%;
 }
+body.loading > * {
+    display: none;
+}
 .player .image, .player > .track {
     display: inline-block;
 }

@@ -27,7 +27,7 @@ var _debug = false;
  * @namespace window.webkitAudioContext
  * @namespace window.devicePixelRatio
  */
-(function () {
+var run_engine = function () {
     var engine = window.engine = {};
     //options
     var boot = true;
@@ -264,4 +264,33 @@ var _debug = false;
         _windows[type].setBounds(params);
     };
     engine.windowManager = engine_wm(settings, engine);
-})();
+};
+var engine_modules = ['e_cloud', 'e_notification', 'e_player', 'e_playlist', 'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm'];
+var engine_loading = function() {
+    var dune = true;
+    engine_modules.forEach(function(name) {
+        if ( window['engin'+name] === undefined ) {
+            dune = false;
+            return 0;
+        }
+    });
+    if (!dune) {
+        setTimeout(function() {
+            engine_loading();
+        }, 10);
+        console.log('waiting');
+    } else {
+        run_engine();
+    }
+};
+if (!window.minimize_mode) {
+    var s = document.getElementsByTagName('script')[0];
+    engine_modules.forEach(function(src) {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.async = true;
+        script.src = 'scripts/engine/'+src+'.js';
+        s.parentNode.insertBefore(script, s);
+    });
+}
+engine_loading();

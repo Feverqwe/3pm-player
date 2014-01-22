@@ -15,26 +15,22 @@ copy .\*.png .\build\.
 java -jar compiler.jar --js .\www\js\main.js --js_output_file .\build\www\js\main.js
 :: make background.js
 java -jar compiler.jar --js .\scripts\background.js --js_output_file .\build\scripts\background.js
-:: make engine.js
-java -jar compiler.jar --js .\scripts\engine.js --js_output_file .\build\scripts\engine.js
-:: make engine/e_cloud.js
-java -jar compiler.jar --js .\scripts\engine\e_cloud.js --js_output_file .\build\scripts\engine\e_cloud.js
-:: make engine/e_lastfm.js
-java -jar compiler.jar --js .\scripts\engine\e_lastfm.js --js_output_file .\build\scripts\engine\e_lastfm.js
-:: make engine/e_notification.js
-java -jar compiler.jar --js .\scripts\engine\e_notification.js --js_output_file .\build\scripts\engine\e_notification.js
-:: make engine/e_player.js
-java -jar compiler.jar --js .\scripts\engine\e_player.js --js_output_file .\build\scripts\engine\e_player.js
-:: make engine/e_playlist.js
-java -jar compiler.jar --js .\scripts\engine\e_playlist.js --js_output_file .\build\scripts\engine\e_playlist.js
-:: make engine/e_tags.js
-java -jar compiler.jar --js .\scripts\engine\e_tags.js --js_output_file .\build\scripts\engine\e_tags.js
-:: make engine/e_webui.js
-java -jar compiler.jar --js .\scripts\engine\e_webui.js --js_output_file .\build\scripts\engine\e_webui.js
-:: make engine/e_wm.js
-java -jar compiler.jar --js .\scripts\engine\e_wm.js --js_output_file .\build\scripts\engine\e_wm.js
-:: make engine/e_files.js
-java -jar compiler.jar --js .\scripts\engine\e_files.js --js_output_file .\build\scripts\engine\e_files.js
+
+#make engine.js
+java -jar compiler.jar --js .\scripts\minimize_mode.js^
+ --js .\scripts\engine\e_cloud.js^
+ --js .\scripts\engine\e_files.js^
+ --js .\scripts\engine\e_lastfm.js^
+ --js .\scripts\engine\e_notification.js^
+ --js .\scripts\engine\e_player.js^
+ --js .\scripts\engine\e_playlist.js^
+ --js .\scripts\engine\e_tags.js^
+ --js .\scripts\engine\e_webui.js^
+ --js .\scripts\engine\e_wm.js^
+ --js .\scripts\engine.js^
+ --js_output_file .\build\scripts\engine.js
+rd /S /Q .\build\scripts\engine
+
 :: make id3-minimized.js
 java -jar compiler.jar --js .\scripts\id3-minimized.js --js_output_file .\build\scripts\id3-minimized.js
 :: make player.js
