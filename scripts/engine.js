@@ -28,6 +28,7 @@ var _debug = false;
  * @namespace window.devicePixelRatio
  */
 var run_engine = function () {
+    window.run_engine = undefined;
     var engine = window.engine = {};
     //options
     var boot = true;
