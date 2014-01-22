@@ -1,5 +1,5 @@
 var engine_player = function(mySettings, myEngine) {
-    delete window.engine_player;
+    window.engine_player = undefined;
     var settings = mySettings;
     var engine = myEngine;
     var e_player = function () {

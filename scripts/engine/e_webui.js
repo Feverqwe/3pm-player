@@ -1,5 +1,5 @@
 var engine_webui = function(mySettings, myEngine) {
-    delete window.engine_webui;
+    window.engine_webui = undefined;
     var settings = mySettings;
     var engine = myEngine;
     chrome.runtime.onMessage.addListener(function(msg) {

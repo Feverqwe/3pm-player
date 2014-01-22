@@ -1,5 +1,5 @@
 var engine_tags = function(mySettings,myEngine) {
-    delete window.engine_tags;
+    window.engine_tags = undefined;
     var settings = mySettings;
     var engine = myEngine;
     var e_tags = function () {

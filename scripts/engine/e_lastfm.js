@@ -1,5 +1,5 @@
 var engine_lastfm = function(mySettings, myEngine) {
-    delete window.engine_lastfm;
+    window.engine_lastfm = undefined;
     var settings = mySettings;
     var engine = myEngine;
     var e_lastfm = function() {

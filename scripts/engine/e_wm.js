@@ -1,5 +1,5 @@
 var engine_wm = function(mySettings,myEngine) {
-    delete window.engine_wm;
+    window.engine_wm = undefined;
     var settings = mySettings;
     var engine = myEngine;
     var e_wm = function () {

@@ -1,5 +1,5 @@
 var engine_notification = function (mySettings,myEngine) {
-    delete window.engine_notification;
+    window.engine_notification = undefined;
     var settings = mySettings;
     var engine = myEngine;
     var e_notification = function () {

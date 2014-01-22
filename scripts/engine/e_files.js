@@ -1,5 +1,5 @@
 var engine_files = function(mySettings, myEngine) {
-    delete window.engine_files;
+    window.engine_files = undefined;
     var settings = mySettings;
     var engine = myEngine;
     var e_files = function() {

@@ -1,5 +1,5 @@
 var engine_cloud = function(mySettings, myEngine) {
-    delete window.engine_cloud;
+   window.engine_cloud = undefined;
     var settings = mySettings;
     var engine = myEngine;
     var e_cloud = function() {

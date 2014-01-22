@@ -1,5 +1,5 @@
 var engine_playlist = function(mySettings, myEngine) {
-    delete window.engine_playlist;
+    window.engine_playlist = undefined;
     var settings = mySettings;
     var engine = myEngine;
     var e_playlist = function () {
