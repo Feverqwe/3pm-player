@@ -197,4 +197,19 @@ video {
     z-index: 5;
     margin-top: -15px;
     margin-left: -15px;
+    color: #fff;
+}
+.volume_value {
+    display: none;
+    font-size: 200%;
+    color: rgb(255, 255, 255);
+    position: absolute;
+    right: 5%;
+    top: 5%;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.28);
+    padding-bottom: 2px;
+    padding-left: 7px;
+    padding-right: 6px;
+    border-radius: 4px;
 }
