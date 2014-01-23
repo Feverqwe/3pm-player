@@ -4,8 +4,7 @@
  * @namespace document.webkitHidden
  * @namespace chrome.app.window.current.onBoundsChanged
  */
-(function () {
-    var view = window.view = {};
+window.view = function () {
     var dom_cache = {};
     var var_cache = {};
     var time_tipe = 0;
@@ -678,510 +677,512 @@
             dom_cache.trackname.parent().attr('class', 'name');
         }
     };
-    view.show = function () {
-        write_language();
-        settings = window._settings;
-        $('body').removeClass('loading');
-        window.onfocus = function () {
-            if (dom_cache.focusing_all && dom_cache.focus_state === false) {
-                dom_cache.focusing_all = false;
-                dom_cache.focus_state = true;
-                return;
-            }
-            if (dom_cache.focusing_all) {
-                //protect!
-                dom_cache.disable_focusing_all = true;
-                dom_cache.focusing_all = false;
-                console.log('Focusing disabled!');
-            }
-            if (dom_cache.focus_state) {
-                return;
-            }
-            dom_cache.focus_state = true;
-            if (!dom_cache.disable_focusing_all) {
-                dom_cache.focusing_all = true;
-                window._showAll(undefined, function () {
-                    dom_cache.focusing_all = false;
-                });
-            }
-        };
-        window.onblur = function () {
-            dom_cache.focus_state = false;
-        };
-        dom_cache = {
-            body: $('body'),
-            drop: $('div.drop'),
-            loading: $('div.loading'),
-            trackname: $('.track > .name > span'),
-            trackalbum: $('.track > .album > span'),
-            time: $('.info > .time'),
-            btnPlayPause: $('.controls .playpause.btn'),
-            btnPrev: $('.controls .prev.btn'),
-            btnNext: $('.controls .next.btn'),
-            progress: $('.progress'),
-            picture: $('.image'),
-            volume: $('.volume'),
-            mute: $('.volume_controll .pic'),
-            click_for_open: $('.click_for_open'),
-            btnPlaylist: $('.playlist.btn')
-        };
-        is_winamp = settings.is_winamp;
-        if (is_winamp) {
-            dom_cache.body.addClass('winamp');
-            $('li.btn.playlist').hide();
-            $('div.pl_state').hide();
-            var win = chrome.app.window.current();
-            var dpr = window.devicePixelRatio;
-            var win_w = parseInt(275 * dpr);
-            var win_h = parseInt(116 * dpr);
-            /**
-             * @namespace win.resizeTo
-             */
-            win.resizeTo(win_w, win_h);
-            $('.player').append(
-                $('<div>', {'class': "shuffle"}),
-                $('<div>', {'class': "loop"}),
-                $('<div>', {'class': "state"}),
-                $('<div>', {'class': "w_kbps", text: 320}),
-                $('<div>', {'class': "w_kHz", text: 44}),
-                $('<div>', {'class': "stereo"}),
-                $('<div>', {'class': "w_playlist"}).on('click', function () {
-                    engine.windowManager({type: 'playlist'});
-                }));
-            dom_cache.time = function () {
-                var obj = $('.info > .time');
-                var back = false;
-                obj.empty();
-                var mm = $('<div>', {'class': 'wmp mm', 'style': 'visibility: hidden; background-position-x: -99px;'});
-                var m_10 = $('<div>', {'class': 'wmp m_10'});
-                var m_0 = $('<div>', {'class': 'wmp m_0'});
-                var s_10 = $('<div>', {'class': 'wmp s_10'});
-                var s_0 = $('<div>', {'class': 'wmp s_0'});
-                obj.append(mm, m_10, m_0, s_10, s_0);
-                var setVal = function (num, obj) {
-                    num = parseInt(num);
-                    var val = 9 * num;
-                    obj.css('background-position-x', '-' + val + 'px');
-                };
-                return {
-                    on: function (a, b) {
-                        obj.on(a, b);
-                    },
-                    text: function (value) {
-                        var val = value.split(':');
-                        if (val[0].length === 2) {
-                            if (back) {
-                                mm.css('visibility', 'hidden');
-                                back = false;
-                            }
-                            setVal(val[0][0], m_10);
-                            setVal(val[0][1], m_0);
-                        } else {
-                            if (back === false) {
-                                mm.css('visibility', 'visible');
-                                back = true;
-                            }
-                            setVal(val[0][1], m_10);
-                            setVal(val[0][2], m_0);
-                        }
-                        setVal(val[1][0], s_10);
-                        setVal(val[1][1], s_0);
-                    },
-                    empty: function () {
-                        setVal(0, m_10);
-                        setVal(0, m_0);
-                        setVal(0, s_10);
-                        setVal(0, s_0);
-                    }
-                };
-            }();
-            writeWinampFFT();
-        }
-        dom_cache.progress.slider({
-            range: "min",
-            min: 0,
-            max: 1000,
-            change: function (event, ui) {
-                if (event.which === undefined) {
-                    return;
-                }
-                if (isNaN(ui.value)) {
-                    return;
-                }
-                engine.player.position(ui.value / 10);
-                if (is_winamp) {
-                    var lp = parseInt(ui.value / 1000 * -29) || 0;
-                    dom_cache.progress_ui_a.css('margin-left', lp + 'px');
-                }
-            },
-            slide: function (event, ui) {
-                if (event.which === undefined) {
-                    return;
-                }
-                if (isNaN(ui.value)) {
-                    return;
-                }
-                engine.player.position(ui.value / 10);
-                if (is_winamp) {
-                    var lp = parseInt(ui.value / 1000 * -29) || 0;
-                    dom_cache.progress_ui_a.css('margin-left', lp + 'px');
-                }
-            },
-            create: function () {
-                var div_loaded = $('<div>', {'class': 'loaded'});
-                dom_cache.progress.append(div_loaded);
-                preBufferingController.setObj(div_loaded);
-                dom_cache.progress_ui_a = dom_cache.progress.find('a').eq(0);
-            }
-        });
-        dom_cache.volume.slider({
-            range: "min",
-            min: 0,
-            max: 100,
-            change: function (event, ui) {
-                if (event.which === undefined) {
-                    return;
-                }
-                if (isNaN(ui.value)) {
-                    return;
-                }
-                engine.player.volume(ui.value);
-                if (is_winamp) {
-                    dom_cache.volume.css('background', getVolumeColor(ui.value));
-                }
-            },
-            slide: function (event, ui) {
-                if (event.which === undefined) {
-                    return;
-                }
-                if (isNaN(ui.value)) {
-                    return;
-                }
-                engine.player.volume(ui.value);
-                if (is_winamp) {
-                    dom_cache.volume.css('background', getVolumeColor(ui.value));
-                }
-            }
-        });
-        view.state('emptied');
-        view.state("playlist_is_empty");
-        chrome.storage.local.get(['time_tipe', 'extend_volume_scroll', 'volume', 'shuffle', 'loop'], function (storage) {
-            if (storage.time_tipe !== undefined) {
-                time_tipe = storage.time_tipe;
-            }
-            if (storage.extend_volume_scroll !== undefined) {
-                make_extend_volume(storage.extend_volume_scroll);
-            }
-            if (storage.shuffle) {
-                engine.playlist.setShuffle();
-            }
-            if (storage.loop) {
-                engine.playlist.setLoop();
-            }
-            engine.player.volume(storage.volume);
-        });
-        engine.setHotkeys(document);
-        /**
-         * @namespace info.menuItemId
-         */
-        chrome.contextMenus.onClicked.addListener(function (info) {
-            if (context_menu[info.menuItemId] !== undefined && context_menu[info.menuItemId].action !== undefined) {
-                context_menu[info.menuItemId].action(info);
-            }
-        });
-        dom_cache.body.on('drop', function (event) {
-            event.preventDefault();
-            /**
-             * @namespace event.originalEvent.dataTransfer
-             * @namespace event.originalEvent.dataTransfer.files
-             */
-            var entrys = event.originalEvent.dataTransfer.items;
-            engine.files.readAnyFiles(entrys);
-        });
-        var drag_timeout = undefined;
-        dom_cache.body.on('dragover', function (event) {
-            event.preventDefault();
-            dom_cache.drop.css({"display": "block"});
-            clearTimeout(drag_timeout);
-            drag_timeout = setTimeout(function () {
-                dom_cache.drop.css({"display": "none"});
-            }, 300);
-        });
-        dom_cache.btnPlayPause.on('click', function () {
-            if ($(this).hasClass('play')) {
-                engine.player.play();
-            } else if ($(this).hasClass('pause')) {
-                engine.player.pause();
-            }
-        });
-        dom_cache.btnNext.on('click', function () {
-            engine.playlist.next();
-        });
-        dom_cache.btnPrev.on('click', function () {
-            engine.playlist.preview();
-        });
-        $('.close').on('click', function () {
-            window.close();
-        });
-        $('.mini').on('click', function () {
-            chrome.app.window.current().minimize();
-        });
-        $('.t_btn.menu').on('click', function () {
-            engine.showMenu();
-        });
-        dom_cache.time.on('click', function () {
-            time_tipe = (time_tipe) ? 0 : 1;
-            chrome.storage.local.set({'time_tipe': time_tipe});
-            var audio = engine.player.getAudio();
-            view.setProgress(audio.duration, audio.currentTime);
-        });
-        $('.click_for_open').on('click', function () {
-            var accepts = [
-                {
-                    mimeTypes: ['audio/*', 'video/*']
-                }
-            ];
-            chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function (entry) {
-                if (!entry) {
-                    return;
-                }
-                engine.files.readAnyFiles(entry);
-            });
-        });
-        dom_cache.mute.on('click', function () {
-            engine.player.mute();
-        });
-        dom_cache.volume.parent().get(0).onmousewheel = function (e) {
-            if (e.wheelDelta > 0) {
-                engine.player.volume("+10");
-            } else {
-                engine.player.volume("-10");
-            }
-        };
-        dom_cache.progress.get(0).onmousewheel = function (e) {
-            if (e.wheelDelta > 0) {
-                clearTimeout(var_cache.progress_timer);
-                var_cache.progress_timer = setTimeout(function () {
-                    engine.player.position("+5");
-                }, 25);
-            } else {
-                clearTimeout(var_cache.progress_timer);
-                var_cache.progress_timer = setTimeout(function () {
-                    engine.player.position("-5");
-                }, 25);
-            }
-        };
-        dom_cache.btnPlaylist.on('click', function () {
-            engine.windowManager({type: 'playlist'});
-        });
-        $('div.loop').on('click', function () {
-            engine.playlist.setLoop();
-        });
-        $('div.shuffle').on('click', function () {
-            engine.playlist.setShuffle();
-        });
-        var bounds_timer;
-        var next_step;
-        chrome.app.window.current().onBoundsChanged.addListener(function () {
-            if (document.webkitHidden) {
-                return;
-            }
-            if (settings.pined_playlist) {
-                engine.setPinPosition('playlist', settings.pin_position);
-            }
-            var time = (new Date).getTime();
-            if (next_step > time) {
-                return;
-            }
-            next_step = time + 450;
-            clearTimeout(bounds_timer);
-            bounds_timer = setTimeout(function () {
-                var window_left = window.screenLeft;
-                var window_top = window.screenTop;
-                if (var_cache.window_left !== window_left || var_cache.window_top !== window_top) {
-                    var_cache.window_left = window_left;
-                    var_cache.window_top = window_top;
-                    chrome.storage.local.set({'pos_left': window_left, 'pos_top': window_top});
-                }
-            }, 500);
-        });
-    };
-    view.setTags = function (tb) {
-        if (is_winamp) {
-            var trackalbum = '';
-            if (tb.aa !== undefined) {
-                trackalbum = ' - ' + tb.aa;
-            }
-            dom_cache.trackname.text(tb.title + trackalbum).parent().attr("title", tb.title + trackalbum);
-            calculateMoveble(dom_cache.trackname, 153, 'name');
-        } else {
-            dom_cache.trackname.text(tb.title).parent().attr("title", tb.title);
-            dom_cache.trackalbum.text(tb.aa || '').parent().attr("title", tb.aa || '');
-        }
-        if (tb.picture !== undefined) {
-            showImage(tb.picture);
-        } else {
-            hideImage();
-        }
-        setTrueText(tb.title, tb.aa || '');
-        //console.log(tags)
-    };
-    view.setProgress = function (max, pos) {
-        var width_persent = pos / max * 100;
-        dom_cache.progress.slider("value", width_persent * 10);
-        if (is_winamp) {
-            var lp = parseInt(width_persent / 100 * -29) || 0;
-            dom_cache.progress_ui_a.css('margin-left', lp + 'px');
-        }
-        var time = undefined;
-        if (time_tipe) {
-            time = "-" + toHHMMSS(max - pos);
-        } else {
-            time = toHHMMSS(pos);
-        }
-        if (time === dom_cache.time_cache) {
-            return;
-        }
-        dom_cache.time_cache = time;
-        dom_cache.time.text(time);
-    };
-    view.setVolume = function (pos) {
-        if (engine.player.getMute()) {
-            if (var_cache.volume_image === -1) {
-                return;
-            }
-            dom_cache.volume.parent().children('.pic').attr('class', 'pic mute');
-            var_cache.volume_image = -1;
-            return;
-        }
-        var max = 1.0;
-        var width_persent = pos / max * 100;
-        dom_cache.volume.slider("value", width_persent);
-        if (is_winamp) {
-            dom_cache.volume.css('background', getVolumeColor(width_persent));
-        }
-        if (width_persent > 70) {
-            if (var_cache.volume_image === 1) {
-                return;
-            }
-            var_cache.volume_image = 1;
-            dom_cache.volume.parent().children('.pic').attr('class', 'pic high');
-        } else if (pos === 0) {
-            if (var_cache.volume_image === 2) {
-                return;
-            }
-            var_cache.volume_image = 2;
-            dom_cache.volume.parent().children('.pic').attr('class', 'pic zero');
-        } else if (width_persent < 40) {
-            if (var_cache.volume_image === 3) {
-                return;
-            }
-            var_cache.volume_image = 3;
-            dom_cache.volume.parent().children('.pic').attr('class', 'pic low');
-        } else if (width_persent < 70) {
-            if (var_cache.volume_image === 4) {
-                return;
-            }
-            var_cache.volume_image = 4;
-            dom_cache.volume.parent().children('.pic').attr('class', 'pic medium');
-        }
-    };
-    view.state = function (type) {
-        if (_debug) {
-            console.log(type);
-        }
-        if (type === "playlist_is_empty") {
-            dom_cache.click_for_open.show();
-        }
-        if (type === "playlist_not_empty") {
-            dom_cache.click_for_open.hide();
-        }
-        if (type === "preloading") {
-            dom_cache.loading.show();
-        }
-        if (type === "preloading_dune") {
-            dom_cache.loading.hide();
-        }
-        if (type === "loadstart") {
-            dom_cache.loading.show();
-            preBufferingController.loading();
-        }
-        if (type === "loadeddata") {
-            dom_cache.loading.hide();
-            preBufferingController.update();
-            preBufferingController.start();
-        }
-        if (type === "emptied") {
-            dom_cache.loading.hide();
-            dom_cache.trackname.empty();
-            dom_cache.trackalbum.empty();
-            dom_cache.time.empty();
-            hideImage();
-            var_cache = {};
-            var_cache.progress_w = dom_cache.progress.width();
-            var_cache.volume_w = dom_cache.volume.width();
-            isPause();
-            view.setProgress(0.1, 0);
-            preBufferingController.stop();
-            preBufferingController.hide();
-        }
-        if (type === "error") {
-            dom_cache.loading.hide();
-            preBufferingController.stop();
-            preBufferingController.hide();
-            isPause();
-        }
-        if (type === "waiting") {
-            dom_cache.loading.show();
-        }
-        if (type === "play") {
-            dom_cache.loading.show();
-            isPlaying();
-        }
-        if (type === "playing") {
-            dom_cache.loading.hide();
-            isPlaying();
-        }
-        if (type === "pause") {
-            dom_cache.loading.hide();
-            isPause();
-        }
-        if (type === "canplay") {
-            engine.player.play();
-        }
-    };
-    view.updateSettings = function (changes) {
-        if (changes.extend_volume_scroll !== undefined) {
-            make_extend_volume(changes.extend_volume_scroll);
-        }
-        if (changes.visual_type !== undefined) {
-            writeWinampFFT();
-        }
-        if (_lang.t !== window._language) {
-            window._language = _lang.t;
+    return {
+        show : function () {
             write_language();
-        }
+            settings = window._settings;
+            $('body').removeClass('loading');
+            window.onfocus = function () {
+                if (dom_cache.focusing_all && dom_cache.focus_state === false) {
+                    dom_cache.focusing_all = false;
+                    dom_cache.focus_state = true;
+                    return;
+                }
+                if (dom_cache.focusing_all) {
+                    //protect!
+                    dom_cache.disable_focusing_all = true;
+                    dom_cache.focusing_all = false;
+                    console.log('Focusing disabled!');
+                }
+                if (dom_cache.focus_state) {
+                    return;
+                }
+                dom_cache.focus_state = true;
+                if (!dom_cache.disable_focusing_all) {
+                    dom_cache.focusing_all = true;
+                    window._showAll(undefined, function () {
+                        dom_cache.focusing_all = false;
+                    });
+                }
+            };
+            window.onblur = function () {
+                dom_cache.focus_state = false;
+            };
+            dom_cache = {
+                body: $('body'),
+                drop: $('div.drop'),
+                loading: $('div.loading'),
+                trackname: $('.track > .name > span'),
+                trackalbum: $('.track > .album > span'),
+                time: $('.info > .time'),
+                btnPlayPause: $('.controls .playpause.btn'),
+                btnPrev: $('.controls .prev.btn'),
+                btnNext: $('.controls .next.btn'),
+                progress: $('.progress'),
+                picture: $('.image'),
+                volume: $('.volume'),
+                mute: $('.volume_controll .pic'),
+                click_for_open: $('.click_for_open'),
+                btnPlaylist: $('.playlist.btn')
+            };
+            is_winamp = settings.is_winamp;
+            if (is_winamp) {
+                dom_cache.body.addClass('winamp');
+                $('li.btn.playlist').hide();
+                $('div.pl_state').hide();
+                var win = chrome.app.window.current();
+                var dpr = window.devicePixelRatio;
+                var win_w = parseInt(275 * dpr);
+                var win_h = parseInt(116 * dpr);
+                /**
+                 * @namespace win.resizeTo
+                 */
+                win.resizeTo(win_w, win_h);
+                $('.player').append(
+                    $('<div>', {'class': "shuffle"}),
+                    $('<div>', {'class': "loop"}),
+                    $('<div>', {'class': "state"}),
+                    $('<div>', {'class': "w_kbps", text: 320}),
+                    $('<div>', {'class': "w_kHz", text: 44}),
+                    $('<div>', {'class': "stereo"}),
+                    $('<div>', {'class': "w_playlist"}).on('click', function () {
+                        engine.windowManager({type: 'playlist'});
+                    }));
+                dom_cache.time = function () {
+                    var obj = $('.info > .time');
+                    var back = false;
+                    obj.empty();
+                    var mm = $('<div>', {'class': 'wmp mm', 'style': 'visibility: hidden; background-position-x: -99px;'});
+                    var m_10 = $('<div>', {'class': 'wmp m_10'});
+                    var m_0 = $('<div>', {'class': 'wmp m_0'});
+                    var s_10 = $('<div>', {'class': 'wmp s_10'});
+                    var s_0 = $('<div>', {'class': 'wmp s_0'});
+                    obj.append(mm, m_10, m_0, s_10, s_0);
+                    var setVal = function (num, obj) {
+                        num = parseInt(num);
+                        var val = 9 * num;
+                        obj.css('background-position-x', '-' + val + 'px');
+                    };
+                    return {
+                        on: function (a, b) {
+                            obj.on(a, b);
+                        },
+                        text: function (value) {
+                            var val = value.split(':');
+                            if (val[0].length === 2) {
+                                if (back) {
+                                    mm.css('visibility', 'hidden');
+                                    back = false;
+                                }
+                                setVal(val[0][0], m_10);
+                                setVal(val[0][1], m_0);
+                            } else {
+                                if (back === false) {
+                                    mm.css('visibility', 'visible');
+                                    back = true;
+                                }
+                                setVal(val[0][1], m_10);
+                                setVal(val[0][2], m_0);
+                            }
+                            setVal(val[1][0], s_10);
+                            setVal(val[1][1], s_0);
+                        },
+                        empty: function () {
+                            setVal(0, m_10);
+                            setVal(0, m_0);
+                            setVal(0, s_10);
+                            setVal(0, s_0);
+                        }
+                    };
+                }();
+                writeWinampFFT();
+            }
+            dom_cache.progress.slider({
+                range: "min",
+                min: 0,
+                max: 1000,
+                change: function (event, ui) {
+                    if (event.which === undefined) {
+                        return;
+                    }
+                    if (isNaN(ui.value)) {
+                        return;
+                    }
+                    engine.player.position(ui.value / 10);
+                    if (is_winamp) {
+                        var lp = parseInt(ui.value / 1000 * -29) || 0;
+                        dom_cache.progress_ui_a.css('margin-left', lp + 'px');
+                    }
+                },
+                slide: function (event, ui) {
+                    if (event.which === undefined) {
+                        return;
+                    }
+                    if (isNaN(ui.value)) {
+                        return;
+                    }
+                    engine.player.position(ui.value / 10);
+                    if (is_winamp) {
+                        var lp = parseInt(ui.value / 1000 * -29) || 0;
+                        dom_cache.progress_ui_a.css('margin-left', lp + 'px');
+                    }
+                },
+                create: function () {
+                    var div_loaded = $('<div>', {'class': 'loaded'});
+                    dom_cache.progress.append(div_loaded);
+                    preBufferingController.setObj(div_loaded);
+                    dom_cache.progress_ui_a = dom_cache.progress.find('a').eq(0);
+                }
+            });
+            dom_cache.volume.slider({
+                range: "min",
+                min: 0,
+                max: 100,
+                change: function (event, ui) {
+                    if (event.which === undefined) {
+                        return;
+                    }
+                    if (isNaN(ui.value)) {
+                        return;
+                    }
+                    engine.player.volume(ui.value);
+                    if (is_winamp) {
+                        dom_cache.volume.css('background', getVolumeColor(ui.value));
+                    }
+                },
+                slide: function (event, ui) {
+                    if (event.which === undefined) {
+                        return;
+                    }
+                    if (isNaN(ui.value)) {
+                        return;
+                    }
+                    engine.player.volume(ui.value);
+                    if (is_winamp) {
+                        dom_cache.volume.css('background', getVolumeColor(ui.value));
+                    }
+                }
+            });
+            view.state('emptied');
+            view.state("playlist_is_empty");
+            chrome.storage.local.get(['time_tipe', 'extend_volume_scroll', 'volume', 'shuffle', 'loop'], function (storage) {
+                if (storage.time_tipe !== undefined) {
+                    time_tipe = storage.time_tipe;
+                }
+                if (storage.extend_volume_scroll !== undefined) {
+                    make_extend_volume(storage.extend_volume_scroll);
+                }
+                if (storage.shuffle) {
+                    engine.playlist.setShuffle();
+                }
+                if (storage.loop) {
+                    engine.playlist.setLoop();
+                }
+                engine.player.volume(storage.volume);
+            });
+            engine.setHotkeys(document);
+            /**
+             * @namespace info.menuItemId
+             */
+            chrome.contextMenus.onClicked.addListener(function (info) {
+                if (context_menu[info.menuItemId] !== undefined && context_menu[info.menuItemId].action !== undefined) {
+                    context_menu[info.menuItemId].action(info);
+                }
+            });
+            dom_cache.body.on('drop', function (event) {
+                event.preventDefault();
+                /**
+                 * @namespace event.originalEvent.dataTransfer
+                 * @namespace event.originalEvent.dataTransfer.files
+                 */
+                var entrys = event.originalEvent.dataTransfer.items;
+                engine.files.readAnyFiles(entrys);
+            });
+            var drag_timeout = undefined;
+            dom_cache.body.on('dragover', function (event) {
+                event.preventDefault();
+                dom_cache.drop.css({"display": "block"});
+                clearTimeout(drag_timeout);
+                drag_timeout = setTimeout(function () {
+                    dom_cache.drop.css({"display": "none"});
+                }, 300);
+            });
+            dom_cache.btnPlayPause.on('click', function () {
+                if ($(this).hasClass('play')) {
+                    engine.player.play();
+                } else if ($(this).hasClass('pause')) {
+                    engine.player.pause();
+                }
+            });
+            dom_cache.btnNext.on('click', function () {
+                engine.playlist.next();
+            });
+            dom_cache.btnPrev.on('click', function () {
+                engine.playlist.preview();
+            });
+            $('.close').on('click', function () {
+                window.close();
+            });
+            $('.mini').on('click', function () {
+                chrome.app.window.current().minimize();
+            });
+            $('.t_btn.menu').on('click', function () {
+                engine.showMenu();
+            });
+            dom_cache.time.on('click', function () {
+                time_tipe = (time_tipe) ? 0 : 1;
+                chrome.storage.local.set({'time_tipe': time_tipe});
+                var audio = engine.player.getAudio();
+                view.setProgress(audio.duration, audio.currentTime);
+            });
+            $('.click_for_open').on('click', function () {
+                var accepts = [
+                    {
+                        mimeTypes: ['audio/*', 'video/*']
+                    }
+                ];
+                chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function (entry) {
+                    if (!entry) {
+                        return;
+                    }
+                    engine.files.readAnyFiles(entry);
+                });
+            });
+            dom_cache.mute.on('click', function () {
+                engine.player.mute();
+            });
+            dom_cache.volume.parent().get(0).onmousewheel = function (e) {
+                if (e.wheelDelta > 0) {
+                    engine.player.volume("+10");
+                } else {
+                    engine.player.volume("-10");
+                }
+            };
+            dom_cache.progress.get(0).onmousewheel = function (e) {
+                if (e.wheelDelta > 0) {
+                    clearTimeout(var_cache.progress_timer);
+                    var_cache.progress_timer = setTimeout(function () {
+                        engine.player.position("+5");
+                    }, 25);
+                } else {
+                    clearTimeout(var_cache.progress_timer);
+                    var_cache.progress_timer = setTimeout(function () {
+                        engine.player.position("-5");
+                    }, 25);
+                }
+            };
+            dom_cache.btnPlaylist.on('click', function () {
+                engine.windowManager({type: 'playlist'});
+            });
+            $('div.loop').on('click', function () {
+                engine.playlist.setLoop();
+            });
+            $('div.shuffle').on('click', function () {
+                engine.playlist.setShuffle();
+            });
+            var bounds_timer;
+            var next_step;
+            chrome.app.window.current().onBoundsChanged.addListener(function () {
+                if (document.webkitHidden) {
+                    return;
+                }
+                if (settings.pined_playlist) {
+                    engine.setPinPosition('playlist', settings.pin_position);
+                }
+                var time = (new Date).getTime();
+                if (next_step > time) {
+                    return;
+                }
+                next_step = time + 450;
+                clearTimeout(bounds_timer);
+                bounds_timer = setTimeout(function () {
+                    var window_left = window.screenLeft;
+                    var window_top = window.screenTop;
+                    if (var_cache.window_left !== window_left || var_cache.window_top !== window_top) {
+                        var_cache.window_left = window_left;
+                        var_cache.window_top = window_top;
+                        chrome.storage.local.set({'pos_left': window_left, 'pos_top': window_top});
+                    }
+                }, 500);
+            });
+        },
+        setTags : function (tb) {
+            if (is_winamp) {
+                var trackalbum = '';
+                if (tb.aa !== undefined) {
+                    trackalbum = ' - ' + tb.aa;
+                }
+                dom_cache.trackname.text(tb.title + trackalbum).parent().attr("title", tb.title + trackalbum);
+                calculateMoveble(dom_cache.trackname, 153, 'name');
+            } else {
+                dom_cache.trackname.text(tb.title).parent().attr("title", tb.title);
+                dom_cache.trackalbum.text(tb.aa || '').parent().attr("title", tb.aa || '');
+            }
+            if (tb.picture !== undefined) {
+                showImage(tb.picture);
+            } else {
+                hideImage();
+            }
+            setTrueText(tb.title, tb.aa || '');
+            //console.log(tags)
+        },
+        setProgress : function (max, pos) {
+            var width_persent = pos / max * 100;
+            dom_cache.progress.slider("value", width_persent * 10);
+            if (is_winamp) {
+                var lp = parseInt(width_persent / 100 * -29) || 0;
+                dom_cache.progress_ui_a.css('margin-left', lp + 'px');
+            }
+            var time = undefined;
+            if (time_tipe) {
+                time = "-" + toHHMMSS(max - pos);
+            } else {
+                time = toHHMMSS(pos);
+            }
+            if (time === dom_cache.time_cache) {
+                return;
+            }
+            dom_cache.time_cache = time;
+            dom_cache.time.text(time);
+        },
+        setVolume : function (pos) {
+            if (engine.player.getMute()) {
+                if (var_cache.volume_image === -1) {
+                    return;
+                }
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic mute');
+                var_cache.volume_image = -1;
+                return;
+            }
+            var max = 1.0;
+            var width_persent = pos / max * 100;
+            dom_cache.volume.slider("value", width_persent);
+            if (is_winamp) {
+                dom_cache.volume.css('background', getVolumeColor(width_persent));
+            }
+            if (width_persent > 70) {
+                if (var_cache.volume_image === 1) {
+                    return;
+                }
+                var_cache.volume_image = 1;
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic high');
+            } else if (pos === 0) {
+                if (var_cache.volume_image === 2) {
+                    return;
+                }
+                var_cache.volume_image = 2;
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic zero');
+            } else if (width_persent < 40) {
+                if (var_cache.volume_image === 3) {
+                    return;
+                }
+                var_cache.volume_image = 3;
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic low');
+            } else if (width_persent < 70) {
+                if (var_cache.volume_image === 4) {
+                    return;
+                }
+                var_cache.volume_image = 4;
+                dom_cache.volume.parent().children('.pic').attr('class', 'pic medium');
+            }
+        },
+        state : function (type) {
+            if (_debug) {
+                console.log(type);
+            }
+            if (type === "playlist_is_empty") {
+                dom_cache.click_for_open.show();
+            }
+            if (type === "playlist_not_empty") {
+                dom_cache.click_for_open.hide();
+            }
+            if (type === "preloading") {
+                dom_cache.loading.show();
+            }
+            if (type === "preloading_dune") {
+                dom_cache.loading.hide();
+            }
+            if (type === "loadstart") {
+                dom_cache.loading.show();
+                preBufferingController.loading();
+            }
+            if (type === "loadeddata") {
+                dom_cache.loading.hide();
+                preBufferingController.update();
+                preBufferingController.start();
+            }
+            if (type === "emptied") {
+                dom_cache.loading.hide();
+                dom_cache.trackname.empty();
+                dom_cache.trackalbum.empty();
+                dom_cache.time.empty();
+                hideImage();
+                var_cache = {};
+                var_cache.progress_w = dom_cache.progress.width();
+                var_cache.volume_w = dom_cache.volume.width();
+                isPause();
+                view.setProgress(0.1, 0);
+                preBufferingController.stop();
+                preBufferingController.hide();
+            }
+            if (type === "error") {
+                dom_cache.loading.hide();
+                preBufferingController.stop();
+                preBufferingController.hide();
+                isPause();
+            }
+            if (type === "waiting") {
+                dom_cache.loading.show();
+            }
+            if (type === "play") {
+                dom_cache.loading.show();
+                isPlaying();
+            }
+            if (type === "playing") {
+                dom_cache.loading.hide();
+                isPlaying();
+            }
+            if (type === "pause") {
+                dom_cache.loading.hide();
+                isPause();
+            }
+            if (type === "canplay") {
+                engine.player.play();
+            }
+        },
+        updateSettings : function (changes) {
+            if (changes.extend_volume_scroll !== undefined) {
+                make_extend_volume(changes.extend_volume_scroll);
+            }
+            if (changes.visual_type !== undefined) {
+                writeWinampFFT();
+            }
+            if (_lang.t !== window._language) {
+                window._language = _lang.t;
+                write_language();
+            }
+        },
+        preBufferingController : preBufferingController,
+        setShuffle : function (shuffle) {
+            if (shuffle) {
+                $('div.shuffle').addClass('on');
+            } else {
+                $('div.shuffle').removeClass('on');
+            }
+        },
+        setLoop : function (loop) {
+            if (loop) {
+                $('div.loop').addClass('on');
+            } else {
+                $('div.loop').removeClass('on');
+            }
+        },
+        getContextMenu : function () {
+            return context_menu;
+        },
+        toHHMMSS : toHHMMSS
     };
-    view.preBufferingController = preBufferingController;
-    view.setShuffle = function (shuffle) {
-        if (shuffle) {
-            $('div.shuffle').addClass('on');
-        } else {
-            $('div.shuffle').removeClass('on');
-        }
-    };
-    view.setLoop = function (loop) {
-        if (loop) {
-            $('div.loop').addClass('on');
-        } else {
-            $('div.loop').removeClass('on');
-        }
-    };
-    view.getContextMenu = function () {
-        return context_menu;
-    };
-    view.toHHMMSS = toHHMMSS;
-})();
+}();
 (function () {
     var settings_ready = false;
     var dom_ready = false;
