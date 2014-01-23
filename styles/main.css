@@ -124,6 +124,9 @@ div.progress > a {
     position: absolute;
     top: 0;
 }
+div.progress > a:focus {
+    outline-color: #fff;
+}
 div.progress > div.loaded {
     position: absolute;
     width: 0;
