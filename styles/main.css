@@ -200,6 +200,9 @@ div.progress.download > div.loaded {
     height: 5px;
     width: 2px;
 }
+.player > div.controls li.volume_controll > .volume > a:focus {
+    outline-color: #fff;
+}
 .player > .controls .volume_controll .pic {
     position: absolute;
     left: 0;
