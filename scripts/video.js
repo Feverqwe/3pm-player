@@ -96,6 +96,14 @@ var video = function() {
                     document.webkitCancelFullScreen();
                 }
             });
+            $(document).keydown(function(event) {
+                if (event.ctrlKey || event.metaKey) {
+                    return;
+                }
+                if (event.keyCode === 122) {
+                    $('.full').trigger('click');
+                }
+            });
             $('body').on('mousemove', '.mouse_panel', function () {
                 show_panels();
             });

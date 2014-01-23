@@ -205,7 +205,9 @@ var engine_wm = function(mySettings,myEngine) {
                         window.onClosed.addListener(function () {
                             delete _windows[options.type];
                             engine.player.discAdapters('viz');
-                            chrome.power.releaseKeepAwake();
+                            if (_windows.video === undefined || _windows.video.contentWindow.window === null) {
+                                chrome.power.releaseKeepAwake();
+                            }
                         });
                         window.contentWindow._lang = _lang;
                         window.contentWindow._send = _send;

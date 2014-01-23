@@ -38,6 +38,14 @@ var viz = function() {
                     document.webkitCancelFullScreen();
                 }
             });
+            $(document).keydown(function(event) {
+                if (event.ctrlKey || event.metaKey) {
+                    return;
+                }
+                if (event.keyCode === 122) {
+                    $('.full').trigger('click');
+                }
+            });
             var bounds_timer;
             var next_step;
             chrome.app.window.current().onBoundsChanged.addListener(function() {
