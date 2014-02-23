@@ -520,7 +520,7 @@ window.view = function () {
         for (var i = 0; i < titles_l; i++) {
             var str_w = titles.eq(i).width();
             if (str_w <= size) {
-                titles.eq(i).parent().attr('class', 'name');
+                titles.eq(i).parent().attr('class', classname);
                 continue;
             }
             str_w = Math.ceil(str_w / 10);

@@ -698,7 +698,7 @@ var dialog = function() {
             $('.close').on('click', function() {
                 window.close();
             });
-            $(document).keydown(function(event) {
+            $(document).on('keydown', function(event) {
                 if (event.ctrlKey || event.metaKey) {
                     return;
                 } else {

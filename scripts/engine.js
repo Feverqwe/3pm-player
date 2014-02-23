@@ -154,7 +154,7 @@ var run_engine = function () {
         },
         setHotkeys: function (_document) {
             var progress_keydown_timer;
-            $(_document).keydown(function (event) {
+            $(_document).on('keydown',function (event) {
                 if (event.ctrlKey || event.metaKey) {
                     if (event.keyCode === 38) {
                         event.preventDefault();

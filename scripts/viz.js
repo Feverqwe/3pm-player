@@ -33,12 +33,12 @@ var viz = function() {
                  * @namespace document.webkitCancelFullScreen
                  */
                 if (!document.webkitIsFullScreen) {
-                    document.documentElement.webkitRequestFullScreen();
+                    document.documentElement.webkitRequestFullScreen(document.body.ALLOW_KEYBOARD_INPUT);
                 } else {
                     document.webkitCancelFullScreen();
                 }
             });
-            $(document).keydown(function(event) {
+            $(document).on('keydown', function(event) {
                 if (event.ctrlKey || event.metaKey) {
                     return;
                 }
