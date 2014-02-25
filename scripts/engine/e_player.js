@@ -67,7 +67,7 @@ var engine_player = function(mySettings, myEngine) {
             }
             return false;
         };
-        function init_media_el() {
+        var init_media_el = function () {
             $(media_el).off();
             $(media_el).on('loadstart', function () {
                 var tb = engine.tags.getTagBody(e_player.current_id);

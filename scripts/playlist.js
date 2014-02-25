@@ -194,6 +194,7 @@ var playlist = function() {
             info = {name: _lang.playlist_title};
         }
         dom_cache.title.text(info.name).attr('title', info.name);
+        document.title = info.name;
         dom_cache.pl_list.children('li.selected').removeClass("selected");
         if (info.id !== undefined) {
             dom_cache.pl_list.children('li[data-id=' + info.id + ']').addClass("selected");
