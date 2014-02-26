@@ -3,7 +3,7 @@
     "name": "__MSG_appName__",
     "description": "__MSG_appDesc__",
     "default_locale": "en",
-    "version": "0.7.84",
+    "version": "0.7.85",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "icon_16.png",
@@ -16,6 +16,7 @@
     },
     "offline_enabled": true,
     "permissions": [
+        {"mediaGalleries": ["read"]},
         "app.runtime", "storage",
         "contextMenus", "fullscreen",
         "identity", "notifications",

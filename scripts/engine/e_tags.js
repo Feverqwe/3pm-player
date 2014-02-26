@@ -2,6 +2,9 @@ var engine_tags = function(mySettings,myEngine) {
     window.engine_tags = undefined;
     var settings = mySettings;
     var engine = myEngine;
+    var options = {
+        hasGetMetadata: chrome.mediaGalleries.getMetadata !== undefined
+    };
     var e_tags = function () {
         var covers = [];
         var str2blob = function (byteCharacters, contentType, sliceSize) {
@@ -123,9 +126,7 @@ var engine_tags = function(mySettings,myEngine) {
                 cb(cover_id);
             });
         };
-        var fileTagReader = function (id, cb) {
-            var track = engine.playlist.playlist[id];
-            var file = track.blob || track.file;
+        var fileID3TagReader = function(track, params, id, cb) {
             /*
              if (window.time_log === undefined) {
              window.time_log = [];
@@ -136,7 +137,6 @@ var engine_tags = function(mySettings,myEngine) {
                 cb(id);
                 return;
             }
-            var params = {tags: ["artist", "title", "album", "picture"], file: file};
             ID3.loadTags(0, function () {
                 /*
                  var endDate = new Date().getTime();
@@ -150,7 +150,6 @@ var engine_tags = function(mySettings,myEngine) {
                  */
                 var new_tags = ID3.getAllTags(0);
                 ID3.clearAll();
-
                 ['title', 'artist', 'album'].forEach(function (key) {
                     var item = new_tags[key];
                     if (item !== undefined) {
@@ -168,6 +167,31 @@ var engine_tags = function(mySettings,myEngine) {
                     cb(id);
                 });
             }, params);
+        };
+        var fileTagReader = function (id, cb) {
+            var track = engine.playlist.playlist[id];
+            var file = track.blob || track.file;
+            var params = {tags: ["artist", "title", "album", "picture"], file: file};
+            if (options.hasGetMetadata) {
+                params.tags = ["picture"];
+                chrome.mediaGalleries.getMetadata(file, {metadataType: 'all'}, function(metadata){
+                    if (metadata.title !== undefined) {
+                        track.tags.title = metadata.title;
+                    }
+                    if (metadata.artist !== undefined) {
+                        track.tags.artist = metadata.artist;
+                    }
+                    if (metadata.album !== undefined) {
+                        track.tags.album = metadata.artist;
+                    }
+                    if (metadata.duration !== undefined) {
+                        track.duration = metadata.duration;
+                    }
+                    fileID3TagReader(track, params, id, cb);
+                });
+                return;
+            }
+            fileID3TagReader(track, params, id, cb);
         };
         var cloudTagReader = function (id, cb) {
             var track = engine.playlist.playlist[id];
