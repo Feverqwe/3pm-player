@@ -172,7 +172,7 @@ var engine_tags = function(mySettings,myEngine) {
             var track = engine.playlist.playlist[id];
             var file = track.blob || track.file;
             var params = {tags: ["artist", "title", "album", "picture"], file: file};
-            if (options.hasGetMetadata) {
+            if (options.hasGetMetadata && track.file.isVideo) {
                 params.tags = ["picture"];
                 chrome.mediaGalleries.getMetadata(file, {metadataType: 'all'}, function(metadata){
                     if (metadata.title !== undefined) {
