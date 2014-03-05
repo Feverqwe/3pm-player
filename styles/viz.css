@@ -8,6 +8,8 @@ body {
     overflow: hidden;
     width: 100%;
     -webkit-app-region: drag;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 75%;
 }
 .main {
     position:fixed;
