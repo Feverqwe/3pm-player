@@ -406,6 +406,9 @@ var playlist = function() {
                         return;
                     }
                     window.engine.files.readAnyFiles(entrys, function(playlists) {
+                        if (playlists === undefined) {
+                            return;
+                        }
                         var def_index = -1;
                         playlists.forEach(function(list, n) {
                             if (list.isDefault) {
