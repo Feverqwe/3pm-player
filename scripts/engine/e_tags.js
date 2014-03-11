@@ -126,7 +126,7 @@ var engine_tags = function(mySettings,myEngine) {
                 cb(cover_id);
             });
         };
-        var fileID3TagReader = function(track, params, id, cb) {
+        var fileID3TagReader = function(track, params, cb) {
             /*
              if (window.time_log === undefined) {
              window.time_log = [];
@@ -134,7 +134,7 @@ var engine_tags = function(mySettings,myEngine) {
              var startDate = new Date().getTime();
              */
             if (track.file.isVideo) {
-                cb(id);
+                cb();
                 return;
             }
             ID3.loadTags(0, function () {
@@ -157,19 +157,18 @@ var engine_tags = function(mySettings,myEngine) {
                     }
                 });
                 if (new_tags.picture === undefined) {
-                    cb(id);
+                    cb();
                     return;
                 }
                 readImage(new_tags.picture.data, function (cover_id) {
                     if (cover_id !== undefined) {
                         track.tags.picture = cover_id;
                     }
-                    cb(id);
+                    cb();
                 });
             }, params);
         };
-        var fileTagReader = function (id, cb) {
-            var track = engine.playlist.playlist[id];
+        var fileTagReader = function (track, cb) {
             var file = track.blob || track.file;
             var params = {tags: ["artist", "title", "album", "picture"], file: file};
             if (options.hasGetMetadata && track.file.isVideo) {
@@ -187,14 +186,13 @@ var engine_tags = function(mySettings,myEngine) {
                     if (metadata.duration !== undefined) {
                         track.duration = metadata.duration;
                     }
-                    fileID3TagReader(track, params, id, cb);
+                    fileID3TagReader(track, params, cb);
                 });
                 return;
             }
-            fileID3TagReader(track, params, id, cb);
+            fileID3TagReader(track, params, cb);
         };
-        var cloudTagReader = function (id, cb) {
-            var track = engine.playlist.playlist[id];
+        var cloudTagReader = function (track, cb) {
             engine.cloud[track.cloud.type].read_tags(track, function (new_tags) {
                 ['title', 'artist', 'album'].forEach(function (key) {
                     var item = new_tags[key];
@@ -203,22 +201,52 @@ var engine_tags = function(mySettings,myEngine) {
                     }
                 });
                 if (new_tags.picture === undefined) {
-                    cb(id);
+                    cb();
                     return;
                 }
                 readImage(new_tags.picture.data, function (cover_id) {
                     if (cover_id !== undefined) {
                         track.tags.picture = cover_id;
                     }
-                    cb(id);
+                    cb();
                 });
             });
         };
-        var postTagReader = function (id, cb) {
+        var postTagReader = function (track, cb) {
+            var id = track.id;
             cb(id);
             if (settings.lastfm_info || settings.lastfm_cover) {
-                e_tags.lfmTagReader(id);
+                e_tags.lfmTagReader(track);
             }
+        };
+        var lastfmTagReady = function (track, new_tags, blob, cb) {
+            if (new_tags === undefined) {
+                return;
+            }
+            var id = track.id;
+            readImage(blob, function (cover_id) {
+                if (cover_id !== undefined) {
+                    track.tags.picture = cover_id;
+                }
+                if (new_tags !== undefined) {
+                    var changes_vk = false;
+                    if (new_tags.artist !== undefined && track.tags.artist !== new_tags.artist) {
+                        track.tags.artist = new_tags.artist;
+                        changes_vk = true;
+                    }
+                    if (new_tags.album !== undefined && track.tags.album !== new_tags.album) {
+                        track.tags.album = new_tags.album;
+                    }
+                    if (new_tags.title !== undefined && track.tags.title !== new_tags.title) {
+                        track.tags.title = new_tags.title;
+                        changes_vk = true;
+                    }
+                    if (changes_vk && settings.vk_tag_update && track.cloud !== undefined && track.cloud.type === 'vk' && track.cloud.from_lib === true) {
+                        engine.cloud.vk.update_tags(track.cloud.owner_id, track.cloud.track_id, track.tags.artist, track.tags.title);
+                    }
+                }
+                cb(id);
+            });
         };
         return {
             getCover : function (id) {
@@ -227,14 +255,13 @@ var engine_tags = function(mySettings,myEngine) {
             clearCovers: function () {
                 covers = [];
             },
-            tagReader : function (id, cb) {
-                var loading_mode = function (id, track) {
+            tagReader : function (track, cb) {
+                var loading_mode = function (track) {
                     track.state = "loading";
                     _send('playlist', function (window) {
-                        window.playlist.updPlaylistItem(id, track);
+                        window.playlist.updPlaylistItem(track.id, track);
                     });
                 };
-                var track = engine.playlist.playlist[id];
                 if (track.tags === undefined) {
                     track.tags = {};
                 }
@@ -248,25 +275,25 @@ var engine_tags = function(mySettings,myEngine) {
                         if (engine.cloud[track.cloud.type].read_tags) {
                             config = 'cloud';
                         } else {
-                            postTagReader(id, cb);
+                            postTagReader(track, cb);
                             return;
                         }
                     }
                     if (config === 'blob') {
-                        loading_mode(id, track);
-                        fileTagReader(id, function (id) {
-                            postTagReader(id, cb);
+                        loading_mode(track);
+                        fileTagReader(track, function () {
+                            postTagReader(track, cb);
                         });
                     } else if (config === 'cloud') {
-                        loading_mode(id, track);
-                        cloudTagReader(id, function (id) {
-                            postTagReader(id, cb);
+                        loading_mode(track);
+                        cloudTagReader(track, function () {
+                            postTagReader(track, cb);
                         });
                     }
                 } else if (track.file.slice !== undefined) {
-                    loading_mode(id, track);
-                    fileTagReader(id, function (id) {
-                        postTagReader(id, cb);
+                    loading_mode(track);
+                    fileTagReader(track, function () {
+                        postTagReader(track, cb);
                     });
                 }
             },
@@ -274,12 +301,13 @@ var engine_tags = function(mySettings,myEngine) {
                 if (id === undefined) {
                     id = engine.player.current_id;
                 }
-                if (engine.playlist.playlist[id] === undefined) {
+                var track = engine.playlist.playlist[id];
+                if (track === undefined) {
                     return {title: '3pm-player'};
                 }
-                var tags = engine.playlist.playlist[id].tags;
+                var tags = track.tags;
                 if (tags === undefined) {
-                    return {title: engine.playlist.playlist[id].file.name};
+                    return {title: track.file.name};
                 }
                 var title = "";
                 var album = "";
@@ -288,7 +316,7 @@ var engine_tags = function(mySettings,myEngine) {
                 if (tags.title !== undefined && tags.title.length > 0) {
                     title = tags.title;
                 } else {
-                    title = engine.playlist.playlist[id].file.name;
+                    title = track.file.name;
                 }
                 if (tags.artist !== undefined && tags.artist.length > 0) {
                     artist = tags.artist;
@@ -318,16 +346,17 @@ var engine_tags = function(mySettings,myEngine) {
                 }
                 return data;
             },
-            tagsLoaded : function (id, state) {
+            tagsLoaded : function (track, state) {
                 // 1 - playlist only
                 // 2 - player, lfm, viz
                 // 3 - player, playlist, viz, notifi
                 // other - all
                 var tb;
-                engine.playlist.playlist[id].state = "dune";
+                var id = track.id;
+                track.state = "dune";
                 var plist = function () {
                     _send('playlist', function (window) {
-                        window.playlist.updPlaylistItem(id, engine.playlist.playlist[id]);
+                        window.playlist.updPlaylistItem(id, track);
                     });
                 };
                 var plr = function () {
@@ -387,15 +416,14 @@ var engine_tags = function(mySettings,myEngine) {
                 viz();
                 lfm();
             },
-            lfmTagReader: function (id) {
-                var track = engine.playlist.playlist[id];
+            lfmTagReader: function (track) {
                 if (track.lfm === undefined) {
                     track.lfm = {};
                 }
                 if (!settings.lastfm_info && !settings.lastfm_cover || track.lfm.lastfm) {
                     return;
                 }
-                var use_cache = engine.player.current_id !== id;
+                var use_cache = engine.player.current_id !== track.id;
                 if (use_cache) {
                     if (track.lfm.lastfm_cache) {
                         return;
@@ -411,47 +439,18 @@ var engine_tags = function(mySettings,myEngine) {
                     return;
                 }
                 var no_cover = track.tags.picture !== undefined;
-                engine.lastfm.getInfo(track.tags.artist, track.tags.title, track.tags.album, function (lfm_tags, blob) {
+                engine.lastfm.getInfo(track, function (lfm_tags, blob) {
                     if (lfm_tags === undefined) {
                         return;
                     }
-                    e_tags.lastfmTagReady(id, lfm_tags, blob, function (id) {
+                    lastfmTagReady(track, lfm_tags, blob, function (id) {
                         if (id === engine.player.current_id) {
-                            e_tags.tagsLoaded(id, 3);
+                            e_tags.tagsLoaded(track, 3);
                         } else {
-                            e_tags.tagsLoaded(id, 1);
+                            e_tags.tagsLoaded(track, 1);
                         }
                     });
                 }, use_cache, no_cover);
-            },
-            lastfmTagReady : function (id, new_tags, blob, cb) {
-                if (new_tags === undefined) {
-                    return;
-                }
-                var track = engine.playlist.playlist[id];
-                readImage(blob, function (cover_id) {
-                    if (cover_id !== undefined) {
-                        track.tags.picture = cover_id;
-                    }
-                    if (new_tags !== undefined) {
-                        var changes_vk = false;
-                        if (new_tags.artist !== undefined && track.tags.artist !== new_tags.artist) {
-                            track.tags.artist = new_tags.artist;
-                            changes_vk = true;
-                        }
-                        if (new_tags.album !== undefined && track.tags.album !== new_tags.album) {
-                            track.tags.album = new_tags.album;
-                        }
-                        if (new_tags.title !== undefined && track.tags.title !== new_tags.title) {
-                            track.tags.title = new_tags.title;
-                            changes_vk = true;
-                        }
-                        if (changes_vk && settings.vk_tag_update && track.cloud !== undefined && track.cloud.type === 'vk' && track.cloud.from_lib === true) {
-                            engine.cloud.vk.update_tags(track.cloud.owner_id, track.cloud.track_id, track.tags.artist, track.tags.title);
-                        }
-                    }
-                    cb(id);
-                });
             },
             readAllTags: function () {
                 /*
@@ -483,8 +482,8 @@ var engine_tags = function(mySettings,myEngine) {
                 };
                 var read_item = function (item) {
                     next_item();
-                    e_tags.tagReader(item.id, function (id) {
-                        e_tags.tagsLoaded(id, 1);
+                    e_tags.tagReader(item, function (id) {
+                        e_tags.tagsLoaded(item, 1);
                         thread--;
                         next_item();
                     });

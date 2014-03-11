@@ -114,8 +114,9 @@ var engine_player = function(mySettings, myEngine) {
                 discAdapters();
             });
             $(media_el).on('loadedmetadata', function () {
-                if (engine.playlist.playlist[e_player.current_id].duration === undefined) {
-                    engine.playlist.playlist[e_player.current_id].duration = this.duration;
+                var track = engine.playlist.playlist[e_player.current_id];
+                if (track.duration === undefined) {
+                    track.duration = this.duration;
                 }
                 if (_debug) {
                     view.state("loadedmetadata");
@@ -131,13 +132,13 @@ var engine_player = function(mySettings, myEngine) {
                 }
                 var track = engine.playlist.playlist[e_player.current_id];
                 if (track.tags === undefined || track.tags.reader_state !== true) {
-                    engine.tags.tagReader(e_player.current_id, function (id) {
-                        engine.tags.tagsLoaded(id);
+                    engine.tags.tagReader(track, function (id) {
+                        engine.tags.tagsLoaded(track);
                     });
                 } else {
-                    engine.tags.tagsLoaded(e_player.current_id, 2);
+                    engine.tags.tagsLoaded(track, 2);
                     if ((settings.lastfm_info || settings.lastfm_cover) && (track.lfm === undefined || track.lfm.lastfm !== true)) {
-                        engine.tags.lfmTagReader(e_player.current_id);
+                        engine.tags.lfmTagReader(track);
                     }
                 }
                 view.state("loadeddata");
@@ -244,22 +245,22 @@ var engine_player = function(mySettings, myEngine) {
             },
             open: function (id) {
                 id = parseInt(id);
-                var item = engine.playlist.playlist[id];
-                if (item === undefined) {
+                var track = engine.playlist.playlist[id];
+                if (track === undefined) {
                     return;
                 }
                 e_player.current_id = id;
                 _send('playlist', function (window) {
                     window.playlist.selected(e_player.current_id);
                 });
-                if ('url' in item.file) {
-                    if (!audioPreload(item)) {
-                        setMediaUrl(item,item.file.url);
+                if ('url' in track.file) {
+                    if (!audioPreload(track)) {
+                        setMediaUrl(track,track.file.url);
                     }
                     return;
                 }
-                var file_url = window.URL.createObjectURL(item.file);
-                setMediaUrl(item,file_url);
+                var file_url = window.URL.createObjectURL(track.file);
+                setMediaUrl(track,file_url);
             },
             playToggle: function () {
                 if (media_el.paused) {
@@ -276,9 +277,9 @@ var engine_player = function(mySettings, myEngine) {
                     engine.playlist.playedlist = [];
                 }
                 if (engine.playlist.playlist[e_player.current_id].file.url !== undefined && media_el.src.split(':')[0] === "chrome-extension") {
-                    var item = engine.playlist.playlist[e_player.current_id];
-                    if (!audioPreload(item)) {
-                        setMediaUrl(item,item.file.url);
+                    var track = engine.playlist.playlist[e_player.current_id];
+                    if (!audioPreload(track)) {
+                        setMediaUrl(track,track.file.url);
                     }
                 } else {
                     media_el.play();

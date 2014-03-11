@@ -620,6 +620,10 @@ var engine_lastfm = function(mySettings, myEngine) {
             if (cache[cn] !== undefined || !settings.lastfm_info) {
                 return getTrackInfo(cn, artist, title, cb, no_cover);
             }
+            if (cn === undefined) {
+                cb();
+                return;
+            }
             iDB.get(cn, function(item) {
                 if (item !== undefined) {
                     if (item.timeStamp < today_date - 2 * 24 * 60 * 60 * 1000) {
@@ -635,7 +639,10 @@ var engine_lastfm = function(mySettings, myEngine) {
             });
         };
         return {
-            getInfo : function(artist, title, album, cb, cache_only, no_cover) {
+            getInfo : function(track, cb, cache_only, no_cover) {
+                var artist = track.tags.artist;
+                var title = track.tags.title;
+                var album = track.tags.album;
                 var track_hash, album_hash;
                 if (artist.length !== 0 && title.length !== 0) {
                     track_hash = makeCN(artist, title);

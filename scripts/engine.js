@@ -41,7 +41,7 @@ var run_engine = function () {
         preload_vk: 0,
         preload_db: 0,
         preload_sc: 0,
-        preload_gd: 1,
+        preload_gd: 0,
         preload_box: 1,
         preload_sd: 0,
         lastfm: 0,
