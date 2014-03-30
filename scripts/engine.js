@@ -28,6 +28,7 @@
  */
 (function () {
     window._debug = false;
+    var settings;
     var engine = window.engine = {
         resetPlayer: function () {
             /*
@@ -195,7 +196,6 @@
         }
     };
     var allReady = function() {
-        var settings = window._settings;
         engine.webui = engine_webui(settings, engine);
         engine.lastfm = engine_lastfm(settings, engine);
         engine.cloud = engine_cloud(settings, engine);
@@ -216,6 +216,7 @@
             }
         } else
         if (message === 'settings_ready') {
+            settings = window._settings;
             allReady();
         }
     });
