@@ -402,11 +402,6 @@ var engine_webui = function(mySettings, myEngine) {
                 }
             });
         };
-        var Info = function() {
-            chrome.socket.getInfo(server_socketId, function(e) {
-                console.log(e);
-            });
-        };
         return {
             start: function() {
                 chrome.storage.local.get('wabui_socket', function(obj) {
@@ -420,7 +415,6 @@ var engine_webui = function(mySettings, myEngine) {
                     });
                 });
             },
-            info: Info,
             stop: function() {
                 stop(function() {
                     chrome.contextMenus.update("webUI", {checked: active});

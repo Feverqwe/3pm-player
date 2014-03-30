@@ -71,7 +71,7 @@ var engine_tags = function(mySettings,myEngine) {
         };
         var checkCover = function (len, checksum) {
             /*
-             * Проверяет наличие уже обложке в массиве обложек по некой checksum
+             * Проверяет наличие обложки в массиве обложек по некой checksum
              */
             var id;
             covers.forEach(function (item) {

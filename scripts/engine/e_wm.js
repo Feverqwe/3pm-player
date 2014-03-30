@@ -91,14 +91,9 @@ var engine_wm = function(mySettings,myEngine) {
             if (msg === '_player_') {
                 sendResponse('ok');
                 window._focusAll();
-            } else if (msg === '_player_window_') {
-                chrome.runtime.getBackgroundPage(function (bg) {
-                    bg.player_window = window;
-                    sendResponse('ok');
-                });
             }
         });
-        chrome.app.window.current().onClosed.addListener(function () {
+        _windows.player.onClosed.addListener(function () {
             var _windows = window._windows;
             for (var i in _windows) {
                 if (!_windows.hasOwnProperty(i)) {
@@ -111,7 +106,7 @@ var engine_wm = function(mySettings,myEngine) {
             }
             delete _windows['player'];
         });
-        chrome.app.window.current().onMinimized.addListener(function () {
+        _windows.player.onMinimized.addListener(function () {
             /**
              * @namespace window._windows
              * @namespace _windows.minimize
@@ -124,7 +119,7 @@ var engine_wm = function(mySettings,myEngine) {
                 _windows[i].minimize();
             }
         });
-        chrome.app.window.current().onRestored.addListener(function () {
+        _windows.player.onRestored.addListener(function () {
             window._focusAll();
         });
         var checkWindowPosition = function (position) {
