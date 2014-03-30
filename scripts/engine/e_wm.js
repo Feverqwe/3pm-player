@@ -1,3 +1,4 @@
+chrome.runtime.sendMessage('script_ready');
 var engine_wm = function(mySettings,myEngine) {
     window.engine_wm = undefined;
     var settings = mySettings;

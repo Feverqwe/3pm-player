@@ -1,3 +1,4 @@
+chrome.runtime.sendMessage('script_ready');
 var engine_lastfm = function(mySettings, myEngine) {
     window.engine_lastfm = undefined;
     var settings = mySettings;

@@ -1,4 +1,3 @@
-var _debug = false;
 /**
  * @namespace chrome
  * @namespace chrome.storage
@@ -27,58 +26,9 @@ var _debug = false;
  * @namespace window.webkitAudioContext
  * @namespace window.devicePixelRatio
  */
-var run_engine = function () {
-    window.run_engine = undefined;
-    //options
-    var boot = true;
-    var settings = window._settings = {
-        next_track_notification: 0,
-        extend_volume_scroll: 0,
-        notifi_buttons: 0,
-        is_winamp: 0,
-        visual_type: '1',
-        foreign_tracks: 0,
-        preload_vk: 0,
-        preload_db: 0,
-        preload_sc: 0,
-        preload_gd: 0,
-        preload_box: 1,
-        preload_sd: 0,
-        lastfm: 0,
-        lastfm_info: 1,
-        lastfm_cover: 1,
-        webui_port: 9898,
-        webui_interface: 'Any',
-        webui_run_onboot: 0,
-        vk_tag_update: 0,
-        pined_playlist: 0,
-        pin_position: 2
-    };
+(function () {
+    window._debug = false;
     var engine = window.engine = {
-        loadSettings: function (obj) {
-            var changes = {};
-            for (var key in settings) {
-                if (!settings.hasOwnProperty(key)) {
-                    continue;
-                }
-                if (obj[key] !== undefined && settings[key] !== obj[key]) {
-                    settings[key] = obj[key];
-                    changes[key] = obj[key];
-                }
-            }
-            if (boot) {
-                chrome.runtime.sendMessage('settings_ready');
-                boot = false;
-                return;
-            }
-            if (changes.is_winamp !== undefined) {
-                chrome.runtime.reload();
-            }
-            if ((changes.webui_port !== undefined || changes.webui_interface !== undefined) && engine.webui.active()) {
-                engine.webui.start();
-            }
-            chrome.runtime.sendMessage({settings: changes});
-        },
         resetPlayer: function () {
             /*
              * Функция сброса плеера.
@@ -244,61 +194,45 @@ var run_engine = function () {
             _windows[type].setBounds(params);
         }
     };
-    engine.webui = engine_webui(settings, engine);
-    engine.lastfm = engine_lastfm(settings, engine);
-    engine.cloud = engine_cloud(settings, engine);
-    engine.notification = engine_notification(settings, engine);
-    engine.player = engine_player(settings, engine);
-    engine.tags = engine_tags(settings, engine);
-    engine.playlist = engine_playlist(settings, engine);
-    engine.files = engine_files(settings, engine);
-    engine.windowManager = engine_wm(settings, engine);
-    var list = [];
-    for (var key in settings) {
-        if (!settings.hasOwnProperty(key)) {
-            continue;
-        }
-        list.push(key);
-    }
-    chrome.storage.local.get(list, function (obj) {
-        engine.loadSettings(obj);
-    });
-};
-(function () {
-    var loading_timer = 10;
-    var check_count = 0;
-    var engine_modules = ['e_cloud', 'e_notification', 'e_player', 'e_playlist',
-        'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm'];
-    var engine_loading = function () {
-        var dune = true;
-        engine_modules.forEach(function (name) {
-            if (window['engin' + name] === undefined) {
-                dune = false;
-                return 0;
-            }
-        });
-        if (!dune) {
-            if (check_count < 10) {
-                check_count++;
-            } else if (check_count === 10) {
-                loading_timer = 1000;
-            }
-            setTimeout(function () {
-                engine_loading();
-            }, loading_timer);
-        } else {
-            run_engine();
-        }
+    var allReady = function() {
+        var settings = window._settings;
+        engine.webui = engine_webui(settings, engine);
+        engine.lastfm = engine_lastfm(settings, engine);
+        engine.cloud = engine_cloud(settings, engine);
+        engine.notification = engine_notification(settings, engine);
+        engine.player = engine_player(settings, engine);
+        engine.tags = engine_tags(settings, engine);
+        engine.playlist = engine_playlist(settings, engine);
+        engine.files = engine_files(settings, engine);
+        engine.windowManager = engine_wm(settings, engine);
+        chrome.runtime.sendMessage('engine_ready');
     };
-    if (!window.minimize_mode) {
-        var s = document.getElementsByTagName('script')[0];
-        engine_modules.forEach(function (src) {
-            var script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.async = true;
-            script.src = 'scripts/engine/' + src + '.js';
-            s.parentNode.insertBefore(script, s);
+    var readyCount = 0;
+    chrome.runtime.onMessage.addListener(function (message) {
+        if (message === 'script_ready') {
+            readyCount--;
+            if (readyCount === 0) {
+                engine_settings(engine);
+            }
+        } else
+        if (message === 'settings_ready') {
+            allReady();
+        }
+    });
+    var loadScript = function() {
+        var head = document.head;
+        readyCount += arguments.length;
+        Array.prototype.forEach.call(arguments, function(name) {
+            var el = document.createElement('script');
+            el.src = 'scripts/engine/' + name + '.js';
+            el.type = 'text/javascript';
+            head.appendChild(el);
         });
+    };
+    if ( window.engine_settings === undefined ) {
+        loadScript('e_cloud', 'e_notification', 'e_player', 'e_playlist',
+            'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm', 'e_settings');
+    } else {
+        engine_settings(engine);
     }
-    engine_loading();
 })();

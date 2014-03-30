@@ -1,3 +1,4 @@
+chrome.runtime.sendMessage('script_ready');
 var engine_files = function(mySettings, myEngine) {
     window.engine_files = undefined;
     var settings = mySettings;

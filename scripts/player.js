@@ -1184,27 +1184,13 @@ window.view = function () {
         toHHMMSS : toHHMMSS
     };
 }();
-(function () {
-    var settings_ready = false;
-    var dom_ready = false;
-    var runView = function() {
-        if (!dom_ready || !settings_ready) {
-            return;
-        }
-        view.show();
-        settings_ready = undefined;
-        dom_ready = undefined;
-    };
-    chrome.runtime.onMessage.addListener(function (msg) {
-        if (msg.settings !== undefined) {
-            view.updateSettings(msg.settings);
-        } else if (msg === 'settings_ready') {
-            settings_ready = true;
-            runView();
-        }
-    });
-    $(function () {
-        dom_ready = true;
-        runView();
-    });
-})();
+chrome.runtime.onMessage.addListener(function (msg) {
+    if (msg.settings !== undefined) {
+        view.updateSettings(msg.settings);
+    } else
+    if (msg === 'engine_ready') {
+        $(function(){
+            view.show();
+        });
+    }
+});

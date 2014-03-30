@@ -1,3 +1,4 @@
+chrome.runtime.sendMessage('script_ready');
 var engine_webui = function(mySettings, myEngine) {
     window.engine_webui = undefined;
     var settings = mySettings;

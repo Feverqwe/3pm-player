@@ -1,3 +1,4 @@
+chrome.runtime.sendMessage('script_ready');
 var engine_tags = function(mySettings,myEngine) {
     window.engine_tags = undefined;
     var settings = mySettings;

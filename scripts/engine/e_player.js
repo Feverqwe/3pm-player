@@ -1,3 +1,4 @@
+chrome.runtime.sendMessage('script_ready');
 var engine_player = function(mySettings, myEngine) {
     window.engine_player = undefined;
     var settings = mySettings;

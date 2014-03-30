@@ -1,3 +1,4 @@
+chrome.runtime.sendMessage('script_ready');
 var engine_playlist = function(mySettings, myEngine) {
     window.engine_playlist = undefined;
     var settings = mySettings;

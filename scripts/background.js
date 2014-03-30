@@ -1,4 +1,4 @@
-var bg = function() {
+(function() {
     var checkWindowPosition = function(position) {
         var screen_width = screen.width,
                 screen_height = screen.height,
@@ -48,24 +48,22 @@ var bg = function() {
             });
         });
     };
-    return {
-        run_player: function() {
-            chrome.runtime.sendMessage('_player_', function(res) {
-                if (res === undefined) {
-                    create_player();
-                }
-            });
-        }
+    var run_player = function() {
+        chrome.runtime.sendMessage('_player_', function(res) {
+            if (res === undefined) {
+                create_player();
+            }
+        });
     };
-}();
-/**
- * @namespace chrome.app.runtime.onLaunched
- */
-chrome.app.runtime.onLaunched.addListener(function() {
-    bg.run_player();
-});
-chrome.runtime.onMessageExternal.addListener(function(msg) {
-    if (msg === 'stop') {
-        bg.run_player();
-    }
-});
+    /**
+     * @namespace chrome.app.runtime.onLaunched
+     */
+    chrome.app.runtime.onLaunched.addListener(function() {
+        run_player();
+    });
+    chrome.runtime.onMessageExternal.addListener(function(msg) {
+        if (msg === 'stop') {
+            run_player();
+        }
+    });
+})();

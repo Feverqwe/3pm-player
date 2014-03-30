@@ -1,3 +1,4 @@
+chrome.runtime.sendMessage('script_ready');
 var engine_cloud = function(mySettings, myEngine) {
     window.engine_cloud = undefined;
     var settings = mySettings;

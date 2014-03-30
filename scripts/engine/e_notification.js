@@ -1,3 +1,4 @@
+chrome.runtime.sendMessage('script_ready');
 var engine_notification = function (mySettings,myEngine) {
     window.engine_notification = undefined;
     var settings = mySettings;
