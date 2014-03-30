@@ -209,9 +209,11 @@
     };
     var readyCount = 0;
     chrome.runtime.onMessage.addListener(function (message) {
-        if (message === 'script_ready') {
+        if (readyCount !== undefined && message === 'script_ready') {
             readyCount--;
             if (readyCount === 0) {
+                readyCount = undefined;
+                get_lang();
                 engine_settings(engine);
             }
         } else
@@ -232,7 +234,7 @@
     };
     if ( window.engine_settings === undefined ) {
         loadScript('e_cloud', 'e_notification', 'e_player', 'e_playlist',
-            'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm', 'e_settings');
+            'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm', 'e_settings', 'lang');
     } else {
         engine_settings(engine);
     }

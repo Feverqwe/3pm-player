@@ -150,7 +150,7 @@ var engine_player = function(mySettings, myEngine) {
                 }
                 view.setVolume(media_el.volume);
             });
-            if (!window.minimize_mode) {
+            if (_debug) {
                 $(media_el).on('ratechange', function () {
                     if (_debug) {
                         view.state("ratechange");

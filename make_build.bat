@@ -17,8 +17,7 @@ java -jar compiler.jar --js .\www\js\main.js --js_output_file .\build\www\js\mai
 java -jar compiler.jar --js .\scripts\background.js --js_output_file .\build\scripts\background.js
 
 :: make engine.js
-java -jar compiler.jar --js .\scripts\engine\minimize_mode.js^
- --js .\scripts\engine\e_cloud.js^
+java -jar compiler.jar --js .\scripts\engine\e_cloud.js^
  --js .\scripts\engine\e_files.js^
  --js .\scripts\engine\e_lastfm.js^
  --js .\scripts\engine\e_notification.js^

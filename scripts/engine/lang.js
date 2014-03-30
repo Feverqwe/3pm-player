@@ -1,3 +1,6 @@
+if (window.engine !== undefined) {
+    chrome.runtime.sendMessage('script_ready');
+}
 var get_lang = function(language) {
     var lang_arr_en = {
         t: 'en',
@@ -200,4 +203,3 @@ var get_lang = function(language) {
         window._lang = lang_arr_en;
     }
 };
-get_lang();
