@@ -80,31 +80,11 @@ var engine_player = function(mySettings, myEngine) {
                     window.video.audio_state('track', tb);
                 });
             });
-            $(media_el).on('progress', function () {
-                if (_debug) {
-                    view.state("progress");
-                }
-            });
-            $(media_el).on('suspend', function () {
-                if (_debug) {
-                    view.state("suspend");
-                }
-            });
-            $(media_el).on('abort', function () {
-                if (_debug) {
-                    view.state("abort");
-                }
-            });
             $(media_el).on('error', function () {
                 view.state("error");
             });
             $(media_el).on('emptied', function () {
                 view.state("emptied");
-            });
-            $(media_el).on('stalled', function () {
-                if (_debug) {
-                    view.state("stalled");
-                }
             });
             $(media_el).on('play', function () {
                 view.state("play");
@@ -154,21 +134,6 @@ var engine_player = function(mySettings, myEngine) {
                 view.state("canplay");
                 view.setVolume(media_el.volume);
             });
-            $(media_el).on('canplaythrough', function () {
-                if (_debug) {
-                    view.state("canplaythrough");
-                }
-            });
-            $(media_el).on('seeking', function () {
-                if (_debug) {
-                    view.state("seeking");
-                }
-            });
-            $(media_el).on('seeked', function () {
-                if (_debug) {
-                    view.state("seeked");
-                }
-            });
             $(media_el).on('timeupdate', function () {
                 view.setProgress(this.duration, this.currentTime);
             });
@@ -178,22 +143,59 @@ var engine_player = function(mySettings, myEngine) {
                     view.state("ended");
                 }
             });
-            $(media_el).on('ratechange', function () {
-                if (_debug) {
-                    view.state("ratechange");
-                }
-            });
-            $(media_el).on('durationchange', function () {
-                if (_debug) {
-                    view.state("durationchange");
-                }
-            });
             $(media_el).on('volumechange', function () {
                 if (_debug) {
                     view.state("volumechange");
                 }
                 view.setVolume(media_el.volume);
             });
+            if (!window.minimize_mode) {
+                $(media_el).on('ratechange', function () {
+                    if (_debug) {
+                        view.state("ratechange");
+                    }
+                });
+                $(media_el).on('durationchange', function () {
+                    if (_debug) {
+                        view.state("durationchange");
+                    }
+                });
+                $(media_el).on('canplaythrough', function () {
+                    if (_debug) {
+                        view.state("canplaythrough");
+                    }
+                });
+                $(media_el).on('seeking', function () {
+                    if (_debug) {
+                        view.state("seeking");
+                    }
+                });
+                $(media_el).on('seeked', function () {
+                    if (_debug) {
+                        view.state("seeked");
+                    }
+                });
+                $(media_el).on('progress', function () {
+                    if (_debug) {
+                        view.state("progress");
+                    }
+                });
+                $(media_el).on('suspend', function () {
+                    if (_debug) {
+                        view.state("suspend");
+                    }
+                });
+                $(media_el).on('abort', function () {
+                    if (_debug) {
+                        view.state("abort");
+                    }
+                });
+                $(media_el).on('stalled', function () {
+                    if (_debug) {
+                        view.state("stalled");
+                    }
+                });
+            }
         };
         init_media_el();
         var discAdapters = function (name) {
