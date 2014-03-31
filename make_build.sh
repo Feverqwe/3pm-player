@@ -68,8 +68,8 @@ java -jar compiler.jar --js ./scripts/dancer/lib/fft.js --js_output_file ./build
 
 #make www/style.css
 java -jar yuicompressor-2.4.8.jar ./www/css/style.css -o ./build/www/css/style.css
-#make main.css
-#java -jar yuicompressor-2.4.8.jar ./styles/main.css -o ./build/styles/main.css
+#make player.css
+#java -jar yuicompressor-2.4.8.jar ./styles/player.css -o ./build/styles/player.css
 #make playlist.css
 java -jar yuicompressor-2.4.8.jar ./styles/playlist.css -o ./build/styles/playlist.css
 #make dialog.css
