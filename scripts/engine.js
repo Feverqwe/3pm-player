@@ -207,24 +207,16 @@
         engine.windowManager = engine_wm(settings, engine);
         chrome.runtime.sendMessage('engine_ready');
     };
-    var readyCount = 0;
     chrome.runtime.onMessage.addListener(function (message) {
-        if (readyCount !== undefined && message === 'script_ready') {
-            readyCount--;
-            if (readyCount === 0) {
-                readyCount = undefined;
-                get_lang();
-                engine_settings(engine);
-            }
-        } else
         if (message === 'settings_ready') {
             settings = window._settings;
             allReady();
         }
     });
+    var readyCount = undefined;
     var loadScript = function() {
         var head = document.head;
-        readyCount += arguments.length;
+        readyCount = arguments.length;
         Array.prototype.forEach.call(arguments, function(name) {
             var el = document.createElement('script');
             el.src = 'scripts/engine/' + name + '.js';
@@ -233,6 +225,20 @@
         });
     };
     if ( window.engine_settings === undefined ) {
+        chrome.runtime.onMessage.addListener(function (message) {
+            if (readyCount === undefined) {
+                return;
+            }
+            if (message === 'script_ready') {
+                readyCount--;
+                if (readyCount !== 0) {
+                    return;
+                }
+                readyCount = undefined;
+                get_lang();
+                engine_settings(engine);
+            }
+        });
         loadScript('e_cloud', 'e_notification', 'e_player', 'e_playlist',
             'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm', 'e_settings', 'lang');
     } else {
