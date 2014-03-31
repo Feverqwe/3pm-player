@@ -216,7 +216,10 @@
     var readyCount = undefined;
     var loadScript = function() {
         var head = document.head;
-        readyCount = arguments.length;
+        if (readyCount === undefined) {
+            readyCount = 0;
+        }
+        readyCount += arguments.length;
         Array.prototype.forEach.call(arguments, function(name) {
             var el = document.createElement('script');
             el.src = 'scripts/engine/' + name + '.js';
