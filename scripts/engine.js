@@ -196,6 +196,7 @@
         }
     };
     var allReady = function() {
+        get_lang();
         engine.webui = engine_webui(settings, engine);
         engine.lastfm = engine_lastfm(settings, engine);
         engine.cloud = engine_cloud(settings, engine);
@@ -238,12 +239,11 @@
                     return;
                 }
                 readyCount = undefined;
-                get_lang();
                 engine_settings(engine);
             }
         });
         loadScript('e_cloud', 'e_notification', 'e_player', 'e_playlist',
-            'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm', 'e_settings', 'lang');
+            'e_tags', 'e_wm', 'e_webui', 'e_files', 'e_lastfm', 'e_settings');
     } else {
         engine_settings(engine);
     }
