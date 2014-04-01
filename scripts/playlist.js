@@ -295,11 +295,11 @@ var playlist = function() {
                         );
             }
             _send('player', function(window) {
+                selectPL(window.engine.playlist.getM3UPlaylists());
                 writePlaylist(window.engine.playlist.getPlaylist());
                 playlist.setShuffle(window.engine.playlist.shuffle);
                 playlist.setLoop(window.engine.playlist.loop);
                 window.engine.setHotkeys(document);
-                selectPL(window.engine.playlist.getM3UPlaylists());
             });
             $('.close').on('click', function() {
                 window.close();
