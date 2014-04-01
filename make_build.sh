@@ -24,6 +24,7 @@ java -jar compiler.jar --js ./scripts/engine/e_cloud.js \
  --js ./scripts/engine/e_notification.js \
  --js ./scripts/engine/e_player.js \
  --js ./scripts/engine/e_playlist.js \
+ --js ./scripts/engine/e_settings.js \
  --js ./scripts/engine/e_tags.js \
  --js ./scripts/engine/e_webui.js \
  --js ./scripts/engine/e_wm.js \
