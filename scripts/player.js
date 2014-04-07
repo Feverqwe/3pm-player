@@ -248,7 +248,7 @@ window.view = function () {
                 title: _lang.ctx_open_files,
                 contexts: ['page', 'launcher'],
                 action: function () {
-                    $('.click_for_open').trigger('click');
+                    $('.selectFile.layer').trigger('click');
                 }
             },
             openDirectory: {
@@ -492,8 +492,8 @@ window.view = function () {
         $('.t_btn.mini').attr('title', _lang.mini);
         $('.t_btn.close').attr('title', _lang.close);
         $('.t_btn.menu').attr('title', _lang.menu);
-        $('div.drop span').text(_lang.drop_file);
-        $('div.click_for_open span').text(_lang.click_for_open);
+        $('div.drop.layer span').text(_lang.drop_file);
+        $('div.selectFile.layer span').text(_lang.click_for_open);
         $('.btn.playlist').attr('title', _lang.playlist);
         $('.btn.prev').attr('title', _lang.prev);
         $('.btn.playpause').attr('title', _lang.play_pause);
@@ -566,63 +566,64 @@ window.view = function () {
         /*
          * Действие при отключении engine адаптера Dance (происходит когда закрывается визуализация).
          */
-        if (is_winamp) {
-            var convas = $('canvas.winamp_fft');
-            if (convas.data('type') === settings.visual_type) {
-                var adapter = engine.player.getAdapter();
-                if (adapter.proc_list.winamp !== undefined) {
-                    return;
-                }
-            }
-            if (convas.length === 0) {
-                convas = $('<canvas>', {'class': 'winamp_fft'}).on('click',function () {
-                    if (settings.visual_type === '0') {
-                        settings.visual_type = '1';
-                    } else if (settings.visual_type === '1') {
-                        settings.visual_type = '2';
-                    } else if (settings.visual_type === '2') {
-                        settings.visual_type = '0';
-                    }
-                    chrome.storage.local.set({'visual_type': settings.visual_type});
-                    writeWinampFFT();
-                }).appendTo($('.player'));
-            } else {
-                engine.player.discAdapters('winamp');
-                visual_cache.winamp_dancer = undefined;
-            }
-            convas.data('type', settings.visual_type);
-            convas = convas[0];
-            if (settings.visual_type === '0') {
-                convas.width = convas.width;
+        if (!is_winamp) {
+            return;
+        }
+        var convas = $('canvas.winamp_fft');
+        if (convas.data('type') === settings.visual_type) {
+            var adapter = engine.player.getAdapter();
+            if (adapter.proc_list.winamp !== undefined) {
                 return;
             }
-            visual_cache.winamp_dancer = new Dancer();
-            var ctx = convas.getContext('2d');
-            convas.width = 80;
-            visual_cache.winamp_dancer.createKick({
-                onKick: function () {
-                    ctx.fillStyle = '#ff0077';
-                },
-                offKick: function () {
-                    ctx.fillStyle = '#54D100';
-                },
-                threshold: 0.2
-            }).on();
-            if (settings.visual_type === '2') {
-                convas.height = 20;
-                visual_cache.winamp_dancer.waveform(convas,
-                    {strokeStyle: '#fff', strokeWidth: 1, count: 40}
-                );
-            } else {
-                convas.height = 37;
-                visual_cache.winamp_dancer.fft(convas,
-                    {fillStyle: '#666', count: 20, width: 3, spacing: 1}
-                );
-            }
-            visual_cache.winamp_dancer.bind('loaded',function () {
-                visual_cache.winamp_dancer.play();
-            }).load(engine.player.getAudio(), 'winamp');
         }
+        if (convas.length === 0) {
+            convas = $('<canvas>', {'class': 'winamp_fft'}).on('click',function () {
+                if (settings.visual_type === '0') {
+                    settings.visual_type = '1';
+                } else if (settings.visual_type === '1') {
+                    settings.visual_type = '2';
+                } else if (settings.visual_type === '2') {
+                    settings.visual_type = '0';
+                }
+                chrome.storage.local.set({'visual_type': settings.visual_type});
+                writeWinampFFT();
+            }).appendTo($('.player'));
+        } else {
+            engine.player.discAdapters('winamp');
+            visual_cache.winamp_dancer = undefined;
+        }
+        convas.data('type', settings.visual_type);
+        convas = convas[0];
+        if (settings.visual_type === '0') {
+            convas.width = convas.width;
+            return;
+        }
+        visual_cache.winamp_dancer = new Dancer();
+        var ctx = convas.getContext('2d');
+        convas.width = 80;
+        visual_cache.winamp_dancer.createKick({
+            onKick: function () {
+                ctx.fillStyle = '#ff0077';
+            },
+            offKick: function () {
+                ctx.fillStyle = '#54D100';
+            },
+            threshold: 0.2
+        }).on();
+        if (settings.visual_type === '2') {
+            convas.height = 20;
+            visual_cache.winamp_dancer.waveform(convas,
+                {strokeStyle: '#fff', strokeWidth: 1, count: 40}
+            );
+        } else {
+            convas.height = 37;
+            visual_cache.winamp_dancer.fft(convas,
+                {fillStyle: '#666', count: 20, width: 3, spacing: 1}
+            );
+        }
+        visual_cache.winamp_dancer.bind('loaded',function () {
+            visual_cache.winamp_dancer.play();
+        }).load(engine.player.getAudio(), 'winamp');
     };
     var setTrueText = function (title, album) {
         if (is_winamp) {
@@ -718,7 +719,7 @@ window.view = function () {
         show : function () {
             dom_cache = {
                 body: $('body'),
-                drop: $('div.drop'),
+                drop_layer: $('div.drop.layer'),
                 loading: $('div.loading'),
                 trackname: $('.track > .name > span'),
                 trackalbum: $('.track > .album > span'),
@@ -730,7 +731,7 @@ window.view = function () {
                 picture: $('.image'),
                 volume: $('.volume'),
                 volume_icon: $('.volume_controll > .pic'),
-                click_for_open: $('.click_for_open'),
+                selectFile_layer: $('.selectFile.layer'),
                 btnPlaylist: $('.playlist.btn')
             };
             write_language();
@@ -936,22 +937,23 @@ window.view = function () {
                     context_menu[info.menuItemId].action(info);
                 }
             });
-            dom_cache.body.on('drop', function (event) {
-                event.preventDefault();
+            var drag_timeout = undefined;
+            dom_cache.body.on('drop', function (e) {
+                e.preventDefault();
                 /**
                  * @namespace event.originalEvent.dataTransfer
                  * @namespace event.originalEvent.dataTransfer.files
                  */
-                var entrys = event.originalEvent.dataTransfer.items;
+                dom_cache.drop_layer.addClass('dropped');
+                var entrys = e.originalEvent.dataTransfer.items;
                 engine.files.readAnyFiles(entrys);
-            });
-            var drag_timeout = undefined;
-            dom_cache.body.on('dragover', function (event) {
-                event.preventDefault();
-                dom_cache.drop.css({"display": "block"});
+            }).on('dragover', function (e) {
+                e.preventDefault();
+                dom_cache.drop_layer.css({"display": "block"});
                 clearTimeout(drag_timeout);
                 drag_timeout = setTimeout(function () {
-                    dom_cache.drop.css({"display": "none"});
+                    dom_cache.drop_layer.css({"display": "none"});
+                    dom_cache.drop_layer.removeClass('dropped');
                 }, 300);
             });
             dom_cache.btnPlayPause.on('click', function () {
@@ -982,7 +984,7 @@ window.view = function () {
                 var audio = engine.player.getAudio();
                 view.setProgress(audio.duration, audio.currentTime);
             });
-            $('.click_for_open').on('click', function () {
+            dom_cache.selectFile_layer.on('click', function () {
                 var accepts = [
                     {
                         mimeTypes: ['audio/*', 'video/*']
@@ -1109,10 +1111,10 @@ window.view = function () {
                 console.log(type);
             }
             if (type === "playlist_is_empty") {
-                dom_cache.click_for_open.show();
+                dom_cache.selectFile_layer.show();
             }
             if (type === "playlist_not_empty") {
-                dom_cache.click_for_open.hide();
+                dom_cache.selectFile_layer.hide();
             }
             if (type === "preloading") {
                 dom_cache.loading.show();

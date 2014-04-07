@@ -261,7 +261,7 @@ div.progress.download > div.loaded {
     background-image: url(../images/playlist_w.png);
     background-position-y: 4px;
 }
-div.drop {
+div.drop.layer {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -274,7 +274,7 @@ div.drop {
     left: 0;
     top: 0;
 }
-div.drop > span {
+div.drop.layer > span {
     display: block;
     margin-top: 35px;
     border: 1px dashed #fff;
@@ -284,6 +284,9 @@ div.drop > span {
     border-radius: 5px;
     font-size: 16px;
     padding-top: 8px;
+}
+div.drop.layer.dropped > span {
+    background-color: #6D6D6D;
 }
 div.engine {
     display: none;
@@ -335,7 +338,7 @@ div.loading {
     background-position: center;
     background-size: 10px;
 }
-.click_for_open {
+.selectFile.layer {
     position: absolute;
     left: 90px;
     top: 20px;
@@ -350,7 +353,7 @@ div.loading {
     padding-top: 6px;
     padding-bottom: 8px;
 }
-.click_for_open input {
+.selectFile.layer input {
     display: none;
 }
 div.volume_scroll {
@@ -398,7 +401,7 @@ body.winamp {
     background: url(../images/winamp/w1.png) center center no-repeat;
 }
 .winamp .image, 
-.winamp .click_for_open,
+.winamp .selectFile.layer,
 .winamp .image_box{
     display: none !important;
 }
@@ -602,7 +605,7 @@ body.winamp {
 .winamp .progress a:active {
     background-position-y: 10px;
 }
-.winamp .drop span {
+.winamp .drop.layer span {
     margin-left: 6%;
 }
 .winamp div.state {
