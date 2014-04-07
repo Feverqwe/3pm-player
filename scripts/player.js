@@ -10,11 +10,17 @@ window.view = function () {
         valume_style: undefined,
         progress_timer: undefined,
         window_left: undefined,
-        window_top: undefined
+        window_top: undefined,
+        disable_focusing_all: undefined,
+        focusing_all: undefined,
+        focus_state: true
     };
     var state = {
         muted: false,
-        volume: 100
+        volume: 100,
+        time_format: 0,
+        shuffle: false,
+        loop: false
     };
     var time_tipe = 0;
     var settings = {};
@@ -248,7 +254,17 @@ window.view = function () {
                 title: _lang.ctx_open_files,
                 contexts: ['page', 'launcher'],
                 action: function () {
-                    $('.selectFile.layer').trigger('click');
+                    var accepts = [
+                        {
+                            mimeTypes: ['audio/*', 'video/*']
+                        }
+                    ];
+                    chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function (entry) {
+                        if (!entry) {
+                            return;
+                        }
+                        engine.files.readAnyFiles(entry);
+                    });
                 }
             },
             openDirectory: {
@@ -468,10 +484,12 @@ window.view = function () {
         /*
          * Расширяет область изменения громкости колесиком мыши.
          */
-        var box = $('body > .player > .box');
-        var boxState = box.hasClass('volume_scroll');
-        if (extend_volume_scroll && !boxState) {
-            box.unbind('mousewheel').addClass('volume_scroll').on('mousewheel', function (e) {
+        var boxState = dom_cache.player_box.hasClass('volume_scroll');
+        if (!extend_volume_scroll === !boxState) {
+            return;
+        }
+        if (extend_volume_scroll) {
+            dom_cache.player_box.unbind('mousewheel').addClass('volume_scroll').on('mousewheel', function (e) {
                 if (e.target.className === 'image') {
                     return;
                 }
@@ -481,8 +499,8 @@ window.view = function () {
                     engine.player.volume("-10");
                 }
             });
-        } else if (!extend_volume_scroll && boxState) {
-            box.unbind('mousewheel').removeClass('volume_scroll');
+        } else {
+            dom_cache.player_box.unbind('mousewheel').removeClass('volume_scroll');
         }
     };
     var write_language = function () {
@@ -501,7 +519,6 @@ window.view = function () {
         $('.volume_controll .pic').attr('title', _lang.mute);
         $('div.shuffle').attr('title', _lang.shuffle);
         $('div.loop').attr('title', _lang.loop);
-        makeCtxMenu();
     };
     var getVolumeColor = function (value) {
         /*
@@ -715,55 +732,222 @@ window.view = function () {
         var_cache.valume_style = style;
         dom_cache.volume_icon.removeClass('v0 v10 v50 v100').addClass( style );
     };
+    var playerRender = function() {
+        dom_cache.body.append(
+            $('<div>', {'class': 'menu t_btn', title: _lang.menu}).on('click', function (e) {
+                e.preventDefault();
+                engine.showMenu();
+            }),
+            dom_cache.drop_layer = $('<div>', {'class': 'drop layer'}).append(
+                $('<span>', {text: _lang.drop_file})
+            ),
+            dom_cache.selectFile_layer = $('<div>', {'class': 'selectFile layer'}).append(
+                $('<span>', {text: _lang.click_for_open})
+            ).on('click', function () {
+                context_menu.openFiles.action();
+            }),
+            $('<div>', {'class': 'player'}).append(
+                dom_cache.player_box = $('<div>', {'class': 'box'}).append(
+                    dom_cache.picture = $('<div>', {'class': 'image'}),
+                    $('<div>', {'class': 'image_box'}),
+                    $('<div>', {'class': 'track'}).append(
+                        $('<div>', {'class': 'name'}).append(
+                            dom_cache.trackname = $('<span>')
+                        ),
+                        $('<div>', {'class': 'album'}).append(
+                            dom_cache.trackalbum = $('<span>')
+                        )
+                    )
+                ),
+                $('<div>', {'class': 'info'}).append(
+                    dom_cache.time = $('<span>', {'class': 'time'}).on('click', function () {
+                        state.time_format = (state.time_format === 1) ? 0 : 1;
+                        chrome.storage.local.set({'time_format': state.time_format});
+                        // time update
+                    }),
+                    $('<div>', {'class': 'pl_state'}).append(
+                        dom_cache.shuffle = $('<div>', {'class': 's_btn shuffle', title: _lang.shuffle}).on('click', function () {
+                            engine.playlist.setShuffle();
+                        }),
+                        dom_cache.loop = $('<div>', {'class': 's_btn loop', title: _lang.loop}).on('click', function () {
+                            engine.playlist.setLoop();
+                        })
+                    )
+                ),
+                dom_cache.progress = $('<div>', {'class': 'progress'}).slider({
+                    range: "min",
+                    min: 0,
+                    max: 1000,
+                    value: 0,
+                    change: function (event, ui) {
+                        if (event.which === undefined) {
+                            return;
+                        }
+                        if (isNaN(ui.value)) {
+                            return;
+                        }
+                        engine.player.position(ui.value / 10);
+                        if (is_winamp) {
+                            var lp = parseInt(ui.value / 1000 * -29) || 0;
+                            dom_cache.progress_ui_a.css('margin-left', lp + 'px');
+                        }
+                    },
+                    slide: function (event, ui) {
+                        if (event.which === undefined) {
+                            return;
+                        }
+                        if (isNaN(ui.value)) {
+                            return;
+                        }
+                        engine.player.position(ui.value / 10);
+                        if (is_winamp) {
+                            var lp = parseInt(ui.value / 1000 * -29) || 0;
+                            dom_cache.progress_ui_a.css('margin-left', lp + 'px');
+                        }
+                    },
+                    create: function () {
+                        var $this = $(this);
+                        var div_loaded = $('<div>', {'class': 'loaded'});
+                        $this.append(div_loaded);
+                        preBufferingController.setObj(div_loaded);
+                        dom_cache.progress_ui_a = $this.children('a');
+                        if (is_winamp) {
+                            dom_cache.progress_ui_a.css('margin-left', '0px');
+                        }
+                    }
+                }).on('mousewheel', function ($e) {
+                    var e = $e.originalEvent;
+                    clearTimeout(var_cache.progress_timer);
+                    var_cache.progress_timer = setTimeout(function () {
+                        if (e.wheelDelta > 0) {
+                            engine.player.position("+5");
+                        } else {
+                            engine.player.position("-5");
+                        }
+                    }, 25);
+                }),
+                $('<div>', {'class': 'controls'}).append(
+                    $('<ul>').append(
+                        $('<li>', {'class': 'btn playlist', title: _lang.playlist}).on('click', function (e) {
+                            e.preventDefault();
+                            engine.windowManager({type: 'playlist'});
+                        }),
+                        $('<li>', {'class': 'btn prev', title: _lang.prev}).on('click', function () {
+                            engine.playlist.preview();
+                        }),
+                        dom_cache.btnPlayPause = $('<li>', {'class': 'btn playpause play', title: _lang.play_pause}).append(
+                            dom_cache.loading = $('<div>', {'class': 'loading'})
+                        ).on('click', function () {
+                            var $this = dom_cache.btnPlayPause;
+                            if (!$this.hasClass('pause')) {
+                                engine.player.play();
+                            } else {
+                                engine.player.pause();
+                            }
+                        }),
+                        $('<li>', {'class': 'btn next', title: _lang.next}).on('click', function () {
+                            engine.playlist.next();
+                        }),
+                        $('<li>', {'class': 'volume_controll'}).append(
+                            dom_cache.volume_icon = $('<div>', {'class': 'pic', title: _lang.mute}).on('click', function () {
+                                engine.player.mute(!state.muted);
+                            }),
+                            dom_cache.volume = $('<div>', {'class': 'volume'}).slider({
+                                range: "min",
+                                min: 0,
+                                max: 100,
+                                value: state.volume,
+                                change: function (event, ui) {
+                                    if (event.which === undefined) {
+                                        return;
+                                    }
+                                    if (isNaN(ui.value)) {
+                                        return;
+                                    }
+                                    state.volume = ui.value;
+                                    changeVolumeIcon( ui.value );
+                                    engine.player.volume(ui.value);
+                                    if (is_winamp) {
+                                        dom_cache.volume.css('background', getVolumeColor(ui.value));
+                                    }
+                                },
+                                slide: function (event, ui) {
+                                    if (event.which === undefined) {
+                                        return;
+                                    }
+                                    if (isNaN(ui.value)) {
+                                        return;
+                                    }
+                                    state.volume = ui.value;
+                                    changeVolumeIcon( ui.value );
+                                    engine.player.volume(ui.value);
+                                    if (is_winamp) {
+                                        dom_cache.volume.css('background', getVolumeColor(ui.value));
+                                    }
+                                },
+                                create: function () {
+                                    $this = $(this);
+                                    if (is_winamp) {
+                                        $this.css('background', getVolumeColor(state.volume));
+                                    }
+                                }
+                            })
+                        ).on('mousewheel', function ($e) {
+                            var e = $e.originalEvent;
+                            if (e.wheelDelta > 0) {
+                                engine.player.volume("+10");
+                            } else {
+                                engine.player.volume("-10");
+                            }
+                        })
+                    )
+                )
+            )
+        );
+        makeCtxMenu();
+    };
     return {
         show : function () {
-            dom_cache = {
-                body: $('body'),
-                drop_layer: $('div.drop.layer'),
-                loading: $('div.loading'),
-                trackname: $('.track > .name > span'),
-                trackalbum: $('.track > .album > span'),
-                time: $('.info > .time'),
-                btnPlayPause: $('.controls .playpause.btn'),
-                btnPrev: $('.controls .prev.btn'),
-                btnNext: $('.controls .next.btn'),
-                progress: $('.progress'),
-                picture: $('.image'),
-                volume: $('.volume'),
-                volume_icon: $('.volume_controll > .pic'),
-                selectFile_layer: $('.selectFile.layer'),
-                btnPlaylist: $('.playlist.btn')
-            };
-            write_language();
+            dom_cache.body = $(document.body);
+            dom_cache.body.append(
+                $('<div>', {'class': 'mini t_btn', title: _lang.mini}).on('click', function (e) {
+                    e.preventDefault();
+                    chrome.app.window.current().minimize();
+                }),
+                $('<div>', {'class': 'close t_btn', title: _lang.close}).on('click', function (e) {
+                    e.preventDefault();
+                    window.close();
+                })
+            );
             settings = window._settings;
-            dom_cache.body.removeClass('loading');
+            is_winamp = settings.is_winamp;
+            playerRender();
             window.onfocus = function () {
-                if (dom_cache.focusing_all && dom_cache.focus_state === false) {
-                    dom_cache.focusing_all = false;
-                    dom_cache.focus_state = true;
+                if (var_cache.focusing_all && var_cache.focus_state === false) {
+                    var_cache.focusing_all = false;
+                    var_cache.focus_state = true;
                     return;
                 }
-                if (dom_cache.focusing_all) {
+                if (var_cache.focusing_all) {
                     //protect!
-                    dom_cache.disable_focusing_all = true;
-                    dom_cache.focusing_all = false;
+                    var_cache.disable_focusing_all = true;
+                    var_cache.focusing_all = false;
                     console.log('Focusing disabled!');
                 }
-                if (dom_cache.focus_state) {
+                if (var_cache.focus_state) {
                     return;
                 }
-                dom_cache.focus_state = true;
-                if (!dom_cache.disable_focusing_all) {
-                    dom_cache.focusing_all = true;
+                var_cache.focus_state = true;
+                if (!var_cache.disable_focusing_all) {
+                    var_cache.focusing_all = true;
                     window._showAll(undefined, function () {
-                        dom_cache.focusing_all = false;
+                        var_cache.focusing_all = false;
                     });
                 }
             };
             window.onblur = function () {
-                dom_cache.focus_state = false;
+                var_cache.focus_state = false;
             };
-            is_winamp = settings.is_winamp;
             if (is_winamp) {
                 dom_cache.body.addClass('winamp');
                 $('li.btn.playlist').hide();
@@ -835,48 +1019,11 @@ window.view = function () {
                 }();
                 writeWinampFFT();
             }
-            dom_cache.progress.slider({
-                range: "min",
-                min: 0,
-                max: 1000,
-                change: function (event, ui) {
-                    if (event.which === undefined) {
-                        return;
-                    }
-                    if (isNaN(ui.value)) {
-                        return;
-                    }
-                    engine.player.position(ui.value / 10);
-                    if (is_winamp) {
-                        var lp = parseInt(ui.value / 1000 * -29) || 0;
-                        dom_cache.progress_ui_a.css('margin-left', lp + 'px');
-                    }
-                },
-                slide: function (event, ui) {
-                    if (event.which === undefined) {
-                        return;
-                    }
-                    if (isNaN(ui.value)) {
-                        return;
-                    }
-                    engine.player.position(ui.value / 10);
-                    if (is_winamp) {
-                        var lp = parseInt(ui.value / 1000 * -29) || 0;
-                        dom_cache.progress_ui_a.css('margin-left', lp + 'px');
-                    }
-                },
-                create: function () {
-                    var div_loaded = $('<div>', {'class': 'loaded'});
-                    dom_cache.progress.append(div_loaded);
-                    preBufferingController.setObj(div_loaded);
-                    dom_cache.progress_ui_a = dom_cache.progress.find('a').eq(0);
-                }
-            });
             view.state('emptied');
             view.state("playlist_is_empty");
-            chrome.storage.local.get(['time_tipe', 'extend_volume_scroll', 'volume', 'shuffle', 'loop'], function (storage) {
-                if (storage.time_tipe !== undefined) {
-                    time_tipe = storage.time_tipe;
+            chrome.storage.local.get(['time_format', 'extend_volume_scroll', 'volume', 'shuffle', 'loop'], function (storage) {
+                if (storage.time_format !== undefined) {
+                    state.time_format = storage.time_format;
                 }
                 if (storage.extend_volume_scroll !== undefined) {
                     make_extend_volume(storage.extend_volume_scroll);
@@ -891,42 +1038,9 @@ window.view = function () {
                     storage.volume = 100;
                 }
                 state.volume = storage.volume;
+                dom_cache.volume_value.slider('value', state.volume);
                 changeVolumeIcon(state.volume);
-                dom_cache.volume.slider({
-                    range: "min",
-                    min: 0,
-                    max: 100,
-                    value: state.volume,
-                    change: function (event, ui) {
-                        if (event.which === undefined) {
-                            return;
-                        }
-                        if (isNaN(ui.value)) {
-                            return;
-                        }
-                        state.volume = ui.value;
-                        changeVolumeIcon( ui.value );
-                        engine.player.volume(ui.value);
-                        if (is_winamp) {
-                            dom_cache.volume.css('background', getVolumeColor(ui.value));
-                        }
-                    },
-                    slide: function (event, ui) {
-                        if (event.which === undefined) {
-                            return;
-                        }
-                        if (isNaN(ui.value)) {
-                            return;
-                        }
-                        state.volume = ui.value;
-                        changeVolumeIcon( ui.value );
-                        engine.player.volume(ui.value);
-                        if (is_winamp) {
-                            dom_cache.volume.css('background', getVolumeColor(ui.value));
-                        }
-                    }
-                });
-                engine.player.volume(storage.volume);
+                engine.player.volume(state.volume);
             });
             engine.setHotkeys(document);
             /**
@@ -955,79 +1069,6 @@ window.view = function () {
                     dom_cache.drop_layer.css({"display": "none"});
                     dom_cache.drop_layer.removeClass('dropped');
                 }, 300);
-            });
-            dom_cache.btnPlayPause.on('click', function () {
-                if ($(this).hasClass('play')) {
-                    engine.player.play();
-                } else if ($(this).hasClass('pause')) {
-                    engine.player.pause();
-                }
-            });
-            dom_cache.btnNext.on('click', function () {
-                engine.playlist.next();
-            });
-            dom_cache.btnPrev.on('click', function () {
-                engine.playlist.preview();
-            });
-            $('.close').on('click', function () {
-                window.close();
-            });
-            $('.mini').on('click', function () {
-                chrome.app.window.current().minimize();
-            });
-            $('.t_btn.menu').on('click', function () {
-                engine.showMenu();
-            });
-            dom_cache.time.on('click', function () {
-                time_tipe = (time_tipe) ? 0 : 1;
-                chrome.storage.local.set({'time_tipe': time_tipe});
-                var audio = engine.player.getAudio();
-                view.setProgress(audio.duration, audio.currentTime);
-            });
-            dom_cache.selectFile_layer.on('click', function () {
-                var accepts = [
-                    {
-                        mimeTypes: ['audio/*', 'video/*']
-                    }
-                ];
-                chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function (entry) {
-                    if (!entry) {
-                        return;
-                    }
-                    engine.files.readAnyFiles(entry);
-                });
-            });
-            dom_cache.volume_icon.on('click', function () {
-                engine.player.mute(!state.muted);
-            });
-            dom_cache.volume.parent().get(0).onmousewheel = function (e) {
-                if (e.wheelDelta > 0) {
-                    engine.player.volume("+10");
-                } else {
-                    engine.player.volume("-10");
-                }
-            };
-            dom_cache.progress.get(0).onmousewheel = function (e) {
-                if (e.wheelDelta > 0) {
-                    clearTimeout(var_cache.progress_timer);
-                    var_cache.progress_timer = setTimeout(function () {
-                        engine.player.position("+5");
-                    }, 25);
-                } else {
-                    clearTimeout(var_cache.progress_timer);
-                    var_cache.progress_timer = setTimeout(function () {
-                        engine.player.position("-5");
-                    }, 25);
-                }
-            };
-            dom_cache.btnPlaylist.on('click', function () {
-                engine.windowManager({type: 'playlist'});
-            });
-            $('div.loop').on('click', function () {
-                engine.playlist.setLoop();
-            });
-            $('div.shuffle').on('click', function () {
-                engine.playlist.setShuffle();
             });
             var bounds_timer;
             var next_step;
@@ -1133,13 +1174,10 @@ window.view = function () {
             }
             if (type === "emptied") {
                 dom_cache.loading.hide();
-                dom_cache.trackname.empty();
-                dom_cache.trackalbum.empty();
                 dom_cache.time.empty();
                 hideImage();
-                var_cache = {};
                 isPause();
-                view.setProgress(0.1, 0);
+                dom_cache.progress.slider('value',0);
                 preBufferingController.stop();
                 preBufferingController.hide();
             }
@@ -1183,16 +1221,16 @@ window.view = function () {
         preBufferingController : preBufferingController,
         setShuffle : function (shuffle) {
             if (shuffle) {
-                $('div.shuffle').addClass('on');
+                dom_cache.shuffle.addClass('on');
             } else {
-                $('div.shuffle').removeClass('on');
+                dom_cache.shuffle.removeClass('on');
             }
         },
         setLoop : function (loop) {
             if (loop) {
-                $('div.loop').addClass('on');
+                dom_cache.loop.addClass('on');
             } else {
-                $('div.loop').removeClass('on');
+                dom_cache.loop.removeClass('on');
             }
         },
         getContextMenu : function () {
