@@ -6,7 +6,16 @@
  */
 window.view = function () {
     var dom_cache = {};
-    var var_cache = {};
+    var var_cache = {
+        valume_style: undefined,
+        progress_timer: undefined,
+        window_left: undefined,
+        window_top: undefined
+    };
+    var state = {
+        muted: false,
+        volume: 100
+    };
     var time_tipe = 0;
     var settings = {};
     var is_winamp = false;
@@ -677,11 +686,56 @@ window.view = function () {
             dom_cache.trackname.parent().attr('class', 'name');
         }
     };
+    var volume2style = function (value) {
+        if (value > 70) {
+            return 'v100';
+        }
+        if (value > 40) {
+            return 'v50';
+        }
+        if (value > 0) {
+            return 'v10';
+        }
+        return 'v0';
+    };
+    var changeMuteIcon = function () {
+        var $this = dom_cache.volume_icon;
+        if (state.muted) {
+            $this.addClass('muted');
+        } else {
+            $this.removeClass('muted');
+        }
+    };
+    var changeVolumeIcon = function (value) {
+        var style = volume2style(value);
+        if (var_cache.valume_style === style) {
+            return;
+        }
+        var_cache.valume_style = style;
+        dom_cache.volume_icon.removeClass('v0 v10 v50 v100').addClass( style );
+    };
     return {
         show : function () {
+            dom_cache = {
+                body: $('body'),
+                drop: $('div.drop'),
+                loading: $('div.loading'),
+                trackname: $('.track > .name > span'),
+                trackalbum: $('.track > .album > span'),
+                time: $('.info > .time'),
+                btnPlayPause: $('.controls .playpause.btn'),
+                btnPrev: $('.controls .prev.btn'),
+                btnNext: $('.controls .next.btn'),
+                progress: $('.progress'),
+                picture: $('.image'),
+                volume: $('.volume'),
+                volume_icon: $('.volume_controll > .pic'),
+                click_for_open: $('.click_for_open'),
+                btnPlaylist: $('.playlist.btn')
+            };
             write_language();
             settings = window._settings;
-            $('body').removeClass('loading');
+            dom_cache.body.removeClass('loading');
             window.onfocus = function () {
                 if (dom_cache.focusing_all && dom_cache.focus_state === false) {
                     dom_cache.focusing_all = false;
@@ -707,23 +761,6 @@ window.view = function () {
             };
             window.onblur = function () {
                 dom_cache.focus_state = false;
-            };
-            dom_cache = {
-                body: $('body'),
-                drop: $('div.drop'),
-                loading: $('div.loading'),
-                trackname: $('.track > .name > span'),
-                trackalbum: $('.track > .album > span'),
-                time: $('.info > .time'),
-                btnPlayPause: $('.controls .playpause.btn'),
-                btnPrev: $('.controls .prev.btn'),
-                btnNext: $('.controls .next.btn'),
-                progress: $('.progress'),
-                picture: $('.image'),
-                volume: $('.volume'),
-                mute: $('.volume_controll .pic'),
-                click_for_open: $('.click_for_open'),
-                btnPlaylist: $('.playlist.btn')
             };
             is_winamp = settings.is_winamp;
             if (is_winamp) {
@@ -834,35 +871,6 @@ window.view = function () {
                     dom_cache.progress_ui_a = dom_cache.progress.find('a').eq(0);
                 }
             });
-            dom_cache.volume.slider({
-                range: "min",
-                min: 0,
-                max: 100,
-                change: function (event, ui) {
-                    if (event.which === undefined) {
-                        return;
-                    }
-                    if (isNaN(ui.value)) {
-                        return;
-                    }
-                    engine.player.volume(ui.value);
-                    if (is_winamp) {
-                        dom_cache.volume.css('background', getVolumeColor(ui.value));
-                    }
-                },
-                slide: function (event, ui) {
-                    if (event.which === undefined) {
-                        return;
-                    }
-                    if (isNaN(ui.value)) {
-                        return;
-                    }
-                    engine.player.volume(ui.value);
-                    if (is_winamp) {
-                        dom_cache.volume.css('background', getVolumeColor(ui.value));
-                    }
-                }
-            });
             view.state('emptied');
             view.state("playlist_is_empty");
             chrome.storage.local.get(['time_tipe', 'extend_volume_scroll', 'volume', 'shuffle', 'loop'], function (storage) {
@@ -878,6 +886,45 @@ window.view = function () {
                 if (storage.loop) {
                     engine.playlist.setLoop();
                 }
+                if (storage.volume === undefined) {
+                    storage.volume = 100;
+                }
+                state.volume = storage.volume;
+                changeVolumeIcon(state.volume);
+                dom_cache.volume.slider({
+                    range: "min",
+                    min: 0,
+                    max: 100,
+                    value: state.volume,
+                    change: function (event, ui) {
+                        if (event.which === undefined) {
+                            return;
+                        }
+                        if (isNaN(ui.value)) {
+                            return;
+                        }
+                        state.volume = ui.value;
+                        changeVolumeIcon( ui.value );
+                        engine.player.volume(ui.value);
+                        if (is_winamp) {
+                            dom_cache.volume.css('background', getVolumeColor(ui.value));
+                        }
+                    },
+                    slide: function (event, ui) {
+                        if (event.which === undefined) {
+                            return;
+                        }
+                        if (isNaN(ui.value)) {
+                            return;
+                        }
+                        state.volume = ui.value;
+                        changeVolumeIcon( ui.value );
+                        engine.player.volume(ui.value);
+                        if (is_winamp) {
+                            dom_cache.volume.css('background', getVolumeColor(ui.value));
+                        }
+                    }
+                });
                 engine.player.volume(storage.volume);
             });
             engine.setHotkeys(document);
@@ -948,8 +995,8 @@ window.view = function () {
                     engine.files.readAnyFiles(entry);
                 });
             });
-            dom_cache.mute.on('click', function () {
-                engine.player.mute();
+            dom_cache.volume_icon.on('click', function () {
+                engine.player.mute(!state.muted);
             });
             dom_cache.volume.parent().get(0).onmousewheel = function (e) {
                 if (e.wheelDelta > 0) {
@@ -1046,45 +1093,15 @@ window.view = function () {
             dom_cache.time_cache = time;
             dom_cache.time.text(time);
         },
-        setVolume : function (pos) {
-            if (engine.player.getMute()) {
-                if (var_cache.volume_image === -1) {
-                    return;
-                }
-                dom_cache.volume.parent().children('.pic').attr('class', 'pic mute');
-                var_cache.volume_image = -1;
-                return;
+        setVolume : function (e) {
+            if (state.muted !== e.target.muted) {
+                state.muted = e.target.muted;
+                changeMuteIcon();
             }
-            var max = 1.0;
-            var width_persent = pos / max * 100;
-            dom_cache.volume.slider("value", width_persent);
-            if (is_winamp) {
-                dom_cache.volume.css('background', getVolumeColor(width_persent));
-            }
-            if (width_persent > 70) {
-                if (var_cache.volume_image === 1) {
-                    return;
-                }
-                var_cache.volume_image = 1;
-                dom_cache.volume.parent().children('.pic').attr('class', 'pic high');
-            } else if (pos === 0) {
-                if (var_cache.volume_image === 2) {
-                    return;
-                }
-                var_cache.volume_image = 2;
-                dom_cache.volume.parent().children('.pic').attr('class', 'pic zero');
-            } else if (width_persent < 40) {
-                if (var_cache.volume_image === 3) {
-                    return;
-                }
-                var_cache.volume_image = 3;
-                dom_cache.volume.parent().children('.pic').attr('class', 'pic low');
-            } else if (width_persent < 70) {
-                if (var_cache.volume_image === 4) {
-                    return;
-                }
-                var_cache.volume_image = 4;
-                dom_cache.volume.parent().children('.pic').attr('class', 'pic medium');
+            if (state.volume !== e.target.volume * 100) {
+                state.volume = e.target.volume * 100;
+                changeVolumeIcon( state.volume );
+                dom_cache.volume.slider('value', state.volume);
             }
         },
         state : function (type) {
@@ -1119,8 +1136,6 @@ window.view = function () {
                 dom_cache.time.empty();
                 hideImage();
                 var_cache = {};
-                var_cache.progress_w = dom_cache.progress.width();
-                var_cache.volume_w = dom_cache.volume.width();
                 isPause();
                 view.setProgress(0.1, 0);
                 preBufferingController.stop();

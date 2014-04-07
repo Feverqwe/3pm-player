@@ -69,8 +69,9 @@ var engine_player = function(mySettings, myEngine) {
             return false;
         };
         var init_media_el = function () {
-            $(media_el).off();
-            $(media_el).on('loadstart', function () {
+            var $mediaEl = $(media_el);
+            $mediaEl.off();
+            $mediaEl.on('loadstart', function () {
                 var tb = engine.tags.getTagBody(e_player.current_id);
                 view.setTags(tb);
                 view.state("loadstart");
@@ -81,20 +82,20 @@ var engine_player = function(mySettings, myEngine) {
                     window.video.audio_state('track', tb);
                 });
             });
-            $(media_el).on('error', function () {
+            $mediaEl.on('error', function () {
                 view.state("error");
             });
-            $(media_el).on('emptied', function () {
+            $mediaEl.on('emptied', function () {
                 view.state("emptied");
             });
-            $(media_el).on('play', function () {
+            $mediaEl.on('play', function () {
                 view.state("play");
             });
-            $(media_el).on('pause', function () {
+            $mediaEl.on('pause', function () {
                 view.state("pause");
                 discAdapters();
             });
-            $(media_el).on('loadedmetadata', function () {
+            $mediaEl.on('loadedmetadata', function () {
                 var track = engine.playlist.playlist[e_player.current_id];
                 if (track.duration === undefined) {
                     track.duration = this.duration;
@@ -107,7 +108,7 @@ var engine_player = function(mySettings, myEngine) {
                 });
                 discAdapters();
             });
-            $(media_el).on('loadeddata', function () {
+            $mediaEl.on('loadeddata', function () {
                 if (settings.next_track_notification) {
                     engine.notification.show();
                 }
@@ -124,74 +125,73 @@ var engine_player = function(mySettings, myEngine) {
                 }
                 view.state("loadeddata");
             });
-            $(media_el).on('waiting', function () {
+            $mediaEl.on('waiting', function () {
                 view.state("waiting");
             });
-            $(media_el).on('playing', function () {
+            $mediaEl.on('playing', function () {
                 engine.playlist.addPlayed(e_player.current_id);
                 view.state("playing");
             });
-            $(media_el).on('canplay', function () {
+            $mediaEl.on('canplay', function (e) {
                 view.state("canplay");
-                view.setVolume(media_el.volume);
             });
-            $(media_el).on('timeupdate', function () {
+            $mediaEl.on('timeupdate', function () {
                 view.setProgress(this.duration, this.currentTime);
             });
-            $(media_el).on('ended', function () {
+            $mediaEl.on('ended', function () {
                 engine.playlist.player_ended();
                 if (_debug) {
                     view.state("ended");
                 }
             });
-            $(media_el).on('volumechange', function () {
+            $mediaEl.on('volumechange', function (e) {
                 if (_debug) {
                     view.state("volumechange");
                 }
-                view.setVolume(media_el.volume);
+                view.setVolume(e);
             });
             if (_debug) {
-                $(media_el).on('ratechange', function () {
+                $mediaEl.on('ratechange', function () {
                     if (_debug) {
                         view.state("ratechange");
                     }
                 });
-                $(media_el).on('durationchange', function () {
+                $mediaEl.on('durationchange', function () {
                     if (_debug) {
                         view.state("durationchange");
                     }
                 });
-                $(media_el).on('canplaythrough', function () {
+                $mediaEl.on('canplaythrough', function () {
                     if (_debug) {
                         view.state("canplaythrough");
                     }
                 });
-                $(media_el).on('seeking', function () {
+                $mediaEl.on('seeking', function () {
                     if (_debug) {
                         view.state("seeking");
                     }
                 });
-                $(media_el).on('seeked', function () {
+                $mediaEl.on('seeked', function () {
                     if (_debug) {
                         view.state("seeked");
                     }
                 });
-                $(media_el).on('progress', function () {
+                $mediaEl.on('progress', function () {
                     if (_debug) {
                         view.state("progress");
                     }
                 });
-                $(media_el).on('suspend', function () {
+                $mediaEl.on('suspend', function () {
                     if (_debug) {
                         view.state("suspend");
                     }
                 });
-                $(media_el).on('abort', function () {
+                $mediaEl.on('abort', function () {
                     if (_debug) {
                         view.state("abort");
                     }
                 });
-                $(media_el).on('stalled', function () {
+                $mediaEl.on('stalled', function () {
                     if (_debug) {
                         view.state("stalled");
                     }
@@ -335,44 +335,31 @@ var engine_player = function(mySettings, myEngine) {
                 }
                 return status;
             },
-            volume: function (persent) {
-                var save_volume = function (pos) {
-                    var width_persent = pos * 100;
-                    chrome.storage.local.set({'volume': width_persent});
-                };
-                if (persent === undefined) {
-                    view.setVolume(media_el.volume);
-                    return;
+            volume: function (value) {
+                if (value === undefined) {
+                    return media_el.volume;
                 }
-                if (media_el.muted) {
-                    media_el.muted = false;
-                }
-                if (typeof (persent) === "string") {
-                    if (persent.substr(0, 1) === "+") {
-                        persent = parseFloat(persent.substr(1));
+                if (typeof (value) === "string") {
+                    if (value.substr(0, 1) === "+") {
+                        value = media_el.volume * 100 + parseInt(value.substr(1));
                     } else {
-                        persent = -1 * parseFloat(persent.substr(1));
+                        value = media_el.volume * 100 - parseInt(value.substr(1));
                     }
-                    if (isNaN(persent)) {
+                    if (isNaN(value)) {
                         return;
                     }
-                    var new_val = media_el.volume + persent / 100;
-                    if (new_val > 1) {
-                        new_val = 1;
-                    } else if (new_val < 0) {
-                        new_val = 0;
-                    }
-                    media_el.volume = new_val;
-                    save_volume(media_el.volume);
-                    return;
                 }
-                var val = 1.0 / 100 * persent;
-                if (media_el.volume === val) {
-                    view.setVolume(media_el.volume);
-                } else {
-                    media_el.volume = val;
+                if (value > 0 && media_el.muted) {
+                    media_el.muted = false;
                 }
-                save_volume(media_el.volume);
+                if (value < 0) {
+                    value = 0;
+                }
+                if (value > 100) {
+                    value = 100;
+                }
+                media_el.volume = value / 100;
+                chrome.storage.local.set({'volume': value});
             },
             position: function (persent) {
                 if (isNaN(media_el.duration))
@@ -397,8 +384,11 @@ var engine_player = function(mySettings, myEngine) {
                 }
                 media_el.currentTime = media_el.duration / 100 * persent;
             },
-            mute: function () {
-                media_el.muted = !media_el.muted;
+            mute: function (state) {
+                if (state === undefined) {
+                    state = !media_el.muted;
+                }
+                media_el.muted = state;
             },
             getMute: function () {
                 return media_el.muted;
