@@ -604,18 +604,34 @@ window.view = function () {
             dom_cache.progress_bar.removeClass('stream');
         }
     };
-    var changeStateIcon = function () {
+    var changeStateIcon = function (audio) {
         if (state.waiting) {
             dom_cache.stateIcon.addClass('waiting');
         } else {
             dom_cache.stateIcon.removeClass('waiting');
         }
-        if (state.error) {
-            dom_cache.stateIcon.addClass('error');
-            // dom_cache.stateIcon.attr('title', state.error);
+        if (state.error && audio) {
+            dom_cache.stateIcon.removeClass('waiting').addClass('error');
+            var error_code = audio.error;
+            if (error_code !== undefined) {
+                var title;
+                if (error_code.code === 1) {
+                    title = 'MEDIA_ERR_ABORTED';
+                } else
+                if (error_code.code === 2) {
+                    title = 'MEDIA_ERR_NETWORK';
+                } else
+                if (error_code.code === 3) {
+                    title = 'MEDIA_ERR_DECODE';
+                } else
+                if (error_code.code === 4) {
+                    title = 'MEDIA_ERR_SRC_NOT_SUPPORTED';
+                }
+                dom_cache.stateIcon.attr('title', title);
+            }
         } else {
             dom_cache.stateIcon.removeClass('error');
-            // dom_cache.stateIcon.removeAttr('title');
+            dom_cache.stateIcon.removeAttr('title');
         }
     };
     var playerRender = function() {
@@ -831,6 +847,10 @@ window.view = function () {
     };
     var updatePreloadBar = function (audio) {
         var i;
+        if (audio === undefined) {
+            clearPreloadBars();
+            return;
+        }
         var duration = audio.duration;
         if (duration === Infinity) {
             return;
@@ -852,7 +872,7 @@ window.view = function () {
             if (isNaN(width)) {
                 continue;
             }
-            if (left + width > 100) {
+            if (left + width >= 99) {
                 continue;
             }
             ranges.push([left, width]);
@@ -1225,7 +1245,7 @@ window.view = function () {
             }
         },
         onStalled: function (e) {
-            updatePreloadBar(e.target);
+            updatePreloadBar();
         },
         onError: function (e) {
             if (state.waiting) {
@@ -1234,23 +1254,28 @@ window.view = function () {
             }
             if (!state.error) {
                 state.error = true;
-                changeStateIcon();
+                changeStateIcon(e.target);
             }
+            state.duration = 0;
+            changeProgressBarMode();
         },
         onEmptied: function (e) {
             if (e.target === undefined) {
                 e = {target: e};
             }
-            updatePreloadBar(e.target);
-            // TODO: Empty time.
+            updatePreloadBar();
             hideImage();
-
-            dom_cache.progress_bar.slider('value',0);
+            if (state.waiting) {
+                state.waiting = false;
+                changeStateIcon();
+            }
+            state.duration = 0;
+            changeProgressBarMode();
         },
         onLoadStart: function (e) {
             if (state.error) {
                 state.error = false;
-                changeStateIcon();
+                changeStateIcon(e.target);
             }
             if (!state.waiting) {
                 state.waiting = true;
@@ -1259,6 +1284,14 @@ window.view = function () {
             if (state.download !== undefined) {
                 updateDownloadBar(undefined);
             }
+            updatePreloadBar(e.target);
+            var duration = Infinity;
+            if ( state.duration !== duration ) {
+                state.duration = duration;
+                changeProgressBarMode();
+            }
+            state.paused = e.target.paused;
+            changePlayState();
         },
         onLoadedMetaData: function (e) {
 
@@ -1318,6 +1351,27 @@ window.view = function () {
                 changeStateIcon();
             }
             updateDownloadBar(percent)
+        },
+        onSwitchMedia: function (audio) {
+            var duration = 0;
+            if (state.error) {
+                state.error = false;
+                changeStateIcon(audio);
+            }
+            if ( state.duration !== duration ) {
+                state.duration = duration;
+                changeProgressBarMode();
+            }
+            if (state.paused !== audio.paused) {
+                state.paused = true;
+                changePlayState();
+            }
+            var percent = 0;
+            if (state.progress_bar !== percent) {
+                state.progress_bar = percent;
+                dom_cache.progress_bar.slider('value', percent);
+            }
+            changeTime(audio);
         }
     };
 }();

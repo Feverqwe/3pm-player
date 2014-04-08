@@ -470,6 +470,7 @@ var engine_player = function(mySettings, myEngine) {
                     e_player.mode = 'audio';
                     view.updateSettings({visual_type: settings.visual_type});
                 }
+                view.onSwitchMedia(media_el);
                 media_el.volume = volume_state;
                 media_el.muted = mute_state;
                 init_media_el();
