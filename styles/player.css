@@ -81,13 +81,14 @@ body {
     right: 3px;
     -webkit-app-region: no-drag;
 }
-.player > div.controls > a {
+.player > div.controls > .btn {
     display: inline-block;
     height: 27px;
     width: 59px;
     background-repeat: no-repeat;
     background-position: center;
     -webkit-app-region: no-drag;
+    cursor: pointer;
 }
 div.progress_bar > *,
 div.volume_bar > * {
@@ -178,7 +179,7 @@ div.progress_bar > div.preloadBar > div {
     -webkit-animation: pre_progress_move 1s linear infinite;
 }
 div.progress_bar.download > div.ui-slider-range,
-div.progress_bar.download > a {
+div.progress_bar.download > a.ui-slider-handle {
     opacity: 0.6;
     background: #fff;
     box-shadow: 0px 0px 5px #fff;
@@ -219,7 +220,7 @@ div.progress_bar > div.downloadBar {
     height: 5px;
     box-shadow: 0px 0px 5px rgba(255, 155, 5, 0.7);
 }
-.player .volume_bar > a {
+.player .volume_bar > a.ui-slider-handle {
     background-color: rgb(241, 241, 241);
     position: absolute;
     z-index: 2;
@@ -440,11 +441,6 @@ body.winamp {
     left: 40px;
     z-index: 1;
 }
-.winamp .player > div.controls a {
-    width: 23px;
-    height: 18px;
-    background-position-y: 0;
-}
 .winamp .controls {
     margin-left: 20px;
 }
@@ -454,9 +450,6 @@ body.winamp {
     top: 56px;
     width: 58px !important;
     height: 15px !important;
-}
-.winamp .btn.volume_icon {
-    display: none;
 }
 .winamp .track {
     position: absolute;
@@ -543,32 +536,38 @@ body.winamp {
     opacity: 1;
     -webkit-filter: brightness(1.5);
 }
-.winamp .controls .playlist {
-    display: none;
-}
-.winamp .controls .btn {
+.winamp .player > .controls > .btn {
     background-image: url(../images/winamp/btns.png) !important;
     background-position: 0;
     margin-top: 6px;
+    border: 0;
+    width: 23px;
+    height: 18px;
 }
-.winamp .controls .playpause{
+.winamp .player > .controls > .btn.playlist {
+    display: none;
+}
+.winamp .player > .controls > .btn.volume_icon {
+    display: none;
+}
+.winamp .player > .controls > .btn.playpause {
     background-position-x: -22px;
 }
-.winamp .controls .paused{
+.winamp .player > .controls > .btn.paused {
     background-position-x: -45px;
 }
-.winamp .controls .next {
+.winamp .player > .controls > .btn.next {
     background-position-x: -91px;
 }
-.winamp .controls .prev {
+.winamp .player > .controls > .btn.prev {
     background-position-x: 1px;
 }
-.winamp .controls div.stateIcon {
+.winamp .player > .controls div.stateIcon {
     position: absolute;
     top: 90px;
     left: 250px;
 }
-.winamp .controls .btn:active {
+.winamp .player > .controls > .btn:active {
     -webkit-filter: brightness(0.7);
 }
 .winamp .shuffle {
@@ -638,6 +637,9 @@ body.winamp {
 .winamp .progress_bar a.ui-slider-handle:active {
     background-position-y: 10px;
 }
+.winamp .progress_bar > .preloadBar > div {
+    background-color: rgb(46, 46, 46);
+}
 .winamp .drop.layer span {
     margin-left: 8%;
 }
@@ -688,9 +690,6 @@ body.winamp {
 .winamp .volume_bar {
     box-shadow: inset 1px 1px 2px 0.3px #1A1A1A;
 }
-.winamp .player > div.controls a.btn {
-    border: 0;
-}
 .winamp span.time {
     width: 56px;
     position: initial !important;
@@ -710,9 +709,6 @@ body.winamp {
 .winamp .box.volume_scroll {
     margin-top: 14px;
     height: 66px;
-}
-.winamp div.progress_bar > div.preloadBar > div {
-    background-color: rgb(46, 46, 46);
 }
 @-webkit-keyframes onpausetime {
     0% {opacity: 1;}

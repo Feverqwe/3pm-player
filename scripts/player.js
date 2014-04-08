@@ -866,15 +866,15 @@ window.view = function () {
                     }, 25);
                 }),
                 $('<div>', {'class': 'controls'}).append(
-                    $('<a>', {href: '#', 'class': 'btn playlist', title: _lang.playlist}).on('click', function (e) {
+                    $('<div>', {'class': 'btn playlist', title: _lang.playlist}).on('click', function (e) {
                         e.preventDefault();
                         engine.windowManager({type: 'playlist'});
                     }),
-                    $('<a>', {href: '#', 'class': 'btn prev', title: _lang.prev}).on('click', function (e) {
+                    $('<div>', {'class': 'btn prev', title: _lang.prev}).on('click', function (e) {
                         e.preventDefault();
                         engine.playlist.preview();
                     }),
-                    dom_cache.playpause = $('<a>', {href: '#', 'class': 'btn playpause', title: _lang.play_pause}).append(
+                    dom_cache.playpause = $('<div>', {'class': 'btn playpause', title: _lang.play_pause}).append(
                         dom_cache.stateIcon = $('<div>', {'class': 'stateIcon'})
                     ).on('click', function (e) {
                         e.preventDefault();
@@ -884,11 +884,11 @@ window.view = function () {
                             engine.player.pause();
                         }
                     }),
-                    $('<a>', {href: '#', 'class': 'btn next', title: _lang.next}).on('click', function (e) {
+                    $('<div>', {'class': 'btn next', title: _lang.next}).on('click', function (e) {
                         e.preventDefault();
                         engine.playlist.next();
                     }),
-                    dom_cache.volume_icon = $('<a>', {href: '#', 'class': 'btn volume_icon', title: _lang.mute}).on('click', function (e) {
+                    dom_cache.volume_icon = $('<div>', {'class': 'btn volume_icon', title: _lang.mute}).on('click', function (e) {
                         e.preventDefault();
                         engine.player.mute(!state.muted);
                     }),
