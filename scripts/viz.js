@@ -77,7 +77,7 @@ var viz = function() {
         run: function() {
             chrome.power.requestKeepAwake('display');
             _send('player', function(window) {
-                audio = window.engine.player.getAudio();
+                audio = window.engine.player.getMedia();
                 setTags(window.engine.tags.getTagBody());
                 window.engine.setHotkeys(document);
             });

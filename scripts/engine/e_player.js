@@ -34,12 +34,10 @@ var engine_player = function(mySettings, myEngine) {
                     setMediaUrl(track, track.blob.url);
                     return true;
                 }
-                view.state("preloading");
                 engine.cloud[track_type].preload({
                     view: view,
                     track: track
                 }, function (blob) {
-                    view.state("preloading_dune");
                     if (blob === undefined) {
                         console.log('No url');
                         /** @namespace audio.trigger **/
@@ -55,9 +53,7 @@ var engine_player = function(mySettings, myEngine) {
                 /*
                  * onplay return only URL!
                  */
-                view.state("preloading");
                 engine.cloud[track_type].onplay(track, view, function (url) {
-                    view.state("preloading_dune");
                     if (url.length === 0) {
                         console.log('No url');
                         return;
@@ -71,44 +67,45 @@ var engine_player = function(mySettings, myEngine) {
         var init_media_el = function () {
             var $mediaEl = $(media_el);
             $mediaEl.off();
-            $mediaEl.on('loadstart', function () {
+            $mediaEl.on('loadstart', function (e) {
+                // TODO: Fix me!
                 var tb = engine.tags.getTagBody(e_player.current_id);
                 view.setTags(tb);
-                view.state("loadstart");
                 _send('viz', function (window) {
                     window.viz.audio_state('track', tb);
                 });
                 _send('video', function (window) {
                     window.video.audio_state('track', tb);
                 });
+                view.onLoadStart(e);
             });
-            $mediaEl.on('error', function () {
-                view.state("error");
+            $mediaEl.on('error', function (e) {
+                view.onError(e);
             });
-            $mediaEl.on('emptied', function () {
-                view.state("emptied");
+            $mediaEl.on('emptied', function (e) {
+                view.onEmptied(e);
             });
-            $mediaEl.on('play', function () {
-                view.state("play");
+            $mediaEl.on('play', function (e) {
+                view.onPlay(e);
             });
-            $mediaEl.on('pause', function () {
-                view.state("pause");
+            $mediaEl.on('pause', function (e) {
+                view.onPause(e);
                 discAdapters();
             });
-            $mediaEl.on('loadedmetadata', function () {
+            $mediaEl.on('loadedmetadata', function (e) {
+                // TODO: Fix me!
                 var track = engine.playlist.playlist[e_player.current_id];
                 if (track.duration === undefined) {
                     track.duration = this.duration;
-                }
-                if (_debug) {
-                    view.state("loadedmetadata");
                 }
                 _send('viz', function (window) {
                     window.viz.audio_state('loadedmetadata');
                 });
                 discAdapters();
+                view.onLoadedMetaData(e);
             });
-            $mediaEl.on('loadeddata', function () {
+            $mediaEl.on('loadeddata', function (e) {
+                // TODO: Fix me!
                 if (settings.next_track_notification) {
                     engine.notification.show();
                 }
@@ -123,80 +120,56 @@ var engine_player = function(mySettings, myEngine) {
                         engine.tags.lfmTagReader(track);
                     }
                 }
-                view.state("loadeddata");
+                view.onLoadedData(e);
             });
-            $mediaEl.on('waiting', function () {
-                view.state("waiting");
+            $mediaEl.on('waiting', function (e) {
+                view.onWaiting(e);
             });
-            $mediaEl.on('playing', function () {
+            $mediaEl.on('playing', function (e) {
+                view.onPlaying(e);
+                // TODO: Fix me!
                 engine.playlist.addPlayed(e_player.current_id);
-                view.state("playing");
             });
             $mediaEl.on('canplay', function (e) {
-                view.state("canplay");
+                view.onCanPlay(e);
             });
-            $mediaEl.on('timeupdate', function () {
-                view.setProgress(this.duration, this.currentTime);
+            $mediaEl.on('timeupdate', function (e) {
+                view.onTimeUpdate(e);
             });
-            $mediaEl.on('ended', function () {
+            $mediaEl.on('ended', function (e) {
+                view.onEnded(e);
                 engine.playlist.player_ended();
-                if (_debug) {
-                    view.state("ended");
-                }
             });
             $mediaEl.on('volumechange', function (e) {
-                if (_debug) {
-                    view.state("volumechange");
-                }
-                view.setVolume(e);
+                view.onVolumeChange(e);
             });
-            if (_debug) {
-                $mediaEl.on('ratechange', function () {
-                    if (_debug) {
-                        view.state("ratechange");
-                    }
-                });
-                $mediaEl.on('durationchange', function () {
-                    if (_debug) {
-                        view.state("durationchange");
-                    }
-                });
-                $mediaEl.on('canplaythrough', function () {
-                    if (_debug) {
-                        view.state("canplaythrough");
-                    }
-                });
-                $mediaEl.on('seeking', function () {
-                    if (_debug) {
-                        view.state("seeking");
-                    }
-                });
-                $mediaEl.on('seeked', function () {
-                    if (_debug) {
-                        view.state("seeked");
-                    }
-                });
-                $mediaEl.on('progress', function () {
-                    if (_debug) {
-                        view.state("progress");
-                    }
-                });
-                $mediaEl.on('suspend', function () {
-                    if (_debug) {
-                        view.state("suspend");
-                    }
-                });
-                $mediaEl.on('abort', function () {
-                    if (_debug) {
-                        view.state("abort");
-                    }
-                });
-                $mediaEl.on('stalled', function () {
-                    if (_debug) {
-                        view.state("stalled");
-                    }
-                });
-            }
+            $mediaEl.on('ratechange', function (e) {
+                view.onRateChange(e);
+            });
+            $mediaEl.on('durationchange', function (e) {
+                view.onDurationChange(e);
+            });
+            $mediaEl.on('canplaythrough', function (e) {
+                view.onCanPlayThrough(e);
+            });
+            $mediaEl.on('seeking', function (e) {
+                view.onSeeking(e);
+            });
+            $mediaEl.on('seeked', function (e) {
+                view.onSeeked(e);
+            });
+            $mediaEl.on('progress', function (e) {
+                view.onProgress(e);
+            });
+            $mediaEl.on('suspend', function (e) {
+                view.onSuspend(e);
+            });
+            $mediaEl.on('abort', function (e) {
+                view.onAbort(e);
+            });
+            $mediaEl.on('stalled', function (e) {
+                view.onStalled(e);
+            });
         };
         init_media_el();
         var discAdapters = function (name) {
@@ -404,7 +377,7 @@ var engine_player = function(mySettings, myEngine) {
                 type_list[mime] = media_el.canPlayType(mime).length > 0;
                 return type_list[mime];
             },
-            getAudio: function () {
+            getMedia: function () {
                 return media_el;
             },
             switchMedia: function(type) {

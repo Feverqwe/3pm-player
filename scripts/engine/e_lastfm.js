@@ -349,7 +349,7 @@ var engine_lastfm = function(mySettings, myEngine) {
                     }
                     var start_timer = function() {
                         scrobler_timer = setTimeout(function() {
-                            var audio = engine.player.getAudio();
+                            var audio = engine.player.getMedia();
                             var pos = parseInt(audio.currentTime);
                             if (isNaN(pos)) {
                                 return;

@@ -32,7 +32,7 @@ var video = function() {
         }
         var_cache.infoLeft = currentTime;
         _send('player', function (window) {
-            dom_cache.info_left.text(window.view.toHHMMSS(currentTime));
+            dom_cache.info_left.text(window.view.timeFormat(currentTime));
         });
     };
     var infoRight = function (duration) {
@@ -41,7 +41,7 @@ var video = function() {
         }
         var_cache.infoRight = duration;
         _send('player', function (window) {
-            dom_cache.info_right.text(window.view.toHHMMSS(duration));
+            dom_cache.info_right.text(window.view.timeFormat(duration));
         });
     };
     var updateUi = function () {
@@ -218,7 +218,7 @@ var video = function() {
                     return;
                 }
                 _send('player', function (window) {
-                    var text = window.view.toHHMMSS(sec);
+                    var text = window.view.timeFormat(sec);
                     var text_len = text.length;
                     if (dom_cache.progress_popup_len !== text_len) {
                         dom_cache.progress_popup_len = text_len;

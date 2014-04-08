@@ -227,7 +227,8 @@ var engine_wm = function(mySettings,myEngine) {
                             delete _windows[options.type];
                             chrome.power.releaseKeepAwake();
                             if (engine.player.mode === 'video') {
-                                view.state('emptied');
+                                // TODO: Add player empty!
+                                view.onEmptied( engine.player.getMedia() );
                                 engine.player.switchMedia();
                             }
                         });

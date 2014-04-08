@@ -16,33 +16,37 @@ window.view = function () {
         focus_state: true
     };
     var state = {
+        paused: true,
         muted: false,
         volume: 100,
         time_format: 0,
         shuffle: false,
-        loop: false
+        loop: false,
+        preload: undefined,
+        progress_bar: 0,
+        time_text: '00:00',
+        duration: undefined,
+        loading: false,
+        waiting: false,
+        error: false
     };
     var settings = {};
     var is_winamp = false;
     var visual_cache = {};
     var context_menu = undefined;
-    var isPlaying = function () {
-        /*
-         * Выставляет статус - проигрывается.
-         */
-        if (is_winamp) {
-            dom_cache.body.attr('data-state', 'play');
+    var changePlayState = function () {
+        var $this = dom_cache.playpause;
+        if (state.paused) {
+            $this.removeClass('paused');
+            if (is_winamp) {
+                dom_cache.body.attr('data-state', 'pause');
+            }
+        } else {
+            $this.addClass('paused');
+            if (is_winamp) {
+                dom_cache.body.attr('data-state', 'play');
+            }
         }
-        dom_cache.btnPlayPause.removeClass('play').addClass('pause');
-    };
-    var isPause = function () {
-        /*
-         * Выставляет статус - пауза.
-         */
-        if (is_winamp) {
-            dom_cache.body.attr('data-state', 'pause');
-        }
-        dom_cache.btnPlayPause.removeClass('pause').addClass('play');
     };
     var showImage = function (id) {
         /*
@@ -72,11 +76,11 @@ window.view = function () {
             }, 50);
         }
     };
-    var toHHMMSS = function (val) {
+    var timeFormat = function (currentTime) {
         /*
          * Выводит время трека.
          */
-        var sec_num = parseInt(val, 10); // don't forget the second parm
+        var sec_num = parseInt(currentTime, 10); // don't forget the second parm
         if (isNaN(sec_num))
             return '00:00';
         var hours = Math.floor(sec_num / 3600);
@@ -175,7 +179,7 @@ window.view = function () {
             if (obj === undefined) {
                 return;
             }
-            var audio = engine.player.getAudio();
+            var audio = engine.player.getMedia();
             var buffered = audio.buffered;
             if (!buffered) {
                 stop();
@@ -509,8 +513,8 @@ window.view = function () {
         $('.t_btn.mini').attr('title', _lang.mini);
         $('.t_btn.close').attr('title', _lang.close);
         $('.t_btn.menu').attr('title', _lang.menu);
-        $('div.drop.layer span').text(_lang.drop_file);
-        $('div.selectFile.layer span').text(_lang.click_for_open);
+        $('.layer.drop span').text(_lang.drop_file);
+        $('.layer.selectFile span').text(_lang.click_for_open);
         $('.btn.playlist').attr('title', _lang.playlist);
         $('.btn.prev').attr('title', _lang.prev);
         $('.btn.playpause').attr('title', _lang.play_pause);
@@ -639,7 +643,7 @@ window.view = function () {
         }
         visual_cache.winamp_dancer.bind('loaded',function () {
             visual_cache.winamp_dancer.play();
-        }).load(engine.player.getAudio(), 'winamp');
+        }).load(engine.player.getMedia(), 'winamp');
     };
     var setTrueText = function (title, album) {
         if (is_winamp) {
@@ -731,6 +735,34 @@ window.view = function () {
         var_cache.valume_style = style;
         dom_cache.volume_icon.removeClass('v0 v10 v50 v100').addClass( style );
     };
+    var changeLoadingStyle = function () {
+        if (state.loading) {
+            dom_cache.progress_bar.addClass('loading');
+        } else {
+            dom_cache.progress_bar.removeClass('loading');
+        }
+    };
+    var changeProgressBarMode = function () {
+        if (state.duration === Infinity) {
+            dom_cache.progress_bar.addClass('stream');
+        } else {
+            dom_cache.progress_bar.removeClass('stream');
+        }
+    };
+    var changeStateIcon = function () {
+        if (state.waiting) {
+            dom_cache.stateIcon.addClass('waiting');
+        } else {
+            dom_cache.stateIcon.removeClass('waiting');
+        }
+        if (state.error) {
+            dom_cache.stateIcon.addClass('error');
+            // dom_cache.stateIcon.attr('title', state.error);
+        } else {
+            dom_cache.stateIcon.removeClass('error');
+            // dom_cache.stateIcon.removeAttr('title');
+        }
+    };
     var playerRender = function() {
         dom_cache.body.append(
             $('<div>', {'class': 'menu t_btn', title: _lang.menu}).on('click', function (e) {
@@ -759,10 +791,10 @@ window.view = function () {
                     )
                 ),
                 $('<div>', {'class': 'info'}).append(
-                    dom_cache.time = $('<span>', {'class': 'time'}).on('click', function () {
+                    dom_cache.currentTime = $('<span>', {'class': 'time', text: '00:00'}).on('click', function () {
                         state.time_format = (state.time_format === 1) ? 0 : 1;
                         chrome.storage.local.set({'time_format': state.time_format});
-                        // time update
+                        changeTime( engine.player.getMedia() );
                     }),
                     $('<div>', {'class': 'pl_state'}).append(
                         dom_cache.shuffle = $('<div>', {'class': 's_btn shuffle', title: _lang.shuffle}).on('click', function () {
@@ -773,18 +805,23 @@ window.view = function () {
                         })
                     )
                 ),
-                dom_cache.progress = $('<div>', {'class': 'progress'}).slider({
+                dom_cache.progress_bar = $('<div>', {'class': 'progress_bar'}).slider({
                     range: "min",
                     min: 0,
                     max: 1000,
-                    value: 0,
+                    value: state.progress_bar,
                     change: function (event, ui) {
                         if (event.which === undefined) {
+                            if (is_winamp) {
+                                var lp = parseInt(ui.value / 1000 * -29) || 0;
+                                dom_cache.progress_ui_a.css('margin-left', lp + 'px');
+                            }
                             return;
                         }
                         if (isNaN(ui.value)) {
                             return;
                         }
+                        state.progress_bar = ui.value;
                         engine.player.position(ui.value / 10);
                         if (is_winamp) {
                             var lp = parseInt(ui.value / 1000 * -29) || 0;
@@ -798,6 +835,7 @@ window.view = function () {
                         if (isNaN(ui.value)) {
                             return;
                         }
+                        state.progress_bar = ui.value;
                         engine.player.position(ui.value / 10);
                         if (is_winamp) {
                             var lp = parseInt(ui.value / 1000 * -29) || 0;
@@ -806,9 +844,10 @@ window.view = function () {
                     },
                     create: function () {
                         var $this = $(this);
-                        var div_loaded = $('<div>', {'class': 'loaded'});
-                        $this.append(div_loaded);
-                        preBufferingController.setObj(div_loaded);
+                        dom_cache.preloadBar = $('<div>', {'class': 'preloadBar'});
+                        var downloadBar = $('<div>', {'class': 'downloadBar'});
+                        $this.append(dom_cache.preloadBar, downloadBar);
+                        // preBufferingController.setObj(div_loaded);
                         dom_cache.progress_ui_a = $this.children('a');
                         if (is_winamp) {
                             dom_cache.progress_ui_a.css('margin-left', '0px');
@@ -834,12 +873,11 @@ window.view = function () {
                         e.preventDefault();
                         engine.playlist.preview();
                     }),
-                    dom_cache.btnPlayPause = $('<a>', {href: '#', 'class': 'btn playpause play', title: _lang.play_pause}).append(
-                        dom_cache.loading = $('<div>', {'class': 'loading'})
+                    dom_cache.playpause = $('<a>', {href: '#', 'class': 'btn playpause', title: _lang.play_pause}).append(
+                        dom_cache.stateIcon = $('<div>', {'class': 'stateIcon'})
                     ).on('click', function (e) {
                         e.preventDefault();
-                        var $this = dom_cache.btnPlayPause;
-                        if (!$this.hasClass('pause')) {
+                        if (state.paused) {
                             engine.player.play();
                         } else {
                             engine.player.pause();
@@ -853,8 +891,8 @@ window.view = function () {
                         e.preventDefault();
                         engine.player.mute(!state.muted);
                     }),
-                    $('<div>', {'class': 'volume_controll'}).append(
-                        dom_cache.volume = $('<div>', {'class': 'volume'}).slider({
+                    $('<div>', {'class': 'volume_container'}).append(
+                        dom_cache.volumeBar = $('<div>', {'class': 'volume_bar'}).slider({
                             range: "min",
                             min: 0,
                             max: 100,
@@ -862,7 +900,7 @@ window.view = function () {
                             change: function (event, ui) {
                                 if (event.which === undefined) {
                                     if (is_winamp) {
-                                        dom_cache.volume.css('background', getVolumeColor(ui.value));
+                                        dom_cache.volumeBar.css('background', getVolumeColor(ui.value));
                                     }
                                     return;
                                 }
@@ -873,7 +911,7 @@ window.view = function () {
                                 changeVolumeIcon( ui.value );
                                 engine.player.volume(ui.value);
                                 if (is_winamp) {
-                                    dom_cache.volume.css('background', getVolumeColor(ui.value));
+                                    dom_cache.volumeBar.css('background', getVolumeColor(ui.value));
                                 }
                             },
                             slide: function (event, ui) {
@@ -887,7 +925,7 @@ window.view = function () {
                                 changeVolumeIcon( ui.value );
                                 engine.player.volume(ui.value);
                                 if (is_winamp) {
-                                    dom_cache.volume.css('background', getVolumeColor(ui.value));
+                                    dom_cache.volumeBar.css('background', getVolumeColor(ui.value));
                                 }
                             },
                             create: function () {
@@ -909,6 +947,84 @@ window.view = function () {
             )
         );
         makeCtxMenu();
+    };
+    var clearPreloadBars = function () {
+        if (state.preload !== undefined) {
+            state.preload.forEach(function(item) {
+                item.node.remove();
+            });
+            state.preload = undefined;
+            dom_cache.preloadBar.css('display', 'none');
+        }
+    };
+    var updatePreloadBar = function (audio) {
+        var i;
+        var duration = audio.duration;
+        if (duration === Infinity) {
+            return;
+        }
+        var buffered = audio.buffered;
+        if (!buffered) {
+            return;
+        }
+        var ranges = [];
+        var ranges_len = buffered.length;
+        if (ranges_len === 0) {
+            clearPreloadBars();
+            return;
+        }
+        for (i = 0; i < ranges_len; i++) {
+            var left = parseInt((buffered.start(i) / duration) * 100);
+            var right = parseInt((buffered.end(i) / duration) * 100);
+            var width = right - left;
+            if (isNaN(width)) {
+                continue;
+            }
+            if (left + width > 100) {
+                continue;
+            }
+            ranges.push([left, width]);
+        }
+        ranges_len = ranges.length;
+        if (ranges_len === 1 && ranges[0][1] === 100) {
+            clearPreloadBars();
+            return;
+        }
+        if (state.preload === undefined) {
+            state.preload = [];
+            dom_cache.preloadBar.css('display', 'block');
+        }
+        var preload_len = state.preload.length;
+        if (preload_len > ranges_len) {
+            var rm_list = state.preload.splice(ranges_len, preload_len - ranges_len);
+            rm_list.forEach(function(item) {
+                item.node.remove();
+            });
+        }
+        for (i = 0; i < ranges_len; i++) {
+            if (state.preload[i] === undefined) {
+                state.preload[i] = {};
+                state.preload[i].node = $('<div>').appendTo(dom_cache.preloadBar);
+            }
+            if (state.preload[i].left === ranges[i][0] && state.preload[i].width === ranges[i][1] ) {
+                continue;
+            }
+            state.preload[i].left = ranges[i][0];
+            state.preload[i].width = ranges[i][1];
+            state.preload[i].node.css({'left': ranges[i][0]+'%', width: ranges[i][1]+'%'});
+        }
+    };
+    var changeTime = function (audio) {
+        var time;
+        if (state.time_format) {
+            time = "-" + timeFormat(audio.duration - audio.currentTime);
+        } else {
+            time = timeFormat(audio.currentTime);
+        }
+        if (state.time_text !== time) {
+            dom_cache.currentTime.text(time);
+            state.time_text = time;
+        }
     };
     return {
         show : function () {
@@ -978,7 +1094,7 @@ window.view = function () {
                     $('<div>', {'class': "w_playlist"}).on('click', function () {
                         engine.windowManager({type: 'playlist'});
                     }));
-                dom_cache.time = function () {
+                dom_cache.currentTime = function () {
                     var obj = $('.info > .time');
                     var back = false;
                     obj.empty();
@@ -1027,7 +1143,7 @@ window.view = function () {
                 }();
                 writeWinampFFT();
             }
-            view.state('emptied');
+            view.onEmptied( engine.player.getMedia() );
             view.state("playlist_is_empty");
             chrome.storage.local.get(['time_format', 'extend_volume_scroll', 'volume', 'shuffle', 'loop'], function (storage) {
                 if (storage.time_format !== undefined) {
@@ -1046,7 +1162,7 @@ window.view = function () {
                     storage.volume = 100;
                 }
                 state.volume = storage.volume;
-                dom_cache.volume_value.slider('value', state.volume);
+                dom_cache.volumeBar.slider('value', state.volume);
                 changeVolumeIcon(state.volume);
                 engine.player.volume(state.volume);
             });
@@ -1125,95 +1241,6 @@ window.view = function () {
             setTrueText(tb.title, tb.aa || '');
             //console.log(tags)
         },
-        setProgress : function (max, pos) {
-            var width_persent = pos / max * 100;
-            dom_cache.progress.slider("value", width_persent * 10);
-            if (is_winamp) {
-                var lp = parseInt(width_persent / 100 * -29) || 0;
-                dom_cache.progress_ui_a.css('margin-left', lp + 'px');
-            }
-            var time = undefined;
-            if (state.time_format) {
-                time = "-" + toHHMMSS(max - pos);
-            } else {
-                time = toHHMMSS(pos);
-            }
-            if (time === dom_cache.time_cache) {
-                return;
-            }
-            dom_cache.time_cache = time;
-            dom_cache.time.text(time);
-        },
-        setVolume : function (e) {
-            if (state.muted !== e.target.muted) {
-                state.muted = e.target.muted;
-                changeMuteIcon();
-            }
-            if (state.volume !== e.target.volume * 100) {
-                state.volume = e.target.volume * 100;
-                changeVolumeIcon( state.volume );
-                dom_cache.volume.slider('value', state.volume);
-            }
-        },
-        state : function (type) {
-            if (_debug) {
-                console.log(type);
-            }
-            if (type === "playlist_is_empty") {
-                dom_cache.selectFile_layer.show();
-            }
-            if (type === "playlist_not_empty") {
-                dom_cache.selectFile_layer.hide();
-            }
-            if (type === "preloading") {
-                dom_cache.loading.show();
-            }
-            if (type === "preloading_dune") {
-                dom_cache.loading.hide();
-            }
-            if (type === "loadstart") {
-                dom_cache.loading.show();
-                preBufferingController.loading();
-            }
-            if (type === "loadeddata") {
-                dom_cache.loading.hide();
-                preBufferingController.update();
-                preBufferingController.start();
-            }
-            if (type === "emptied") {
-                dom_cache.loading.hide();
-                dom_cache.time.empty();
-                hideImage();
-                isPause();
-                dom_cache.progress.slider('value',0);
-                preBufferingController.stop();
-                preBufferingController.hide();
-            }
-            if (type === "error") {
-                dom_cache.loading.hide();
-                preBufferingController.stop();
-                preBufferingController.hide();
-                isPause();
-            }
-            if (type === "waiting") {
-                dom_cache.loading.show();
-            }
-            if (type === "play") {
-                dom_cache.loading.show();
-                isPlaying();
-            }
-            if (type === "playing") {
-                dom_cache.loading.hide();
-                isPlaying();
-            }
-            if (type === "pause") {
-                dom_cache.loading.hide();
-                isPause();
-            }
-            if (type === "canplay") {
-                engine.player.play();
-            }
-        },
         updateSettings : function (changes) {
             if (changes.extend_volume_scroll !== undefined) {
                 make_extend_volume(changes.extend_volume_scroll);
@@ -1244,7 +1271,197 @@ window.view = function () {
         getContextMenu : function () {
             return context_menu;
         },
-        toHHMMSS : toHHMMSS
+        timeFormat : timeFormat,
+
+
+        state : function (type) {
+            if (_debug) {
+                console.log(type);
+            }
+            if (type === "playlist_is_empty") {
+                dom_cache.selectFile_layer.show();
+            }
+            if (type === "playlist_not_empty") {
+                dom_cache.selectFile_layer.hide();
+            }
+            if (type === "preloading") {
+                state.waiting = true;
+                changeStateIcon();
+            }
+            if (type === "preloading_dune") {
+                state.waiting = false;
+                changeStateIcon();
+            }
+        },
+        onVolumeChange: function (e) {
+            if (state.muted !== e.target.muted) {
+                state.muted = e.target.muted;
+                changeMuteIcon();
+            }
+            if (state.volume !== e.target.volume * 100) {
+                state.volume = e.target.volume * 100;
+                changeVolumeIcon( state.volume );
+                dom_cache.volumeBar.slider('value', state.volume);
+            }
+        },
+        onPlay: function (e) {
+            if (state.paused !== e.target.paused) {
+                state.paused = false;
+                changePlayState();
+            }
+            
+            dom_cache.stateIcon.show();
+        },
+        onPause: function (e) {
+            if (state.paused !== e.target.paused) {
+                state.paused = true;
+                changePlayState();
+            }
+            if (state.waiting) {
+                state.waiting = false;
+                changeStateIcon();
+            }
+
+            dom_cache.stateIcon.hide();
+        },
+        onWaiting: function (e) {
+            if (!state.waiting) {
+                state.waiting = true;
+                changeStateIcon();
+            }
+
+            dom_cache.stateIcon.show();
+        },
+        onPlaying: function (e) {
+            if (state.waiting) {
+                state.waiting = false;
+                changeStateIcon();
+            }
+
+            dom_cache.stateIcon.hide();
+        },
+        onTimeUpdate: function (e) {
+            var duration = e.target.duration;
+            var currentTime = e.target.currentTime;
+            var percent = parseInt( currentTime / duration * 1000 );
+            if (state.progress_bar !== percent) {
+                state.progress_bar = percent;
+                dom_cache.progress_bar.slider('value', percent);
+            }
+            if ( state.duration !== duration ) {
+                state.duration = duration;
+                changeProgressBarMode();
+            }
+            changeTime(e.target);
+        },
+        onDurationChange: function (e) {
+            var duration = e.target.duration;
+            if ( state.duration !== duration ) {
+                state.duration = duration;
+                changeProgressBarMode();
+            }
+        },
+        onStalled: function (e) {
+            updatePreloadBar(e.target);
+        },
+        onError: function (e) {
+            if (state.waiting) {
+                state.waiting = false;
+                changeStateIcon();
+            }
+            if (!state.error) {
+                state.error = true;
+                changeStateIcon();
+            }
+
+            dom_cache.stateIcon.hide();
+            // preBufferingController.stop();
+            // preBufferingController.hide();
+        },
+        onEmptied: function (e) {
+            if (e.target === undefined) {
+                e = {target: e};
+            }
+            updatePreloadBar(e.target);
+
+            dom_cache.stateIcon.hide();
+            // TODO: Empty time.
+            hideImage();
+            dom_cache.progress_bar.slider('value',0);
+            // preBufferingController.stop();
+            // preBufferingController.hide();
+        },
+        onLoadStart: function (e) {
+            if (state.error) {
+                state.error = false;
+                changeStateIcon();
+            }
+            if (!state.waiting) {
+                state.waiting = true;
+                changeStateIcon();
+            }
+
+            // показать бар загрузки
+            dom_cache.stateIcon.show();
+            // preBufferingController.loading();
+        },
+        onLoadedMetaData: function (e) {
+
+        },
+        onCanPlay: function (e) {
+
+        },
+        onCanPlayThrough: function (e) {
+
+        },
+        onLoadedData: function (e) {
+            // скрыть бар загрузки
+            dom_cache.stateIcon.hide();
+            // preBufferingController.update();
+            // preBufferingController.start();
+
+            if (state.waiting) {
+                state.waiting = false;
+                changeStateIcon();
+            }
+            var duration = e.target.duration;
+            if ( state.duration !== duration ) {
+                state.duration = duration;
+                changeProgressBarMode();
+            }
+            engine.player.play();
+        },
+        onEnded: function (e) {
+
+        },
+        onRateChange: function (e) {
+
+        },
+        onSeeking: function (e) {
+            if (!state.loading) {
+                state.loading = true;
+                changeLoadingStyle();
+            }
+        },
+        onSeeked: function (e) {
+            if (state.loading) {
+                state.loading = false;
+                changeLoadingStyle();
+            }
+        },
+        onProgress: function (e) {
+            updatePreloadBar(e.target);
+        },
+        onSuspend: function (e) {
+
+        },
+        onAbort: function (e) {
+            if (state.paused !== e.target.paused) {
+                state.paused = e.target.paused;
+                changePlayState();
+            }
+            updatePreloadBar(e.target);
+        }
     };
 }();
 chrome.runtime.onMessage.addListener(function (msg) {
