@@ -23,6 +23,9 @@ var engine_cloud = function(mySettings, myEngine) {
             }
             dl_xhr.responseType = "blob";
             dl_xhr.onprogress = function(e) {
+                if (this.status !== 200) {
+                    return;
+                }
                 view.onDownload( parseInt((e.loaded / e.total) * 100) );
             };
             dl_xhr.onload = function() {

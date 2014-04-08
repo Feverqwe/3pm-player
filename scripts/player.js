@@ -964,11 +964,13 @@ window.view = function () {
         }
         if (percent === undefined) {
             state.download = percent;
+            dom_cache.progress_bar.removeClass('download');
             dom_cache.downloadBar.hide();
             return;
         }
         dom_cache.downloadBar.css({'width': percent+'%'});
         if (state.download === undefined) {
+            dom_cache.progress_bar.addClass('download');
             dom_cache.downloadBar.show();
         }
         state.download = percent;
@@ -1433,15 +1435,15 @@ window.view = function () {
 
         },
         onSeeking: function (e) {
-            if (!state.loading) {
-                state.loading = true;
-                changeLoadingStyle();
+            if (!state.waiting) {
+                state.waiting = true;
+                changeStateIcon();
             }
         },
         onSeeked: function (e) {
-            if (state.loading) {
-                state.loading = false;
-                changeLoadingStyle();
+            if (state.waiting) {
+                state.waiting = false;
+                changeStateIcon();
             }
         },
         onProgress: function (e) {

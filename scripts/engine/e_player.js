@@ -73,6 +73,9 @@ var engine_player = function(mySettings, myEngine) {
             $mediaEl.off();
             $mediaEl.on('loadstart', function (e) {
                 // TODO: Fix me!
+                if (_debug) {
+                    console.log('loadstart');
+                }
                 var tb = engine.tags.getTagBody(e_player.current_id);
                 view.setTags(tb);
                 _send('viz', function (window) {
@@ -84,19 +87,34 @@ var engine_player = function(mySettings, myEngine) {
                 view.onLoadStart(e);
             });
             $mediaEl.on('error', function (e) {
+                if (_debug) {
+                    console.log('error');
+                }
                 view.onError(e);
             });
             $mediaEl.on('emptied', function (e) {
+                if (_debug) {
+                    console.log('emptied');
+                }
                 view.onEmptied(e);
             });
             $mediaEl.on('play', function (e) {
+                if (_debug) {
+                    console.log('play');
+                }
                 view.onPlay(e);
             });
             $mediaEl.on('pause', function (e) {
+                if (_debug) {
+                    console.log('pause');
+                }
                 view.onPause(e);
                 discAdapters();
             });
             $mediaEl.on('loadedmetadata', function (e) {
+                if (_debug) {
+                    console.log('loadedmetadata');
+                }
                 // TODO: Fix me!
                 var track = engine.playlist.playlist[e_player.current_id];
                 if (track.duration === undefined) {
@@ -109,6 +127,9 @@ var engine_player = function(mySettings, myEngine) {
                 view.onLoadedMetaData(e);
             });
             $mediaEl.on('loadeddata', function (e) {
+                if (_debug) {
+                    console.log('loadeddata');
+                }
                 // TODO: Fix me!
                 if (settings.next_track_notification) {
                     engine.notification.show();
@@ -127,51 +148,96 @@ var engine_player = function(mySettings, myEngine) {
                 view.onLoadedData(e);
             });
             $mediaEl.on('waiting', function (e) {
+                if (_debug) {
+                    console.log('waiting');
+                }
                 view.onWaiting(e);
             });
             $mediaEl.on('playing', function (e) {
+                if (_debug) {
+                    console.log('playing');
+                }
                 view.onPlaying(e);
                 // TODO: Fix me!
                 engine.playlist.addPlayed(e_player.current_id);
             });
             $mediaEl.on('canplay', function (e) {
+                if (_debug) {
+                    console.log('canplay');
+                }
                 view.onCanPlay(e);
             });
             $mediaEl.on('timeupdate', function (e) {
+                if (_debug) {
+                    console.log('timeupdate');
+                }
                 view.onTimeUpdate(e);
             });
             $mediaEl.on('ended', function (e) {
+                if (_debug) {
+                    console.log('ended');
+                }
                 view.onEnded(e);
                 engine.playlist.player_ended();
             });
             $mediaEl.on('volumechange', function (e) {
+                if (_debug) {
+                    console.log('volumechange');
+                }
                 view.onVolumeChange(e);
             });
             $mediaEl.on('ratechange', function (e) {
+                if (_debug) {
+                    console.log('ratechange');
+                }
                 view.onRateChange(e);
             });
             $mediaEl.on('durationchange', function (e) {
+                if (_debug) {
+                    console.log('durationchange');
+                }
                 view.onDurationChange(e);
             });
             $mediaEl.on('canplaythrough', function (e) {
+                if (_debug) {
+                    console.log('canplaythrough');
+                }
                 view.onCanPlayThrough(e);
             });
             $mediaEl.on('seeking', function (e) {
+                if (_debug) {
+                    console.log('seeking');
+                }
                 view.onSeeking(e);
             });
             $mediaEl.on('seeked', function (e) {
+                if (_debug) {
+                    console.log('seeked');
+                }
                 view.onSeeked(e);
             });
             $mediaEl.on('progress', function (e) {
+                if (_debug) {
+                    console.log('progress');
+                }
                 view.onProgress(e);
             });
             $mediaEl.on('suspend', function (e) {
+                if (_debug) {
+                    console.log('suspend');
+                }
                 view.onSuspend(e);
             });
             $mediaEl.on('abort', function (e) {
+                if (_debug) {
+                    console.log('abort');
+                }
                 view.onAbort(e);
             });
             $mediaEl.on('stalled', function (e) {
+                if (_debug) {
+                    console.log('stalled');
+                }
                 view.onStalled(e);
             });
         };
