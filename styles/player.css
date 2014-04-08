@@ -84,22 +84,13 @@ body.loading > * {
     right: 3px;
     -webkit-app-region: no-drag;
 }
-.player > div.controls {
-}
-.player > div.controls ul {
-    padding: 0;
-    margin: 0;
-}
-.player > div.controls li {
+.player > div.controls > a {
     display: inline-block;
-    height: 25px;
-    width: 60px;
+    height: 27px;
+    width: 59px;
     background-repeat: no-repeat;
     background-position: center;
     -webkit-app-region: no-drag;
-    padding-top: 2px;
-    padding-bottom: 4px;
-    margin-left: -3px;
 }
 div.progress {
     background-color: #111111;
@@ -171,93 +162,91 @@ div.progress.download > a {
 div.progress.download > div.loaded {
     background-color: rgb(0, 78, 175);
 }
-.player > div.controls li.volume_controll {
+.player > div.controls .volume_controll {
+    display: inline-block;
     background-color: initial;
-    width: 80px;
+    width: 62px;
     position: relative;
-    float: right;
     margin-right: 5px;
+    height: 27px;
+    -webkit-app-region: no-drag;
 }
-.player > div.controls li.volume_controll > .volume {
+.player > div.controls .volume_controll > .volume {
     height: 5px;
     background-color: #111111;
-    margin-top: 8px;
-    margin-left: 20px;
-    -webkit-app-region: no-drag;
     cursor: pointer;
     position: relative;
     border: 1px solid #3C3C3C;
+    margin-top: 11px;
 }
-.player > div.controls li.volume_controll > .volume > div {
+.player > div.controls .volume_controll > .volume > div {
     background: -webkit-linear-gradient(top, #F8D476 0%,#FF8500 100%);
     position: absolute;
     z-index: 1;
     height: 5px;
     box-shadow: 0px 0px 5px rgba(255, 155, 5, 0.7);
 }
-.player > div.controls li.volume_controll > .volume > a {
+.player > div.controls div.volume_controll > .volume > a {
     background-color: rgb(241, 241, 241);
     position: absolute;
     z-index: 2;
     height: 5px;
     width: 2px;
 }
-.player > div.controls li.volume_controll > .volume > a:focus {
+.player > div.controls .volume_controll > .volume > a:focus {
     outline-color: #fff;
 }
-.player > .controls .volume_controll .pic {
-    position: absolute;
-    left: 0;
-    height: 25px;
-    width: 16px;
-    background-image: url(../images/sound_high_w.png);
-    background-position: left 3px;
-    background-repeat: no-repeat;
-    cursor: pointer;
-}
-.player > .controls > ul > .volume_controll > .pic.v100 {
-    background-image: url(../images/sound_high_w.png);
-}
-.player > .controls > ul > .volume_controll > .pic.v50 {
-    background-image: url(../images/sound_medium_w.png);
-}
-.player > .controls > ul > .volume_controll > .pic.v10 {
-    background-image: url(../images/sound_low_w.png);
-}
-.player > .controls > ul > .volume_controll > .pic.v0 {
-    background-image: url(../images/sound_zero_w.png);
-}
-.player > .controls > ul > .volume_controll > .pic.muted {
-    background-image: url(../images/sound_mute_w.png);
-}
-.player > div.controls li.btn {
-    cursor: pointer;
+.player > div.controls .btn {
     border-right: 1px solid #000000;
 }
-.player > div.controls li.btn:active {
+.player > .controls .btn.volume_icon {
+    width: 16px;
+    background-image: url(../images/sound_high_w.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-right: 0;
+}
+.player > .controls > .btn.volume_icon.v100 {
+    background-image: url(../images/sound_high_w.png);
+}
+.player > .controls > .btn.volume_icon.v50 {
+    background-image: url(../images/sound_medium_w.png);
+}
+.player > .controls > .btn.volume_icon.v10 {
+    background-image: url(../images/sound_low_w.png);
+}
+.player > .controls > .btn.volume_icon.v0 {
+    background-image: url(../images/sound_zero_w.png);
+}
+.player > .controls > .btn.volume_icon.muted {
+    background-image: url(../images/sound_mute_w.png);
+}
+.player > div.controls .btn:active {
     background-color: #161616;
 }
-.player > div.controls li.prev {
+.player > div.controls .prev {
     background-image: url(../images/playback_prev_w.png);
     background-position-y: 6px;
 }
-.player > div.controls li.play {
+.player > div.controls .play {
     background-image: url(../images/playback_play_w.png);
     background-position-y: 6px;
 }
-.player > div.controls li.pause {
+.player > div.controls .pause {
     background-image: url(../images/playback_pause_w.png);
     background-position-y: 5px;
 }
-.player > div.controls li.stop {
+.player > div.controls .stop {
     background-image: url(../images/playback_stop_w.png);
     background-position-y: 5px;
 }
-.player > div.controls li.next {
+.player > div.controls .next {
     background-image: url(../images/playback_next_w.png);
     background-position-y: 6px;
 }
-.player > div.controls li.playlist {
+.player > div.controls .playlist {
     background-image: url(../images/playlist_w.png);
     background-position-y: 4px;
 }
@@ -411,9 +400,9 @@ body.winamp {
     left: 40px;
     z-index: 1;
 }
-.winamp .player > div.controls li {
+.winamp .player > div.controls a {
     width: 23px;
-    height: 12px;
+    height: 18px;
     background-position-y: 0;
 }
 .winamp .controls {
@@ -421,11 +410,12 @@ body.winamp {
 }
 .winamp .volume_controll {
     position: absolute !important;
-    left: 92px;
-    top: 50px;
-    width: 80px !important;
+    left: 110px;
+    top: 56px;
+    width: 58px !important;
+    height: 15px !important;
 }
-.winamp .volume_controll .pic {
+.winamp .btn.volume_icon {
     display: none;
 }
 .winamp .track {
@@ -511,6 +501,9 @@ body.winamp {
     opacity: 1;
     -webkit-filter: brightness(1.5);
 }
+.winamp .controls .playlist {
+    display: none;
+}
 .winamp .controls .btn {
     background-image: url(../images/winamp/btns.png) !important;
     background-position: 0;
@@ -528,11 +521,6 @@ body.winamp {
 .winamp .controls .prev {
     background-position-x: 1px;
 }
-.winamp .controls .playlist {
-    background-position-x: -113px;
-    height: 10px !important;
-    margin-bottom: 1px;
-}
 .winamp .controls div.loading {
     position: absolute;
     top: 89px;
@@ -546,8 +534,8 @@ body.winamp {
     position: absolute;
     width: 47px;
     height: 16px;
-    left: 93px;
-    top: 88px;
+    left: -26px;
+    top: 75px;
     cursor: pointer;
     -webkit-app-region: no-drag;
 }
@@ -559,8 +547,8 @@ body.winamp {
     position: absolute;
     width: 27px;
     height: 13px;
-    left: 146px;
-    top: 89px;
+    left: 27px;
+    top: 76px;
     cursor: pointer;
     -webkit-app-region: no-drag;
 }
@@ -581,6 +569,9 @@ body.winamp {
     top: 57px;
     cursor: pointer;
     -webkit-app-region: no-drag;
+}
+.winamp .volume_controll > .volume {
+    margin-top: 4px !important;
 }
 .winamp .volume_controll a {
     background-image: url(../images/winamp/vol.png);
@@ -606,7 +597,7 @@ body.winamp {
     background-position-y: 10px;
 }
 .winamp .drop.layer span {
-    margin-left: 6%;
+    margin-left: 8%;
 }
 .winamp div.state {
     background-image: url(../images/winamp/state.png);
@@ -655,7 +646,7 @@ body.winamp {
 .winamp .volume {
     box-shadow: inset 1px 1px 2px 0.3px #1A1A1A;
 }
-.winamp .player > div.controls li.btn {
+.winamp .player > div.controls a.btn {
     border: 0;
 }
 .winamp span.time {

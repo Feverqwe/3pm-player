@@ -22,7 +22,6 @@ window.view = function () {
         shuffle: false,
         loop: false
     };
-    var time_tipe = 0;
     var settings = {};
     var is_winamp = false;
     var visual_cache = {};
@@ -516,9 +515,9 @@ window.view = function () {
         $('.btn.prev').attr('title', _lang.prev);
         $('.btn.playpause').attr('title', _lang.play_pause);
         $('.btn.next').attr('title', _lang.next);
-        $('.volume_controll .pic').attr('title', _lang.mute);
-        $('div.shuffle').attr('title', _lang.shuffle);
-        $('div.loop').attr('title', _lang.loop);
+        $('.btn.volume_icon').attr('title', _lang.mute);
+        $('.s_btn.shuffle').attr('title', _lang.shuffle);
+        $('.s_btn.loop').attr('title', _lang.loop);
     };
     var getVolumeColor = function (value) {
         /*
@@ -827,80 +826,85 @@ window.view = function () {
                     }, 25);
                 }),
                 $('<div>', {'class': 'controls'}).append(
-                    $('<ul>').append(
-                        $('<li>', {'class': 'btn playlist', title: _lang.playlist}).on('click', function (e) {
-                            e.preventDefault();
-                            engine.windowManager({type: 'playlist'});
-                        }),
-                        $('<li>', {'class': 'btn prev', title: _lang.prev}).on('click', function () {
-                            engine.playlist.preview();
-                        }),
-                        dom_cache.btnPlayPause = $('<li>', {'class': 'btn playpause play', title: _lang.play_pause}).append(
-                            dom_cache.loading = $('<div>', {'class': 'loading'})
-                        ).on('click', function () {
-                            var $this = dom_cache.btnPlayPause;
-                            if (!$this.hasClass('pause')) {
-                                engine.player.play();
-                            } else {
-                                engine.player.pause();
-                            }
-                        }),
-                        $('<li>', {'class': 'btn next', title: _lang.next}).on('click', function () {
-                            engine.playlist.next();
-                        }),
-                        $('<li>', {'class': 'volume_controll'}).append(
-                            dom_cache.volume_icon = $('<div>', {'class': 'pic', title: _lang.mute}).on('click', function () {
-                                engine.player.mute(!state.muted);
-                            }),
-                            dom_cache.volume = $('<div>', {'class': 'volume'}).slider({
-                                range: "min",
-                                min: 0,
-                                max: 100,
-                                value: state.volume,
-                                change: function (event, ui) {
-                                    if (event.which === undefined) {
-                                        return;
-                                    }
-                                    if (isNaN(ui.value)) {
-                                        return;
-                                    }
-                                    state.volume = ui.value;
-                                    changeVolumeIcon( ui.value );
-                                    engine.player.volume(ui.value);
+                    $('<a>', {href: '#', 'class': 'btn playlist', title: _lang.playlist}).on('click', function (e) {
+                        e.preventDefault();
+                        engine.windowManager({type: 'playlist'});
+                    }),
+                    $('<a>', {href: '#', 'class': 'btn prev', title: _lang.prev}).on('click', function (e) {
+                        e.preventDefault();
+                        engine.playlist.preview();
+                    }),
+                    dom_cache.btnPlayPause = $('<a>', {href: '#', 'class': 'btn playpause play', title: _lang.play_pause}).append(
+                        dom_cache.loading = $('<div>', {'class': 'loading'})
+                    ).on('click', function (e) {
+                        e.preventDefault();
+                        var $this = dom_cache.btnPlayPause;
+                        if (!$this.hasClass('pause')) {
+                            engine.player.play();
+                        } else {
+                            engine.player.pause();
+                        }
+                    }),
+                    $('<a>', {href: '#', 'class': 'btn next', title: _lang.next}).on('click', function (e) {
+                        e.preventDefault();
+                        engine.playlist.next();
+                    }),
+                    dom_cache.volume_icon = $('<a>', {href: '#', 'class': 'btn volume_icon', title: _lang.mute}).on('click', function (e) {
+                        e.preventDefault();
+                        engine.player.mute(!state.muted);
+                    }),
+                    $('<div>', {'class': 'volume_controll'}).append(
+                        dom_cache.volume = $('<div>', {'class': 'volume'}).slider({
+                            range: "min",
+                            min: 0,
+                            max: 100,
+                            value: state.volume,
+                            change: function (event, ui) {
+                                if (event.which === undefined) {
                                     if (is_winamp) {
                                         dom_cache.volume.css('background', getVolumeColor(ui.value));
                                     }
-                                },
-                                slide: function (event, ui) {
-                                    if (event.which === undefined) {
-                                        return;
-                                    }
-                                    if (isNaN(ui.value)) {
-                                        return;
-                                    }
-                                    state.volume = ui.value;
-                                    changeVolumeIcon( ui.value );
-                                    engine.player.volume(ui.value);
-                                    if (is_winamp) {
-                                        dom_cache.volume.css('background', getVolumeColor(ui.value));
-                                    }
-                                },
-                                create: function () {
-                                    $this = $(this);
-                                    if (is_winamp) {
-                                        $this.css('background', getVolumeColor(state.volume));
-                                    }
+                                    return;
                                 }
-                            })
-                        ).on('mousewheel', function ($e) {
-                            var e = $e.originalEvent;
-                            if (e.wheelDelta > 0) {
-                                engine.player.volume("+10");
-                            } else {
-                                engine.player.volume("-10");
+                                if (isNaN(ui.value)) {
+                                    return;
+                                }
+                                state.volume = ui.value;
+                                changeVolumeIcon( ui.value );
+                                engine.player.volume(ui.value);
+                                if (is_winamp) {
+                                    dom_cache.volume.css('background', getVolumeColor(ui.value));
+                                }
+                            },
+                            slide: function (event, ui) {
+                                if (event.which === undefined) {
+                                    return;
+                                }
+                                if (isNaN(ui.value)) {
+                                    return;
+                                }
+                                state.volume = ui.value;
+                                changeVolumeIcon( ui.value );
+                                engine.player.volume(ui.value);
+                                if (is_winamp) {
+                                    dom_cache.volume.css('background', getVolumeColor(ui.value));
+                                }
+                            },
+                            create: function () {
+                                $this = $(this);
+                                if (is_winamp) {
+                                    $this.css('background', getVolumeColor(state.volume));
+                                }
                             }
                         })
-                    )
+                    ).on('mousewheel', function ($e) {
+                        var e = $e.originalEvent;
+                        if (e.wheelDelta > 0) {
+                            engine.player.volume("+10");
+                        } else {
+                            engine.player.volume("-10");
+                        }
+                    })
                 )
             )
         );
@@ -950,19 +954,23 @@ window.view = function () {
             };
             if (is_winamp) {
                 dom_cache.body.addClass('winamp');
-                $('li.btn.playlist').hide();
-                $('div.pl_state').hide();
                 var win = chrome.app.window.current();
                 var dpr = window.devicePixelRatio;
                 var win_w = parseInt(275 * dpr);
                 var win_h = parseInt(116 * dpr);
+                dom_cache.shuffle.removeClass('s_btn');
+                dom_cache.loop.removeClass('s_btn');
                 /**
                  * @namespace win.resizeTo
                  */
                 win.resizeTo(win_w, win_h);
                 $('.player').append(
-                    $('<div>', {'class': "shuffle"}),
-                    $('<div>', {'class': "loop"}),
+                    /*$('<div>', {'class': "shuffle"}).on('click', function () {
+                        engine.playlist.setShuffle();
+                    }),
+                    $('<div>', {'class': "loop"}).on('click', function () {
+                        engine.playlist.setLoop();
+                    }),*/
                     $('<div>', {'class': "state"}),
                     $('<div>', {'class': "w_kbps", text: 320}),
                     $('<div>', {'class': "w_kHz", text: 44}),
@@ -1125,7 +1133,7 @@ window.view = function () {
                 dom_cache.progress_ui_a.css('margin-left', lp + 'px');
             }
             var time = undefined;
-            if (time_tipe) {
+            if (state.time_format) {
                 time = "-" + toHHMMSS(max - pos);
             } else {
                 time = toHHMMSS(pos);
