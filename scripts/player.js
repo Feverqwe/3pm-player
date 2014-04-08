@@ -28,7 +28,8 @@ window.view = function () {
         duration: undefined,
         loading: false,
         waiting: false,
-        error: false
+        error: false,
+        download: undefined
     };
     var settings = {};
     var is_winamp = false;
@@ -845,8 +846,8 @@ window.view = function () {
                     create: function () {
                         var $this = $(this);
                         dom_cache.preloadBar = $('<div>', {'class': 'preloadBar'});
-                        var downloadBar = $('<div>', {'class': 'downloadBar'});
-                        $this.append(dom_cache.preloadBar, downloadBar);
+                        dom_cache.downloadBar = $('<div>', {'class': 'downloadBar'});
+                        $this.append(dom_cache.preloadBar, dom_cache.downloadBar);
                         // preBufferingController.setObj(div_loaded);
                         dom_cache.progress_ui_a = $this.children('a');
                         if (is_winamp) {
@@ -956,6 +957,21 @@ window.view = function () {
             state.preload = undefined;
             dom_cache.preloadBar.css('display', 'none');
         }
+    };
+    var updateDownloadBar = function (percent) {
+        if (state.download === percent) {
+            return;
+        }
+        if (percent === undefined) {
+            state.download = percent;
+            dom_cache.downloadBar.hide();
+            return;
+        }
+        dom_cache.downloadBar.css({'width': percent+'%'});
+        if (state.download === undefined) {
+            dom_cache.downloadBar.show();
+        }
+        state.download = percent;
     };
     var updatePreloadBar = function (audio) {
         var i;
@@ -1309,8 +1325,6 @@ window.view = function () {
                 state.paused = false;
                 changePlayState();
             }
-            
-            dom_cache.stateIcon.show();
         },
         onPause: function (e) {
             if (state.paused !== e.target.paused) {
@@ -1321,24 +1335,18 @@ window.view = function () {
                 state.waiting = false;
                 changeStateIcon();
             }
-
-            dom_cache.stateIcon.hide();
         },
         onWaiting: function (e) {
             if (!state.waiting) {
                 state.waiting = true;
                 changeStateIcon();
             }
-
-            dom_cache.stateIcon.show();
         },
         onPlaying: function (e) {
             if (state.waiting) {
                 state.waiting = false;
                 changeStateIcon();
             }
-
-            dom_cache.stateIcon.hide();
         },
         onTimeUpdate: function (e) {
             var duration = e.target.duration;
@@ -1373,23 +1381,16 @@ window.view = function () {
                 state.error = true;
                 changeStateIcon();
             }
-
-            dom_cache.stateIcon.hide();
-            // preBufferingController.stop();
-            // preBufferingController.hide();
         },
         onEmptied: function (e) {
             if (e.target === undefined) {
                 e = {target: e};
             }
             updatePreloadBar(e.target);
-
-            dom_cache.stateIcon.hide();
             // TODO: Empty time.
             hideImage();
+
             dom_cache.progress_bar.slider('value',0);
-            // preBufferingController.stop();
-            // preBufferingController.hide();
         },
         onLoadStart: function (e) {
             if (state.error) {
@@ -1400,10 +1401,9 @@ window.view = function () {
                 state.waiting = true;
                 changeStateIcon();
             }
-
-            // показать бар загрузки
-            dom_cache.stateIcon.show();
-            // preBufferingController.loading();
+            if (state.download !== undefined) {
+                updateDownloadBar(undefined);
+            }
         },
         onLoadedMetaData: function (e) {
 
@@ -1415,11 +1415,6 @@ window.view = function () {
 
         },
         onLoadedData: function (e) {
-            // скрыть бар загрузки
-            dom_cache.stateIcon.hide();
-            // preBufferingController.update();
-            // preBufferingController.start();
-
             if (state.waiting) {
                 state.waiting = false;
                 changeStateIcon();
@@ -1461,6 +1456,13 @@ window.view = function () {
                 changePlayState();
             }
             updatePreloadBar(e.target);
+        },
+        onDownload: function (percent) {
+            if (state.waiting) {
+                state.waiting = false;
+                changeStateIcon();
+            }
+            updateDownloadBar(percent)
         }
     };
 }();

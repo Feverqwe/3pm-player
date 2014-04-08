@@ -23,13 +23,14 @@ var engine_cloud = function(mySettings, myEngine) {
             }
             dl_xhr.responseType = "blob";
             dl_xhr.onprogress = function(e) {
-                //TODO: Fix me!
-                // view.preBufferingController.download(parseInt((e.loaded / e.total) * 100));
+                view.onDownload( parseInt((e.loaded / e.total) * 100) );
             };
             dl_xhr.onload = function() {
+                view.onDownload( undefined );
                 cb(dl_xhr.response);
             };
             dl_xhr.onerror = function() {
+                view.onDownload( undefined );
                 cb();
             };
             dl_xhr.send(null);

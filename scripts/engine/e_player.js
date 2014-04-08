@@ -34,10 +34,12 @@ var engine_player = function(mySettings, myEngine) {
                     setMediaUrl(track, track.blob.url);
                     return true;
                 }
+                view.state("preloading");
                 engine.cloud[track_type].preload({
                     view: view,
                     track: track
                 }, function (blob) {
+                    view.state("preloading_dune");
                     if (blob === undefined) {
                         console.log('No url');
                         /** @namespace audio.trigger **/
@@ -53,7 +55,9 @@ var engine_player = function(mySettings, myEngine) {
                 /*
                  * onplay return only URL!
                  */
+                view.state("preloading");
                 engine.cloud[track_type].onplay(track, view, function (url) {
+                    view.state("preloading_dune");
                     if (url.length === 0) {
                         console.log('No url');
                         return;
