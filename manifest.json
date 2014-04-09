@@ -17,10 +17,10 @@
     "offline_enabled": true,
     "permissions": [
         {"mediaGalleries": ["read"]},
-        "app.runtime", "storage",
+        "storage",
         "contextMenus", "fullscreen",
         "identity", "notifications",
-        "app.window","power",
+        "power",
         {"socket": ["tcp-listen:*:*"]},
         {"fileSystem": ["retainEntries", "directory"]},
         "https://api.vk.com/*",

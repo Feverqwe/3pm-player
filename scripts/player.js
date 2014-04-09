@@ -970,6 +970,7 @@ window.view = function () {
                 var win_h = parseInt(116 * dpr);
                 dom_cache.shuffle.removeClass('s_btn');
                 dom_cache.loop.removeClass('s_btn');
+                changePlayState();
                 /**
                  * @namespace win.resizeTo
                  */

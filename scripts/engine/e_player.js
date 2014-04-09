@@ -329,7 +329,7 @@ var engine_player = function(mySettings, myEngine) {
                         setMediaUrl(track,track.file.url);
                     }
                 } else
-                if (media_el.currentSrc === '') {
+                if (media_el.currentSrc === '' || media_el.src.split(':')[0] === "chrome-extension") {
                     e_player.open( e_player.current_id );
                 } else {
                     media_el.play();
