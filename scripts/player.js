@@ -377,6 +377,7 @@ window.view = function () {
         $('.btn.volume_icon').attr('title', _lang.mute);
         $('.s_btn.shuffle').attr('title', _lang.shuffle);
         $('.s_btn.loop').attr('title', _lang.loop);
+        makeCtxMenu();
     };
     var getVolumeColor = function (value) {
         /*
@@ -613,7 +614,7 @@ window.view = function () {
         if (state.error && audio) {
             dom_cache.stateIcon.removeClass('waiting').addClass('error');
             var error_code = audio.error;
-            if (error_code !== undefined) {
+            if (error_code !== null) {
                 var title;
                 if (error_code.code === 1) {
                     title = 'MEDIA_ERR_ABORTED';
@@ -820,13 +821,14 @@ window.view = function () {
         makeCtxMenu();
     };
     var clearPreloadBars = function () {
-        if (state.preload !== undefined) {
-            state.preload.forEach(function(item) {
-                item.node.remove();
-            });
-            state.preload = undefined;
-            dom_cache.preloadBar.css('display', 'none');
+        if (state.preload === undefined) {
+            return;
         }
+        state.preload.forEach(function(item) {
+            item.node.remove();
+        });
+        state.preload = undefined;
+        dom_cache.preloadBar.css('display', 'none');
     };
     var updateDownloadBar = function (percent) {
         if (state.download === percent) {
@@ -1053,9 +1055,9 @@ window.view = function () {
                 if (storage.volume === undefined) {
                     storage.volume = 100;
                 }
-                state.volume = storage.volume;
-                dom_cache.volumeBar.slider('value', state.volume);
-                changeVolumeIcon(state.volume);
+                // state.volume = storage.volume;
+                // dom_cache.volumeBar.slider('value', state.volume);
+                // changeVolumeIcon(state.volume);
                 engine.player.volume(state.volume);
             });
             engine.setHotkeys(document);

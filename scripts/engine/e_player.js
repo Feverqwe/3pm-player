@@ -165,6 +165,7 @@ var engine_player = function(mySettings, myEngine) {
                 if (_debug) {
                     console.log('canplay');
                 }
+                // нафига тут был view.setVolume(media_el.volume);
                 view.onCanPlay(e);
             });
             $mediaEl.on('timeupdate', function (e) {
