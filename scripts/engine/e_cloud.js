@@ -801,7 +801,7 @@ var engine_cloud = function(mySettings, myEngine) {
                 });
             };
             var getExploreTracks = function(category, cb) {
-                var url = 'https://api-web.soundcloud.com/explore/' + encodeURIComponent(category) + '?limit=100&offset=0&client_id=' + client_id;
+                var url = 'https://api-v2.soundcloud.com/explore/' + encodeURIComponent(category) + '?limit=100&offset=0&client_id=' + client_id;
                 $.ajax({
                     url: url,
                     dataType: 'JSON',
