@@ -3,7 +3,7 @@
     "name": "__MSG_appName__",
     "description": "__MSG_appDesc__",
     "default_locale": "en",
-    "version": "0.7.88",
+    "version": "0.7.89",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "icon_16.png",
@@ -15,6 +15,26 @@
         }
     },
     "offline_enabled": true,
+    "file_handlers": {
+        "audio": {
+            "types": [
+                "audio/mpeg", "audio/mp4", "audio/ogg"
+            ],
+            "extensions": [
+                "mp3", "m4a", "ogg", "oga"
+            ],
+            "title": "Audio player"
+        },
+        "video": {
+            "types": [
+                "video/mp4", "video/quicktime"
+            ],
+            "extensions": [
+                "mp4", "mov", "m4v"
+            ],
+            "title": "Video player"
+        }
+    },
     "permissions": [
         {"mediaGalleries": ["read"]},
         "storage",

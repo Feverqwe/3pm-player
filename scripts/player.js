@@ -188,7 +188,7 @@ window.view = function () {
             },
             cloud: {
                 title: _lang.ctx_cloud,
-                contexts: ['page', 'launcher']
+                contexts: ['page']
             },
             vk: {
                 parentId: "cloud",
@@ -290,7 +290,7 @@ window.view = function () {
             },
             save_vk: {
                 title: _lang.ctx_save_vk_track,
-                contexts: ['page', 'launcher'],
+                contexts: ['page'],
                 hide: 1,
                 action: function () {
                     var track = engine.playlist.getCurrentTrack();
@@ -301,7 +301,7 @@ window.view = function () {
             },
             save_sc: {
                 title: _lang.ctx_save_sc_track,
-                contexts: ['page', 'launcher'],
+                contexts: ['page'],
                 hide: 1,
                 action: function () {
                     var track = engine.playlist.getCurrentTrack();
@@ -920,6 +920,27 @@ window.view = function () {
             state.time_text = time;
         }
     };
+    var checkLaunchData = function() {
+        if (window._launchData === undefined) {
+            return;
+        }
+        if (window._launchData.items !== undefined) {
+            var entrys = [];
+            window._launchData.items.forEach(function (item) {
+                entrys.push(item.entry);
+            });
+            engine.files.readAnyFiles(entrys);
+        } else
+        if (window._launchData.url !== undefined) {
+            engine.open([{url: window._launchData.url}], {name: "URL"});
+        }
+        window._launchData = undefined;
+    };
+    chrome.runtime.onMessage.addListener(function (message) {
+        if (message === '_check_launchData_') {
+            checkLaunchData();
+        }
+    });
     return {
         show : function () {
             dom_cache.body = $(document.body);
@@ -1089,6 +1110,7 @@ window.view = function () {
                     dom_cache.drop_layer.removeClass('dropped');
                 }, 300);
             });
+            checkLaunchData();
             var bounds_timer;
             var next_step;
             chrome.app.window.current().onBoundsChanged.addListener(function () {

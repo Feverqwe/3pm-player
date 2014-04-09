@@ -1,4 +1,5 @@
 (function() {
+    var launchDataStore = undefined;
     var checkWindowPosition = function(position) {
         var screen_width = screen.width,
                 screen_height = screen.height,
@@ -45,6 +46,8 @@
                 sub_window._language = storage.lang;
                 sub_window._windows = {player: window};
                 sub_window._settings = {};
+                sub_window._launchData = launchDataStore;
+                launchDataStore = undefined;
             });
         });
     };
@@ -52,13 +55,24 @@
         chrome.runtime.sendMessage('_player_', function(res) {
             if (res === undefined) {
                 create_player();
+                return;
             }
+            var windows = chrome.app.window.getAll();
+            windows.forEach(function(win) {
+                var sub_window = win.contentWindow;
+                if (sub_window.engine !== undefined) {
+                    sub_window._launchData = launchDataStore;
+                    chrome.runtime.sendMessage('_check_launchData_');
+                    launchDataStore = undefined;
+                }
+            });
         });
     };
     /**
      * @namespace chrome.app.runtime.onLaunched
      */
-    chrome.app.runtime.onLaunched.addListener(function() {
+    chrome.app.runtime.onLaunched.addListener(function(launchData) {
+        launchDataStore = launchData;
         run_player();
     });
     chrome.runtime.onMessageExternal.addListener(function(msg) {
