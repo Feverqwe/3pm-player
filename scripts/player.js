@@ -1354,13 +1354,13 @@ window.view = function () {
         },
         onSwitchMedia: function (audio) {
             var duration = 0;
-            if (state.error) {
-                state.error = false;
-                changeStateIcon(audio);
-            }
             if ( state.duration !== duration ) {
                 state.duration = duration;
                 changeProgressBarMode();
+            }
+            if (state.error) {
+                state.error = false;
+                changeStateIcon(audio);
             }
             if (state.paused !== audio.paused) {
                 state.paused = true;

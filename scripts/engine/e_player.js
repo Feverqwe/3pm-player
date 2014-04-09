@@ -327,6 +327,9 @@ var engine_player = function(mySettings, myEngine) {
                     if (!audioPreload(track)) {
                         setMediaUrl(track,track.file.url);
                     }
+                } else
+                if (media_el.currentSrc === '') {
+                    e_player.open( e_player.current_id );
                 } else {
                     media_el.play();
                 }
