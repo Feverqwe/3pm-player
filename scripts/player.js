@@ -1055,9 +1055,9 @@ window.view = function () {
                 if (storage.volume === undefined) {
                     storage.volume = 100;
                 }
-                // state.volume = storage.volume;
-                // dom_cache.volumeBar.slider('value', state.volume);
-                // changeVolumeIcon(state.volume);
+                state.volume = storage.volume;
+                dom_cache.volumeBar.slider('value', state.volume);
+                changeVolumeIcon(state.volume);
                 engine.player.volume(state.volume);
             });
             engine.setHotkeys(document);
