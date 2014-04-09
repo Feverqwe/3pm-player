@@ -4,7 +4,7 @@ var engine_webui = function(mySettings, myEngine) {
     var settings = mySettings;
     var engine = myEngine;
     chrome.runtime.onMessage.addListener(function(msg) {
-        if (msg === 'settings_ready') {
+        if (msg === 'engine_ready') {
             if (settings.webui_run_onboot) {
                 e_webui.start();
             }
