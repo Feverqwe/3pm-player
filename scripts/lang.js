@@ -39,6 +39,7 @@ var get_lang = function(language) {
         vk_rec: '[ Suggested music ]',
         vk_pop: '[ Popular music ]',
         no_viz: 'Need install visualizatitoin extension!',
+        resize: 'To adjust the window to the size of the video',
         dialog: {
             back: 'Go Back',
             play_folder: 'Play folder',
@@ -130,6 +131,7 @@ var get_lang = function(language) {
         vk_rec: '[ Рекомендации ]',
         vk_pop: '[ Популярное ]',
         no_viz: 'Требуется расширение для визуализации',
+        resize: 'Подогнать окно к размеру видео',
         dialog: {
             back: 'Назад',
             play_folder: 'Воспроизвести директорию',

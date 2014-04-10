@@ -11,6 +11,7 @@ var video = function() {
         $('.btn.next').attr('title', _lang.next);
         $('.btn.scroll_up').attr('title', _lang.scroll_up);
         $('.btn.scroll_down').attr('title', _lang.scroll_down);
+        dom_cache.btnResize.attr('title', _lang.resize);
     };
     var showVolume = function (volume) {
         var value = parseInt(volume * 100);
@@ -90,6 +91,7 @@ var video = function() {
             dom_cache.bottom_panel = $('.bottom_panel');
             dom_cache.top_panel = $('.top_panel');
             dom_cache.volume_value = $('.volume_value');
+            dom_cache.btnResize = $('.controls .resize.btn');
             var_cache.bad_bump = 0;
             write_language();
             $('.close').on('click', function() {
@@ -153,7 +155,6 @@ var video = function() {
             dom_cache.btnNext = $('.controls .next.btn');
             dom_cache.btnScrolllUp = $('.controls .scroll_up.btn');
             dom_cache.btnScrolllDown = $('.controls .scroll_down.btn');
-            dom_cache.btnResize = $('.controls .resize.btn');
             dom_cache.track = $('.top_panel .track');
             dom_cache.progress_body = $('.bottom_panel .progress_body');
             dom_cache.progress = dom_cache.progress_body.children('.progress');
