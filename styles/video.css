@@ -88,7 +88,7 @@ video {
 .mouse_panel .controls ul {
     padding: 0;
     margin: 0 auto;
-    width: 312px;
+    width: 375px;
     height: 30px;
 }
 .mouse_panel .controls li {
@@ -123,6 +123,11 @@ video {
 .mouse_panel .controls li.next {
     background-image: url(../images/playback_next_w.png);
     background-position-y: 6px;
+}
+.mouse_panel .controls li.resize {
+    background-image: url(../images/resize_w.png);
+    background-position-y: 7px;
+    background-size: 14px;
 }
 .mouse_panel .controls li.btn {
     cursor: pointer;

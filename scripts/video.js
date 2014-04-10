@@ -115,11 +115,9 @@ var video = function() {
             });
             $('body').on('mousemove', '.mouse_panel', function () {
                 show_panels();
-            });
-            $('body').on('mouseup', '.mouse_panel', function () {
+            }).on('mouseup', '.mouse_panel', function () {
                 show_panels(1);
-            });
-            $('body').on('mouseenter', '.mouse_panel', function () {
+            }).on('mouseenter', '.mouse_panel', function () {
                 show_panels(1);
             });
             show_panels();
@@ -155,18 +153,20 @@ var video = function() {
             dom_cache.btnNext = $('.controls .next.btn');
             dom_cache.btnScrolllUp = $('.controls .scroll_up.btn');
             dom_cache.btnScrolllDown = $('.controls .scroll_down.btn');
+            dom_cache.btnResize = $('.controls .resize.btn');
             dom_cache.track = $('.top_panel .track');
             dom_cache.progress_body = $('.bottom_panel .progress_body');
             dom_cache.progress = dom_cache.progress_body.children('.progress');
             dom_cache.info_left = dom_cache.progress_body.children('.info_left');
             dom_cache.info_right = dom_cache.progress_body.children('.info_right');
             dom_cache.progress_popup = $('.progress_popup');
-            dom_cache.video = $('video')[0];
-            $(dom_cache.video).on('play', function () {
+            dom_cache.$video = $('video');
+            dom_cache.video = dom_cache.$video[0];
+            dom_cache.$video.on('play', function () {
                 dom_cache.btnPlayPause.removeClass('play').addClass('pause');
                 chrome.power.requestKeepAwake('display');
             });
-            $(dom_cache.video).on('pause', function () {
+            dom_cache.$video.on('pause', function () {
                 dom_cache.btnPlayPause.removeClass('pause').addClass('play');
                 chrome.power.releaseKeepAwake();
             });
@@ -194,6 +194,27 @@ var video = function() {
                 _send('player', function (window) {
                     window.engine.player.position('-10');
                 });
+            });
+            dom_cache.btnResize.on('click', function () {
+                var win = chrome.app.window.current();
+                if (document.webkitIsFullScreen || document.webkitHidden || win.isMaximized()) {
+                    return;
+                }
+                var vh = dom_cache.video.videoHeight;
+                if (vh === 0) {
+                    return;
+                }
+                var vw = dom_cache.video.videoWidth;
+                var wh = window.innerHeight;
+                var ww = window.innerWidth;
+                if (wh - vh < ww - vw ) {
+                    ww = (vw * wh) / vh;
+                    console.log('b');
+                } else {
+                    wh = (vh * ww) / vw;
+                    console.log('a');
+                }
+                win.resizeTo( ww, wh );
             });
             _send('player', function(window) {
                 window.engine.setHotkeys(document);
@@ -282,7 +303,7 @@ var video = function() {
                     infoRight(max);
                 }
             });
-            $(dom_cache.video).on('volumechange', function () {
+            dom_cache.$video.on('volumechange', function () {
                 showVolume(this.volume);
             });
             dom_cache.control_panels.get(0).onmousewheel = function (e) {
