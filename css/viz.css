@@ -1,0 +1,71 @@
+html {
+    height: 100%;
+    background-color:#000;
+}
+body {
+    margin: 0;
+    -webkit-app-region: drag;
+    background-color: #000;
+    color: #C9C9C9;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 75%;
+    overflow: hidden;
+}
+.main {
+    position:fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+.need_addon {
+    text-align: center;
+    font-size: 300%;
+    color: #67C2FF;
+    -webkit-app-region: no-drag;
+    z-index: 1;
+    display: block;
+}
+.track {
+    z-index: 2;
+    position:fixed;
+    bottom: 20px;
+    left: 20px;
+    color: #fff;
+    font-size: 130%;
+    font-weight: bolder;
+    opacity: 0.8;
+}
+.t_btn {
+    background-size: 14px 14px;
+    height: 14px;
+    width: 14px;
+    float: right;
+    opacity: 0.45;
+    z-index: 50;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 2px;
+    background-color: #000;
+    border: 1px solid #525252;
+    border-radius: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.t_btn:hover {
+    opacity: 0.7;
+}
+.mini {
+    background-image: url('../img/__w.png');
+    right: 18px;
+}
+.close {
+    background-image: url('../img/x_w.png');
+    right: 2px;
+}
+.inFullscreen {
+    background-image: url('../img/fullscreen_w.png');
+    right: 34px;
+    background-size: 10px;
+}

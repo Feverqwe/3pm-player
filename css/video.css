@@ -1,0 +1,212 @@
+html {
+    height: 100%;
+    background-color:#000;
+}
+body {
+    margin: 0;
+    -webkit-app-region: drag;
+    background-color: #000;
+    color: #C9C9C9;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 75%;
+    overflow: hidden;
+}
+video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+.t_btn {
+    background-size: 14px 14px;
+    height: 14px;
+    width: 14px;
+    float: right;
+    opacity: 0.45;
+    z-index: 50;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 2px;
+    background-color: #000;
+    border: 1px solid #525252;
+    border-radius: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.t_btn:hover {
+    opacity: 0.7;
+}
+.mini {
+    background-image: url('../img/__w.png');
+    right: 18px;
+}
+.close {
+    background-image: url('../img/x_w.png');
+    right: 2px;
+}
+.inFullscreen {
+    background-image: url('../img/fullscreen_w.png');
+    right: 34px;
+    background-size: 10px;
+}
+.onTop {
+    background-image: url('../img/pin_w.png');
+    right: 50px;
+}
+.onTop.on {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.winResize {
+    background-image: url('../img/diagonal_w.png');
+    right: 66px;
+    background-size: 10px;
+}
+body.show .panel {
+    opacity: 1;
+}
+.panel {
+    position: absolute;
+    min-height: 30px;
+    -webkit-app-region: no-drag;
+    z-index: 10;
+    width: 100%;
+    opacity: 0;
+    transition: opacity .2s;
+}
+.panel.top {
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+.panel.bottom .controls_body {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+.panel.bottom {
+    bottom: 0;
+    left: 0;
+}
+.panel.top .title {
+    padding-right: 83px;
+    font-size: 19px;
+    padding-left: 5px;
+    word-wrap: break-word;
+}
+div.controls {
+    margin: 0 auto;
+    width: 300px;
+    height: 28px;
+}
+div.controls > div {
+    display: inline-block;
+    width: 60px;
+    height: 27px;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+div.controls > div:active {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+div.controls .prev {
+    background-image: url(../img/playback_prev_w.png);
+    background-position-y: 6px;
+}
+div.controls .playpause {
+    background-image: url(../img/playback_play_w.png);
+    background-position-y: 6px;
+}
+div.controls .paused {
+    background-image: url(../img/playback_pause_w.png);
+    background-position-y: 5px;
+}
+div.controls .next {
+    background-image: url(../img/playback_next_w.png);
+    background-position-y: 6px;
+}
+div.controls .scroll_down {
+    background-image: url(../img/playback_scroll_down_w.png);
+    background-position-y: 6px;
+}
+div.controls .scroll_up {
+    background-image: url(../img/playback_scroll_up_w.png);
+    background-position-y: 6px;
+}
+.progress_body .progress_bar {
+    height: 10px;
+}
+.progress_body .dec_line {
+    position: absolute;
+    top: 4px;
+    display: block;
+    width: 100%;
+    height: 5px;
+    background-color: rgba(0, 0, 0, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.33);
+    border-left: 0;
+    border-right: 0;
+}
+.progress_body .info_left {
+    position: absolute;
+    left: 4px;
+    top: 10px
+}
+.progress_body .info_right {
+    position: absolute;
+    right: 4px;
+    top: 10px
+}
+.progress_body .progress_bar {
+    z-index: 1;
+    position: relative;
+    cursor: pointer;
+}
+.progress_body .progress_bar > div {
+    background-color: #CC181E;
+    height: 5px;
+    z-index: 1;
+    position: absolute;
+    top: 5px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 1);
+}
+.progress_body .progress_bar > a {
+    background-color: rgb(255, 255, 255);
+    height: 5px;
+    width: 2px;
+    z-index: 2;
+    position: absolute;
+    top: 5px;
+}
+.progress_body .progress_bar > a:focus {
+    outline-color: #fff;
+}
+.progress_body > .popup {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.28);
+    padding-left: 2px;
+    padding-right: 2px;
+    border-radius: 2px;
+    z-index: 5;
+    margin-top: -15px;
+    margin-left: -15px;
+    color: #fff;
+}
+.volume_popup {
+    display: none;
+    font-size: 200%;
+    color: rgb(255, 255, 255);
+    position: absolute;
+    right: 5%;
+    top: 5%;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.28);
+    padding-bottom: 2px;
+    padding-left: 7px;
+    padding-right: 6px;
+    border-radius: 4px;
+    z-index: 15;
+}

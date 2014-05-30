@@ -1,0 +1,560 @@
+html {
+    height: 100%;
+}
+body {
+    margin: 0;
+    -webkit-app-region: drag;
+    background: -webkit-linear-gradient(top, #565A61 0%,#212125 120px,#212125 100%);
+    color: #C9C9C9;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 75%;
+}
+.t_btn {
+    background-size: 14px 14px;
+    height: 14px;
+    width: 14px;
+    float: right;
+    opacity: 0.45;
+    z-index: 50;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 2px;
+    background-color: #000;
+    border: 1px solid #525252;
+    border-radius: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.t_btn:hover {
+    opacity: 0.7;
+}
+.mini {
+    background-image: url('../img/__w.png');
+    right: 18px;
+}
+.close {
+    background-image: url('../img/x_w.png');
+    right: 2px;
+}
+.collections {
+    background-image: url(../img/select_w.png);
+    right: 34px;
+}
+div.title {
+    text-align: center;
+    margin-bottom: 2px;
+    color: #fff;
+    font-size: 110%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-left: 50px;
+    margin-right: 50px;
+    overflow: hidden;
+}
+
+div.drop.layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0.7;
+    color: #fff;
+    text-align: center;
+    display: none;
+    z-index: 11;
+    left: 0;
+    top: 0;
+}
+div.layer.drop > span {
+    display: block;
+    margin-top: 35px;
+    border: 1px dashed #fff;
+    width: 210px;
+    margin-left: 15%;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    padding-top: 8px;
+}
+div.layer.drop.dropped > span {
+    background-color: #6D6D6D;
+}
+
+div.controls {
+    margin-bottom: -49px;
+}
+div.controls > .btn {
+    display: inline-block;
+    height: 27px;
+    width: 59px;
+    background-repeat: no-repeat;
+    background-position: center;
+    -webkit-app-region: no-drag;
+    cursor: pointer;
+    border-right: 1px solid #000000;
+}
+div.controls .btn:active {
+    background-color: #161616;
+}
+div.controls div.shuffle {
+    background-image: url(../img/shuffle_w.png);
+    background-position-y: 4px;
+}
+div.controls div.loop {
+    background-image: url(../img/loop_w.png);
+    background-position-y: 7px;
+}
+div.controls div.loop.on {
+    background-image: url(../img/loop_on.png);
+}
+div.controls div.shuffle.on {
+    background-image: url(../img/shuffle_on.png);
+}
+div.controls div.sort {
+    background-image: url(../img/sort_w.png);
+    background-position-y: 5px;
+    position: relative;
+}
+div.controls div.sort:active {
+    background-color: transparent;
+}
+div.controls div.read_tags {
+    background-image: url('../img/read_tags_w.png');
+    right: 2px;
+}
+div.controls div.sort .popup {
+    display: none;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    top: -66px;
+    left: -40px;
+    width: 157px;
+    padding: 5px;
+}
+div.controls div.sort .popup > div {
+    padding-bottom: 2px;
+    padding-top: 1px;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-bottom: 1px solid #585858;
+}
+div.controls div.sort .popup > div:hover {
+    background-color: rgba(37, 79, 131, 0.75);
+    color: #fff;
+}
+div.controls div.sort .popup > div:last-child {
+    border-bottom: 0;
+}
+div.controls div.sort:hover .popup {
+    display: block;
+}
+
+.collectionList {
+    display: none;
+}
+.trackListStyle,
+.collectionList {
+    -webkit-app-region: no-drag;
+    height: calc(100% - 51px);
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    border-top: 1px solid #363636;
+    border-bottom: 1px solid #000;
+}
+.nextList {
+    height: auto;
+    position: absolute;
+    top: 18px;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: none;
+    z-index: 1;
+    padding: 2px;
+    min-height: 16px;
+    color: #C9C9C9;
+    border: 0;
+    border: 1px solid #818181;
+}
+.nextList.hidden {
+    visibility: hidden;
+}
+.nextList .emptyList {
+    text-align: center;
+    color: #ccc;
+}
+.nextList li .menu > div {
+    cursor: pointer;
+}
+.collectionList {
+    position: absolute;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.75);
+    width: 100%;
+    border-color: transparent;
+}
+.trackListStyle li {
+    list-style-type: none;
+    height: 39px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    position: relative;
+    cursor: pointer;
+    padding: 3px;
+    border-radius: 3px;
+}
+.nextList li {
+    cursor: default;
+}
+.trackListStyle li > .gr_line {
+    display: block;
+    background: -webkit-linear-gradient(left, transparent 0%, rgba(109, 109, 109, 1) 50%, transparent 100%);
+    height: 1px;
+    margin-top: -5px;
+    margin-bottom: 4px;
+}
+.trackListStyle > li:first-child > .gr_line {
+    background: none;
+}
+.trackListStyle > li.selected {
+    background-color: #39516F;
+    color: #fff;
+}
+.trackListStyle > li .cover {
+    height: 39px;
+    width: 39px;
+    display: block;
+    position: absolute;
+    background-size: 39px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.trackListStyle > li .cover.pic_none {
+    background-image: url(../img/no-cover.png);
+    background-repeat: no-repeat;
+}
+.trackListStyle > li > span {
+    margin-left: 42px;
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.trackListStyle > li .title {
+    margin-top: 5px;
+    font-size: 120%;
+}
+
+.trackListStyle .menu {
+    position: absolute;
+    right: 4px;
+    background-color: rgba(0, 0, 0, 0.7);
+    top: 13px;
+    height: 18px;
+    border-radius: 3px;
+    display: none;
+}
+.trackListStyle > li:hover .menu {
+    display: block;
+}
+.trackListStyle .menu > div {
+    width: 18px;
+    height: 18px;
+    opacity: 0.6;
+    background-position: center;
+    display: inline-block;
+    background-repeat: no-repeat;
+}
+.trackListStyle .menu > div:first-child {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+.trackListStyle .menu > div:last-child {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.trackListStyle .menu > div:hover {
+    background-color: rgba(0, 0, 0, 0.45);
+    opacity: 1;
+}
+.trackListStyle .menu > div.inNext {
+    background-image: url(../img/inNext_w.png);
+    position: relative;
+}
+.trackListStyle .menu > div.inNext:hover .nextList {
+    display: block;
+}
+.trackListStyle .menu > div.move,
+.trackListStyle .menu > div.sub_move{
+    background-image: url(../img/move_w.png);
+    cursor: n-resize;
+}
+.trackListStyle .menu > div.remove {
+    background-image: url(../img/x_w.png);
+    background-size: 16px 16px;
+}
+.trackListStyle > li.inline .menu {
+    top: 1px;
+}
+.trackListStyle > li.inline {
+    height: auto;
+    padding: 0;
+    margin: 0;
+    padding-bottom: 1px;
+    padding-right: 36px;
+}
+.trackListStyle > li.inline span {
+    margin: 0;
+    font-size: 120%;
+}
+.trackListStyle > li.inline .state {
+    width: 16px;
+    height: 16px;
+    float: left;
+}
+.trackListStyle > li.inline .title_artist_album {
+    padding-left: 3px;
+    padding-right: 3px;
+}
+.collectionList > li {
+    padding-left: 5px;
+    padding-right: 20px;
+    padding-top: 2px;
+    padding-bottom: 3px;
+    position: relative;
+    border-bottom: 1px solid #585858;
+    color: #c9c9c9;
+    cursor: pointer;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+.collectionList > li:hover {
+    background-color: rgba(37, 79, 131, 0.75);
+    color: #fff;
+}
+.collectionList > li .action {
+    position: absolute;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    right: 2px;
+    top: 2px;
+    background-image: url('../img/x.png');
+    background-size: 16px;
+    background-color: rgba(0, 0, 0, 0.61);
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.collectionList > li > .action:hover {
+    -webkit-filter: brightness(1.8);
+}
+.collectionList > li.selected {
+    background-color: rgba(37, 79, 131, 1);
+    color: rgba(255, 255, 255, 1);
+    cursor: default;
+}
+.collectionList > li:last-child {
+    border-bottom: 0;
+}
+.customScroll::-webkit-scrollbar {
+    height: 15px;
+    width: 15px;
+}
+.customScroll::-webkit-scrollbar-button {
+    height: 0;
+    width: 0;
+}
+.customScroll::-webkit-scrollbar-thumb:vertical {
+    background-clip: padding-box;
+    background-color: #565A61;
+    border: 5px solid transparent;
+    border-radius: 10px;
+    min-height: 20px;
+    min-width: 20px;
+    height: 5px;
+    width: 5px;
+}
+
+
+body.winamp {
+    background: -webkit-linear-gradient(left, #1c1c2c 0%,#383758 50%,#1d1d2d 100%);
+    font-size: 10px;
+    color: rgb(33, 248, 33);
+}
+.winamp div.title {
+    visibility: hidden;
+    margin-bottom: 6px;
+}
+.winamp .w_head {
+    background-image: url(../img/winamp/w_head.png);
+    height: 20px;
+    width: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.winamp .w_bottom {
+    background-image: url(../img/winamp/w_bottom.png);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 7px;
+}
+.winamp .w_b_l {
+    background-image: url(../img/winamp/w_b_l.png);
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 7px;
+    width: 11px;
+}
+.winamp .w_b_r {
+    background-image: url(../img/winamp/w_b_r.png);
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 7px;
+    width: 8px;
+}
+.winamp .w_l_t {
+    background-image: url(../img/winamp/w_l_t.png);
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 19px;
+    width: 11px;
+}
+.winamp .w_r_t {
+    background-image: url(../img/winamp/w_r_t.png);
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 20px;
+    width: 36px;
+}
+.winamp .w_left {
+    background-image: url(../img/winamp/w_left.png);
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 11px;
+}
+.winamp .w_right {
+    background-image: url(../img/winamp/w_right_c.png);
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+}
+.winamp ul.trackList {
+    background-color: #000;
+    margin-left: 11px;
+    background-image: url(../img/winamp/w_right.png);
+    background-repeat: repeat-y;
+    background-position-x: 100%;
+}
+.winamp .close {
+    background-image: url(../img/winamp/close.png) !important;
+    width: 7px;
+    height: 7px;
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    background-size: 7px 7px;
+    top: 4px;
+    right: 3px;
+    opacity: 1;
+    -webkit-filter: inherit;
+}
+.winamp .close:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.5);
+}
+.winamp .mini {
+    background-image: url(../img/winamp/mini.png) !important;
+    width: 7px;
+    height: 7px;
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    background-size: 7px 7px;
+    right: 14px;
+    top: 4px;
+    opacity: 1;
+    -webkit-filter: inherit;
+}
+.winamp .mini:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.5);
+}
+.winamp div.collections {
+    right: 21px;
+    border: 0;
+    background-color: initial;
+    -webkit-filter: brightness(1.7);
+    border-radius: 0;
+    top: 1px;
+}
+.winamp div.collections:hover {
+    -webkit-filter: brightness(5);
+}
+.winamp div.controls {
+    margin-left: 11px;
+    font-size: 12px;
+}
+.winamp div.controls div.sort .popup {
+    left: -57px;
+}
+.winamp ul.collectionList::-webkit-scrollbar-thumb:vertical,
+.winamp ul.trackList::-webkit-scrollbar-thumb:vertical {
+    border: 0;
+    border-radius: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-left-width: 1px;
+    border-right-width: 4px;
+}
+.winamp ul.trackList li {
+    padding: 0;
+    border-radius: 0;
+    margin-right: 15px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+.winamp ul.trackList li.selected {
+    background-color: #0000C6;
+}
+.winamp ul.trackList .menu {
+    top: 0px;
+}
+.winamp .nextList {
+    top: 16px;
+    color: rgb(33, 248, 33);
+    padding: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+.winamp ul.trackList li .nextList li {
+    margin-right: 0;
+    padding-right: 40px;
+}
+.winamp ul.collectionList {
+    width: auto;
+    background-color: #000;
+    margin-left: 11px;
+    background-image: url(../img/winamp/w_right.png);
+    background-repeat: repeat-y;
+    background-position-x: 100%;
+    font-size: 12px;
+}
+.winamp ul.collectionList li {
+    margin: 0;
+}

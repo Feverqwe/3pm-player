@@ -1,0 +1,158 @@
+html {
+    height: 100%;
+    overflow: auto;
+}
+body {
+    font-family: Verdana, sans-serif;
+    font-size: 0.84em;
+    margin: 0;
+}
+body > div {
+    width: 720px;
+    margin: 0 auto;
+}
+body > div.page {
+    display: none;
+}
+body > div.page.active {
+    display: block;
+}
+div.title {
+    font-size: 1.1em;
+}
+div.menu {
+    background-color: #e6e6e6;
+}
+a {
+    color: #0051D8;
+}
+div.menu > a {
+    display: inline-block;
+    font-size: 1.1em;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    color: #0051D8;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    margin-top: -1px;
+    margin-bottom: -1px;
+}
+div.menu > a.active {
+    text-decoration: none;
+    border-color: #ccc;
+    color: #000;
+}
+div.menu > a.btnSave {
+    float: right;
+    background-color: #fff;
+    border-color: #ccc !important;
+}
+div.menu > a.btnSave:hover {
+    background-color: #ebebeb;
+}
+div.menu > a.btnSave:active {
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+input {
+    font-size: 1em;
+}
+select {
+    font-size: 1em;
+}
+textarea {
+    font-size: 1em;
+}
+input[type="button"] {
+    font-size: 1em;
+}
+input[type="number"] {
+    width: 60px;
+}
+fieldset {
+    margin-top: 15px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+div.infoList {
+    border: 1px solid;
+    background-color: #f0f7fd;
+    border-color: #d0e3f0;
+    border-left-width: 5px;
+    border-radius: 0px;
+}
+div.infoList > div {
+    padding: 2px 4px;
+    border-radius: 4px;
+    background-color: #fff;
+}
+h1 {
+    font-size: 36px;
+    margin: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    line-height: 1.1;
+    box-sizing: border-box;
+    -webkit-margin-after: 0.2em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+div.btnTop {
+    display: none;
+    bottom: 0;
+    width: 50px;
+    height: 60px;
+    background: url(../img/go_top.png) no-repeat center bottom;
+    position: fixed;
+    right: 0;
+    z-index: 10;
+    cursor: pointer;
+    padding-top: 100%;
+    opacity: 0.9;
+}
+div.btnTop:hover {
+    background-color: #ddd;
+}
+span.key {
+    background-color: #f0f7fd;
+    border: 1px solid #d0e3f0;
+    border-radius: 0;
+    padding: 1px;
+    padding-left: 3px;
+    padding-right: 3px;
+    color: #c7254e;
+    margin-right: 7px;
+}
+.qrList {
+    text-align: center;
+}
+.qrList > div {
+    display: inline-block;
+    padding: 10px;
+    margin-top: 5px;
+    margin-right: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+.qrList > div > * {
+    display: block;
+}
+div.optionList > div {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+div.optionList > div > *:first-child {
+    margin-right: 7px;
+}
+div.bottom {
+    font-size: 0.8em;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: right;
+}
+span.author {
+    color: #82838e;
+}

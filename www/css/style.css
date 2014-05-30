@@ -3,28 +3,28 @@
     background-position: center;    
 }
 .btn.prev {
-    background-image: url(/images/playback_prev.png);
+    background-image: url(/img/playback_prev.png);
 }
 .btn.prev_10 {
-    background-image: url(/images/playback_prev_down.png);
+    background-image: url(/img/playback_prev_down.png);
 }
 .btn.play {
-    background-image: url(/images/playback_play.png);
+    background-image: url(/img/playback_play.png);
 }
 .btn.pause {
-    background-image: url(/images/playback_pause.png);
+    background-image: url(/img/playback_pause.png);
 }
 .btn.stop {
-    background-image: url(/images/playback_stop.png);
+    background-image: url(/img/playback_stop.png);
 }
 .btn.next {
-    background-image: url(/images/playback_next.png);
+    background-image: url(/img/playback_next.png);
 }
 .btn.next_10 {
-    background-image: url(/images/playback_next_up.png);
+    background-image: url(/img/playback_next_up.png);
 }
 .btn.playlist {
-    background-image: url(/images/playlist.png);
+    background-image: url(/img/playlist.png);
     background-position-y: 4px;
 }
 .playlist {
@@ -43,22 +43,22 @@ li a.selected {
     z-index: 10;
 }
 .btn.shuffle {
-    background-image: url(../images/shuffle.png);
+    background-image: url(../img/shuffle.png);
 }
 .btn.loop {
-    background-image: url(../images/loop.png);
+    background-image: url(../img/loop.png);
 }
 .btn.shuffle.on {
-    background-image: url(../images/shuffle_on.png);
+    background-image: url(../img/shuffle_on.png);
 }
 .btn.loop.on {
-    background-image: url(../images/loop_on.png);
+    background-image: url(../img/loop_on.png);
 }
 .btn.volume {
     font-weight: bolder;
 }
 .btn.read_tags {
-    background-image: url(../images/read_tags.png);
+    background-image: url(../img/read_tags.png);
 }
 .title {
     text-align: center;

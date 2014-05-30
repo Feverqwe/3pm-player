@@ -1,0 +1,723 @@
+html {
+    height: 100%;
+}
+body {
+    margin: 0;
+    -webkit-app-region: drag;
+    background: -webkit-linear-gradient(top, #565A61 0%,#212125 100%);
+    color: #C9C9C9;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 75%;
+}
+.player .image, .player > .track {
+    display: inline-block;
+}
+.player .track {
+    margin-left: 83px;
+    overflow: hidden;
+    max-height: 68px;
+}
+.player .track > div {
+    word-wrap: break-word;
+    text-overflow: ellipsis;
+}
+.player .track > div.name {
+    color: #fff;
+    font-size: 130%;
+    max-width: 232px;
+}
+.player .track > .name.scroller {
+    overflow: hidden;
+    -webkit-app-region: no-drag;
+}
+.player .track > .name.scroller > span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.player .track > .album {
+    font-size: 110%;
+    max-width: 232px;
+}
+.player .track > .album.scroller {
+    overflow: hidden;
+    -webkit-app-region: no-drag;
+}
+.player .track > .album.scroller > span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.player .image_box {
+    width: 81px;
+    height: 80px;
+    float: left;
+    margin-right: 4px;
+    border-right: 1px solid #5A5A5A;
+}
+.player .image {
+    width: 80px;
+    height: 80px;
+    left: 0;
+    top: 0;
+    position: absolute;
+    z-index: 10;
+    overflow: hidden;
+    border-right: 1px solid #000;
+    background-size: 80px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #1D1D1D;
+    background-image: url(../img/no-cover.png);
+}
+.player .box {
+    overflow: hidden;
+    height: 80px;
+}
+.player .info {
+    position: relative;
+}
+.player .info > span.time {
+    position: absolute;
+    top: -15px;
+    right: 3px;
+    -webkit-app-region: no-drag;
+}
+.player > div.controls > .btn {
+    display: inline-block;
+    height: 27px;
+    width: 59px;
+    background-repeat: no-repeat;
+    background-position: center;
+    -webkit-app-region: no-drag;
+    cursor: pointer;
+}
+div.progress_bar > *,
+div.volume_bar > * {
+    position: absolute;
+    top: 0;
+    height: 5px;
+}
+div.progress_bar > a.ui-slider-handle:focus,
+.player .volume_bar > a.ui-slider-handle:focus {
+    outline-color: #fff;
+}
+div.progress_bar {
+    background-color: #111111;
+    height: 5px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: relative;
+    border-top: 1px solid #3C3C3C;
+    border-bottom: 1px solid #3C3C3C;
+}
+div.progress_bar > div.ui-slider-range {
+    background: -webkit-linear-gradient(top, #F8D476 0%,#FF8500 100%);
+    z-index: 1;
+    box-shadow: 0px 0px 5px rgba(255, 155, 5, 0.7);
+}
+div.progress_bar > a.ui-slider-handle {
+    background-color: rgb(241, 241, 241);
+    width: 2px;
+    z-index: 2;
+}
+
+@-webkit-keyframes pre_progress_move {
+    0% {
+        background-position: 0 20px;
+    }
+    100% {
+        background-position: 20px 20px;
+    }
+}
+
+div.progress_bar.loading {
+    background-image: -webkit-gradient(linear, left top, right bottom,
+    color-stop(.25, rgba(255, 255, 255, .1)),
+    color-stop(.25, transparent),
+    color-stop(.5, transparent),
+    color-stop(.5, rgba(255, 255, 255, .1))
+    );
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    -webkit-animation: pre_progress_move 1s linear infinite;
+}
+div.player > div.progress_bar.stream {
+    cursor: default;
+}
+div.progress_bar.stream > a.ui-slider-handle {
+    display: none;
+}
+div.progress_bar.stream > div.ui-slider-range {
+    width: 100% !important;
+    background-image: -webkit-gradient(linear, left top, right bottom,
+    color-stop(.25, rgba(255, 255, 255, .1)),
+    color-stop(.25, transparent),
+    color-stop(.5, transparent),
+    color-stop(.5, rgba(255, 255, 255, .1))
+    );
+    box-shadow: none;
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    background-color: transparent;
+    -webkit-animation: pre_progress_move 1s linear infinite;
+}
+div.progress_bar > div.preloadBar {
+    width: 100%;
+}
+div.progress_bar > div.preloadBar > div {
+    position: absolute;
+    top: 0;
+    height: 5px;
+    background-image: -webkit-gradient(linear, left top, right bottom,
+    color-stop(.25, rgba(255, 255, 255, .1)),
+    color-stop(.25, transparent),
+    color-stop(.5, transparent),
+    color-stop(.5, rgba(255, 255, 255, .1))
+    );
+    background-color: rgb(31, 31, 31);
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    -webkit-animation: pre_progress_move 1s linear infinite;
+}
+div.progress_bar.download > div.ui-slider-range,
+div.progress_bar.download > a.ui-slider-handle {
+    opacity: 0.6;
+    background: #fff;
+    box-shadow: 0px 0px 5px #fff;
+}
+div.progress_bar > div.downloadBar {
+    background-image: -webkit-gradient(linear, left top, right bottom,
+    color-stop(.25, rgba(255, 255, 255, .1)),
+    color-stop(.25, transparent),
+    color-stop(.5, transparent),
+    color-stop(.5, rgba(255, 255, 255, .1))
+    );
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    background-color: rgb(0, 78, 175);
+    -webkit-animation: pre_progress_move 1s linear infinite;
+}
+.player .volume_container {
+    display: inline-block;
+    background-color: initial;
+    width: 62px;
+    position: relative;
+    margin-right: 5px;
+    height: 27px;
+    -webkit-app-region: no-drag;
+}
+.player .volume_bar {
+    height: 5px;
+    background-color: #111111;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid #3C3C3C;
+    margin-top: 11px;
+}
+.player .volume_bar > div {
+    background: -webkit-linear-gradient(top, #F8D476 0%,#FF8500 100%);
+    position: absolute;
+    z-index: 1;
+    height: 5px;
+    box-shadow: 0px 0px 5px rgba(255, 155, 5, 0.7);
+}
+.player .volume_bar > a.ui-slider-handle {
+    background-color: rgb(241, 241, 241);
+    position: absolute;
+    z-index: 2;
+    height: 5px;
+    width: 2px;
+}
+.player > div.controls .btn {
+    border-right: 1px solid #000000;
+}
+.player > .controls .btn.volume_icon {
+    width: 16px;
+    background-image: url(../img/sound_high_w.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-right: 0;
+}
+.player > .controls > .btn.volume_icon.v100 {
+    background-image: url(../img/sound_high_w.png);
+}
+.player > .controls > .btn.volume_icon.v50 {
+    background-image: url(../img/sound_medium_w.png);
+}
+.player > .controls > .btn.volume_icon.v10 {
+    background-image: url(../img/sound_low_w.png);
+}
+.player > .controls > .btn.volume_icon.v0 {
+    background-image: url(../img/sound_zero_w.png);
+}
+.player > .controls > .btn.volume_icon.muted {
+    background-image: url(../img/sound_mute_w.png);
+}
+.player > div.controls .btn:active {
+    background-color: #161616;
+}
+.player > div.controls .prev {
+    background-image: url(../img/playback_prev_w.png);
+    background-position-y: 6px;
+}
+.player > div.controls .playpause {
+    background-image: url(../img/playback_play_w.png);
+    background-position-y: 6px;
+}
+.player > div.controls .paused {
+    background-image: url(../img/playback_pause_w.png);
+    background-position-y: 5px;
+}
+.player > div.controls .stop {
+    background-image: url(../img/playback_stop_w.png);
+    background-position-y: 5px;
+}
+.player > div.controls .next {
+    background-image: url(../img/playback_next_w.png);
+    background-position-y: 6px;
+}
+.player > div.controls .playlist {
+    background-image: url(../img/playlist_w.png);
+    background-position-y: 4px;
+}
+div.drop.layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0.7;
+    color: #fff;
+    text-align: center;
+    display: none;
+    z-index: 11;
+    left: 0;
+    top: 0;
+}
+div.layer.drop > span {
+    display: block;
+    margin-top: 35px;
+    border: 1px dashed #fff;
+    width: 210px;
+    margin-left: 15%;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    padding-top: 8px;
+}
+div.layer.drop.dropped > span {
+    background-color: #6D6D6D;
+}
+div.engine {
+    display: none;
+}
+div.stateIcon {
+    height: 20px;
+    width: 20px;
+    display: none;
+    margin-top: 3px;
+    margin-left: 2px;
+}
+div.stateIcon.waiting {
+    background: url(../img/loading.gif) center center no-repeat;
+    -webkit-filter: invert(0.84);
+    display: block;
+}
+div.stateIcon.error {
+    background: url(../img/error.png) center center no-repeat;
+    display: block;
+    opacity: 0.7;
+}
+.t_btn {
+    background-size: 14px 14px;
+    height: 14px;
+    width: 14px;
+    float: right;
+    opacity: 0.45;
+    z-index: 50;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 2px;
+    background-color: #000;
+    border: 1px solid #525252;
+    border-radius: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.t_btn:hover {
+    opacity: 0.7;
+}
+.mini {
+    background-image: url('../img/__w.png');
+    top: 18px;
+    right: 2px;
+}
+.close {
+    background-image: url('../img/x_w.png');
+    right: 2px;
+}
+.t_btn.menu {
+    background-image: url('../img/menu_w.png');
+    top: 34px;
+    right: 2px;
+    background-position: center;
+    background-size: 10px;
+}
+.selectFile.layer {
+    position: absolute;
+    left: 90px;
+    top: 20px;
+    font-size: 18px;
+    color: #ccc;
+    border: 1px dashed #ccc;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    -webkit-app-region: no-drag;
+    width: 218px;
+    padding-top: 6px;
+    padding-bottom: 8px;
+}
+.selectFile.layer input {
+    display: none;
+}
+div.volume_scroll {
+    -webkit-app-region: no-drag;
+}
+div.volume_scroll > div.image {
+    -webkit-app-region: drag;
+}
+div.pl_state {
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: -13px;
+    left: 82px;
+}
+div.s_btn {
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: 13px;
+    cursor: pointer;
+    background-position-x: 3px;
+    height: 12px;
+    width: 19px;
+}
+div.s_btn.shuffle {
+    background-image: url(../img/shuffle_w.png);
+    background-position-y: -1px
+}
+div.s_btn.loop {
+    background-image: url(../img/loop_w.png);
+    background-position-y: 1px;
+    background-size: 14px;
+}
+div.s_btn.loop.on {
+    background-image: url(../img/loop_on.png);
+}
+div.s_btn.shuffle.on {
+    background-image: url(../img/shuffle_on.png);
+}
+
+
+body.winamp {
+    /*background: -webkit-linear-gradient(left, #1a1a29 0%,#39395a 48%,#1a1a29 100%);
+    border: 1px solid #000;
+    box-shadow: inset 0 0 1px 0 #000;*/
+    background: url(../img/winamp/w1.png) center center no-repeat;
+}
+.winamp .image,
+.winamp .selectFile.layer,
+.winamp .image_box{
+    display: none !important;
+}
+.winamp .info {
+    position: absolute;
+    top: 2.2em;
+    left: 40px;
+    z-index: 1;
+}
+.winamp .controls {
+    margin-left: 20px;
+}
+.winamp .volume_container {
+    position: absolute !important;
+    left: 110px;
+    top: 56px;
+    width: 58px !important;
+    height: 15px !important;
+}
+.winamp .track {
+    position: absolute;
+    margin-left: 0;
+    left: 111px;
+    top: 2em;
+    width: 153px;
+    overflow: hidden;
+}
+.winamp .track div.name {
+    white-space: nowrap;
+    font-size: 10px !important;
+    color: rgb(0, 218, 0) !important;
+    overflow: hidden;
+    -webkit-app-region: no-drag;
+}
+.winamp .track div.album {
+    display: none;
+}
+.winamp .player .progress_bar {
+    position: absolute;
+    left: 18px;
+    top: 73px;
+    width: 246px;
+    height: 8px;
+    background: none;
+    border: 0;
+}
+.winamp .player .progress_bar > div,
+.winamp .player .progress_bar > div.preloadBar > div,
+.winamp .player .progress_bar > a.ui-slider-handle {
+    height: 7px;
+}
+.winamp .close {
+    background-image: url(../img/winamp/close.png) !important;
+    width: 7px;
+    height: 7px;
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    background-size: 7px 7px;
+    top: 4px;
+    right: 3px;
+    opacity: 1;
+    -webkit-filter: inherit;
+}
+.winamp .close:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.5);
+}
+.winamp .mini {
+    background-image: url(../img/winamp/mini.png) !important;
+    width: 7px;
+    height: 7px;
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    background-size: 7px 7px;
+    right: 14px;
+    top: 4px;
+    opacity: 1;
+    -webkit-filter: inherit;
+}
+.winamp .mini:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.5);
+}
+.winamp .t_btn.menu {
+    left: 6px;
+    top: 4px;
+    background-image: url('../img/winamp/menu.png');
+    background-size: 9px 7px;
+    width: 9px;
+    height: 7px;
+    border-radius: 0;
+    border: 0;
+    background-color: inherit;
+    opacity: 1;
+    -webkit-filter: inherit;
+    right: auto;
+    background-position: center;
+}
+.winamp .t_btn.menu:hover {
+    opacity: 1;
+    -webkit-filter: brightness(1.5);
+}
+.winamp .player > .controls > .btn {
+    background-image: url(../img/winamp/btns.png) !important;
+    background-position: 0;
+    margin-top: 6px;
+    border: 0;
+    width: 23px;
+    height: 18px;
+}
+.winamp .player > .controls > .btn.playlist {
+    display: none;
+}
+.winamp .player > .controls > .btn.volume_icon {
+    display: none;
+}
+.winamp .player > .controls > .btn.playpause {
+    background-position-x: -22px;
+}
+.winamp .player > .controls > .btn.paused {
+    background-position-x: -45px;
+}
+.winamp .player > .controls > .btn.next {
+    background-position-x: -91px;
+}
+.winamp .player > .controls > .btn.prev {
+    background-position-x: 1px;
+}
+.winamp .player > .controls div.stateIcon {
+    position: absolute;
+    top: 90px;
+    left: 250px;
+}
+.winamp .player > .controls > .btn:active {
+    -webkit-filter: brightness(0.7);
+}
+.winamp .shuffle {
+    background-image: url(../img/winamp/shuffle.png);
+    position: absolute;
+    width: 47px;
+    height: 16px;
+    left: -26px;
+    top: 75px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+.winamp .shuffle.on {
+    background-position-y: 15px;
+}
+.winamp .loop {
+    background-image: url(../img/winamp/loop.png);
+    position: absolute;
+    width: 27px;
+    height: 13px;
+    left: 27px;
+    top: 76px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+.winamp .loop.on {
+    background-position-y: 13px;
+}
+.winamp .w_playlist:active,
+.winamp .shuffle:active,
+.winamp .loop:active {
+    -webkit-filter: brightness(0.7);
+}
+.winamp .w_playlist {
+    background-image: url(../img/winamp/pl.png);
+    position: absolute;
+    width: 22px;
+    height: 11px;
+    left: 242px;
+    top: 57px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+.winamp .volume_bar {
+    margin-top: 4px !important;
+}
+.winamp .volume_bar a.ui-slider-handle {
+    background-image: url(../img/winamp/vol.png);
+    width: 12px !important;
+    height: 9px !important;
+    top: -2px;
+    margin-left: -5px;
+    outline-width: 0px;
+}
+.winamp .progress_bar div.ui-slider-range {
+    background: initial;
+    box-shadow: none;
+}
+.winamp .progress_bar a.ui-slider-handle {
+    background-image: url(../img/winamp/progress.png);
+    width: 29px !important;
+    height: 10px !important;
+    top: -1px;
+    margin-left: -15px;
+    outline-width: 0px;
+}
+.winamp .progress_bar a.ui-slider-handle:active {
+    background-position-y: 10px;
+}
+.winamp .progress_bar > .preloadBar > div {
+    background-color: rgb(46, 46, 46);
+}
+.winamp .drop.layer span {
+    margin-left: 8%;
+}
+.winamp div.state {
+    background-image: url(../img/winamp/state.png);
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    top: 28px;
+    left: 25px;
+}
+.winamp[data-state="pause"] div.state {
+    background-position-y: 9px;
+}
+.winamp div.stereo {
+    background-image: url(../img/winamp/stereo.png);
+    position: absolute;
+    width: 58px;
+    height: 12px;
+    top: 41px;
+    left: 207px;
+}
+.winamp[data-state="pause"] div.stereo {
+    background-position-y: 12px;
+}
+.winamp div.w_kbps {
+    position: absolute;
+    top: 4.39em;
+    left: 110px;
+    font-size: 0.75em;
+    color: rgb(110, 248, 110) !important;
+}
+.winamp div.w_kHz {
+    position: absolute;
+    top: 4.39em;
+    left: 155px;
+    font-size: 0.75em;
+    color: rgb(110, 248, 110) !important;
+}
+.winamp[data-state="pause"] div.w_kbps,
+.winamp[data-state="pause"] div.w_kHz {
+    display: none;
+}
+.winamp .volume_bar div.ui-slider-range {
+    background: initial !important;
+    box-shadow: none !important;
+}
+.winamp .volume_bar {
+    box-shadow: inset 1px 1px 2px 0.3px #1A1A1A;
+}
+.winamp span.time {
+    width: 56px;
+    position: initial !important;
+    top: auto !important;
+    display: block;
+}
+.winamp span.time > div.wmp {
+    display: inline-block;
+    width: 9px;
+    height: 13px;
+    background-image: url(../img/winamp/num.png);
+    margin-left: 1px;
+}
+.winamp span.time > .s_10 {
+    margin-left: 7px !important;
+}
+.winamp .box.volume_scroll {
+    margin-top: 14px;
+    height: 66px;
+}
+@-webkit-keyframes onpausetime {
+    0% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 1;}
+}
+.winamp[data-state="pause"] span.time .wmp {
+    -webkit-animation: onpausetime 2s infinite;
+}
+.winamp .winamp_fft {
+    position: absolute;
+    bottom: 56px;
+    left: 22px;
+    -webkit-app-region: no-drag;
+}

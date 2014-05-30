@@ -2,16 +2,16 @@
     "manifest_version": 2,
     "name": "__MSG_appName__",
     "description": "__MSG_appDesc__",
-    "default_locale": "en",
-    "version": "0.7.92",
+    "default_locale": "ru",
+    "version": "0.8",
     "minimum_chrome_version": "23",
     "icons": {
-        "16": "icon_16.png",
-        "128": "icon_128.png"
+        "16": "img/icon_16.png",
+        "128": "img/icon_128.png"
     },
     "app": {
         "background": {
-            "scripts": ["scripts/background.js"]
+            "scripts": ["js/launcher.js"]
         }
     },
     "offline_enabled": true,
@@ -23,7 +23,7 @@
             "extensions": [
                 "mp3", "m4a", "ogg", "oga"
             ],
-            "title": "Audio player"
+            "title": "3pm-audio player"
         },
         "video": {
             "types": [
@@ -32,11 +32,12 @@
             "extensions": [
                 "mp4", "mov", "m4v"
             ],
-            "title": "Video player"
+            "title": "3pm-video player"
         }
     },
     "permissions": [
         {"mediaGalleries": ["read"]},
+        "alwaysOnTopWindows",
         "storage",
         "contextMenus", "fullscreen",
         "identity", "notifications",
@@ -49,11 +50,12 @@
         "https://dl.boxcloud.com/*",
         "https://*.livefilestore.com/*",
         "https://skydrive.live.com/",
-        "http://api.soundcloud.com/*",
+        "http://*.soundcloud.com/*",
+        "https://*.soundcloud.com/*",
         "http://userserve-ak.last.fm/*",
         "http://cdn.last.fm/*",
         "http://chart.apis.google.com/*",
         "http://images.amazon.com/*",
-        "https://api-v2.soundcloud.com/explore/*"
+        "https://api-web.soundcloud.com/explore/*"
     ]
 }
