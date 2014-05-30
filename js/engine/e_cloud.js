@@ -69,10 +69,17 @@ engine.cloud = function() {
                 if (responseURL.indexOf("expires_in=") !== -1) {
                     expires = parseInt(responseURL.replace(/.*expires_in=([0-9]*).*/, "$1"));
                 }
-                if (responseURL.indexOf("access_token=") === -1) {
-                    return console.log("Auth", type, "Token not found!", responseURL);
+                if (type === 'lastfm') {
+                    if (responseURL.indexOf("token=") === -1) {
+                        return console.log("Auth", type, "Token not found!", responseURL);
+                    }
+                    token = responseURL.replace(/.*token=([^&]*).*/, "$1");
+                } else {
+                    if (responseURL.indexOf("access_token=") === -1) {
+                        return console.log("Auth", type, "Token not found!", responseURL);
+                    }
+                    token = responseURL.replace(/.*access_token=([^&]*).*/, "$1");
                 }
-                token = responseURL.replace(/.*access_token=([^&]*).*/, "$1");
                 tokenStore.set(type, token, expires);
                 cb(token);
             }
