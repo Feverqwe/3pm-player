@@ -302,7 +302,8 @@ engine.lastfm = function() {
         if (tags.album !== undefined) {
             data.album = tags.album;
         }
-        if (duration !== Infinity) {
+        duration = parseInt(duration);
+        if (isNaN(duration) === false) {
             data.duration = duration;
         }
         var api_sig = apiCallSignature(data);
@@ -332,7 +333,8 @@ engine.lastfm = function() {
                     var_cache.scrobler_timer = setTimeout(function() {
                         var audio = engine.player.getMedia();
                         var pos = parseInt(audio.currentTime);
-                        if (pos === Infinity) {
+                        var _duration = parseInt(audio.duration);
+                        if (isNaN(pos) || duration !== _duration) {
                             return;
                         }
                         if (pos > 30 && (pos > audio.duration / 2 || pos > 60 * 3)) {
@@ -359,9 +361,7 @@ engine.lastfm = function() {
         if (tags.album !== undefined) {
             data.album = tags.album;
         }
-        if (duration !== Infinity) {
-            data.duration = duration;
-        }
+        data.duration = duration;
         var api_sig = apiCallSignature(data);
         $.ajax({
             type: "POST",
