@@ -55,7 +55,7 @@ engine.cloud = function() {
     }();
     var auth_getToken = function(type, url, cb) {
         if (var_cache.auth_dialog_count > 0) {
-            console.log("Auth", "More one opened dialod!", dialog_count);
+            console.log("Auth", "More one opened dialod!", var_cache.auth_dialog_count);
             return;
         }
         var_cache.auth_dialog_count++;

@@ -294,7 +294,7 @@ engine.lastfm = function() {
             artist: tags.artist,
             track: tags.title,
             format: 'json',
-            sk: session_key
+            sk: var_cache.session_key
         };
         if (tags.artist === undefined || data.track.length === 0) {
             return;
