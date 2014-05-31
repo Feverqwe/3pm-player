@@ -476,17 +476,32 @@ var dialog = function() {
             for (var i = 0, item; item = _config.collectionList[i]; i++) {
                 list.push( $('<li>', {class: (item.id !== undefined && item.id === _config.id)?'active':undefined }).data('index', i).append(
                     $('<div>', {'class': 'playlist icon'}),
-                    item.title
+                    $('<span>', {text: item.title})
                 ) );
             }
             dom_cache.body.append(
-                $('<ul>', {'class': 'collectionList customScroll'}).append(list).on('click', 'li', function(e) {
+                $('<ul>', {'class': 'collectionList customScroll'+( (_config.join)?' join':'' )}).append(list).on('click', 'li', function(e) {
                     e.preventDefault();
                     var $this = $(this);
                     var index = $this.data('index');
                     _config.cb( index );
                     chrome.app.window.current().close();
-                })
+                }),
+                _config.join && $('<div>', {'class': 'join_body'}).append(
+                    $('<input>', {type: 'button', name: 'join', value: chrome.i18n.getMessage('btnJoinPlaylistList') }).on('click', function(e) {
+                        e.preventDefault();
+                        var collectionList = _config.collectionList.splice(0);
+                        _config.collectionList.push({title: chrome.i18n.getMessage('playlist'), trackList: []});
+                        collectionList.forEach(function(collection) {
+                            if (collection.trackList === undefined) {
+                                return 1;
+                            }
+                            _config.collectionList[0].trackList = _config.collectionList[0].trackList.concat(collection.trackList);
+                        });
+                        _config.cb( 0 );
+                        chrome.app.window.current().close();
+                    })
+                )
             );
             return;
         }

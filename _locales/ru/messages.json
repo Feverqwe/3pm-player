@@ -90,5 +90,6 @@
     "key_ctrl_right": {"message": "Прокрутить вперед на 10 секунд"},
     "opt_info_osx_ctrl": {"message": "* Для OSX вместо Ctrl используется Command"},
     "opt_vk_foreign_tracks": {"message": "Только зарубежные треки"},
-    "opt_vk_tag_update": {"message": "Переписывать неправильные теги"}
+    "opt_vk_tag_update": {"message": "Переписывать неправильные теги"},
+    "btnJoinPlaylistList": {"message": "Объединить в один плейлист"}
 }

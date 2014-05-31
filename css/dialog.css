@@ -74,6 +74,9 @@ ul.collectionList {
     height: calc(100% - 20px);
     font-size: 14px;
 }
+ul.collectionList.join {
+    height: calc(100% - 44px);
+}
 ul.collectionList > li {
     padding: 2px;
     cursor: pointer;
@@ -84,6 +87,8 @@ ul.collectionList > li {
     background-repeat: no-repeat;
     padding-left: 3px;
     padding-right: 3px;
+    overflow: hidden;
+    padding-top: 8px;
 }
 ul.collectionList > li:first-child {
     background-image: none;
@@ -93,22 +98,26 @@ ul.collectionList > li:hover {
     color: #fff;
     border-radius: 3px;
 }
-ul.collectionList > li {
-    margin-top: 1px;
-    margin-bottom: 2px;
-    padding-top: 6px;
-    padding-bottom: 6px;
-}
 ul.collectionList > li div.icon.playlist {
-    width: 24px;
-    height: 24px;
-    float: left;
+    width: 32px;
+    height: 32px;
     display: inline-block;
-    background-image: url(../img/playlist_i_w.png);
-    background-size: 24px;
+    background-image: url(../img/no-cover.png);
+    background-size: 32px;
     background-repeat: no-repeat;
     margin-right: 5px;
-    margin-top: -2px;
+    float: left;
+    margin-top: -3px;
+}
+div.join_body {
+    -webkit-app-region: no-drag;
+    text-align: right;
+    height: 26px;
+    margin-top: -11px;
+    margin-right: 2px;
+}
+div.join_body > input[type="button"] {
+    height: 26px;
 }
 
 .customScroll::-webkit-scrollbar {
@@ -163,6 +172,7 @@ fieldset.url div.radioItem > input {
 .fl_body {
     height: 100%;
 }
+.join_body input[type="button"],
 .fl_body input[type="button"] {
     margin-top: 5px;
     float: right;
@@ -180,9 +190,11 @@ fieldset.url div.radioItem > input {
     outline: none;
     -webkit-app-region: no-drag;
 }
+.join_body input[type="button"]:hover,
 .fl_body input[type="button"]:hover {
     background-color: #424242;
 }
+.join_body input[type="button"]:active,
 .fl_body input[type="button"]:active {
     background-color: #585858;
 }

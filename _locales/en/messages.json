@@ -89,5 +89,6 @@
     "key_ctrl_right": {"message": "Scroll forward 10 seconds"},
     "opt_info_osx_ctrl": {"message": "* For OSX instead Ctrl use Command button"},
     "opt_vk_foreign_tracks": {"message": "Only foreign tracks"},
-    "opt_vk_tag_update": {"message": "Rewrite wrong tags"}
+    "opt_vk_tag_update": {"message": "Rewrite wrong tags"},
+    "btnJoinPlaylistList": {"message": "Merge into one playlist"}
 }

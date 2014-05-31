@@ -494,7 +494,7 @@ window.player = function () {
                 if (collections === undefined) {
                     return;
                 }
-                engine.wm.createWindow({type: 'm3u', config: {type: 'm3u', collectionList: collections, cb: function(index) {
+                engine.wm.createWindow({type: 'm3u', config: {type: 'm3u', collectionList: collections, join: 1, cb: function(index) {
                     engine.playlist.emptyPlaylist(function(){
                         engine.playlist.appendPlaylist(collections, function() {
                             engine.playlist.selectPlaylist(collections[index].id);
@@ -976,7 +976,7 @@ window.player = function () {
                 if (collections === undefined) {
                     return;
                 }
-                engine.wm.createWindow({type: 'm3u', config: {type: 'm3u', collectionList: collections, cb: function(index) {
+                engine.wm.createWindow({type: 'm3u', config: {type: 'm3u', collectionList: collections, join: 1, cb: function(index) {
                     engine.playlist.emptyPlaylist(function(){
                         engine.playlist.appendPlaylist(collections, function() {
                             engine.playlist.selectPlaylist(collections[index].id);

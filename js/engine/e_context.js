@@ -17,7 +17,7 @@ engine.context = function() {
                         if (collections === undefined) {
                             return;
                         }
-                        engine.wm.createWindow({type: 'm3u', config: {type: 'm3u', collectionList: collections, cb: function(index) {
+                        engine.wm.createWindow({type: 'm3u', config: {type: 'm3u', collectionList: collections, join: 1, cb: function(index) {
                             engine.playlist.emptyPlaylist(function(){
                                 engine.playlist.appendPlaylist(collections, function() {
                                     engine.playlist.selectPlaylist(collections[index].id);
@@ -34,7 +34,7 @@ engine.context = function() {
             action: function () {
                 chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function (entry) {
                     engine.files.readAnyFiles([entry], function(collections) {
-                        engine.wm.createWindow({type: 'm3u', config: {type: 'm3u', collectionList: collections, cb: function(index) {
+                        engine.wm.createWindow({type: 'm3u', config: {type: 'm3u', collectionList: collections, join: 1, cb: function(index) {
                             engine.playlist.emptyPlaylist(function(){
                                 engine.playlist.appendPlaylist(collections, function() {
                                     engine.playlist.selectPlaylist(collections[index].id);
@@ -64,7 +64,7 @@ engine.context = function() {
             contexts: ['page', 'launcher'],
             action: function () {
                 var collections = engine.playlist.memory.collectionList;
-                if (collections.length === 1) {
+                if (collections.length < 2) {
                     return;
                 }
                 var id = undefined;
