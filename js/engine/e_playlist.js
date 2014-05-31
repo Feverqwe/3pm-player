@@ -311,7 +311,9 @@ engine.playlist = function() {
                 collection.played.splice(pos, 1);
             }
             collection.played.push(id);
-            if (id !== collection.history[0]) {
+            // если воспроизвводится не из истории и треки не играю два раза подряд.
+            if (var_cache.track_history_index === 0
+                && id !== collection.history[0]) {
                 collection.history.unshift(id);
             }
         },
