@@ -150,7 +150,7 @@ engine.webui = function() {
         } else
         if (headerMap.url.substr(0, 4) === '/pl/') {
             var id = headerMap.url.substr(4);
-            engine.player.open(id);
+            engine.playlist.selectTrack(id);
             return response_(socketId, headerMap, api_player(), ['200 OK', 'Location: /', 'Cache-Control: no-cache', 'Content-Type: application/json']);
         } else
         if (headerMap.url.substr(0, 14) === '/set_playlist/') {
