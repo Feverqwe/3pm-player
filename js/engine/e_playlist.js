@@ -144,7 +144,6 @@ engine.playlist = function() {
                 }
             }
             if (_settings.shuffle) {
-                var track_history_len = collection.history.length;
                 if (var_cache.track_history_index !== 0) {
                     // идем вперед по истории
                     var_cache.track_history_index--;
@@ -155,7 +154,7 @@ engine.playlist = function() {
                     var n = 100;
                     var n_track_index = getRandomInt(0, track_list_len);
                     n_track_id = collection.trackList[n_track_index].id;
-                    if (track_history_len === collection.trackList.length) {
+                    if (collection.played.length === collection.trackList.length) {
                         collection.played = [];
                     }
                     while (collection.played.indexOf(n_track_id) !== -1 && n > 0) {
