@@ -70,8 +70,9 @@ engine.playlist = function() {
             var_cache.collection.played.splice(played_index, 1);
         }
         var history_index = var_cache.collection.history.indexOf(id);
-        if (history_index !== -1) {
+        while (history_index !== -1) {
             var_cache.collection.history.splice(history_index, 1);
+            history_index = var_cache.collection.history.indexOf(id);
         }
         if ( var_cache.collection.trackList.length === 0 ) {
             engine.playlist.removeColelction(var_cache.collection.id);
