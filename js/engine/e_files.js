@@ -180,7 +180,7 @@ engine.files = function() {
                 var proto_url = line.substr(0, 7).toLowerCase();
                 if (proto_url === "http://" || proto_url === "https:/") {
                     promiseList.push(new Promise(function(resolve){
-                        trackList.push({url: line, tags: {default: {title: trackName || line}}});
+                        trackList.push({url: line, type: '.mp3', tags: {default: {title: trackName || line}}});
                         resolve(true);
                     }));
                     return 1;
