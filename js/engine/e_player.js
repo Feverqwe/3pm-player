@@ -52,15 +52,17 @@ engine.player = function () {
         }
         var track = engine.playlist.memory.collection.trackObj[id];
         engine.tags.getTags(track, 0, function() {
-            engine.tags.readTrackTags(track);
             if (track.cloud !== undefined && engine.cloud[track.cloud.type].onTagReady !== undefined) {
                 engine.cloud[track.cloud.type].onTagReady(track);
             }
-            if (engine.playlist.memory.wait_tags) {
-                var tags = engine.tags.readTags(track);
-                var duration = media_el.duration;
-                engine.lastfm.nowPlaying(tags, duration);
-                engine.notification.updateInfo(track);
+            if (track.id === engine.playlist.memory.collection.track_id) {
+                engine.tags.readTrackTags(track);
+                if (engine.playlist.memory.wait_tags) {
+                    var tags = engine.tags.readTags(track);
+                    var duration = media_el.duration;
+                    engine.lastfm.nowPlaying(tags, duration);
+                    engine.notification.updateInfo(track);
+                }
             }
         });
     };
