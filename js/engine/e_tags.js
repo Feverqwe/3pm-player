@@ -325,12 +325,11 @@ engine.tags = function() {
             var read_item = function (track) {
                 next_item();
                 getTags(track, 1, function() {
-                    _send('playlist', function(window) {
-                        if (collection_id !== engine.playlist.memory.collection.id) {
-                            return;
-                        }
-                        window.playlist.updateTrack(track);
-                    });
+                    if (collection_id === engine.playlist.memory.collection.id) {
+                        _send('playlist', function(window) {
+                            window.playlist.updateTrack(track);
+                        });
+                    }
                     thread--;
                     next_item();
                 });
