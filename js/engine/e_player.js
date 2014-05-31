@@ -63,6 +63,11 @@ engine.player = function () {
                     engine.lastfm.nowPlaying(tags, duration);
                     engine.notification.updateInfo(track);
                 }
+            } else {
+                // трек уже сменился, а теги только газрузились.обновляем только плейлист.
+                _send('playlist', function(window) {
+                    window.playlist.updateTrack(track);
+                });
             }
         });
     };
