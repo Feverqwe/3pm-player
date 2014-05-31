@@ -5,7 +5,7 @@ engine.playlist = function() {
         collection: undefined,
         // индекс трека в массиве поспроизведенных треков.
         // Позволяет перемещаться по историит воспроизведения
-        track_history_index: -1
+        track_history_index: 0
     };
     var configureTrackList = function(collection) {
         if (collection.trackObj !== undefined) {
@@ -13,6 +13,7 @@ engine.playlist = function() {
         }
         var trackList = collection.trackList;
         var trackObj = collection.trackObj = {};
+        collection.history = [];
         collection.nextList = [];
         if (trackList === undefined || trackList.length === 0) {
             collection.trackList = [];
@@ -68,7 +69,10 @@ engine.playlist = function() {
         if (played_index !== -1) {
             var_cache.collection.played.splice(played_index, 1);
         }
-        var_cache.track_history_index = -1;
+        var history_index = var_cache.collection.history.indexOf(id);
+        if (history_index !== -1) {
+            var_cache.collection.history.splice(history_index, 1);
+        }
         if ( var_cache.collection.trackList.length === 0 ) {
             engine.playlist.removeColelction(var_cache.collection.id);
             return;
@@ -108,7 +112,7 @@ engine.playlist = function() {
             });
         },
         setShuffle: function (value) {
-            var_cache.track_history_index = -1;
+            var_cache.track_history_index = 0;
             if (value === undefined) {
                 value = (_settings.shuffle === 1)?0:1;
             }
@@ -139,15 +143,11 @@ engine.playlist = function() {
                 }
             }
             if (_settings.shuffle) {
-                var track_history_len = collection.played.length;
-                if (var_cache.track_history_index !== -1) {
+                var track_history_len = collection.history.length;
+                if (var_cache.track_history_index !== 0) {
                     // идем вперед по истории
-                    var_cache.track_history_index++;
-                    if (var_cache.track_history_index >= track_history_len) {
-                        var_cache.track_history_index = -1;
-                        return engine.playlist.nextTrack();
-                    }
-                    n_track_id = collection.played[ track_history_len - var_cache.track_history_index - 1];
+                    var_cache.track_history_index--;
+                    n_track_id = collection.history[ var_cache.track_history_index ];
                 } else {
                     var track_list_len = collection.trackList.length - 1;
                     // получаем случайны трек из списка, кроме воспроизведенных
@@ -184,15 +184,12 @@ engine.playlist = function() {
             }
             var p_track_id = undefined;
             if (_settings.shuffle) {
-                if (var_cache.track_history_index === -1) {
-                    var_cache.track_history_index = collection.played.length - 1;
-                }
-                if (var_cache.track_history_index <= 0) {
+                if (var_cache.track_history_index === collection.history.length - 1) {
                     // конец списка истории
                     return;
                 }
-                var_cache.track_history_index--;
-                p_track_id = collection.played[var_cache.track_history_index];
+                var_cache.track_history_index++;
+                p_track_id = collection.history[var_cache.track_history_index];
             } else {
                 var c_id = collection.track_id;
                 var c_track_index = collection.trackObj[c_id].index;
@@ -218,14 +215,12 @@ engine.playlist = function() {
                 } else {
                     if (collection.played.length === collection.trackList.length) {
                         // если все треки уже были проигранны
-                        if (var_cache.track_history_index !== -1 &&
-                            var_cache.track_history_index !== collection.played.length - 1) {
+                        if (var_cache.track_history_index !== 0) {
                             // если воспроизведение из истории, продолжаем пока история не закончится
                             engine.playlist.nextTrack();
                         } else {
-                            // если последний трек отиграл - нужно сбросить историю
+                            // если последний трек отиграл - нужно сбросить список воспроизведенных треков
                             console.log('trackEnd played reset!');
-                            var_cache.track_history_index = -1;
                             collection.played = [];
                         }
                     } else {
@@ -296,11 +291,10 @@ engine.playlist = function() {
                 var_cache.collection = playlist;
                 var collection = var_cache.collection;
                 collection.played = [];
-                var_cache.track_history_index = -1;
+                var_cache.track_history_index = 0;
                 _send('playlist', function(window) {
                     window.playlist.updatePlaylist(collection);
                 });
-                var_cache.track_history_index = -1;
                 var track_id = 0;
                 if (_settings.shuffle) {
                     var track_index = getRandomInt(0, playlist.trackList.length - 1);
@@ -317,9 +311,12 @@ engine.playlist = function() {
                 collection.played.splice(pos, 1);
             }
             collection.played.push(id);
+            if (id !== collection.history[0]) {
+                collection.history.unshift(id);
+            }
         },
         selectTrack: function( id ) {
-            var_cache.track_history_index = -1;
+            var_cache.track_history_index = 0;
             onOpenTrack(id);
         },
         removeTrack: removeTrack
