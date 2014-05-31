@@ -404,8 +404,8 @@ var playlist = function() {
         filename = filename || tags.title;
         return var_cache.nextObj[id] = $('<li>', {'class': 'inline'}).data('id', id).data('filename', filename).append(
             $('<span>', {'class': 'title_artist_album', title: tags.title_artist_album, text: tags.title_artist_album}),
-            $('<div>', {'class': 'menu'}).append(
-                $('<div>', {'class': 'remove', title: chrome.i18n.getMessage('btnRemove')}),
+            $('<div>', {'class': 'sub_menu'}).append(
+                $('<div>', {'class': 'sub_remove', title: chrome.i18n.getMessage('btnRemove')}),
                 $('<div>', {'class': 'sub_move', title: chrome.i18n.getMessage('btnMove')})
             )
         );
@@ -456,14 +456,14 @@ var playlist = function() {
                     window.engine.playlist.selectTrack(id);
                 });
             });
-            dom_cache.trackList.on('click', '> li > .menu > .remove', function(e) {
+            dom_cache.trackList.on('click', '.remove', function(e) {
                 e.stopPropagation();
                 var id = $(this).parent().parent().data('id');
                 _send('player', function(window) {
                     window.engine.playlist.removeTrack(id);
                 });
             });
-            dom_cache.trackList.on('click', '> li > .menu > .move', function(e) {
+            dom_cache.trackList.on('click', '.move', function(e) {
                 e.stopPropagation();
             });
             dom_cache.collectionList.on('click', 'li', function(e) {
@@ -533,7 +533,7 @@ var playlist = function() {
                     });
                 }
             });
-            dom_cache.nextList.on('click', '> li > .menu > .remove', function(e) {
+            dom_cache.nextList.on('click', '.sub_remove', function(e) {
                 e.stopPropagation();
                 e.preventDefault();
                 var $this = $(this);
@@ -555,8 +555,12 @@ var playlist = function() {
                     updateNextList(window.engine.playlist.memory.collection);
                 });
             });
-            dom_cache.trackList.on('click', '> li > .menu > .inNext', function(e) {
+            dom_cache.trackList.on('click', '.inNext', function(e) {
                 e.stopPropagation();
+                if (e.target.className.indexOf('inNext') === -1) {
+                    console.log('bad trigger');
+                    return;
+                }
                 var $this = $(this);
                 var id = $this.parent().parent().data('id');
                 _send('player', function(window) {
@@ -565,7 +569,7 @@ var playlist = function() {
                     updateNextList(window.engine.playlist.memory.collection);
                 });
             });
-            dom_cache.trackList.on('mouseover', '> li > .menu > .inNext', function(e) {
+            dom_cache.trackList.on('mouseover', '.inNext', function(e) {
                 var $this = $(this);
                 var id = $this.data('id');
                 if (var_cache.nextListID === id) {

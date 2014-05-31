@@ -185,7 +185,7 @@ div.controls div.sort:hover .popup {
     text-align: center;
     color: #ccc;
 }
-.nextList li .menu > div {
+.nextList li .sub_menu > div {
     cursor: pointer;
 }
 .collectionList {
@@ -246,7 +246,7 @@ div.controls div.sort:hover .popup {
     margin-top: 5px;
     font-size: 120%;
 }
-
+.trackListStyle .sub_menu,
 .trackListStyle .menu {
     position: absolute;
     right: 4px;
@@ -256,9 +256,11 @@ div.controls div.sort:hover .popup {
     border-radius: 3px;
     display: none;
 }
+.trackListStyle > li:hover .sub_menu,
 .trackListStyle > li:hover .menu {
     display: block;
 }
+.trackListStyle .sub_menu > div,
 .trackListStyle .menu > div {
     width: 18px;
     height: 18px;
@@ -267,14 +269,17 @@ div.controls div.sort:hover .popup {
     display: inline-block;
     background-repeat: no-repeat;
 }
+.trackListStyle .sub_menu > div:first-child,
 .trackListStyle .menu > div:first-child {
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
 }
+.trackListStyle .sub_menu > div:last-child,
 .trackListStyle .menu > div:last-child {
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
 }
+.trackListStyle .sub_menu > div:hover,
 .trackListStyle .menu > div:hover {
     background-color: rgba(0, 0, 0, 0.45);
     opacity: 1;
@@ -287,14 +292,16 @@ div.controls div.sort:hover .popup {
     display: block;
 }
 .trackListStyle .menu > div.move,
-.trackListStyle .menu > div.sub_move{
+.trackListStyle .sub_menu > div.sub_move {
     background-image: url(../img/move_w.png);
     cursor: n-resize;
 }
+.trackListStyle .sub_menu > div.sub_remove,
 .trackListStyle .menu > div.remove {
     background-image: url(../img/x_w.png);
     background-size: 16px 16px;
 }
+.trackListStyle > li.inline .sub_menu,
 .trackListStyle > li.inline .menu {
     top: 1px;
 }
@@ -532,6 +539,7 @@ body.winamp {
 .winamp ul.trackList li.selected {
     background-color: #0000C6;
 }
+.winamp ul.trackList .sub_menu,
 .winamp ul.trackList .menu {
     top: 0px;
 }
