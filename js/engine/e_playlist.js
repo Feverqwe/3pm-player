@@ -315,6 +315,9 @@ engine.playlist = function() {
             if (var_cache.track_history_index === 0
                 && id !== collection.history[0]) {
                 collection.history.unshift(id);
+                if (collection.history.length > 200) {
+                    collection.history.splice(-1);
+                }
             }
         },
         selectTrack: function( id ) {
