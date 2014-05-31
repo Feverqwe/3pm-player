@@ -405,7 +405,29 @@ var playlist = function() {
         return var_cache.nextObj[id] = $('<li>', {'class': 'inline'}).data('id', id).data('filename', filename).append(
             $('<span>', {'class': 'title_artist_album', title: tags.title_artist_album, text: tags.title_artist_album}),
             $('<div>', {'class': 'sub_menu'}).append(
-                $('<div>', {'class': 'sub_remove', title: chrome.i18n.getMessage('btnRemove')}),
+                $('<div>', {'class': 'sub_remove', title: chrome.i18n.getMessage('btnRemove')})
+                    .on('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    var $this = $(this);
+                    var id = $this.parent().parent().data('id');
+                    _send('player', function(window) {
+                        var nextList = window.engine.playlist.memory.collection.nextList;
+                        var index = undefined;
+                        for (var i = 0, track; track = nextList[i]; i++) {
+                            if (track.id !== id) {
+                                continue;
+                            }
+                            index = i;
+                            break;
+                        }
+                        if (index === undefined) {
+                            return;
+                        }
+                        nextList.splice(index, 1);
+                        updateNextList(window.engine.playlist.memory.collection);
+                    });
+                }),
                 $('<div>', {'class': 'sub_move', title: chrome.i18n.getMessage('btnMove')})
             )
         );
@@ -425,7 +447,33 @@ var playlist = function() {
             dom_cache.nextList.empty().addClass('hidden');
             return;
         }
-        dom_cache.nextList.empty().removeClass('hidden').append(var_cache.nextList);
+        dom_cache.nextList.empty().removeClass('hidden');
+        dom_cache.nextList.append(var_cache.nextList);
+        if (dom_cache.nextList.hasClass('ui-sortable')) {
+            dom_cache.nextList.sortable('refresh');
+        } else {
+            dom_cache.nextList.sortable({
+                handle: ".sub_move",
+                axis: "y",
+                stop: function () {
+                    _send('player', function (window) {
+                        var nextList = window.engine.playlist.memory.collection.nextList;
+                        var trackObj = window.engine.playlist.memory.collection.trackObj;
+                        var new_nextList = [];
+                        var $nextList = [];
+                        var arr = $.makeArray(dom_cache.nextList.children('li'));
+                        arr.forEach(function (item) {
+                            var $item = $(item);
+                            var id = $item.data('id');
+                            new_nextList.push(trackObj[id]);
+                            $nextList.push($item);
+                        });
+                        window.engine.playlist.memory.collection.nextList = new_nextList;
+                        var_cache.nextList = $nextList;
+                    });
+                }
+            });
+        }
     };
     return {
         show: function() {
@@ -449,7 +497,7 @@ var playlist = function() {
                 updateCollectionList(window.engine.playlist.memory.collectionList);
                 updatePlaylist(window.engine.playlist.memory.collection);
             });
-            dom_cache.trackList.on('click', 'li', function(e) {
+            dom_cache.trackList.on('click', '> li', function(e) {
                 e.preventDefault();
                 var id = $(this).data('id');
                 _send('player', function(window) {
@@ -512,53 +560,9 @@ var playlist = function() {
                     });
                 }
             });
-            dom_cache.nextList.sortable({
-                handle: ".sub_move",
-                axis: "y",
-                stop: function() {
-                    _send('player', function(window) {
-                        var nextList = window.engine.playlist.memory.collection.nextList;
-                        var trackObj = window.engine.playlist.memory.collection.trackObj;
-                        var new_nextList = [];
-                        var $nextList = [];
-                        var arr = $.makeArray(dom_cache.nextList.children('li'));
-                        arr.forEach(function(item) {
-                            var $item = $(item);
-                            var id = $item.data('id');
-                            new_nextList.push( trackObj[id] );
-                            $nextList.push( $item );
-                        });
-                        window.engine.playlist.memory.collection.nextList = new_nextList;
-                        var_cache.nextList = $nextList;
-                    });
-                }
-            });
-            dom_cache.nextList.on('click', '.sub_remove', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                var $this = $(this);
-                var id = $this.parent().parent().data('id');
-                _send('player', function(window) {
-                    var nextList = window.engine.playlist.memory.collection.nextList;
-                    var index = undefined;
-                    for (var i = 0, track; track = nextList[i]; i++) {
-                        if (track.id !== id) {
-                            continue;
-                        }
-                        index = i;
-                        break;
-                    }
-                    if (index === undefined) {
-                        return;
-                    }
-                    nextList.splice(index, 1);
-                    updateNextList(window.engine.playlist.memory.collection);
-                });
-            });
             dom_cache.trackList.on('click', '.inNext', function(e) {
                 e.stopPropagation();
                 if (e.target.className.indexOf('inNext') === -1) {
-                    console.log('bad trigger');
                     return;
                 }
                 var $this = $(this);
@@ -579,13 +583,6 @@ var playlist = function() {
                 var width = dom_cache.trackList.width();
                 dom_cache.nextList.css({left: -(width-60+14)+'px', width: (width-32)+'px'});
                 $this.append(dom_cache.nextList);
-            });
-            dom_cache.nextList.on('mouseover', function(e){
-                e.stopPropagation();
-            });
-            dom_cache.nextList.on('click', function(e){
-                e.stopPropagation();
-                e.preventDefault();
             });
             if (_settings.pineble_playlist === 1) {
                 chrome.app.window.current().onBoundsChanged.addListener(function () {

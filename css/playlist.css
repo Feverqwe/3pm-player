@@ -177,6 +177,8 @@ div.controls div.sort:hover .popup {
     color: #C9C9C9;
     border: 0;
     border: 1px solid #818181;
+    padding-left: 0;
+    padding-right: 0;
 }
 .nextList.hidden {
     visibility: hidden;
