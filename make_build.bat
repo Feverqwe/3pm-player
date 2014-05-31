@@ -33,8 +33,6 @@ java -jar compiler.jar --language_in ECMASCRIPT5 --js .\js\engine.min.js^
  --js_output_file .\build\js\engine.js
 rd /S /Q .\build\js\engine
 
-:: make id3-minimized.js
-java -jar compiler.jar --js .\js\id3-minimized.js --js_output_file .\build\js\id3-minimized.js
 :: make player.js
 java -jar compiler.jar --js .\js\player.js --js_output_file .\build\js\player.js
 :: make playlist.js
