@@ -304,6 +304,7 @@ engine.tags = function() {
             var thread = 0;
             var item_id = -1;
             var items = engine.playlist.memory.collection.trackList;
+            var collection_id = engine.playlist.memory.collection.id;
             var items_len = items.length;
             var next_item = function () {
                 if (thread < 5) {
@@ -325,6 +326,9 @@ engine.tags = function() {
                 next_item();
                 getTags(track, 1, function() {
                     _send('playlist', function(window) {
+                        if (collection_id !== engine.playlist.memory.collection.id) {
+                            return;
+                        }
                         window.playlist.updateTrack(track);
                     });
                     thread--;
