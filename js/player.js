@@ -18,7 +18,8 @@ window.player = function () {
         // состояние скина
         is_winamp: false,
         // кэш состояния empty
-        player_is_empty: true
+        player_is_empty: true,
+        change_cover_timer: undefined
     };
     var state = {
         paused: true,
@@ -55,8 +56,11 @@ window.player = function () {
             return;
         }
         state.picture = id;
+        clearTimeout(var_cache.change_cover_timer);
         if (id === undefined) {
-            dom_cache.picture.css('background-image', '');
+            var_cache.change_cover_timer = setTimeout(function() {
+                dom_cache.picture.css('background-image', '');
+            }, 250);
             return;
         }
         var url = engine.tags.cover[id].url;
