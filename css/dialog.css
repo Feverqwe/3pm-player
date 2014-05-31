@@ -110,7 +110,6 @@ ul.collectionList > li div.icon.playlist {
     margin-top: -3px;
 }
 div.join_body {
-    -webkit-app-region: no-drag;
     text-align: right;
     height: 26px;
     margin-top: -11px;
