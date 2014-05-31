@@ -129,8 +129,8 @@ engine.webui = function() {
         if (headerMap.url === '/favicon.ico') {
             headerMap.url = '/../img/icon_16.png';
         } else
-        if (headerMap.url === '/js/jquery-2.1.0.min.js') {
-            headerMap.url = '/../js/jquery-2.1.0.min.js';
+        if (headerMap.url === '/js/jquery-2.1.1.min.js') {
+            headerMap.url = '/../js/jquery-2.1.1.min.js';
         }
         if (headerMap.url.substr(0, 5) === '/img/') {
             headerMap.url = '/..' + headerMap.url;
