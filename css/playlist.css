@@ -56,8 +56,8 @@ div.title {
 
 div.drop.layer {
     position: absolute;
-    width: 100%;
     height: 100%;
+    width: 100%;
     background-color: #000;
     opacity: 0.7;
     color: #fff;
@@ -67,18 +67,23 @@ div.drop.layer {
     left: 0;
     top: 0;
 }
-div.layer.drop > span {
+div.drop.layer > div {
+    height: calc(50% - 2px);
+    position: relative;
+    overflow: hidden;
+}
+div.layer.drop span {
     display: block;
-    margin-top: 35px;
     border: 1px dashed #fff;
-    width: 210px;
-    margin-left: 15%;
-    padding: 10px;
     border-radius: 5px;
     font-size: 16px;
-    padding-top: 8px;
+    margin-top: calc(50% - 62px);
+    padding-top: 40px;
+    padding-bottom: 40px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
-div.layer.drop.dropped > span {
+div.layer.drop > .dropped span {
     background-color: #6D6D6D;
 }
 

@@ -134,7 +134,6 @@ var playlist = function() {
     };
     var updateCollectionList = function(collectionList) {
         var_cache.collectionList = {};
-        var_cache.selectedCollectionId = undefined;
         writeCollectionList(collectionList);
     };
     var updatePlaylist = function(collection) {
@@ -249,8 +248,13 @@ var playlist = function() {
                     var_cache.stateCollectionList = true;
                 }
             }),
-            $('<div>', {'class': 'drop layer'}).append(
-                $('<span>', {text: chrome.i18n.getMessage("onDropAppendText") })
+            dom_cache.drop_layer = $('<div>', {'class': 'drop layer'}).append(
+                $('<div>', {'class': 'append'}).append(
+                    $('<span>', {'class': 'append', text: chrome.i18n.getMessage("onDropAppendText") })
+                ),
+                $('<div>', {'class': 'newPlaylist'}).append(
+                    $('<span>', {'class': 'newPlaylist', text: chrome.i18n.getMessage("onDropNewPlaylistText") })
+                )
             ),
             dom_cache.collectionList = $('<ul>', {'class': 'collectionList customScroll'}),
             dom_cache.trackList = $('<ul>', {'class': 'trackList customScroll trackListStyle'}),
@@ -583,6 +587,52 @@ var playlist = function() {
                 var width = dom_cache.trackList.width();
                 dom_cache.nextList.css({left: -(width-60+14)+'px', width: (width-32)+'px'});
                 $this.append(dom_cache.nextList);
+            });
+            dom_cache.body.on('drop', function (e) {
+                /**
+                 * @namespace e.originalEvent.dataTransfer
+                 * @namespace e.originalEvent.dataTransfer.files
+                 */
+                e.preventDefault();
+                var append = false;
+                if (e.target.className.indexOf('append') !== -1) {
+                    append = true;
+                }
+                if (append) {
+                    dom_cache.drop_layer.children('.append').addClass('dropped');
+                } else {
+                    dom_cache.drop_layer.children('.newPlaylist').addClass('dropped');
+                }
+                var entryList = e.originalEvent.dataTransfer.items;
+                _send('player', function(window) {
+                    window.engine.files.readDropFiles(entryList, function(collections) {
+                        if (collections === undefined) {
+                            return;
+                        }
+                        if (append) {
+                            var _collection = {trackList: []};
+                            collections.forEach(function(collection) {
+                                _collection.trackList = _collection.trackList.concat(collection.trackList);
+                            });
+                            window.engine.playlist.appendTrack(_collection);
+                            return;
+                        }
+                        window.engine.playlist.appendPlaylist(collections, function() {
+                            if (!var_cache.stateCollectionList) {
+                                dom_cache.collectionList.show();
+                                var_cache.stateCollectionList = true;
+                            }
+                        });
+                    });
+                });
+            }).on('dragover', function (e) {
+                e.preventDefault();
+                dom_cache.drop_layer.css({"display": "block"});
+                clearTimeout(var_cache.drop_timer);
+                var_cache.drop_timer = setTimeout(function () {
+                    dom_cache.drop_layer.css({"display": "none"});
+                    dom_cache.drop_layer.children().removeClass('dropped');
+                }, 300);
             });
             if (_settings.pineble_playlist === 1) {
                 chrome.app.window.current().onBoundsChanged.addListener(function () {

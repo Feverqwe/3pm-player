@@ -7,7 +7,6 @@
     "btnMenu": {"message": "Menu"},
     "onLoading": {"message": "Loading..."},
     "onDropText": {"message": "Drag to open files"},
-    "onDropAppendText": {"message": "Add file"},
     "btnOpenPlaylist": {"message": "Playlist"},
     "btnPreviousTrack": {"message": "Previous track"},
     "btnPlayPause": {"message": "Pause \\ Playback"},
@@ -90,5 +89,7 @@
     "opt_info_osx_ctrl": {"message": "* For OSX instead Ctrl use Command button"},
     "opt_vk_foreign_tracks": {"message": "Only foreign tracks"},
     "opt_vk_tag_update": {"message": "Rewrite wrong tags"},
-    "btnJoinPlaylistList": {"message": "Merge into one playlist"}
+    "btnJoinPlaylistList": {"message": "Merge into one playlist"},
+    "onDropAppendText": {"message": "Add to current playlist"},
+    "onDropNewPlaylistText": {"message": "Add a new playlist"}
 }

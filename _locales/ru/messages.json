@@ -7,7 +7,6 @@
     "btnMenu": {"message": "Меню"},
     "onLoading": {"message": "Загрузка..."},
     "onDropText": {"message": "Перетащите что бы открыть"},
-    "onDropAppendText": {"message": "Добавить файл"},
     "btnOpenPlaylist": {"message": "Плейлист"},
     "btnPreviousTrack": {"message": "Предыдущий трек"},
     "btnPlayPause": {"message": "Пуза \\ Воспроизведение"},
@@ -91,5 +90,7 @@
     "opt_info_osx_ctrl": {"message": "* Для OSX вместо Ctrl используется Command"},
     "opt_vk_foreign_tracks": {"message": "Только зарубежные треки"},
     "opt_vk_tag_update": {"message": "Переписывать неправильные теги"},
-    "btnJoinPlaylistList": {"message": "Объединить в один плейлист"}
+    "btnJoinPlaylistList": {"message": "Объединить в один плейлист"},
+    "onDropAppendText": {"message": "Добавить файл в текущий список воспроизведения"},
+    "onDropNewPlaylistText": {"message": "Добавить как новый список воспроизведения"}
 }
