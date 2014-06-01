@@ -33,8 +33,8 @@ engine.playlist = function() {
                     track.tags = {default: {title: track.fileEntry.name}};
                 }
             }
-            if (track.isVideo === undefined) {
-                track.isVideo = engine.player.isVideo( track.type );
+            if (track.type === undefined) {
+                console.log('type not found!', track);
             }
             trackObj[track.id] = track;
             id++;

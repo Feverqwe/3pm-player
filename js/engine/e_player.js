@@ -232,11 +232,12 @@ engine.player = function () {
         bind_media_el();
         cb();
     };
-    var setPlayerMode = function(isVideo, cb) {
-        if (isVideo && state.video === true) {
+    var setPlayerMode = function(type, cb) {
+        var video = isVideo(type);
+        if (video && state.video === true) {
             return cb();
         }
-        if (isVideo) {
+        if (video) {
             state.video = true;
             engine.wm.createWindow({type: 'video', config: {cb: function(video) {
                 switchMediaEl(video, cb);
@@ -249,6 +250,17 @@ engine.player = function () {
             vw !== null && vw.close();
             cb();
         });
+    };
+    var isVideo = function(mime) {
+        if (mime[0] === '.') {
+            var ext = mime.substr(1);
+            return var_cache.allow_video_ext.indexOf(ext) !== -1;
+        }
+        var isVideo = false;
+        if (mime.substr(0, 5) === 'video') {
+            isVideo = true;
+        }
+        return isVideo;
     };
     return {
         allow_audio_ext: var_cache.allow_audio_ext,
@@ -272,7 +284,7 @@ engine.player = function () {
             _send('playlist', function(window) {
                 window.playlist.selectTrack(track.id);
             });
-            setPlayerMode(track.isVideo, function() {
+            setPlayerMode(track.type, function() {
                 getTrackURL(track, function(url) {
                     state.stoped = false;
                     state.url = undefined;
@@ -387,17 +399,6 @@ engine.player = function () {
             }
             var_cache.allow_mime[mime] = media_el.canPlayType(mime).length > 0;
             return var_cache.allow_mime[mime];
-        },
-        isVideo: function  (mime) {
-            if (mime[0] === '.') {
-                var ext = mime.substr(1);
-                return var_cache.allow_video_ext.indexOf(ext) !== -1;
-            }
-            var isVideo = false;
-            if (mime.substr(0, 5) === 'video') {
-                isVideo = true;
-            }
-            return isVideo;
         },
         getMedia: function () {
             return media_el;

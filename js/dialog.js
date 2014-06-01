@@ -529,7 +529,8 @@ var dialog = function() {
                         if (url.length === 0) {
                             return;
                         }
-                        var track = {url: url, type: '.mp3', isVideo: dom_cache.audio.prop('checked')?false:true, tags: {default: {title: url}} };
+                        var type = dom_cache.audio.prop('checked')?'.mp3':'.mp4';
+                        var track = {url: url, type: type, tags: {default: {title: url}} };
                         var collection = { title: chrome.i18n.getMessage('playlist'), trackList: [] };
                         collection.trackList.push(track);
                         _config.cb(collection);
