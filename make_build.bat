@@ -12,7 +12,7 @@ copy .\*.json .\build\.
 
 :: make www/main.js
 java -jar compiler.jar --js .\www\js\main.js --js_output_file .\build\www\js\main.js
-:: make background.js
+:: make launcher.js
 java -jar compiler.jar --js .\js\launcher.js --js_output_file .\build\js\launcher.js
 
 :: make engine.js
