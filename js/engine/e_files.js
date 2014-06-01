@@ -4,6 +4,28 @@ engine.files = function() {
         workers: 0,
         dirCache: {}
     };
+    var osxCharFix = (function() {
+        // only for cirilic filenames
+        if (window.navigator.platform.indexOf('Mac') === -1) {
+            return;
+        }
+        var checkChar = [
+            [String.fromCharCode(1080) + String.fromCharCode(774), 'й'],
+            [String.fromCharCode(1048) + String.fromCharCode(774), 'Й'],
+            [String.fromCharCode(1045) + String.fromCharCode(776), 'Ё'],
+            [String.fromCharCode(1077) + String.fromCharCode(776), 'ё']
+        ];
+        return function (text) {
+            checkChar.forEach(function(item) {
+                var word = item[0];
+                var repl = item[1];
+                while (text.indexOf(word) !== -1) {
+                    text = text.replace(word, repl);
+                }
+            });
+            return text;
+        }
+    })();
     var getEntryFromDir = function (entry, cb) {
         /**
          * @namespace entry.isDirectory
@@ -24,7 +46,11 @@ engine.files = function() {
         var i = -1;
         entryList.forEach(function(entry){
             i++;
-            var index = fileList.indexOf(entry.name);
+            var filename = entry.name;
+            if (osxCharFix !== undefined) {
+                filename = osxCharFix(filename);
+            }
+            var index = fileList.indexOf(filename);
             if ( index === -1 ) {
                 return 1;
             }
