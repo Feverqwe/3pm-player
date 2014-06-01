@@ -10,10 +10,10 @@ engine.files = function() {
             return;
         }
         var checkChar = [
-            [String.fromCharCode(1080) + String.fromCharCode(774), 'й'],
-            [String.fromCharCode(1048) + String.fromCharCode(774), 'Й'],
-            [String.fromCharCode(1045) + String.fromCharCode(776), 'Ё'],
-            [String.fromCharCode(1077) + String.fromCharCode(776), 'ё']
+            [String.fromCharCode(1080) + String.fromCharCode(774), String.fromCharCode(1081)],
+            [String.fromCharCode(1048) + String.fromCharCode(774), String.fromCharCode(1049)],
+            [String.fromCharCode(1045) + String.fromCharCode(776), String.fromCharCode(1025)],
+            [String.fromCharCode(1077) + String.fromCharCode(776), String.fromCharCode(1105)]
         ];
         return function (text) {
             checkChar.forEach(function(item) {
