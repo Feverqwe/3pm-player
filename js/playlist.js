@@ -617,12 +617,18 @@ var playlist = function() {
                             window.engine.playlist.appendTrack(_collection);
                             return;
                         }
-                        window.engine.playlist.appendPlaylist(collections, function() {
-                            if (!var_cache.stateCollectionList) {
-                                dom_cache.collectionList.show();
-                                var_cache.stateCollectionList = true;
-                            }
-                        });
+                        window.engine.wm.createWindow({type: 'm3u', config: {type: 'm3u', collectionList: collections, join: 1, cb: function(index) {
+                            window.engine.playlist.appendPlaylist(collections, function() {
+                                window.engine.playlist.selectPlaylist(collections[index].id);
+                            });
+                        }, onclose: function() {
+                            window.engine.playlist.appendPlaylist(collections, function() {
+                                if (!var_cache.stateCollectionList) {
+                                    dom_cache.collectionList.show();
+                                    var_cache.stateCollectionList = true;
+                                }
+                            });
+                        }}});
                     });
                 });
             }).on('dragover', function (e) {

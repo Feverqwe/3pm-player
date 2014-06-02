@@ -484,6 +484,7 @@ var dialog = function() {
                     e.preventDefault();
                     var $this = $(this);
                     var index = $this.data('index');
+                    _config.onclose = undefined;
                     _config.cb( index );
                     chrome.app.window.current().close();
                 }),
@@ -498,11 +499,17 @@ var dialog = function() {
                             }
                             _config.collectionList[0].trackList = _config.collectionList[0].trackList.concat(collection.trackList);
                         });
+                        _config.onclose = undefined;
                         _config.cb( 0 );
                         chrome.app.window.current().close();
                     })
                 )
             );
+            if (_config.onclose !== undefined) {
+                chrome.app.window.current().onClosed.addListener(function () {
+                    _config.onclose && _config.onclose();
+                });
+            }
             return;
         }
         if (type === 'url') {
