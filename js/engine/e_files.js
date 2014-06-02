@@ -47,10 +47,11 @@ engine.files = function() {
         entryList.forEach(function(entry){
             i++;
             var filename = entry.name;
-            if (osxCharFix !== undefined) {
-                filename = osxCharFix(filename);
-            }
             var index = fileList.indexOf(filename);
+            if ( index === -1 && osxCharFix !== undefined ) {
+                filename = osxCharFix(filename);
+                index = fileList.indexOf(filename);
+            }
             if ( index === -1 ) {
                 return 1;
             }
