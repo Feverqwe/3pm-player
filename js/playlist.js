@@ -634,6 +634,21 @@ var playlist = function() {
             }).on('dragover', function (e) {
                 e.preventDefault();
                 dom_cache.drop_layer.css({"display": "block"});
+                var divs = dom_cache.drop_layer.children('div');
+                var h = divs.eq(0).height();
+                var s = 44 / 2;
+                var top = (h - s) / 4;
+                var p_top = 0;
+                if (top > 20) {
+                    p_top = top;
+                } else {
+                    top = top*2;
+                }
+                dom_cache.drop_layer.find('span').css({
+                    'margin-top': top,
+                    'padding-top': p_top,
+                    'padding-bottom': p_top
+                });
                 clearTimeout(var_cache.drop_timer);
                 var_cache.drop_timer = setTimeout(function () {
                     dom_cache.drop_layer.css({"display": "none"});

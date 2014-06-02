@@ -77,9 +77,6 @@ div.layer.drop span {
     border: 1px dashed #fff;
     border-radius: 5px;
     font-size: 16px;
-    margin-top: calc(50% - 62px);
-    padding-top: 40px;
-    padding-bottom: 40px;
     margin-left: 10px;
     margin-right: 10px;
 }
