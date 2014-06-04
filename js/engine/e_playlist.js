@@ -12,6 +12,9 @@ engine.playlist = function() {
         var_cache.urlList.push(url);
     };
     var removeAllURLs = function() {
+        if (var_cache.urlList.length === 0) {
+            return;
+        }
         var_cache.urlList.forEach(function(url) {
             URL.revokeObjectURL(url);
         });
