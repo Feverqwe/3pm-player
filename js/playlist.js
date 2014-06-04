@@ -26,15 +26,17 @@ var playlist = function() {
         nextObj: {}
     };
     var setCollectionId = function(id) {
-        if (var_cache.selectedCollectionId !== id) {
-            if (var_cache.selectedCollectionId !== undefined) {
-                var_cache.collectionList[var_cache.selectedCollectionId].removeClass('selected');
-            }
-            var_cache.selectedCollectionId = id;
-            if (id !== undefined) {
-                var_cache.collectionList[id].addClass('selected');
-            }
+        if (var_cache.selectedCollectionId === id) {
+            return;
         }
+        if (var_cache.selectedCollectionId !== undefined) {
+            var_cache.collectionList[var_cache.selectedCollectionId].removeClass('selected');
+        }
+        var_cache.selectedCollectionId = id;
+        if (id === undefined) {
+            return;
+        }
+        var_cache.collectionList[id].addClass('selected');
     };
     var setTrackId = function(id) {
         if (var_cache.selectedTrackId === id) {
@@ -134,6 +136,7 @@ var playlist = function() {
                 $('<span>', {text: collection.title})
             ));
         });
+        var_cache.selectedCollectionId = undefined;
         dom_cache.collectionList.empty().append(list);
     };
     var updateCollectionList = function(collectionList) {
