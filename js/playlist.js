@@ -37,7 +37,7 @@ var playlist = function() {
         }
     };
     var setTrackId = function(id) {
-        if (var_cache.selectedTrackId === id) {
+        if (var_cache.selectedTrackId === id || id === undefined) {
             return;
         }
         if (var_cache.selectedTrackId !== undefined) {
