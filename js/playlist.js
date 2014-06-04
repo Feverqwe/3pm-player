@@ -32,10 +32,10 @@ var playlist = function() {
         if (var_cache.selectedCollectionId !== undefined) {
             var_cache.collectionList[var_cache.selectedCollectionId].removeClass('selected');
         }
-        var_cache.selectedCollectionId = id;
         if (id === undefined) {
             return;
         }
+        var_cache.selectedCollectionId = id;
         var_cache.collectionList[id].addClass('selected');
     };
     var setTrackId = function(id) {
@@ -101,6 +101,9 @@ var playlist = function() {
         });
     };
     var writeCollection = function(collection) {
+        $('style.covers').remove();
+        var_cache.coverList = [];
+        var_cache.trackObj = {};
         if (collection === undefined) {
             document.title = chrome.i18n.getMessage('playlist');
             dom_cache.title.text(chrome.i18n.getMessage('playlist'));
@@ -129,6 +132,7 @@ var playlist = function() {
         setTrackId(collection.track_id);
     };
     var writeCollectionList = function(collectionList) {
+        var_cache.collectionList = {};
         var list = [];
         collectionList.forEach(function(collection) {
             list.push( var_cache.collectionList[collection.id] = $('<li>').data('id', collection.id).append(
@@ -139,14 +143,7 @@ var playlist = function() {
         var_cache.selectedCollectionId = undefined;
         dom_cache.collectionList.empty().append(list);
     };
-    var updateCollectionList = function(collectionList) {
-        var_cache.collectionList = {};
-        writeCollectionList(collectionList);
-    };
     var updatePlaylist = function(collection) {
-        var_cache.coverList = [];
-        var_cache.trackObj = {};
-        $('style.covers').remove();
         writeCollection(collection);
         updateNextList(collection);
     };
@@ -504,7 +501,7 @@ var playlist = function() {
             playlistRender();
             _send('player', function(window) {
                 var_cache.readTags = window.engine.tags.readTags;
-                updateCollectionList(window.engine.playlist.memory.collectionList);
+                writeCollectionList(window.engine.playlist.memory.collectionList);
                 updatePlaylist(window.engine.playlist.memory.collection);
             });
             dom_cache.trackList.on('click', '> li', function(e) {
@@ -681,7 +678,7 @@ var playlist = function() {
         setShuffle: setShuffle,
         setLoop: setLoop,
         updatePlaylist: updatePlaylist,
-        updateCollectionList: updateCollectionList,
+        updateCollectionList: writeCollectionList,
         updateTrack: updateTrack,
         selectTrack: setTrackId,
         removeTrack: removeTrack,
