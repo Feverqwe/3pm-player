@@ -37,11 +37,15 @@ var playlist = function() {
         }
     };
     var setTrackId = function(id) {
-        if (var_cache.selectedTrackId === id || id === undefined) {
+        if (var_cache.selectedTrackId === id) {
             return;
         }
-        if (var_cache.selectedTrackId !== undefined) {
+        if (var_cache.selectedTrackId !== undefined &&
+            var_cache.trackObj[var_cache.selectedTrackId] !== undefined) {
             var_cache.trackObj[var_cache.selectedTrackId].removeClass('selected');
+        }
+        if (id === undefined) {
+            return;
         }
         var_cache.trackObj[id].addClass('selected');
         var_cache.selectedTrackId = id;
