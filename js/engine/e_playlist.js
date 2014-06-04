@@ -6,33 +6,16 @@ engine.playlist = function() {
         // индекс трека в массиве поспроизведенных треков.
         // Позволяет перемещаться по историит воспроизведения
         track_history_index: 0,
-        urlList: {}
+        urlList: []
     };
     var addURL = function(url) {
-        var id = var_cache.collection.id;
-        if (id === undefined) {
-            console.log('Error! Collection ID is', id);
-            return;
-        }
-        if (var_cache.urlList[id] === undefined) {
-            var_cache.urlList[id] = [];
-        }
-        var_cache.urlList[id].push(url);
-    };
-    var removeURLs = function(id) {
-        var list = var_cache.urlList[id];
-        if (list === undefined) {
-            return;
-        }
-        list.forEach(function(url) {
-            URL.revokeObjectURL(url);
-        });
-        delete var_cache.urlList[id];
+        var_cache.urlList.push(url);
     };
     var removeAllURLs = function() {
-        var_cache.collectionList.forEach(function(collection) {
-            removeURLs(collection.id);
+        var_cache.urlList.forEach(function(url) {
+            URL.revokeObjectURL(url);
         });
+        var_cache.urlList = [];
     };
     var configureTrackList = function(collection) {
         if (collection.trackObj !== undefined) {
@@ -150,6 +133,7 @@ engine.playlist = function() {
         }
     };
     var onOpenTrack = function(id) {
+        removeAllURLs();
         engine.playlist.memory.wait_tags = true;
         engine.notification.show( var_cache.collection.trackObj[id] );
         engine.player.open(id);
@@ -305,7 +289,6 @@ engine.playlist = function() {
             cb && cb();
         },
         emptyPlaylist: function(cb) {
-            removeAllURLs();
             engine.tags.emptyCovers();
             var_cache.collectionList = [];
             var_cache.idIndex = 0;
@@ -328,7 +311,6 @@ engine.playlist = function() {
                     window.playlist.updatePlaylist(var_cache.collection);
                 });
             }
-            removeURLs(id);
             cb && cb();
         },
         selectPlaylist: function(id) {
