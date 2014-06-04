@@ -40,8 +40,7 @@ var playlist = function() {
         if (var_cache.selectedTrackId === id) {
             return;
         }
-        if (var_cache.selectedTrackId !== undefined &&
-            var_cache.trackObj[var_cache.selectedTrackId] !== undefined) {
+        if (var_cache.selectedTrackId !== undefined) {
             var_cache.trackObj[var_cache.selectedTrackId].removeClass('selected');
         }
         if (id === undefined) {
@@ -123,6 +122,7 @@ var playlist = function() {
         if (!var_cache.is_winamp) {
             writeCoverList(coverList);
         }
+        var_cache.selectedTrackId = undefined;
         dom_cache.trackList.empty().append(var_cache.trackList);
         setTrackId(collection.track_id);
     };
@@ -143,7 +143,6 @@ var playlist = function() {
     var updatePlaylist = function(collection) {
         var_cache.coverList = [];
         var_cache.trackObj = {};
-        var_cache.selectedTrackId = undefined;
         $('style.covers').remove();
         writeCollection(collection);
         updateNextList(collection);
