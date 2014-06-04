@@ -22,12 +22,12 @@ engine.playlist = function() {
     var removeURLs = function(id) {
         var list = var_cache.urlList[id];
         if (list === undefined) {
-            console.log('Error! urlList', id, 'is', list);
             return;
         }
         list.forEach(function(url) {
             URL.revokeObjectURL(url);
         });
+        delete var_cache.urlList[id];
     };
     var removeAllURLs = function() {
         var_cache.collectionList.forEach(function(collection) {
