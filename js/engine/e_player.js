@@ -217,7 +217,9 @@ engine.player = function () {
         }
         if (track.fileEntry !== undefined) {
             track.fileEntry.file(function(file) {
-                return cb(window.URL.createObjectURL(file));
+                var objectURL = window.URL.createObjectURL(file);
+                engine.playlist.addURL(objectURL);
+                return cb(objectURL);
             });
         }
     };

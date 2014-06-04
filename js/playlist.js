@@ -540,7 +540,7 @@ var playlist = function() {
                 var collection = $this.parent();
                 var id = collection.data('id');
                 _send('player', function(window) {
-                    window.engine.playlist.removeColelction(id, function() {
+                    window.engine.playlist.removeCollection(id, function() {
                         collection.remove();
                     })
                 });
