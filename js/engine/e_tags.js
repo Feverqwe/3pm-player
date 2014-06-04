@@ -8,6 +8,13 @@ engine.tags = function() {
     var options = {
         hasGetMetadata: chrome.mediaGalleries.getMetadata !== undefined
     };
+    var emptyCovers = function() {
+        var_cache.coverList.forEach(function(item) {
+            URL.revokeObjectURL(item.url);
+        });
+        var_cache.coverList.splice(0);
+        var_cache.coverListByURL = {};
+    };
     var arrayChkSum = function (a) {
         var len = a.length;
         var c = 128;
@@ -300,6 +307,7 @@ engine.tags = function() {
         readTrackTags: readTrackTags,
         getTags: getTags,
         cover: var_cache.coverList,
+        emptyCovers: emptyCovers,
         readTrackList: function() {
             var thread = 0;
             var item_id = -1;

@@ -306,6 +306,7 @@ engine.playlist = function() {
         },
         emptyPlaylist: function(cb) {
             removeAllURLs();
+            engine.tags.emptyCovers();
             var_cache.collectionList = [];
             var_cache.idIndex = 0;
             cb && cb();
