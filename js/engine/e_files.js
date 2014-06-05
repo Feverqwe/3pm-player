@@ -200,7 +200,11 @@ engine.files = function() {
                 }
                 var trackName = lines[i - 1] || '';
                 if (trackName.substr(0,8) === '#EXTINF:') {
-                    trackName = trackName.substr(trackName.indexOf(',') + 1 + 8);
+                    var pos = trackName.indexOf(',');
+                    if (pos === -1) {
+                        pos = 7;
+                    }
+                    trackName = trackName.substr(pos + 1);
                 } else {
                     trackName = undefined;
                 }
