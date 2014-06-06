@@ -18,6 +18,8 @@
     "btnSort": {"message": "Сортировать список"},
     "btnReadAllTags": {"message": "Прочитать теги всех файлов"},
     "btnRemove": {"message": "Удалить"},
+    "btnRename": {"message": "Переименовать"},
+    "btnChange": {"message": "Изменить"},
     "ctx_open_files": {"message": "Открыть файлы"},
     "ctx_open_folder": {"message": "Открыть папку"},
     "ctx_open_folder_sub": {"message": "Открыть папку с подпапками"},

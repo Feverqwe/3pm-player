@@ -513,11 +513,12 @@ var dialog = function() {
             return;
         }
         if (type === 'url') {
+            var url = typeof _config.url === 'string' ? _config.url : '';
             dom_cache.body.append(
                 $('<fieldset>', {'class': 'url'}).append(
                     $('<form>').append(
                         $('<div>', {'class': 'urlForm'}).append(
-                            dom_cache.url = $('<input>', {type: 'text', placeholder: 'http://', text: _config.url}),
+                            dom_cache.url = $('<input>', {type: 'text', placeholder: 'http://', value: url}),
                             $('<input>', {type: 'submit', value: chrome.i18n.getMessage('open')})
                         ),
                         $('<div>').append(
@@ -553,6 +554,27 @@ var dialog = function() {
                 )
             );
             dom_cache.url.focus();
+        }
+        if (type === 'rename') {
+            dom_cache.body.append(
+                $('<fieldset>', {'class': 'rename'}).append(
+                    $('<form>').append(
+                        $('<div>').append(
+                            dom_cache.title = $('<input>', {type: 'text', placeholder: _config.title, value: _config.title}),
+                            $('<input>', {type: 'submit', value: chrome.i18n.getMessage('btnChange')})
+                        )
+                    ).on('submit', function(e) {
+                        e.preventDefault();
+                        var title = dom_cache.title.val();
+                        if (title.length === 0) {
+                            return;
+                        }
+                        _config.cb(title);
+                        chrome.app.window.current().close();
+                    })
+                )
+            );
+            dom_cache.title.focus();
         }
         if (_config.filelist !== undefined) {
             dom_cache.body.append(

@@ -18,6 +18,8 @@
     "btnSort": {"message": "Sort playlist"},
     "btnReadAllTags": {"message": "Read tags of all files"},
     "btnRemove": {"message": "Delete"},
+    "btnRename": {"message": "Rename"},
+    "btnChange": {"message": "Change"},
     "ctx_open_files": {"message": "Open files"},
     "ctx_open_folder": {"message": "Open folder"},
     "ctx_open_url": {"message": "Open URL"},

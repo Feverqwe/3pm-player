@@ -56,6 +56,14 @@ engine.wm = function() {
                 height: 600,
                 only: 1,
                 index: 'options.html'
+            },
+            rename: {
+                width: 400,
+                height: 60,
+                resizable: false,
+                frame: 'none',
+                index: 'dialog.html',
+                only: 1
             }
         }
     };
@@ -225,7 +233,9 @@ engine.wm = function() {
                     }
                     appWindow.contentWindow._send = sendToWindow;
                     appWindow.contentWindow._settings = _settings;
-                    engine.setHotkeys(appWindow.contentWindow.document);
+                    if (['rename'].indexOf(type) === -1) {
+                        engine.setHotkeys(appWindow.contentWindow.document);
+                    }
                 });
             });
         });

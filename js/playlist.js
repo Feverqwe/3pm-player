@@ -137,6 +137,7 @@ var playlist = function() {
         collectionList.forEach(function(collection) {
             list.push( var_cache.collectionList[collection.id] = $('<li>').data('id', collection.id).append(
                 $('<div>', {'class': 'action remove', title: chrome.i18n.getMessage('btnRemove')}),
+                $('<div>', {'class': 'action rename', title: chrome.i18n.getMessage('btnRename')}),
                 $('<span>', {text: collection.title})
             ));
         });
@@ -482,6 +483,17 @@ var playlist = function() {
             });
         }
     };
+    var renameCollection = function(id, title) {
+        var $collection = var_cache.collectionList[id];
+        if ($collection === undefined) {
+            return;
+        }
+        $collection.children('span').text(title);
+        if (var_cache.selectedCollectionId === id) {
+            document.title = title;
+            dom_cache.title.text(title);
+        }
+    };
     return {
         show: function() {
             dom_cache.body = $(document.body);
@@ -543,6 +555,21 @@ var playlist = function() {
                     window.engine.playlist.removeCollection(id, function() {
                         collection.remove();
                     })
+                });
+            });
+            dom_cache.collectionList.on('click', '.action.rename', function(e) {
+                e.stopPropagation();
+                var $this = $(this);
+                var $collection = $this.parent();
+                var id = $collection.data('id');
+                _send('player', function(window) {
+                    var collection = window.engine.playlist.getCollectionById(id);
+                    if (collection === undefined) {
+                        return;
+                    }
+                    window.engine.wm.createWindow({type: 'rename', config: {type: 'rename', title: collection.title, cb: function(title) {
+                        window.engine.playlist.renameCollection(id, title);
+                    }}});
                 });
             });
             dom_cache.trackList.sortable({
@@ -682,7 +709,8 @@ var playlist = function() {
         updateTrack: updateTrack,
         selectTrack: setTrackId,
         removeTrack: removeTrack,
-        updateNextList: updateNextList
+        updateNextList: updateNextList,
+        renameCollection: renameCollection
     }
 }();
 $(function(){

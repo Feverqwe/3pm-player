@@ -141,6 +141,19 @@ engine.playlist = function() {
         engine.notification.show( var_cache.collection.trackObj[id] );
         engine.player.open(id);
     };
+    var getCollectionById = function(id) {
+        var index = undefined;
+        for (var i = 0, item; item = var_cache.collectionList[i]; i++) {
+            if (id === item.id) {
+                index = i;
+                break;
+            }
+        }
+        if (index !== undefined) {
+            return var_cache.collectionList[index];
+        }
+        return undefined;
+    };
     return {
         setLoop: function (value) {
             if (value === undefined) {
@@ -297,6 +310,16 @@ engine.playlist = function() {
             var_cache.idIndex = 0;
             cb && cb();
         },
+        renameCollection: function(id, title) {
+            var collection = getCollectionById(id);
+            if (collection === undefined) {
+                return;
+            }
+            collection.title = title;
+            _send('playlist', function(window) {
+                window.playlist.renameCollection(id, title);
+            });
+        },
         removeCollection: function(id, cb) {
             var index = undefined;
             for (var i = 0, item; item = var_cache.collectionList[i]; i++) {
@@ -365,6 +388,7 @@ engine.playlist = function() {
             var_cache.track_history_index = 0;
             onOpenTrack(id);
         },
+        getCollectionById: getCollectionById,
         removeTrack: removeTrack,
         appendTrack: appendTrack,
         addURL: addURL

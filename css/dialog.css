@@ -153,10 +153,10 @@ fieldset.url div.urlForm > input {
     display: inline-block;
 }
 fieldset.url div.urlForm > input[type="text"] {
-    width: 290px;
+    width: 285px;
 }
 fieldset.url div.urlForm > input[type="submit"] {
-    width: 70px;
+    width: 75px;
     margin-left: 5px;
 }
 fieldset.url div.radioItem {
@@ -167,6 +167,19 @@ fieldset.url div.radioItem {
 fieldset.url div.radioItem > input {
     float: left;
     margin-top: 2px;
+}
+fieldset.rename > form > div {
+    margin-top: 6px;
+}
+fieldset.rename input {
+    -webkit-app-region: no-drag;
+}
+fieldset.rename input[type="text"] {
+    width: 290px;
+}
+fieldset.rename input[type="submit"] {
+    width: 70px;
+    margin-left: 5px;
 }
 .fl_body {
     height: 100%;
@@ -329,6 +342,9 @@ body.winamp {
     height: 100%;
     width: 4px;
 }
+.winamp .collectionList {
+    overflow-y: scroll;
+}
 .winamp .collectionList::-webkit-scrollbar-thumb:vertical,
 .winamp .menu::-webkit-scrollbar-thumb:vertical {
     border: 0;
@@ -357,6 +373,12 @@ body.winamp {
 .winamp ul.menu > li {
     border-radius: 0;
 }
+.winamp ul.collectionList.join {
+    height: calc(100% - 57px);
+}
+.winamp div.join_body {
+    margin-right: 6px;
+}
 .winamp fieldset.fl_body div.fl_list > div:hover,
 .winamp ul.collectionList > li:hover,
 .winamp ul.menu > li:hover {
@@ -367,6 +389,10 @@ body.winamp {
 }
 .winamp fieldset.url > form > div:last-child {
     margin-top: -5px;
+}
+.winamp fieldset.rename > form > div {
+    margin-top: 12px;
+    margin-left: 6px;
 }
 .winamp fieldset.fl_body {
     margin-top: 15px;
