@@ -633,7 +633,7 @@ engine.cloud = function() {
             });
         };
         var getExploreCategory = function(cb) {
-            var url = 'https://api.soundcloud.com/explore/v2?client_id=' + client_id;
+            var url = 'https://api-v2.soundcloud.com/explore/categories';
             $.ajax({
                 url: url,
                 dataType: 'JSON',
@@ -642,23 +642,15 @@ engine.cloud = function() {
                     /**
                      * @namespace data.categories
                      */
-                    if (data.categories === undefined) {
+                    if (data.music === undefined) {
                         cb(albums);
                         return;
                     }
-                    var cats = [];
-                    for (var key in data.categories) {
-                        if (!data.categories.hasOwnProperty(key)){
-                            continue;
-                        }
-                        cats.push(data.categories[key]);
-                    }
-                    cats.reverse();
-                    cats.forEach(function(subitem) {
-                        subitem.forEach(function(item) {
-                            var name = item.replace(/\+/g, ' ').replace(/%26/g, '&');
-                            albums.push({title: '[ ' + name + ' ]', cloud: {type: "sc", isExplore: true, name: name}});
-                        });
+                    var categoryList = data.music;
+                    categoryList = categoryList.concat(data.audio);
+                    categoryList.forEach(function(item) {
+                        var name = item.replace(/\+/g, ' ').replace(/%26/g, '&');
+                        albums.push({title: '[ ' + name + ' ]', cloud: {type: "sc", isExplore: true, name: name}});
                     });
                     cb(albums);
                 },
