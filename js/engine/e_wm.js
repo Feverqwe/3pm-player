@@ -176,6 +176,7 @@ engine.wm = function() {
         waitWindowClose(appWindow !== null ? type : undefined, function() {
             getWindowSize(options, function(position) {
                 if (type === 'm3u') {
+                    var len;
                     if (setup.config.collectionList !== undefined) {
                         len = setup.config.collectionList.length;
                     }
