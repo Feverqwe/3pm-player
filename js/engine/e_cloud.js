@@ -993,8 +993,7 @@ engine.cloud = function() {
         };
         var getToken = function(cb) {
             if (token !== undefined) {
-                cb();
-                return;
+                return cb();
             }
             token = tokenStore.get(type);
             if (token === undefined) {
