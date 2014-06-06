@@ -220,6 +220,9 @@ engine.player = function () {
                 var objectURL = window.URL.createObjectURL(file);
                 engine.playlist.addURL(objectURL);
                 return cb(objectURL);
+            }, function(e) {
+                cb();
+                console.log('getTrackURL:', e.name, 'Error code', e.code, ',', e.message);
             });
         }
     };

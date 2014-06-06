@@ -182,11 +182,17 @@ engine.files = function() {
         };
         fileEntry.file(function (file) {
             fileReader.readAsText(file);
+        }, function(e) {
+            cb();
+            console.log('openM3U:', e.name, 'Error code', e.code, ',', e.message);
         });
     };
 
     var readM3U = function(m3uEntry, entryList, cb) {
         openM3U(m3uEntry, function(content) {
+            if (content === undefined) {
+                return cb();
+            }
             var trackList = [];
             var promiseList = [];
             var lines = content.split('\n');
