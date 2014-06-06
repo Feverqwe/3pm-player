@@ -145,11 +145,27 @@ engine.wm = function() {
             appWindow.resizeTo(params.width);
         }
     };
+    var waitWindowClose = function(type, cb) {
+        if (type === undefined) {
+            return cb();
+        }
+        var waiting = function() {
+            setTimeout(function() {
+                var appWindow = chrome.app.window.get(type);
+                if (appWindow !== null) {
+                    return waiting();
+                }
+                return cb();
+            }, 250);
+        };
+        waiting();
+    };
     var createWindow = function (setup) {
         var type = setup.type;
         var options = _options.createWindow[type];
+        var appWindow = null;
         if (options.only || options.toggle) {
-            var appWindow = chrome.app.window.get(type);
+            appWindow = chrome.app.window.get(type);
             if (appWindow !== null) {
                 appWindow.close();
                 if (options.toggle === 1) {
@@ -157,57 +173,59 @@ engine.wm = function() {
                 }
             }
         }
-        getWindowSize(options, function(position) {
-            if (type === 'm3u') {
-                if (setup.config.collectionList !== undefined) {
-                    len = setup.config.collectionList.length;
-                }
-                if (len === 1) {
-                    // хак, если кол-во плейлистов - 1 то диалогового окна нету
-                    return setup.config.cb(0);
-                }
-            }
-            chrome.app.window.create(options.index, {
-                bounds: position,
-                frame: options.frame,
-                resizable: options.resizable,
-                id: type
-            }, function(appWindow) {
-                if (['menu', 'm3u', 'url', 'playlist', 'viz', 'video'].indexOf(type) !== -1) {
-                    appWindow.contentWindow.addEventListener('focus', function() {
-                        showAllWindowOnFocus(type);
-                    });
-                }
-                if (type === 'playlist') {
-                    if (_settings.pineble_playlist === 1 &&_settings.pined_playlist === 1) {
-                        setPinPosition('playlist', _settings.pin_position);
+        waitWindowClose(appWindow !== null ? type : undefined, function() {
+            getWindowSize(options, function(position) {
+                if (type === 'm3u') {
+                    if (setup.config.collectionList !== undefined) {
+                        len = setup.config.collectionList.length;
                     }
-                } else
-                if (type === 'video') {
-                    // stop playing
-                    appWindow.onClosed.addListener(function () {
-                        var viz_win = chrome.app.window.get('viz');
-                        if (viz_win === null) {
-                            chrome.power.releaseKeepAwake();
-                        }
-                        engine.player.closeVideo();
-                    });
-                } else if (type === 'viz') {
-                    // disconnect adapter
-                    appWindow.onClosed.addListener(function () {
-                        var vid_win = chrome.app.window.get('video');
-                        if (vid_win === null) {
-                            chrome.power.releaseKeepAwake();
-                        }
-                        engine.player.discAdapters('viz');
-                    });
+                    if (len === 1) {
+                        // хак, если кол-во плейлистов - 1 то диалогового окна нету
+                        return setup.config.cb(0);
+                    }
                 }
-                if (setup.config !== undefined) {
-                    appWindow.contentWindow._config = setup.config;
-                }
-                appWindow.contentWindow._send = sendToWindow;
-                appWindow.contentWindow._settings = _settings;
-                engine.setHotkeys(appWindow.contentWindow.document);
+                chrome.app.window.create(options.index, {
+                    bounds: position,
+                    frame: options.frame,
+                    resizable: options.resizable,
+                    id: type
+                }, function(appWindow) {
+                    if (['menu', 'm3u', 'url', 'playlist', 'viz', 'video'].indexOf(type) !== -1) {
+                        appWindow.contentWindow.addEventListener('focus', function() {
+                            showAllWindowOnFocus(type);
+                        });
+                    }
+                    if (type === 'playlist') {
+                        if (_settings.pineble_playlist === 1 &&_settings.pined_playlist === 1) {
+                            setPinPosition('playlist', _settings.pin_position);
+                        }
+                    } else
+                    if (type === 'video') {
+                        // stop playing
+                        appWindow.onClosed.addListener(function () {
+                            var viz_win = chrome.app.window.get('viz');
+                            if (viz_win === null) {
+                                chrome.power.releaseKeepAwake();
+                            }
+                            engine.player.closeVideo();
+                        });
+                    } else if (type === 'viz') {
+                        // disconnect adapter
+                        appWindow.onClosed.addListener(function () {
+                            var vid_win = chrome.app.window.get('video');
+                            if (vid_win === null) {
+                                chrome.power.releaseKeepAwake();
+                            }
+                            engine.player.discAdapters('viz');
+                        });
+                    }
+                    if (setup.config !== undefined) {
+                        appWindow.contentWindow._config = setup.config;
+                    }
+                    appWindow.contentWindow._send = sendToWindow;
+                    appWindow.contentWindow._settings = _settings;
+                    engine.setHotkeys(appWindow.contentWindow.document);
+                });
             });
         });
     };
