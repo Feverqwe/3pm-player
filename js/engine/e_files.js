@@ -69,8 +69,7 @@ engine.files = function() {
         var orderEntryList = [];
         indexArr.forEach(function(item) {
             var entry = entryList[item[1]];
-            var ext = '.'+entry.name.substr(entry.name.lastIndexOf('.') + 1).toLowerCase();
-            var type = ext;
+            var type = '.'+entry.name.substr(entry.name.lastIndexOf('.') + 1).toLowerCase();
             if (!engine.player.canPlay(type)) {
                 return 1;
             }
@@ -269,8 +268,7 @@ engine.files = function() {
                 dirList.push(entry);
                 return 1;
             }
-            var ext = '.'+entry.name.substr(entry.name.lastIndexOf('.') + 1).toLowerCase();
-            var type = ext;
+            var type = '.'+entry.name.substr(entry.name.lastIndexOf('.') + 1).toLowerCase();
             if (type === '.m3u') {
                 m3uList.push(entry);
                 return 1;

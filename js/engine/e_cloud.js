@@ -643,8 +643,7 @@ engine.cloud = function() {
                      * @namespace data.categories
                      */
                     if (data.music === undefined) {
-                        cb(albums);
-                        return;
+                        return cb(albums);
                     }
                     var categoryList = data.music;
                     categoryList = categoryList.concat(data.audio);
@@ -667,8 +666,7 @@ engine.cloud = function() {
                 success: function(data) {
                     var tracks = [];
                     if (data.tracks === undefined) {
-                        cb(tracks);
-                        return;
+                        return cb(tracks);
                     }
                     for (var i = 0, track; track = data.tracks[i]; i++) {
                         if (track.streamable === false || (track.original_format === "wav" && track.track_type === 'original')) {
