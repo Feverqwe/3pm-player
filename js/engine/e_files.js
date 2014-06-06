@@ -184,7 +184,7 @@ engine.files = function() {
             fileReader.readAsText(file);
         }, function(e) {
             cb();
-            console.log('openM3U:', e.name, 'Error code', e.code, ',', e.message);
+            console.log('openM3U:', e.name, ',', e.message);
         });
     };
 

@@ -229,7 +229,7 @@ engine.tags = function() {
                         });
                     }, function(e) {
                         getLastFMtags(track, track.tags.default, cache, cb);
-                        console.log('getTags:', e.name, 'Error code', e.code, ',', e.message);
+                        console.log('getTags:', e.name, ',', e.message);
                     });
                 } else {
                     getLastFMtags(track, track.tags.id3, cache, cb);

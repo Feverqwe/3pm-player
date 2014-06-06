@@ -222,7 +222,7 @@ engine.player = function () {
                 return cb(objectURL);
             }, function(e) {
                 cb();
-                console.log('getTrackURL:', e.name, 'Error code', e.code, ',', e.message);
+                console.log('getTrackURL:', e.name, ',', e.message);
             });
         }
     };
