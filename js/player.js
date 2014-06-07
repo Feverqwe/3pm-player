@@ -1022,17 +1022,6 @@ window.player = function () {
                     player.show();
                 });
             });
-
-            if (_settings.pineble_playlist === 1) {
-                chrome.app.window.current().onBoundsChanged.addListener(function () {
-                    if (document.webkitHidden) {
-                        return;
-                    }
-                    if (_settings.pined_playlist === 1) {
-                        engine.wm.setPinPosition('playlist', _settings.pin_position);
-                    }
-                });
-            }
         },
         show : function () {
             /**
@@ -1053,6 +1042,17 @@ window.player = function () {
             engine.player.volume(state.volume);
 
             checkLaunchData();
+
+            if (_settings.pineble_playlist === 1) {
+                chrome.app.window.current().onBoundsChanged.addListener(function () {
+                    if (document.webkitHidden) {
+                        return;
+                    }
+                    if (_settings.pined_playlist === 1) {
+                        engine.wm.setPinPosition('playlist', _settings.pin_position);
+                    }
+                });
+            }
         },
         setTags : function (tags) {
             state.empty = false;
