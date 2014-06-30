@@ -94,7 +94,7 @@ engine.cloud = function() {
             tokenStore.set('vk');
         };
         var vkAuth = function(cb) {
-            var client_id = "4037628";
+            var client_id = "4437959";
             var settings = "audio,offline";
             var redirect_uri = 'https://' + chrome.runtime.id + '.chromiumapp.org/cb';
             var display = "page";
