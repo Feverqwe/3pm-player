@@ -36,6 +36,9 @@ var viz = function() {
                 }
             });
             _send('player', function(window) {
+                if (window.engine.playlist.memory.collection === undefined) {
+                    return;
+                }
                 var track_id = window.engine.playlist.memory.collection.track_id;
                 if (track_id === undefined) {
                     return;
