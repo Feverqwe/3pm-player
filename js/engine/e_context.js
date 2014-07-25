@@ -9,10 +9,11 @@ engine.context = function() {
             action: function () {
                 var accepts = [
                     {
+                        extensions: ['m3u'].concat( engine.player.allow_ext ),
                         mimeTypes: ['audio/*', 'video/*']
                     }
                 ];
-                chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsMultiple: true}, function (entryList) {
+                chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts, acceptsAllTypes: true, acceptsMultiple: true}, function (entryList) {
                     engine.files.readAnyFiles(entryList, function(collections) {
                         if (collections === undefined) {
                             return;
