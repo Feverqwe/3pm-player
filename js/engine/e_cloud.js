@@ -942,6 +942,8 @@ engine.cloud = function() {
     var gd = function() {
         var type = 'gd';
         var token = undefined;
+        var fileListCache = {};
+        var trackUrlKeepAlive = 60*60;
         var clear_data = function() {
             tokenStore.set(type);
             token = undefined;
@@ -1001,6 +1003,53 @@ engine.cloud = function() {
             }
             cb();
         };
+        var updateTrackUrl = function(track, cb) {
+            var folderId = track.cloud.folderId;
+            var now = parseInt(Date.now() / 1000);
+            var folderCache = fileListCache[folderId];
+            var cList;
+
+            var updateCurrentTrackUrl = function(track, url, time) {
+                delete track.cloud.hasAccessToken;
+                track.cloud.time = time;
+                track.url = url;
+            };
+
+            if (folderCache && folderCache.time + trackUrlKeepAlive > now && (cList = folderCache.list)) {
+                if (cList[track.cloud.id]) {
+                    updateCurrentTrackUrl(track, cList[track.cloud.id].downloadUrl, folderCache.time);
+                }
+                cb();
+                return;
+            }
+            fileListCache[folderId] = {
+                time: now,
+                list: {}
+            };
+            cList = fileListCache[folderId].list;
+            gd.getFileList(folderId, function(list) {
+                list.items.forEach(function(item) {
+                    if (!item.id || !item.downloadUrl) {
+                        return 1;
+                    }
+                    cList[item.id] = item;
+                    if (item.id === track.cloud.id) {
+                        updateCurrentTrackUrl(track, item.downloadUrl, now);
+                    }
+                });
+            });
+            cb();
+        };
+        var addTokenInUrl = function(track, cb) {
+            if (track.cloud.hasAccessToken === 1) {
+                return cb();
+            }
+            getToken(function() {
+                track.cloud.hasAccessToken = 1;
+                track.url += '&access_token=' + token;
+                cb();
+            });
+        };
         return {
             getToken: getToken,
             getFileList: function(id, cb) {
@@ -1009,14 +1058,12 @@ engine.cloud = function() {
                 });
             },
             getTrackURL: function(track, cb) {
-                if (track.cloud.hasAccessToken === 1) {
-                    return cb();
+                if (track.cloud.time + trackUrlKeepAlive < parseInt(Date.now() / 1000) ) {
+                    return updateTrackUrl(track, function() {
+                        addTokenInUrl(track, cb);
+                    });
                 }
-                getToken(function() {
-                    track.cloud.hasAccessToken = 1;
-                    track.url += '&access_token=' + token;
-                    cb();
-                });
+                addTokenInUrl(track, cb);
             }
         };
     }();

@@ -220,6 +220,7 @@ var dialog = function() {
                     }
                     _send('player', function(window) {
                         window.engine.cloud.gd.getFileList(folder_id, function(list) {
+                            dom_cache.fileList.data('fileListId', folder_id);
                             writeFileList(list, folder_id);
                         });
                     });
@@ -232,6 +233,7 @@ var dialog = function() {
                     var folder_id = item.id;
                     var _window = window;
                     var pl_name = item.title || "Google Drive";
+                    var now = parseInt(Date.now() / 1000);
                     _send('player', function(window) {
                         window.engine.cloud.gd.getFileList(folder_id, function(list) {
                             var collection = {title: pl_name, trackList: [], cloud: {type: 'gd'}};
@@ -246,7 +248,7 @@ var dialog = function() {
                                 if (isAllowFile(type) === false) {
                                     return 1;
                                 }
-                                collection.trackList.push({url: item.downloadUrl, type: type, tags: {default: {title: name}}, cloud: {type: 'gd'}});
+                                collection.trackList.push({url: item.downloadUrl, type: type, tags: {default: {title: name}}, cloud: {type: 'gd', id: item.id, folderId: folder_id, time: now}});
                             });
                             if (collection.trackList.length === 0) {
                                 return;
@@ -261,6 +263,8 @@ var dialog = function() {
                     var pl_name = "Google Drive";
                     var collection = {title: pl_name, trackList: [], cloud: {type: "gd"}};
                     var items = $.makeArray(dom_cache.fileList.find('input[type="checkbox"]:checked'));
+                    var folderId = dom_cache.fileList.data('fileListId');
+                    var now = parseInt(Date.now() / 1000);
                     items.forEach(function(item) {
                         var index = $(item).data('index');
                         item = cacheList.items[index];
@@ -270,7 +274,7 @@ var dialog = function() {
                         }
                         var name = item.title;
                         var type = item._type;
-                        collection.trackList.push({url: item.downloadUrl, type: type, tags: {default: {title: name}}, cloud: {type: 'gd'}});
+                        collection.trackList.push({url: item.downloadUrl, type: type, tags: {default: {title: name}}, cloud: {type: 'gd', id: item.id, folderId: folderId, time: now}});
                     });
                     if (collection.trackList.length === 0) {
                         return;
