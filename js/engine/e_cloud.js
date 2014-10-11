@@ -10,7 +10,7 @@ engine.cloud = function() {
                     tokenList = store.tokenList;
                     var killList = [];
                     $.each(tokenList, function(key, value) {
-                        if (value.time === undefined) {
+                        if (value.expire !== undefined && value.time === undefined) {
                             value.time = 0;
                         }
                         if (value.expire !== undefined && value.time + value.expire < parseInt(Date.now() / 1000) ) {
@@ -54,7 +54,7 @@ engine.cloud = function() {
                 if (value === undefined) {
                     return;
                 }
-                if (value.time === undefined) {
+                if (value.expire !== undefined && value.time === undefined) {
                     value.time = 0;
                 }
                 if (value.expire !== undefined && value.time + value.expire < parseInt(Date.now() / 1000) ) {
@@ -1087,7 +1087,7 @@ engine.cloud = function() {
             });
         };
         var getToken = function(cb) {
-            token = tokenStore.get(token);
+            token = tokenStore.get(type);
             if (token === undefined) {
                 return sdAuth(cb);
             }
