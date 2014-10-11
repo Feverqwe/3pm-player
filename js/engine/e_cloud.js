@@ -10,7 +10,10 @@ engine.cloud = function() {
                     tokenList = store.tokenList;
                     var killList = [];
                     $.each(tokenList, function(key, value) {
-                        if (value.expire !== undefined && value.expire < Date.now()) {
+                        if (value.time === undefined) {
+                            value.time = 0;
+                        }
+                        if (value.expire !== undefined && value.time + value.expire < parseInt(Date.now() / 1000) ) {
                             killList.push(key);
                         }
                     });
@@ -42,6 +45,7 @@ engine.cloud = function() {
                 }
                 if (expire !== undefined) {
                     tokenList[key].expire = expire;
+                    tokenList[key].time = parseInt(Date.now() / 1000);
                 }
                 return save();
             },
@@ -50,7 +54,10 @@ engine.cloud = function() {
                 if (value === undefined) {
                     return;
                 }
-                if (value.expire !== undefined && value.expire < Date.now()) {
+                if (value.time === undefined) {
+                    value.time = 0;
+                }
+                if (value.expire !== undefined && value.time + value.expire < parseInt(Date.now() / 1000) ) {
                     delete tokenList[key];
                     save();
                     return;
@@ -90,9 +97,13 @@ engine.cloud = function() {
                 if (responseURL === undefined) {
                     return console.log("Auth", type, "URL not found!");
                 }
+                var hashPos = responseURL.indexOf('#');
+                if (hashPos !== -1) {
+                    responseURL = responseURL.substr(hashPos + 1);
+                }
                 var data = parseUrlParams(responseURL);
                 var token = data.access_token || data.token;
-                var expires = parseInt(data.expires_in) || undefined;
+                var expires = data.expires_in ? parseInt(data.expires_in) : 0;
                 if (!token) {
                     return console.log("Auth", type, "Token not found!", responseURL);
                 }
