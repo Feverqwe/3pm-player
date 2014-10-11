@@ -46,13 +46,38 @@ engine.cloud = function() {
                 return save();
             },
             get: function(key) {
-                if (tokenList[key] === undefined) {
+                var value = tokenList[key];
+                if (value === undefined) {
                     return;
                 }
-                return tokenList[key].token;
+                if (value.expire !== undefined && value.expire < Date.now()) {
+                    delete tokenList[key];
+                    save();
+                    return;
+                }
+                return value.token;
             }
         }
     }();
+    var parseUrlParams = function(url) {
+        var startFrom = url.indexOf('?');
+        var query = url;
+        if (startFrom !== -1) {
+            query = url.substr(startFrom + 1);
+        }
+        var sep = '&';
+        if (query.indexOf('&amp;') !== -1) {
+            sep = '&amp;';
+        }
+        var dblParamList = query.split(sep);
+        var params = {};
+        for (var i = 0, len = dblParamList.length; i < len; i++) {
+            var item = dblParamList[i];
+            var ab = item.split('=');
+            params[ab[0]] = ab[1] || '';
+        }
+        return params;
+    };
     var auth_getToken = function(type, url, cb) {
         if (var_cache.auth_dialog_count > 0) {
             console.log("Auth", "More one opened dialod!", var_cache.auth_dialog_count);
@@ -65,20 +90,11 @@ engine.cloud = function() {
                 if (responseURL === undefined) {
                     return console.log("Auth", type, "URL not found!");
                 }
-                var token = undefined, expires = undefined;
-                if (responseURL.indexOf("expires_in=") !== -1) {
-                    expires = parseInt(responseURL.replace(/.*expires_in=([0-9]*).*/, "$1"));
-                }
-                if (type === 'lastfm') {
-                    if (responseURL.indexOf("token=") === -1) {
-                        return console.log("Auth", type, "Token not found!", responseURL);
-                    }
-                    token = responseURL.replace(/.*token=([^&]*).*/, "$1");
-                } else {
-                    if (responseURL.indexOf("access_token=") === -1) {
-                        return console.log("Auth", type, "Token not found!", responseURL);
-                    }
-                    token = responseURL.replace(/.*access_token=([^&]*).*/, "$1");
+                var data = parseUrlParams(responseURL);
+                var token = data.access_token || data.token;
+                var expires = parseInt(data.expires_in) || undefined;
+                if (!token) {
+                    return console.log("Auth", type, "Token not found!", responseURL);
                 }
                 tokenStore.set(type, token, expires);
                 cb(token);
@@ -942,8 +958,6 @@ engine.cloud = function() {
     var gd = function() {
         var type = 'gd';
         var token = undefined;
-        var fileListCache = {};
-        var trackUrlKeepAlive = 60*60;
         var clear_data = function() {
             tokenStore.set(type);
             token = undefined;
@@ -994,61 +1008,11 @@ engine.cloud = function() {
             });
         };
         var getToken = function(cb) {
-            if (token !== undefined) {
-                return cb();
-            }
             token = tokenStore.get(type);
             if (token === undefined) {
                 return gdAuth(cb);
             }
             cb();
-        };
-        var updateTrackUrl = function(track, cb) {
-            var folderId = track.cloud.folderId;
-            var now = parseInt(Date.now() / 1000);
-            var folderCache = fileListCache[folderId];
-            var cList;
-
-            var updateCurrentTrackUrl = function(track, url, time) {
-                delete track.cloud.hasAccessToken;
-                track.cloud.time = time;
-                track.url = url;
-            };
-
-            if (folderCache && folderCache.time + trackUrlKeepAlive > now && (cList = folderCache.list)) {
-                if (cList[track.cloud.id]) {
-                    updateCurrentTrackUrl(track, cList[track.cloud.id].downloadUrl, folderCache.time);
-                }
-                cb();
-                return;
-            }
-            fileListCache[folderId] = {
-                time: now,
-                list: {}
-            };
-            cList = fileListCache[folderId].list;
-            gd.getFileList(folderId, function(list) {
-                list.items.forEach(function(item) {
-                    if (!item.id || !item.downloadUrl) {
-                        return 1;
-                    }
-                    cList[item.id] = item;
-                    if (item.id === track.cloud.id) {
-                        updateCurrentTrackUrl(track, item.downloadUrl, now);
-                    }
-                });
-            });
-            cb();
-        };
-        var addTokenInUrl = function(track, cb) {
-            if (track.cloud.hasAccessToken === 1) {
-                return cb();
-            }
-            getToken(function() {
-                track.cloud.hasAccessToken = 1;
-                track.url += '&access_token=' + token;
-                cb();
-            });
         };
         return {
             getToken: getToken,
@@ -1058,12 +1022,14 @@ engine.cloud = function() {
                 });
             },
             getTrackURL: function(track, cb) {
-                if (track.cloud.time + trackUrlKeepAlive < parseInt(Date.now() / 1000) ) {
-                    return updateTrackUrl(track, function() {
-                        addTokenInUrl(track, cb);
-                    });
-                }
-                addTokenInUrl(track, cb);
+                getToken(function() {
+                    if (track.cloud.hasAccessToken === 1) {
+                        track.url = track.url.substr(0, track.url.indexOf('&access_token='));
+                    }
+                    track.cloud.hasAccessToken = 1;
+                    track.url += '&access_token=' + token;
+                    cb();
+                });
             }
         };
     }();
