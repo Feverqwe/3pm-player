@@ -1087,10 +1087,6 @@ engine.cloud = function() {
             });
         };
         var getToken = function(cb) {
-            if (token !== undefined) {
-                cb(token);
-                return;
-            }
             token = tokenStore.get(token);
             if (token === undefined) {
                 return sdAuth(cb);
@@ -1105,10 +1101,10 @@ engine.cloud = function() {
                 });
             },
             getTrackURL: function(track, cb) {
-                if (track.cloud.hasAccessToken === 1) {
-                    return cb();
-                }
                 getToken(function() {
+                    if (track.cloud.hasAccessToken === 1) {
+                        track.url = track.url.substr(0, track.url.indexOf('&access_token='));
+                    }
                     track.cloud.hasAccessToken = 1;
                     track.url += '&access_token=' + token;
                     cb();
