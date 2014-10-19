@@ -96,6 +96,12 @@ engine.wm = function() {
             engine.player.mute();
         } else if (msg === 'menu') {
             engine.context.showMenu();
+        } else if (msg === 'oFile') {
+            engine.context.menu.openFiles.action();
+        } else if (msg === 'oDir') {
+            engine.context.menu.openDirectory.action();
+        } else if (msg === 'togglePlaylist') {
+            engine.wm.createWindow({type: 'playlist'});
         }
     });
     var getWindowSize = function(position, cb) {

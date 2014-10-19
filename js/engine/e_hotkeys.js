@@ -20,6 +20,12 @@ engine.setHotkeys = function (_document) {
                 progress_keydown_timer = setTimeout(function () {
                     engine.player.position("-10");
                 }, 25);
+            } else if (event.shiftKey && event.keyCode === 79) {
+                engine.context.menu.openDirectory.action();
+            } else if (event.altKey && event.keyCode === 79) {
+                engine.wm.createWindow({type: 'playlist'});
+            } else if (event.keyCode === 79) {
+                engine.context.menu.openFiles.action();
             }
         } else {
             if (event.keyCode === 32 || event.keyCode === 179) {

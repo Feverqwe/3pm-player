@@ -283,6 +283,18 @@ var options = function () {
                         $('<div>').append(
                             $('<span>', {'class': 'key', text: 'Ctrl+Right'}),
                             $('<span>', {text: chrome.i18n.getMessage('key_ctrl_right') })
+                        ),
+                        $('<div>').append(
+                            $('<span>', {'class': 'key', text: 'Ctrl+O'}),
+                            $('<span>', {text: chrome.i18n.getMessage('key_ctrl_o') })
+                        ),
+                        $('<div>').append(
+                            $('<span>', {'class': 'key', text: 'Ctrl+Shift+O'}),
+                            $('<span>', {text: chrome.i18n.getMessage('key_ctrl_shift_o') })
+                        ),
+                        $('<div>').append(
+                            $('<span>', {'class': 'key', text: 'Ctrl+Alt+O'}),
+                            $('<span>', {text: chrome.i18n.getMessage('key_ctrl_alt_o') })
                         )
                     ),
                     $('<div>', {'class': 'infoList'}).append(

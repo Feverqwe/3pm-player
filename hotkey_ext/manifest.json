@@ -55,7 +55,16 @@
         },
         "mute": {
             "description": "Mute"
+        },
+        "oFile": {
+            "description": "Open file"
+        },
+        "oDir": {
+            "description": "Open directory"
+        },
+        "togglePlaylist": {
+            "description": "Open playlist"
         }
     },
-    "version": "0.0.4"
+    "version": "0.0.5"
 }
