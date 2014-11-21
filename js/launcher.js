@@ -1,7 +1,7 @@
 (function() {
     var launchDataStore = undefined;
     var checkWindowPosition = function(position) {
-        var dpr = window.devicePixelRatio;
+        var dpr = 1;
         position.width = parseInt(position.width * dpr);
         position.height = parseInt(position.height * dpr);
         return {width: position.width, height: position.height};

@@ -105,7 +105,7 @@ engine.wm = function() {
         }
     });
     var getWindowSize = function(position, cb) {
-        var dpr = window.devicePixelRatio;
+        var dpr = 1;
         var width = parseInt(position.width * dpr);
         var height = parseInt(position.height * dpr);
         cb({width: width, height: height});

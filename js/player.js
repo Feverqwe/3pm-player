@@ -883,7 +883,7 @@ window.player = function () {
     var setWinampWindow = function() {
         dom_cache.body.addClass('winamp');
         var appWindow = chrome.app.window.current();
-        var dpr = window.devicePixelRatio;
+        var dpr = 1;
         var win_w = parseInt(275 * dpr);
         var win_h = parseInt(116 * dpr);
         dom_cache.shuffle.removeClass('s_btn');
