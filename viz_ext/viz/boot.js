@@ -5,8 +5,10 @@
 if (window.reality === undefined) {
     window.reality = {};
 }
-(function($) {
-    reality = $.extend(true, {debug: true, isDev: false,
+(function ($) {
+    reality = $.extend(true, {
+        debug: true,
+        isDev: false,
         frames: 0,
         dim: {width: window.innerWidth, height: window.innerHeight},
         center: {x: window.innerWidth / 2, y: window.innerHeight / 2},
@@ -27,25 +29,34 @@ if (window.reality === undefined) {
         sampleRate: 44100,
         sampleSize: 2048,
         lib: {moves: {}, populates: {}, entities: {}},
-        timing: {load: new Date().getTime(),
-            finish: function(name, from) {
-                if (this[from])
-                {
+        timing: {
+            load: new Date().getTime(),
+            finish: function (name, from) {
+                if (this[from]) {
                     var time = new Date().getTime() - this[from];
                     reality.debug && console.info(name + ':' + time + ' ms');
                     reality.$document.trigger('timing', [name, time]);
                 }
-            }}, scenes: [{time: 4000, fn: function() {
-                }}, {time: 18000, fn: function() {
-                }}, {time: 30000, fn: function() {
-                }}], free: false, helpers: {},
-        cameraMove: function() {
+            }
+        },
+        scenes: [{
+            time: 4000, fn: function () {
+            }
+        }, {
+            time: 18000, fn: function () {
+            }
+        }, {
+            time: 30000, fn: function () {
+            }
+        }],
+        free: false,
+        helpers: {},
+        cameraMove: function () {
             this.camera.position.x += (this.mouse.x - this.camera.position.x) * reality.cameraSpeed;
             this.camera.position.y += Math.floor(-this.mouse.y - this.camera.position.y) * reality.cameraSpeed;
-        }, init: function()
-        {
-            this.$document.bind('try', function(e, type)
-            {
+        },
+        init: function () {
+            this.$document.bind('try', function (e, type) {
                 var typeAt = reality.toLoad.indexOf(type), loaded = [], total = [], $node = $('<div></div>'), length = 0, i = 0;
                 if (typeAt === -1) {
                     console.warn('INEXISTANT ITEM !!! : ' + type);
@@ -57,8 +68,7 @@ if (window.reality === undefined) {
                 $.merge(total, reality.loaded);
                 total.sort();
                 length = total.length;
-                for (i = 0; i < length; ++i)
-                {
+                for (i = 0; i < length; ++i) {
                     $node.append($('<div>').html(total[i].substr(0, 25)).append($('<span>').html(reality.loaded.indexOf(total[i]) !== -1 ? 'loaded' : 'loading').addClass(reality.loaded.indexOf(total[i]) !== -1 ? 'loaded' : 'loading')));
                 }
                 reality.$item.html($node);
@@ -72,8 +82,7 @@ if (window.reality === undefined) {
             this.camera = new THREE.PerspectiveCamera(80, this.dim.width / this.dim.height, 1, 20000);
             this.camera.position.set(-270, -350, 320);
             this.scene.add(this.camera);
-            for (var m = this.items.length, i = 0; i < m; ++i)
-            {
+            for (var m = this.items.length, i = 0; i < m; ++i) {
                 this.scene.add(this.items[i].particuleSystem);
             }
             this.renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
@@ -81,11 +90,9 @@ if (window.reality === undefined) {
             this.renderer.sortObjects = false;
             this.renderer.autoClearColor = true;
             var lastResize = 0;
-            window.addEventListener('resize', function()
-            {
+            window.addEventListener('resize', function () {
                 clearTimeout(lastResize);
-                lastResize = setTimeout(function()
-                {
+                lastResize = setTimeout(function () {
                     reality.center = {x: window.innerWidth / 2, y: window.innerHeight / 2};
                     reality.dim = {width: window.innerWidth, height: window.innerHeight};
                     reality.camera.aspect = reality.dim.width / reality.dim.height;
@@ -97,8 +104,8 @@ if (window.reality === undefined) {
             this.container.appendChild(this.renderer.domElement);
             Dancer.sampleRate = this.sampleRate;
             Dancer.sampleSize = this.sampleSize;
-        }, loadMusic: function(src)
-        {
+        },
+        loadMusic: function (src) {
             if (src === undefined) {
                 return;
             }
@@ -110,42 +117,39 @@ if (window.reality === undefined) {
             }
             reality.music.audioAdapter.context && (this.webkitAudiorRecyclableContext = reality.music.audioAdapter.context);
             this.music.spectrum = [];
-            this.music.bind('error', function()
-            {
+            this.music.bind('error', function () {
                 reality.toLoad.indexOf('music') !== -1 && reality.$document.trigger('try', ['music']);
             });
-            this.music.bind('loaded', function()
-            {
+            this.music.bind('loaded', function () {
                 if ("dancerInit" in viz) {
                     viz.dancerInit(true);
                 }
                 reality.music.mag = 0;
                 reality.toLoad.indexOf('music') !== -1 && reality.$document.trigger('try', ['music']);
-                reality.music.kick = reality.music.createKick({threshold: .2, onKick: function(mag) {
+                reality.music.kick = reality.music.createKick({
+                    threshold: .2, onKick: function (mag) {
                         reality.music.mag = mag;
                         var fromStart = new Date().getTime() - reality.timing.load;
-                        if (typeof reality.scenes[0] === 'object' && reality.scenes[0].time <= fromStart)
-                        {
+                        if (typeof reality.scenes[0] === 'object' && reality.scenes[0].time <= fromStart) {
                             var scene = reality.scenes.shift();
                             scene.fn.call(scene, reality, fromStart);
                         }
-                    }, offKick: function(mag) {
+                    }, offKick: function (mag) {
                         reality.music.mag = mag;
-                    }});
+                    }
+                });
                 reality.music.kick.on();
                 reality.$document.trigger('musicChange');
             });
             this.music.load(src);
 
-        }, render: function()
-        {
+        },
+        render: function () {
             var s = performance.now(), i = 0, m = this.items.length;
             ++this.frames;
-            if (reality.music && reality.music.isPlaying())
-            {
+            if (reality.music && reality.music.isPlaying()) {
                 this.music.spectrum = this.music.getSpectrum();
-                for (; i < m; ++i)
-                {
+                for (; i < m; ++i) {
                     this.items[i].move();
                 }
                 reality.camera.position.x -= this.items[0].options.controls.camera.positionIncr.x + (this.items[0].options.controls.autoTraveler ? fluent.util.wavef(reality.frames, this.items[0].options.controls.camera.traveler.freq.x, this.items[0].options.controls.camera.traveler.phase.x, this.items[0].options.controls.camera.traveler.width.x, this.items[0].options.controls.camera.traveler.center.x) : 0);
@@ -155,21 +159,22 @@ if (window.reality === undefined) {
             this.free && this.cameraMove();
             this.camera.lookAt(this.scene.position);
             this.renderer.render(this.scene, this.camera);
-        }, animate: function()
-        {
+        },
+        animate: function () {
             requestAnimationFrame(reality.animate);
             reality.render();
-        }}, reality);
+        }
+    }, reality);
 }(jQuery));
-(function($) {
+(function ($) {
     "use strict";
     var k = {}, max = Math.max, min = Math.min;
     k.c = {};
     k.c.d = $(document);
-    k.c.t = function(e) {
+    k.c.t = function (e) {
         return e.originalEvent.touches.length - 1;
     };
-    k.o = function() {
+    k.o = function () {
         var s = this;
         this.o = null;
         this.$ = null;
@@ -192,8 +197,8 @@ if (window.reality === undefined) {
         this.cH = null;
         this.eH = null;
         this.rH = null;
-        this.run = function() {
-            var cf = function(e, conf) {
+        this.run = function () {
+            var cf = function (e, conf) {
                 var k;
                 for (k in conf) {
                     s.o[k] = conf[k];
@@ -201,8 +206,7 @@ if (window.reality === undefined) {
                 s.init();
                 s._configure()._draw();
             };
-            if (this.$.data('kontroled'))
-                return;
+            if (this.$.data('kontroled')) return;
             this.$.data('kontroled', true);
             this.extend();
             this.o = $.extend({
@@ -223,16 +227,16 @@ if (window.reality === undefined) {
                 draw: null,
                 change: null,
                 cancel: null,
-                release: null},
-            this.o);
+                release: null
+            }, this.o);
             if (this.$.is('fieldset')) {
                 this.v = {};
                 this.i = this.$.find('input');
-                this.i.each(function(k) {
+                this.i.each(function (k) {
                     var $this = $(this);
                     s.i[k] = $this;
                     s.v[k] = $this.val();
-                    $this.bind('change', function() {
+                    $this.bind('change', function () {
                         var val = {};
                         val[k] = $this.val();
                         s.val(val);
@@ -243,17 +247,17 @@ if (window.reality === undefined) {
                 this.i = this.$;
                 this.v = this.$.val();
                 (this.v.length === 0) && (this.v = this.o.min);
-                this.$.bind('change', function() {
+                this.$.bind('change', function () {
                     s.val(s.$.val());
                 });
             }
             (!this.o.displayInput) && this.$.hide();
             this.$c = $('<canvas width="' +
-                    this.o.width + 'px" height="' +
-                    this.o.height + 'px"></canvas>');
+                this.o.width + 'px" height="' +
+                this.o.height + 'px"></canvas>');
             this.c = this.$c[0].getContext("2d");
             this.$.wrap($('<div style="' + (this.o.inline ? 'display:inline;' : '') + 'width:' + this.o.width + 'px;height:' +
-                    this.o.height + 'px;"></div>')).before(this.$c);
+                this.o.height + 'px;"></div>')).before(this.$c);
             if (this.v instanceof Object) {
                 this.cv = {};
                 this.copy(this.v, this.cv);
@@ -266,7 +270,7 @@ if (window.reality === undefined) {
             this._draw();
             return this;
         };
-        this._draw = function() {
+        this._draw = function () {
             var d = true, c = document.createElement('canvas');
             c.width = s.o.width;
             c.height = s.o.height;
@@ -277,70 +281,61 @@ if (window.reality === undefined) {
             s.c.drawImage(c, 0, 0);
             c = null;
         };
-        this._touch = function(e) {
-            var touchMove = function(e) {
+        this._touch = function (e) {
+            var touchMove = function (e) {
                 var v = s.xy2val(e.originalEvent.touches[s.t].pageX, e.originalEvent.touches[s.t].pageY, 'touch');
-                if (v == s.cv)
-                    return;
-                if (s.cH && (s.cH(v) === false))
-                    return;
+                if (v == s.cv)return;
+                if (s.cH && (s.cH(v) === false))return;
                 s.change(v);
                 s._draw();
             };
             this.t = k.c.t(e);
-            if (this.sH && (this.sH() === false))
-                return;
+            if (this.sH && (this.sH() === false))return;
             touchMove(e);
-            k.c.d.bind("touchmove.k", touchMove).bind("touchend.k", function() {
+            k.c.d.bind("touchmove.k", touchMove).bind("touchend.k", function () {
                 k.c.d.unbind('touchmove.k touchend.k');
-                if (s.rH && (s.rH(s.cv) === false))
-                    return;
+                if (s.rH && (s.rH(s.cv) === false))return;
                 s.val(s.cv);
             });
             return this;
         };
-        this._mouse = function(e) {
-            var mouseMove = function(e) {
+        this._mouse = function (e) {
+            var mouseMove = function (e) {
                 var v = s.xy2val(e.pageX, e.pageY, 'mouse');
-                if (v == s.cv)
-                    return;
-                if (s.cH && (s.cH(v) === false))
-                    return;
+                if (v == s.cv)return;
+                if (s.cH && (s.cH(v) === false))return;
                 s.change(v);
                 s._draw();
             };
-            if (this.sH && (this.sH() === false))
-                return;
+            if (this.sH && (this.sH() === false))return;
             s.mx = e.pageX;
             s.my = e.pageY;
             mouseMove(e);
-            k.c.d.bind("mousemove.k", mouseMove).bind("keyup.k", function(e) {
+            k.c.d.bind("mousemove.k", mouseMove).bind("keyup.k", function (e) {
                 if (e.keyCode === 27) {
                     k.c.d.unbind("mouseup.k mousemove.k keyup.k");
-                    if (s.eH && (s.eH() === false))
-                        return;
+                    if (s.eH && (s.eH() === false))return;
                     s.cancel();
                 }
-            }).bind("mouseup.k", function(e) {
+            }).bind("mouseup.k", function (e) {
                 k.c.d.unbind('mousemove.k mouseup.k keyup.k');
-                if (s.rH && (s.rH(s.cv) === false))
-                    return;
+                if (s.rH && (s.rH(s.cv) === false))return;
                 s.val(s.cv);
             });
             return this;
         };
-        this._xy = function() {
+        this._xy = function () {
             var o = this.$c.offset();
             this.x = o.left;
             this.y = o.top;
             return this;
         };
-        this._listen = function() {
+        this._listen = function () {
             if (!this.o.readOnly) {
-                this.$c.bind("mousedown", function(e) {
+                this.$c.bind("mousedown", function (e) {
                     e.preventDefault();
                     s._xy()._mouse(e);
-                }).bind("touchstart", function(e) {
+                }).bind("touchstart", function (e) {
                     e.preventDefault();
                     s._xy()._touch(e);
                 });
@@ -350,17 +345,12 @@ if (window.reality === undefined) {
             }
             return this;
         };
-        this._configure = function() {
-            if (this.o.start)
-                this.sH = this.o.start;
-            if (this.o.draw)
-                this.dH = this.o.draw;
-            if (this.o.change)
-                this.cH = this.o.change;
-            if (this.o.cancel)
-                this.eH = this.o.cancel;
-            if (this.o.release)
-                this.rH = this.o.release;
+        this._configure = function () {
+            if (this.o.start)this.sH = this.o.start;
+            if (this.o.draw)this.dH = this.o.draw;
+            if (this.o.change)this.cH = this.o.change;
+            if (this.o.cancel)this.eH = this.o.cancel;
+            if (this.o.release)this.rH = this.o.release;
             if (this.o.displayPrevious) {
                 this.pColor = this.h2rgba(this.o.fgColor, "0.4");
                 this.fgColor = this.h2rgba(this.o.fgColor, "0.6");
@@ -369,39 +359,39 @@ if (window.reality === undefined) {
             }
             return this;
         };
-        this._clear = function() {
+        this._clear = function () {
             this.$c[0].width = this.$c[0].width;
         };
-        this.listen = function() {
+        this.listen = function () {
         };
-        this.extend = function() {
+        this.extend = function () {
         };
-        this.init = function() {
+        this.init = function () {
         };
-        this.change = function(v) {
+        this.change = function (v) {
         };
-        this.val = function(v) {
+        this.val = function (v) {
         };
-        this.xy2val = function(x, y, method) {
+        this.xy2val = function (x, y, method) {
         };
-        this.draw = function() {
+        this.draw = function () {
         };
-        this.clear = function() {
+        this.clear = function () {
             this._clear();
         };
-        this.h2rgba = function(h, a) {
+        this.h2rgba = function (h, a) {
             var rgb;
             h = h.substring(1, 7);
             rgb = [parseInt(h.substring(0, 2), 16), parseInt(h.substring(2, 4), 16), parseInt(h.substring(4, 6), 16)];
-            return"rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + "," + a + ")";
+            return "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + "," + a + ")";
         };
-        this.copy = function(f, t) {
+        this.copy = function (f, t) {
             for (var i in f) {
                 t[i] = f[i];
             }
         };
     };
-    k.Dial = function() {
+    k.Dial = function () {
         k.o.call(this);
         this.startAngle = null;
         this.xy = null;
@@ -410,16 +400,16 @@ if (window.reality === undefined) {
         this.cursorExt = null;
         this.w2 = null;
         this.PI2 = 2 * Math.PI;
-        this.extend = function() {
+        this.extend = function () {
             this.o = $.extend({
                 bgColor: this.$.data('bgcolor') || '#EEEEEE',
                 angleOffset: this.$.data('angleoffset') || 0,
                 angleArc: this.$.data('anglearc') || 360,
                 flatMouse: this.$.data('flatMouse'),
-                inline: true},
-            this.o);
+                inline: true
+            }, this.o);
         };
-        this.val = function(v) {
+        this.val = function (v) {
             if (null != v) {
                 this.cv = this.o.stopper ? max(min(v, this.o.max), this.o.min) : v;
                 this.v = this.cv;
@@ -429,7 +419,7 @@ if (window.reality === undefined) {
                 return this.v;
             }
         };
-        this.xy2val = function(x, y, m) {
+        this.xy2val = function (x, y, m) {
             var a, ret;
             if ((m === 'mouse') && (this.o.flatMouse)) {
                 a = ((this.my - y) + (x - this.mx)) / (this.o.height);
@@ -443,27 +433,25 @@ if (window.reality === undefined) {
                     a += this.PI2;
                 }
                 ret = ~~(0.5 + (a * (this.o.max - this.o.min) / this.angleArc))
-                        + this.o.min;
+                    + this.o.min;
             }
             this.o.stopper && (ret = max(min(ret, this.o.max), this.o.min));
             return ret;
         };
-        this.listen = function() {
-            var s = this, mw = function(e) {
+        this.listen = function () {
+            var s = this, mw = function (e) {
                 if (s.o.noScroll)
                     return;
                 e.preventDefault();
                 var ori = e.originalEvent, deltaX = ori.detail || ori.wheelDeltaX, deltaY = ori.detail || ori.wheelDeltaY, v = parseInt(s.$.val()) + (deltaX > 0 || deltaY > 0 ? 1 : deltaX < 0 || deltaY < 0 ? -1 : 0);
-                if (s.cH && (s.cH(v) === false))
-                    return;
+                if (s.cH && (s.cH(v) === false))return;
                 s.val(v);
             }, kval, to, m = 1, kv = {37: -1, 38: 1, 39: 1, 40: -1};
             this.$c.bind("mousewheel DOMMouseScroll", mw);
             this.$.bind("mousewheel DOMMouseScroll", mw);
         };
-        this.init = function() {
-            if (this.v < this.o.min || this.v > this.o.max)
-                this.v = this.o.min;
+        this.init = function () {
+            if (this.v < this.o.min || this.v > this.o.max)this.v = this.o.min;
             this.$.val(this.v);
             this.w2 = this.o.width / 2;
             this.cursorExt = this.o.cursor / 100;
@@ -491,19 +479,16 @@ if (window.reality === undefined) {
                 'color': this.o.fgColor,
                 'padding': '0px',
                 '-webkit-appearance': 'none'
-            }) || this.i.css({
-                'width': '0px',
-                'visibility': 'hidden'
-            });
+            }) || this.i.css({'width': '0px', 'visibility': 'hidden'});
         };
-        this.change = function(v) {
+        this.change = function (v) {
             this.cv = v;
             this.$.val(v);
         };
-        this.angle = function(v) {
-            return(v - this.o.min) * this.angleArc / (this.o.max - this.o.min);
+        this.angle = function (v) {
+            return (v - this.o.min) * this.angleArc / (this.o.max - this.o.min);
         };
-        this.draw = function() {
+        this.draw = function () {
             var c = this.g, a = this.angle(this.cv), sat = this.startAngle, eat = sat + a, sa, ea, r = 1;
             c.lineWidth = this.lineWidth;
             this.o.cursor && (sat = eat - this.cursorExt) && (eat = eat + this.cursorExt);
@@ -526,19 +511,19 @@ if (window.reality === undefined) {
             c.arc(this.xy, this.xy, this.radius, sat, eat, false);
             c.stroke();
         };
-        this.cancel = function() {
+        this.cancel = function () {
             this.val(this.v);
         };
     };
-    $.fn.dial = $.fn.knob = function(o) {
-        return this.each(function() {
+    $.fn.dial = $.fn.knob = function (o) {
+        return this.each(function () {
             var d = new k.Dial();
             d.o = o;
             d.$ = $(this);
             d.run();
         }).parent();
     };
-    k.XY = function() {
+    k.XY = function () {
         k.o.call(this);
         this.m = [];
         this.p = [];
@@ -548,21 +533,21 @@ if (window.reality === undefined) {
         this.cursor = 0;
         this.v = {};
         this.div = null;
-        this.extend = function() {
+        this.extend = function () {
             this.o = $.extend({
                 min: this.$.data('min') || 0,
                 max: this.$.data('max') || 100,
                 width: this.$.data('width') || 200,
-                height: this.$.data('height') || 200},
-            this.o);
+                height: this.$.data('height') || 200
+            }, this.o);
         };
-        this._coord = function() {
+        this._coord = function () {
             for (var i in this.v) {
                 this.m[i] = ~~(0.5 + ((this.s[i] * this.v[i] - this.o.min) / this.f[i]) + this.cur2);
                 this.p[i] = this.m[i];
             }
         };
-        this.init = function() {
+        this.init = function () {
             this.cursor = this.o.cursor || 30;
             this.cur2 = this.cursor / 2;
             this.f[0] = (this.o.max - this.o.min) / (this.o.width - this.cursor);
@@ -573,24 +558,34 @@ if (window.reality === undefined) {
             if (this.o.displayInput) {
                 var s = this;
                 this.$.css({'margin-top': '-30px', 'border': 0, 'font': '11px Arial'});
-                this.i.each(function() {
-                    $(this).css({'width': (s.o.width / 4) + 'px', 'border': 0, 'background': 'none', 'color': s.o.fgColor, 'padding': '0px', '-webkit-appearance': 'none'});
+                this.i.each(function () {
+                    $(this).css({
+                        'width': (s.o.width / 4) + 'px',
+                        'border': 0,
+                        'background': 'none',
+                        'color': s.o.fgColor,
+                        'padding': '0px',
+                        '-webkit-appearance': 'none'
+                    });
                 });
             } else {
                 this.$.css({'width': '0px', 'visibility': 'hidden'});
             }
         };
-        this.xy2val = function(x, y) {
+        this.xy2val = function (x, y) {
             this.m[0] = max(this.cur2, min(x - this.x, this.o.width - this.cur2));
             this.m[1] = max(this.cur2, min(y - this.y, this.o.height - this.cur2));
-            return{0: ~~(this.o.min + (this.m[0] - this.cur2) * this.f[0]), 1: ~~(this.o.min + (this.o.height - this.m[1] - this.cur2) * this.f[1])};
+            return {
+                0: ~~(this.o.min + (this.m[0] - this.cur2) * this.f[0]),
+                1: ~~(this.o.min + (this.o.height - this.m[1] - this.cur2) * this.f[1])
+            };
         };
-        this.change = function(v) {
+        this.change = function (v) {
             this.cv = v;
             this.i[0].val(this.cv[0]);
             this.i[1].val(this.cv[1]);
         };
-        this.val = function(v) {
+        this.val = function (v) {
             if (null !== v) {
                 this.cv = v;
                 this.copy(this.cv, this.v);
@@ -600,7 +595,7 @@ if (window.reality === undefined) {
                 return this.v;
             }
         };
-        this.cancel = function() {
+        this.cancel = function () {
             this.copy(this.v, this.cv);
             this.i[0].val(this.cv[0]);
             this.i[1].val(this.cv[1]);
@@ -608,7 +603,7 @@ if (window.reality === undefined) {
             this.m[1] = this.p[1];
             this._draw();
         };
-        this.draw = function() {
+        this.draw = function () {
             var c = this.g, r = 1;
             if (this.o.displayPrevious) {
                 c.beginPath();
@@ -627,15 +622,15 @@ if (window.reality === undefined) {
             c.stroke();
         };
     };
-    $.fn.xy = function(o) {
-        return this.each(function() {
+    $.fn.xy = function (o) {
+        return this.each(function () {
             var x = new k.XY();
             x.$ = $(this);
             x.o = o;
             x.run();
         }).parent();
     };
-    k.Bars = function() {
+    k.Bars = function () {
         k.o.call(this);
         this.bar = null;
         this.mid = null;
@@ -643,7 +638,7 @@ if (window.reality === undefined) {
         this.colWidth = null;
         this.fontSize = null;
         this.displayMidLine = false;
-        this.extend = function() {
+        this.extend = function () {
             this.o = $.extend({
                 min: this.$.data('min') || 0,
                 max: this.$.data('max') || 100,
@@ -662,33 +657,43 @@ if (window.reality === undefined) {
                 this.o.height -= this.fontSize;
             }
         };
-        this.xy2val = function(x, y) {
+        this.xy2val = function (x, y) {
             var cw = this.colWidth + this.o.spacing, val = (max(this.o.min, min(this.o.max, -(-this.mid + (y - this.y)) / this.bar))) >> 0, ret = {};
             this.col = max(0, min(this.o.cols - 1, ((x - this.x) / cw) >> 0));
             ret[this.col] = val;
             return ret;
         };
-        this.init = function() {
+        this.init = function () {
             this.bar = this.o.height / (this.o.max - this.o.min);
             this.mid = (this.o.max * this.bar) >> 0;
             this.displayMidLine = this.o.cursor && this.o.min < 0;
             if (this.o.displayInput) {
                 var s = this;
                 this.$.css({'margin': '0px', 'border': 0, 'padding': '0px'});
-                this.i.each(function() {
-                    $(this).css({'width': (s.colWidth - 4 + s.o.spacing) + 'px', 'border': 0, 'background': 'none', 'font': s.fontSize + 'px Arial', 'color': s.o.fgColor, 'margin': '0px', 'padding': '0px', '-webkit-appearance': 'none', 'text-align': 'center'});
+                this.i.each(function () {
+                    $(this).css({
+                        'width': (s.colWidth - 4 + s.o.spacing) + 'px',
+                        'border': 0,
+                        'background': 'none',
+                        'font': s.fontSize + 'px Arial',
+                        'color': s.o.fgColor,
+                        'margin': '0px',
+                        'padding': '0px',
+                        '-webkit-appearance': 'none',
+                        'text-align': 'center'
+                    });
                 });
             } else {
                 this.$.css({'width': '0px', 'visibility': 'hidden'});
             }
         };
-        this.change = function(v) {
+        this.change = function (v) {
             for (var i in v) {
                 this.cv[i] = v[i];
                 this.i[i].val(this.cv[i]);
             }
         };
-        this.val = function(v) {
+        this.val = function (v) {
             if (null !== v) {
                 this.copy(v, this.cv);
                 this.copy(this.cv, this.v);
@@ -698,12 +703,12 @@ if (window.reality === undefined) {
                 return this.v;
             }
         };
-        this.cancel = function() {
+        this.cancel = function () {
             this.copy(this.v, this.cv);
             this.col = null;
             this._draw();
         };
-        this._bar = function(col) {
+        this._bar = function (col) {
             var x = (col * (this.colWidth + this.o.spacing) + this.colWidth / 2);
             if (this.displayMidLine) {
                 this.g.beginPath();
@@ -736,14 +741,14 @@ if (window.reality === undefined) {
             this.g.lineTo(x, this.mid - ((this.cv[col] * this.bar) >> 0) - this.o.cursor / 2);
             this.g.stroke();
         };
-        this.clear = function() {
+        this.clear = function () {
             if (this.col) {
                 this.c.clearRect(this.col * (this.colWidth + this.o.spacing), 0, this.colWidth + this.o.spacing, this.o.height);
             } else {
                 this._clear();
             }
         };
-        this.draw = function() {
+        this.draw = function () {
             if (this.col) {
                 this._bar(this.col);
             } else {
@@ -753,8 +758,8 @@ if (window.reality === undefined) {
             }
         };
     };
-    $.fn.bars = function(o) {
-        return this.each(function() {
+    $.fn.bars = function (o) {
+        return this.each(function () {
             var b = new k.Bars();
             b.$ = $(this);
             b.o = o;
@@ -762,42 +767,38 @@ if (window.reality === undefined) {
         }).parent();
     };
 })(jQuery);
-reality.updateManager = {init: function()
-    {
+reality.updateManager = {
+    init: function () {
         reality.toLoad.push('updates');
         this.checkUpdate();
-        reality.$document.bind('go', function() {
+        reality.$document.bind('go', function () {
             reality.updateManager.isStarted = true;
         });
-    }, isStarted: false, toLoad: [], checkUpdate: function() {
+    }, isStarted: false, toLoad: [], checkUpdate: function () {
         var self = this;
         self.toLoad = [];
-        setTimeout(function() {
+        setTimeout(function () {
             self.updatePresets();
             self.updateFlares();
-            if (!self.isStarted)
-            {
+            if (!self.isStarted) {
                 self.updatePlaylist();
                 reality.$document.trigger('try', ['updates']);
             }
         }, 100);
-    }, updatePresets: function()
-    {
-        var self = this, presets = localStorage2.getItem('presets'),
-                ready = function() {
-                    if (self.isStarted) {
-                        reality.helpers.presets.refresh();
-                    }
-                    else {
-                        reality.$document.trigger('try', ['presets']);
-                    }
-                };
+    }, updatePresets: function () {
+        var self = this, presets = localStorage2.getItem('presets'), ready = function () {
+            if (self.isStarted) {
+                reality.helpers.presets.refresh();
+            }
+            else {
+                reality.$document.trigger('try', ['presets']);
+            }
+        };
         !this.isStarted && reality.toLoad.push('presets');
         reality.presets = presets;
         ready();
-    }, updateFlares: function()
-    {
-        var self = this, flares = localStorage2.getItem('flares'), ready = function() {
+    }, updateFlares: function () {
+        var self = this, flares = localStorage2.getItem('flares'), ready = function () {
             if (!self.isStarted) {
                 reality.$document.trigger('try', ['flares']);
             }
@@ -805,71 +806,78 @@ reality.updateManager = {init: function()
         !this.isStarted && reality.toLoad.push('flares');
         reality.flares = flares;
         ready();
-    }, updatePlaylist: function()
-    {
+    }, updatePlaylist: function () {
         var self = this,
-                ready = function() {
-                    reality.musicUrl = reality.defaults.musicSrc;
-                    reality.toLoad.push('music');
-                    reality.loadMusic(viz.getAudio());
-                    reality.$document.trigger('try', ['playlist']);
-                };
+            ready = function () {
+                reality.musicUrl = reality.defaults.musicSrc;
+                reality.toLoad.push('music');
+                reality.loadMusic(viz.getAudio());
+                reality.$document.trigger('try', ['playlist']);
+            };
         !this.isStarted && reality.toLoad.push('playlist');
         ready();
-    }};
+    }
+};
 reality.updateManager.init();
-reality.settings = {settings: {preset: {mode: 'timer', timer: 25000},
+reality.settings = {
+    settings: {
+        preset: {mode: 'timer', timer: 25000},
         playlist: {mode: 'random', autoStart: true},
-        transition: {time: 1000}, nick: 'Anonymous' + Math.round(Math.random() * 1e6), particlesNumber: 1e4,
+        transition: {time: 1000},
+        nick: 'Anonymous' + Math.round(Math.random() * 1e6),
+        particlesNumber: 1e4,
         lineIn: {freqAmp: 380, magAmp: 7.6, smoothingTimeConstant: 0.04, autoStart: false},
-        tips: {main: 0, lineIn: 0, presets: 0, irc: 0}}, presetInterval: 0, load: function()
-    {
+        tips: {main: 0, lineIn: 0, presets: 0, irc: 0}
+    }, presetInterval: 0, load: function () {
         $.extend(true, this.settings, localStorage2.getItem('settings'));
         return this;
-    }, run: function() {
+    }, run: function () {
         clearInterval(this.presetInterval);
-        if (this.settings.preset.mode === 'timer')
-        {
-            this.presetInterval = setInterval(function() {
+        if (this.settings.preset.mode === 'timer') {
+            this.presetInterval = setInterval(function () {
                 reality.randomPreset();
             }, this.settings.preset.timer);
         }
         return this;
-    }};
+    }
+};
 reality.settings.defaultSettings = JSON.parse(JSON.stringify(reality.settings.settings));
-fluent = {util: {wave: function(i, freq, phase, width, center) {
+fluent = {
+    util: {
+        wave: function (i, freq, phase, width, center) {
             return Math.round(Math.sin(freq * i + phase) * width + center);
-        }, wavec: function(i, freq, phase, width, center) {
+        }, wavec: function (i, freq, phase, width, center) {
             return Math.round(Math.cos(freq * i + phase) * width + center);
-        }, wavef: function(i, freq, phase, width, center) {
+        }, wavef: function (i, freq, phase, width, center) {
             return Math.sin(freq * i + phase) * width + center;
-        }, wavefc: function(i, freq, phase, width, center) {
+        }, wavefc: function (i, freq, phase, width, center) {
             return Math.cos(freq * i + phase) * width + center;
-        }, gradiant: function(i, frequency, phase, center, width) {
+        }, gradiant: function (i, frequency, phase, center, width) {
             i = i || 0;
             center = center || 128;
             width = width || 127;
-            return{i: ++i, color: {
+            return {
+                i: ++i,
+                color: {
                     r: this.wave(i, frequency.r, phase.r, width, center),
                     g: this.wave(i, frequency.g, phase.g, width, center),
-                    b: this.wave(i, frequency.b, phase.b, width, center)}
+                    b: this.wave(i, frequency.b, phase.b, width, center)
+                }
             };
-        }, rgbToHex: function(r, g, b) {
+        }, rgbToHex: function (r, g, b) {
             return parseInt('' + (1 << 24 | r << 16 | g << 8 | b).toString(16).substr(1), 16);
-        }}};
-reality.mutate = function(d1, d2, time, stepHandler, finalHandler)
-{
-    stepHandler = stepHandler || function() {
-    };
-    finalHandler = finalHandler || function() {
-    };
-    var fps = 16, frames = Math.round(time / fps), next = fps, d3 = JSON.parse(JSON.stringify(d1)), last = reality.mutate.last = Math.random(), calcStep = function(d1, d2)
-    {
+        }
+    }
+};
+reality.mutate = function (d1, d2, time, stepHandler, finalHandler) {
+    stepHandler = stepHandler || function () {
+        };
+    finalHandler = finalHandler || function () {
+        };
+    var fps = 16, frames = Math.round(time / fps), next = fps, d3 = JSON.parse(JSON.stringify(d1)), last = reality.mutate.last = Math.random(), calcStep = function (d1, d2) {
         var r = {};
-        for (key in d1)
-        {
-            switch (typeof d1[key])
-            {
+        for (key in d1) {
+            switch (typeof d1[key]) {
                 case'number':
                     r[key] = (d2[key] - d1[key]) / frames;
                     break;
@@ -881,12 +889,9 @@ reality.mutate = function(d1, d2, time, stepHandler, finalHandler)
             }
         }
         return r;
-    }, step = calcStep(d1, d2), doStep = function(d, step)
-    {
-        for (key in d)
-        {
-            switch (typeof d[key])
-            {
+    }, step = calcStep(d1, d2), doStep = function (d, step) {
+        for (key in d) {
+            switch (typeof d[key]) {
                 case'number':
                     d[key] += step[key];
                     break;
@@ -897,10 +902,8 @@ reality.mutate = function(d1, d2, time, stepHandler, finalHandler)
             }
         }
         return d;
-    }, runStep = function()
-    {
-        if ((next < time) && (last == reality.mutate.last))
-        {
+    }, runStep = function () {
+        if ((next < time) && (last == reality.mutate.last)) {
             next += fps;
             doStep(d3, step);
             stepHandler(d3);
@@ -915,57 +918,60 @@ reality.mutate = function(d1, d2, time, stepHandler, finalHandler)
     runStep();
 };
 reality.mutate.last = 0.0;
-$(window).bind('online', function() {
+$(window).bind('online', function () {
     reality.updateManager.checkUpdate();
 });
-reality.getPreset = function(string)
-{
+reality.getPreset = function (string) {
     string = (typeof string === 'boolean' ? string : true);
     var json = [], i = 0, m = reality.items.length;
-    for (; i < m; ++i)
-    {
+    for (; i < m; ++i) {
         json.push({
             controls: reality.items[i].options.controls,
             camera: {
-                position: {x: reality.camera.position.x, y: reality.camera.position.y, z: reality.camera.position.z},
-                rotation: {x: reality.camera.rotation.x, y: reality.camera.rotation.y, z: reality.camera.rotation.z}},
+                position: {
+                    x: reality.camera.position.x,
+                    y: reality.camera.position.y,
+                    z: reality.camera.position.z
+                }, rotation: {x: reality.camera.rotation.x, y: reality.camera.rotation.y, z: reality.camera.rotation.z}
+            },
             particles: {
-                position: {x: reality.items[i].particleSystem.position.x, y: reality.items[i].particleSystem.position.y, z: reality.items[i].particleSystem.position.z},
-                rotation: {x: reality.items[i].particleSystem.rotation.x, y: reality.items[i].particleSystem.rotation.y, z: reality.items[i].particleSystem.rotation.z}
+                position: {
+                    x: reality.items[i].particleSystem.position.x,
+                    y: reality.items[i].particleSystem.position.y,
+                    z: reality.items[i].particleSystem.position.z
+                },
+                rotation: {
+                    x: reality.items[i].particleSystem.rotation.x,
+                    y: reality.items[i].particleSystem.rotation.y,
+                    z: reality.items[i].particleSystem.rotation.z
+                }
             }
         });
     }
     return string ? JSON.stringify(json) : json;
 };
-reality.setPreset = function(preset, fast)
-{
+reality.setPreset = function (preset, fast) {
     !$.isArray(preset.set) && (preset.set = [preset.set]);
     var i = 0, m = preset.set.length || 0, sizeChanged = false;
-    for (; i < m; ++i)
-    {
+    for (; i < m; ++i) {
         $.extend(true, preset.set[i].controls, $.extend(true, {}, reality.lib.entities.adiveinmusic.controlsDefault, preset.set[i].controls));
     }
     var originSet = $.extend(true, [], reality.helpers.presets.current.set, reality.getPreset(false));
     reality.helpers.presets.current = JSON.parse(JSON.stringify(preset));
     var toDel = originSet.length - preset.set.length;
-    if (toDel > 0)
-    {
-        for (i = 0; i < toDel; ++i)
-        {
+    if (toDel > 0) {
+        for (i = 0; i < toDel; ++i) {
             reality.scene.remove(reality.items[preset.set.length + i].particleSystem);
         }
         reality.items.splice(preset.set.length, toDel);
         originSet.splice(preset.set.length, toDel);
         sizeChanged = true;
     }
-    if (preset.id)
-    {
+    if (preset.id) {
         $('.presets .overview p.selected,.myPresets .overview p.selected').removeClass('selected');
-        $('.presets .overview p').each(function()
-        {
+        $('.presets .overview p').each(function () {
             reality.$fake[0] = this;
-            if (reality.$fake.data('presetId') == preset.id)
-            {
+            if (reality.$fake.data('presetId') == preset.id) {
                 reality.$fake.addClass('selected');
                 return;
             }
@@ -974,10 +980,8 @@ reality.setPreset = function(preset, fast)
     if (!preset) {
         return;
     }
-    for (i = 0; i < m; ++i)
-    {
-        if (!reality.items[i])
-        {
+    for (i = 0; i < m; ++i) {
+        if (!reality.items[i]) {
             sizeChanged = true;
             reality.items[i] = new reality.adiveInCloud($.extend(true, {}, reality.lib.entities.adiveinmusic));
             reality.items[i].particleSystem.rotation.x = 1.5;
@@ -986,78 +990,68 @@ reality.setPreset = function(preset, fast)
         }
         reality.items[i].uniforms.texture.texture = THREE.ImageUtils.loadTexture(preset.set[i].controls.picture);
     }
-    if (!sizeChanged && !fast && typeof originSet[0].camera !== 'undefined' && reality.settings.settings.transition.time > 0)
-    {
+    if (!sizeChanged && !fast && typeof originSet[0].camera !== 'undefined' && reality.settings.settings.transition.time > 0) {
         reality.mutate(originSet, preset.set, reality.settings.settings.transition.time, reality.setPreset.dynamicUpdate, reality.setPreset.staticUpdate);
     }
-    else
-    {
+    else {
         reality.setPreset.dynamicUpdate(preset.set);
     }
-    if (sizeChanged)
-    {
+    if (sizeChanged) {
         reality.$document.trigger('refresh', [reality.particlesNumber, fast]);
         return;
     }
     reality.helpers.titles.$main !== null && reality.helpers.titles.show(preset.name + ' by ' + preset.author);
 };
-reality.setPreset.dynamicUpdate = function(set) {
-    for (var i = 0, m = set.length; i < m; ++i)
-    {
+reality.setPreset.dynamicUpdate = function (set) {
+    for (var i = 0, m = set.length; i < m; ++i) {
         $.extend(true, reality.items[i].particleSystem, set[i].particles);
         $.extend(true, reality.items[i].options.controls, reality.items[i].options.controlsDefault, set[i].controls);
     }
     $.extend(reality.camera.position, set[0].camera.position);
     $.extend(reality.camera.rotation, set[0].camera.rotation);
 };
-reality.setPreset.staticUpdate = function() {
+reality.setPreset.staticUpdate = function () {
 };
-reality.getFullPreset = function(set, author, name) {
-    return{author: author || 'Anonymous', name: name || 'Name me', set: set};
+reality.getFullPreset = function (set, author, name) {
+    return {author: author || 'Anonymous', name: name || 'Name me', set: set};
 };
-reality.randomPreset = function() {
+reality.randomPreset = function () {
     reality.setPreset(reality.helpers.presets.presets[Math.round(Math.random() * reality.helpers.presets.presets.length)]);
 };
-reality.getFullPresetFromString = function(str)
-{
+reality.getFullPresetFromString = function (str) {
     return reality.getFullPreset(JSON.parse(str));
 };
-reality.getPresetFromId = function(id)
-{
-    for (var i = 0, l = reality.helpers.presets.presets.length; i < l; ++i)
-    {
-        if (reality.helpers.presets.presets[i].id == id)
-        {
+reality.getPresetFromId = function (id) {
+    for (var i = 0, l = reality.helpers.presets.presets.length; i < l; ++i) {
+        if (reality.helpers.presets.presets[i].id == id) {
             return reality.helpers.presets.presets[i];
         }
     }
     return false;
 };
-reality.set = {add: function()
-    {
+reality.set = {
+    add: function () {
         var newPreset = reality.getFullPreset(reality.getPreset(false));
         newPreset.set.push(newPreset.set[newPreset.set.length - 1]);
         reality.setPreset(newPreset, true);
-    }, remove: function(itemIndex) {
-        if (itemIndex > 0)
-        {
+    }, remove: function (itemIndex) {
+        if (itemIndex > 0) {
             var newPreset = reality.getFullPreset(reality.getPreset(false));
             newPreset.set.splice(itemIndex, 1);
             reality.setPreset(newPreset, true);
         }
-    }};
+    }
+};
 navigator.getMedia = navigator.webkitGetUserMedia;
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 reality.helpers.titles = {
     $main: false,
     pile: [],
-    create: function()
-    {
+    create: function () {
         /*
          this.$main = $('<div>').addClass('titleZone').prependTo('body');
          */
-    }, show: function(title, displayFor)
-    {
+    }, show: function (title, displayFor) {
         return;
         /*
          if (reality.helpers.titles.pile.indexOf(title) === -1)
@@ -1078,8 +1072,7 @@ reality.helpers.titles = {
          }, 100);
          }
          */
-    }, showSub: function(title, delay)
-    {
+    }, showSub: function (title, delay) {
         /*
          typeof reality.helpers.titles.$subTitle === 'undefined' && (reality.helpers.titles.$subTitle = $('<h4>').addClass('sub').appendTo(this.$main));
          reality.helpers.titles.$subTitle.html(title).removeClass('leave').addClass('enter');
@@ -1088,8 +1081,7 @@ reality.helpers.titles = {
          setTimeout(reality.helpers.titles.hideSub, delay);
          }
          */
-    }, hideSub: function()
-    {
+    }, hideSub: function () {
         /*
          reality.helpers.titles.$subTitle.addClass('leave').removeClass('enter');
          */
@@ -1100,25 +1092,23 @@ reality.helpers.presets = {
     name: 'presets',
     presets: [],
     current: false,
-    get: function(id)
-    {
+    get: function (id) {
         var i = 0, p = this.presets, m = p.length;
-        for (; i < m; ++i)
-        {
+        for (; i < m; ++i) {
             if (id == p[i].id) {
                 return p[i];
             }
         }
         return false;
-    }, disconnectCurrent: function()
-    {
+    },
+    disconnectCurrent: function () {
         this.current.id = false;
-    }, refresh: function() {
+    },
+    refresh: function () {
         this.presets = reality.presets;
     }
 };
-reality.$document.bind('go', function()
-{
+reality.$document.bind('go', function () {
     reality.ui = {
         interact: false,
         lastMove: 0,
@@ -1127,10 +1117,9 @@ reality.$document.bind('go', function()
         inspectInterval: 1000,
         sleepingInterval: 3000
     };
-    $(reality.$document).bind('mousemove', function(e) {
+    $(reality.$document).bind('mousemove', function (e) {
         reality.ui.lastTarget = e.target;
-        if (reality.ui.lastPos.x != e.pageX && reality.ui.lastPos.Y != e.pageY)
-        {
+        if (reality.ui.lastPos.x != e.pageX && reality.ui.lastPos.Y != e.pageY) {
             reality.ui.lastMove = new Date();
             reality.ui.interact = true;
             reality.ui.lastPos.x = e.pageX;
@@ -1138,9 +1127,8 @@ reality.$document.bind('go', function()
             reality.$document.trigger('interacting');
         }
     });
-    setInterval(function() {
-        if (reality.ui.lastTarget == reality.renderer.domElement && (new Date() - reality.ui.lastMove) > reality.ui.sleepingInterval)
-        {
+    setInterval(function () {
+        if (reality.ui.lastTarget == reality.renderer.domElement && (new Date() - reality.ui.lastMove) > reality.ui.sleepingInterval) {
             reality.ui.interact = false;
             reality.$document.trigger('sleeping');
         }
@@ -1155,11 +1143,12 @@ reality.cameraSpeed = .0005;
 reality.settings.load();
 reality.particlesNumber = reality.settings.settings.particlesNumber || 3e4;
 reality.delayMusicLoad = true;
-reality.defaults = $.extend(true, reality.defaults, {musicSrc: 'viz/sound/thesaxman.ogg', presetId: 99}, reality.defaultApplication);
-reality.cameraMove = function()
-{
-    switch (reality.lastButtonEvent.which)
-    {
+reality.defaults = $.extend(true, reality.defaults, {
+    musicSrc: 'viz/sound/thesaxman.ogg',
+    presetId: 99
+}, reality.defaultApplication);
+reality.cameraMove = function () {
+    switch (reality.lastButtonEvent.which) {
         case 1:
             this.camera.position.z += (this.mouse.x - this.camera.position.z) * reality.cameraSpeed;
             this.camera.position.y += (this.mouse.y - this.camera.position.y) * reality.cameraSpeed;
@@ -1168,36 +1157,30 @@ reality.cameraMove = function()
 };
 reality.init();
 reality.lastCandidatePresetId = false;
-$(document).bind('mousedown', function(e)
-{
-    if (e.target.tagName == 'CANVAS' && $(e.target).closest('.modal,.panel').length < 1)
-    {
+$(document).bind('mousedown', function (e) {
+    if (e.target.tagName == 'CANVAS' && $(e.target).closest('.modal,.panel').length < 1) {
         reality.free = true;
         reality.lastButtonEvent = e;
     }
-}).bind('mouseup', function(e) {
+}).bind('mouseup', function (e) {
     reality.free = false;
-}).bind('musicChange', function()
-{
+}).bind('musicChange', function () {
     reality.settings.settings.preset.mode == 'song' && reality.randomPreset();
-}).bind('refresh', function(e, particlesNumber, fast)
-{
+}).bind('refresh', function (e, particlesNumber, fast) {
     var i = 0, m = reality.helpers.presets.current.set.length;
     reality.particlesNumber = particlesNumber || reality.particlesNumber;
     reality.lib.entities.adiveinmusic.particleNumber = Math.round(particlesNumber / m);
-    for (; i < m; ++i)
-    {
+    for (; i < m; ++i) {
         reality.scene.remove(reality.items[i].particleSystem);
         reality.items[i] = new reality.adiveInCloud($.extend(true, {}, reality.lib.entities.adiveinmusic));
         reality.scene.add(reality.items[i].particleSystem);
     }
     reality.setPreset(reality.helpers.presets.current, fast);
-}).bind('sleeping', function() {
+}).bind('sleeping', function () {
     reality.$body.addClass('sleeping');
-}).bind('interacting', function() {
+}).bind('interacting', function () {
     reality.$body.removeClass('sleeping');
-}).bind('go', function()
-{
+}).bind('go', function () {
     reality.timing.finish('load', 'load');
     reality.settings.run();
     reality.musicUrl && reality.music.play();
@@ -1219,21 +1202,73 @@ $(document).bind('mousedown', function(e)
 reality.lib.entities.adiveinmusic = {
     image: "img/pg1.png",
     particleNumber: reality.particlesNumber,
-    sizeAttenuation: false, sort: false,
+    sizeAttenuation: false,
+    sort: false,
     blending: THREE.AdditiveBlending,
     vertexColors: THREE.VertexColors,
-    populate: function()
-    {
+    populate: function () {
         this.particleNumber = this.options.particleNumber;
         var i = 0;
-        for (; i < this.particleNumber; ++i)
-        {
+        for (; i < this.particleNumber; ++i) {
             this.particles.vertices.push(new THREE.Vector3(1, i * 50, 1));
             this.attributes.customColor.value.push(new THREE.Color().setRGB(1, 0.5, .5));
             this.attributes.colorDecr.value.push(new THREE.Color().setRGB(0, 0, 0));
         }
-    }, controlsDefault: {seuilAudible: .001, radiusAmplitude: 1, radius: 100, radiusVar: 1, radiusVarAmp: 0, amplitudeOnMag: 0, colors: {r: 0, g: .5, b: .9}, burningColors: {r: 5, g: 0, b: 0}, burningColorsMax: {r: 1, g: 1, b: 1}, spectralColors: {r: 1, g: 1, b: 1}, bgColors: {r: 0, g: 0, b: 0}, speed: 2, picture: "img/pg1.png", colorsDecr: {r: .0017, g: .0017, b: .0017}, dots: 64, maxSize: 500, rotation: {x: 0, y: 0, z: 0}, position: {x: 0, y: 0, z: 0}, radiusIncr: 0, radiusIncrAmp: 0, speedIncr: 0, opacityBase: 1, opacityAmp: 0, opacityDecr: 0, centerAmp: 0, sizeAmp: 1, sizeDecr: 0, freqSpeedIncr: 0, magSpeedIncr: 0, baseRotate: 0, autoRotate: 0, rotateAmp: 0, textureRotateDecr: 0, textureRotateAmp: 0, equalizer: 0, gravity: {x: 0, y: 0, z: 0}, gravityAmp: {x: 0, y: 0, z: 0}, showAmp: true, blending: THREE.AdditiveBlending, autoTraveler: true, camera: {positionIncr: {x: 0, y: 0, z: 0}, traveler: {freq: {x: 0, y: .01, z: .01, x2: 0, y2: 0, z2: 0}, phase: {x: 0, y: .01, z: .01, x2: 0, y2: 0, z2: 0}, width: {x: 0, y: .1, z: .1, x2: 0, y2: 0, z2: 0}, center: {x: 0, y: 0, z: 0, x2: 0, y2: 0, z2: 0}}}}, controls: {}, profiling: {times: [], last: 0}, move: function()
-    {
+    },
+    controlsDefault: {
+        seuilAudible: .001,
+        radiusAmplitude: 1,
+        radius: 100,
+        radiusVar: 1,
+        radiusVarAmp: 0,
+        amplitudeOnMag: 0,
+        colors: {r: 0, g: .5, b: .9},
+        burningColors: {r: 5, g: 0, b: 0},
+        burningColorsMax: {r: 1, g: 1, b: 1},
+        spectralColors: {r: 1, g: 1, b: 1},
+        bgColors: {r: 0, g: 0, b: 0},
+        speed: 2,
+        picture: "img/pg1.png",
+        colorsDecr: {r: .0017, g: .0017, b: .0017},
+        dots: 64,
+        maxSize: 500,
+        rotation: {x: 0, y: 0, z: 0},
+        position: {x: 0, y: 0, z: 0},
+        radiusIncr: 0,
+        radiusIncrAmp: 0,
+        speedIncr: 0,
+        opacityBase: 1,
+        opacityAmp: 0,
+        opacityDecr: 0,
+        centerAmp: 0,
+        sizeAmp: 1,
+        sizeDecr: 0,
+        freqSpeedIncr: 0,
+        magSpeedIncr: 0,
+        baseRotate: 0,
+        autoRotate: 0,
+        rotateAmp: 0,
+        textureRotateDecr: 0,
+        textureRotateAmp: 0,
+        equalizer: 0,
+        gravity: {x: 0, y: 0, z: 0},
+        gravityAmp: {x: 0, y: 0, z: 0},
+        showAmp: true,
+        blending: THREE.AdditiveBlending,
+        autoTraveler: true,
+        camera: {
+            positionIncr: {x: 0, y: 0, z: 0},
+            traveler: {
+                freq: {x: 0, y: .01, z: .01, x2: 0, y2: 0, z2: 0},
+                phase: {x: 0, y: .01, z: .01, x2: 0, y2: 0, z2: 0},
+                width: {x: 0, y: .1, z: .1, x2: 0, y2: 0, z2: 0},
+                center: {x: 0, y: 0, z: 0, x2: 0, y2: 0, z2: 0}
+            }
+        }
+    },
+    controls: {},
+    profiling: {times: [], last: 0},
+    move: function () {
         ++this.uniforms.gProcess.value;
         this.uniforms.textureRotateDecr.value = this.options.controls.textureRotateDecr;
         this.uniforms.speedIncr.value = this.options.controls.speedIncr * reality.music.mag;
@@ -1246,9 +1281,11 @@ reality.lib.entities.adiveinmusic = {
         this.particleSystem.position.y -= this.options.controls.position.y;
         this.particleSystem.position.z -= this.options.controls.position.z;
         this.options.controls.baseRotate += this.options.controls.autoRotate + this.options.controls.rotateAmp * reality.music.mag || 0;
-        var start = {x: -60, y: 300}, i = 0, newVertice = 0, dots = this.options.controls.dots, radius = this.options.controls.radius - this.options.controls.radius * reality.music.mag * this.options.controls.amplitudeOnMag, angle = this.options.controls.baseRotate, angleIncr = Math.PI * 2 / (dots * this.options.controls.radiusVar + (this.options.controls.radiusVar * this.options.controls.radiusVarAmp * reality.music.mag)), currentCenterAmp = this.options.controls.centerAmp * reality.music.mag, currentPosAmp = 0, cVertice = 0, tmp = 0;
-        if (this.options.controls.showAmp)
-        {
+        var start = {
+            x: -60,
+            y: 300
+        }, i = 0, newVertice = 0, dots = this.options.controls.dots, radius = this.options.controls.radius - this.options.controls.radius * reality.music.mag * this.options.controls.amplitudeOnMag, angle = this.options.controls.baseRotate, angleIncr = Math.PI * 2 / (dots * this.options.controls.radiusVar + (this.options.controls.radiusVar * this.options.controls.radiusVarAmp * reality.music.mag)), currentCenterAmp = this.options.controls.centerAmp * reality.music.mag, currentPosAmp = 0, cVertice = 0, tmp = 0;
+        if (this.options.controls.showAmp) {
             ++newVertice;
             cVertice = this.current + newVertice;
             this.particles.vertices[cVertice] = new THREE.Vector3(start.x, 0, 0);
@@ -1261,11 +1298,9 @@ reality.lib.entities.adiveinmusic = {
             this.attributes.size.value[cVertice] = Math.max(1, this.options.controls.maxSize * reality.music.mag * this.options.controls.sizeAmp / 7) | 0;
             this.attributes.speed.value[cVertice] = this.options.controls.speed;
         }
-        for (; i < dots; ++i)
-        {
+        for (; i < dots; ++i) {
             radius += this.options.controls.radiusIncr + (this.options.controls.radiusIncr * this.options.controls.radiusIncrAmp * reality.music.mag);
-            if (reality.music.spectrum[i] > this.options.controls.seuilAudible)
-            {
+            if (reality.music.spectrum[i] > this.options.controls.seuilAudible) {
                 this.options.controls.equalizer != 0 && (reality.music.spectrum[i] = Math.exp(i / this.options.controls.equalizer) * reality.music.spectrum[i]);
                 ++newVertice;
                 cVertice = this.current + newVertice;
@@ -1295,20 +1330,24 @@ reality.lib.entities.adiveinmusic = {
         this.attributes.rotationSpeed.needsUpdate = true;
         this.attributes.process.needsUpdate = true;
         this.attributes.speed.needsUpdate = true;
-    }};
-reality.adiveInCloud = function(options) {
+    }
+};
+reality.adiveInCloud = function (options) {
     this.particles = new THREE.Geometry();
     this.current = 0;
-    this.attributes = {size: {type: 'f', value: new Uint8Array(reality.particlesNumber)},
+    this.attributes = {
+        size: {type: 'f', value: new Uint8Array(reality.particlesNumber)},
         opacity: {type: 'f', value: new Float32Array(reality.particlesNumber)},
         opacityDecr: {type: 'f', value: new Float32Array(reality.particlesNumber)},
-        customColor: {type: 'c', value: []}, colorDecr: {type: 'c', value: []},
+        customColor: {type: 'c', value: []},
+        colorDecr: {type: 'c', value: []},
         rotation: {type: 'f', value: new Float32Array(reality.particlesNumber)},
         rotationSpeed: {type: 'f', value: new Float32Array(reality.particlesNumber)},
         process: {type: 'f', value: new Uint32Array(reality.particlesNumber)},
         speed: {type: 'f', value: new Float32Array(reality.particlesNumber)}
     };
-    this.uniforms = {color: {type: "c"},
+    this.uniforms = {
+        color: {type: "c"},
         texture: {type: "t", value: 0},
         gProcess: {type: 'f', value: 0},
         speedIncr: {type: 'f', value: 0.0},
@@ -1318,64 +1357,76 @@ reality.adiveInCloud = function(options) {
         textureRotateDecr: {type: 'f', value: 0.0},
         spectrum: {type: 'f', value: []}
     };
-    this.initParticles = function()
-    {
-        this.material = new THREE.ShaderMaterial({uniforms: this.uniforms, attributes: this.attributes, vertexShader: '   attribute float size;'
-                    + '   attribute float opacity;'
-                    + '   attribute float opacityDecr;'
-                    + '   attribute float speed;'
-                    + '   attribute float rotation;'
-                    + '   attribute float rotationSpeed;'
-                    + '   attribute vec3 customColor;'
-                    + '   attribute vec3 colorDecr;'
-                    + '   attribute float process;'
-                    + '   uniform float gProcess;'
-                    + '   uniform float textureRotateDecr;'
-                    + '   uniform float speedIncr;'
-                    + '   uniform float gravityX;'
-                    + '   uniform float gravityY;'
-                    + '   uniform float gravityZ;'
-                    + '   varying vec3 vColor;'
-                    + '   varying float vOpacity;'
-                    + '   varying float vOpacityDecr;'
-                    + '   varying float vRotation;'
-                    + '   varying float progress;'
-                    + '   void main() {'
-                    + '    vOpacity = opacity;'
-                    + '    vOpacityDecr= opacityDecr;'
-                    + '    progress = (gProcess - process);'
-                    + '    vColor  = customColor - colorDecr * progress;'
-                    + '    vRotation = rotation + progress * textureRotateDecr + progress * rotationSpeed;'
-                    + '    vec4 mvPosition = modelViewMatrix * vec4( position.x - progress*speed*(1.0+(progress*gravityX)) - speedIncr,position.y*(1.0+(progress*gravityY)),position.z*(1.0+(progress*gravityZ)), 1.0 );'
-                    + '    gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );'
-                    + '    gl_Position = projectionMatrix * mvPosition;'
-                    + '   }', fragmentShader: '   uniform vec3 color;'
-                    + '   uniform sampler2D texture;'
-                    + '   varying vec3 vColor;'
-                    + '   varying float vOpacity;'
-                    + '   varying float vOpacityDecr;'
-                    + '   varying float vRotation;'
-                    + '   varying float progress;'
-                    + '   void main() {'
-                    + '    float mid = 0.5;'
-                    + '    gl_FragColor = vec4( color * vColor,  vOpacity - progress * vOpacityDecr);'
-                    + '    vec2 rotatedCoord = vec2(cos(vRotation) * (gl_PointCoord.x - mid) + sin(vRotation) * (gl_PointCoord.y - mid) + mid, cos(vRotation) * (gl_PointCoord.y - mid) - sin(vRotation) * (gl_PointCoord.x - mid) + mid);'
-                    + '    gl_FragColor = gl_FragColor * texture2D( texture, rotatedCoord );'
-                    + '   }', blending: THREE.AdditiveBlending, depthTest: false, transparent: true});
+    this.initParticles = function () {
+        this.material = new THREE.ShaderMaterial({
+            uniforms: this.uniforms, attributes: this.attributes, vertexShader: '   attribute float size;'
+            + '   attribute float opacity;'
+            + '   attribute float opacityDecr;'
+            + '   attribute float speed;'
+            + '   attribute float rotation;'
+            + '   attribute float rotationSpeed;'
+            + '   attribute vec3 customColor;'
+            + '   attribute vec3 colorDecr;'
+            + '   attribute float process;'
+            + '   uniform float gProcess;'
+            + '   uniform float textureRotateDecr;'
+            + '   uniform float speedIncr;'
+            + '   uniform float gravityX;'
+            + '   uniform float gravityY;'
+            + '   uniform float gravityZ;'
+            + '   varying vec3 vColor;'
+            + '   varying float vOpacity;'
+            + '   varying float vOpacityDecr;'
+            + '   varying float vRotation;'
+            + '   varying float progress;'
+            + '   void main() {'
+            + '    vOpacity = opacity;'
+            + '    vOpacityDecr= opacityDecr;'
+            + '    progress = (gProcess - process);'
+            + '    vColor  = customColor - colorDecr * progress;'
+            + '    vRotation = rotation + progress * textureRotateDecr + progress * rotationSpeed;'
+            + '    vec4 mvPosition = modelViewMatrix * vec4( position.x - progress*speed*(1.0+(progress*gravityX)) - speedIncr,position.y*(1.0+(progress*gravityY)),position.z*(1.0+(progress*gravityZ)), 1.0 );'
+            + '    gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );'
+            + '    gl_Position = projectionMatrix * mvPosition;'
+            + '   }', fragmentShader: '   uniform vec3 color;'
+            + '   uniform sampler2D texture;'
+            + '   varying vec3 vColor;'
+            + '   varying float vOpacity;'
+            + '   varying float vOpacityDecr;'
+            + '   varying float vRotation;'
+            + '   varying float progress;'
+            + '   void main() {'
+            + '    float mid = 0.5;'
+            + '    gl_FragColor = vec4( color * vColor,  vOpacity - progress * vOpacityDecr);'
+            + '    vec2 rotatedCoord = vec2(cos(vRotation) * (gl_PointCoord.x - mid) + sin(vRotation) * (gl_PointCoord.y - mid) + mid, cos(vRotation) * (gl_PointCoord.y - mid) - sin(vRotation) * (gl_PointCoord.x - mid) + mid);'
+            + '    gl_FragColor = gl_FragColor * texture2D( texture, rotatedCoord );'
+            + '   }', blending: THREE.AdditiveBlending, depthTest: false, transparent: true
+        });
         this.particleSystem = new THREE.ParticleSystem(this.particles, this.material);
         this.particleSystem.sortParticles = this.options.sort;
-        for (var max = this.particleSystem.geometry.vertices.length, i = 0; i < max; ++i)
-        {
+        for (var max = this.particleSystem.geometry.vertices.length, i = 0; i < max; ++i) {
             this.particleSystem.geometry.vertices[i].ox = this.particleSystem.geometry.vertices[i].x;
             this.particleSystem.geometry.vertices[i].oy = this.particleSystem.geometry.vertices[i].y;
             this.particleSystem.geometry.vertices[i].oz = this.particleSystem.geometry.vertices[i].z;
         }
     };
-    this.init = function()
-    {
-        this.options = $.extend({move: function() {
-            }, populate: function() {
-            }, image: "img/red.png", size: 200, color: 0xFFFFFF, transparent: true, vertexColors: null, depthTest: false, opacity: 1, sizeAttenuation: false, sort: true, blending: THREE.AdditiveBlending}, options);
+    this.init = function () {
+        this.options = $.extend({
+            move: function () {
+            },
+            populate: function () {
+            },
+            image: "img/red.png",
+            size: 200,
+            color: 0xFFFFFF,
+            transparent: true,
+            vertexColors: null,
+            depthTest: false,
+            opacity: 1,
+            sizeAttenuation: false,
+            sort: true,
+            blending: THREE.AdditiveBlending
+        }, options);
         this.move = this.options.move;
         this.populate = this.options.populate;
         this.uniforms.color.value = new THREE.Color(0xffffff);
