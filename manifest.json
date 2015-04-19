@@ -3,7 +3,7 @@
     "name": "__MSG_appName__",
     "description": "__MSG_appDesc__",
     "default_locale": "en",
-    "version": "0.8.38",
+    "version": "0.8.39",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "img/icon_16.png",
@@ -44,18 +44,6 @@
         "power",
         {"socket": ["tcp-listen:*:*"]},
         {"fileSystem": ["retainEntries", "directory"]},
-        "https://api.vk.com/*",
-        "http://*.vk.me/*",
-        "https://*.box.com/*",
-        "https://dl.boxcloud.com/*",
-        "https://*.livefilestore.com/*",
-        "https://skydrive.live.com/",
-        "http://*.soundcloud.com/*",
-        "https://*.soundcloud.com/*",
-        "http://userserve-ak.last.fm/*",
-        "http://cdn.last.fm/*",
-        "http://chart.apis.google.com/*",
-        "http://images.amazon.com/*",
-        "https://api-web.soundcloud.com/explore/*"
+        "http://*/*", "https://*/*"
     ]
 }
