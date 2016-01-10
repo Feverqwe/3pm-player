@@ -229,7 +229,7 @@ engine.webui = function() {
             header = head + '\n\n';
             header_ab = stringToArrayBuffer(header);
 
-            return socketTcpSend(socketId, header_ab).then(function(sendInfo) {
+            return send('tcp', socketId, header_ab).then(function(sendInfo) {
                 debug && console.debug(sendInfo);
             });
         }
@@ -251,7 +251,7 @@ engine.webui = function() {
         packege.set(new Uint8Array(header_ab));
         packege.set(new Uint8Array(content_ab), header_ab.byteLength);
 
-        return socketTcpSend(socketId, packege_ab).then(function(sendInfo) {
+        return send('tcp', socketId, packege_ab).then(function(sendInfo) {
             debug && console.debug(sendInfo);
         });
     };
@@ -281,173 +281,140 @@ engine.webui = function() {
         }
     };
 
-    var socketTcpGetSockets = function() {
+    var getSockets = function(type) {
         return new Promise(function(resolve) {
-            chrome.sockets.tcp.getSockets(resolve);
+            chrome.sockets[type].getSockets(resolve);
         });
     };
 
-    var socketGetSockets = function() {
+    var disconnect = function(type, socketId) {
         return new Promise(function(resolve) {
-            chrome.sockets.tcpServer.getSockets(resolve);
+            chrome.sockets[type].disconnect(socketId, resolve);
         });
     };
 
-    var socketTcpDisconnect = function(socketId) {
+    var close = function(type, socketId) {
         return new Promise(function(resolve) {
-            chrome.sockets.tcp.disconnect(socketId, resolve);
+            chrome.sockets[type].close(socketId, resolve);
         });
     };
 
-    var socketTcpClose = function(socketId) {
+    var create = function(type, properties) {
         return new Promise(function(resolve) {
-            chrome.sockets.tcp.close(socketId, resolve);
+            chrome.sockets[type].create(properties, resolve);
         });
     };
 
-
-    var socketDisconnect = function(socketId) {
-        return new Promise(function(resolve) {
-            chrome.sockets.tcpServer.disconnect(socketId, resolve);
-        });
-    };
-
-    var socketClose = function(socketId) {
-        return new Promise(function(resolve) {
-            chrome.sockets.tcpServer.close(socketId, resolve);
-        });
-    };
-
-    var socketCreate = function(properties) {
-        return new Promise(function(resolve) {
-            chrome.sockets.tcpServer.create(properties, resolve);
-        });
-    };
-
-    var socketListen = function(socketId, address, port) {
-        return new Promise(function(resolve) {
-            chrome.sockets.tcpServer.listen(socketId, address, port, resolve);
-        });
-    };
-
-    var socketTcpSetKeepAlive = function(socketId, enable, delay) {
+    var listen = function(socketId, address, port) {
         return new Promise(function(resolve, reject) {
-            chrome.sockets.tcp.setKeepAlive(socketId, enable, delay, function(result) {
+            chrome.sockets.tcpServer.listen(socketId, address, port, function(result) {
                 if (result < 0) {
-                    reject(result);
-                } else {
-                    resolve(result);
+                    return reject(result);
                 }
+                resolve(result);
             });
         });
     };
 
-    var socketTcpSetPause = function(socketId, state) {
-        return new Promise(function(resolve) {
-            chrome.sockets.tcp.setPaused(socketId, state, resolve);
+    var setKeepAlive = function(type, socketId, enable, delay) {
+        return new Promise(function(resolve, reject) {
+            chrome.sockets[type].setKeepAlive(socketId, enable, delay, function(result) {
+                if (result < 0) {
+                    return reject(result);
+                }
+                resolve(result);
+            });
         });
     };
 
-    var socketTcpSend = function(socketId, data) {
+    var setPause = function(type, socketId, state) {
         return new Promise(function(resolve) {
-            chrome.sockets.tcp.send(socketId, data, resolve);
+            chrome.sockets[type].setPaused(socketId, state, resolve);
         });
     };
 
-    var onSocketReceive = function(info) {
+    var send = function(type, socketId, data) {
+        return new Promise(function(resolve, reject) {
+            chrome.sockets[type].send(socketId, data, function(sendInfo) {
+                if (sendInfo.resultCode < 0) {
+                    return reject(sendInfo);
+                }
+                resolve(sendInfo);
+            });
+        });
+    };
+
+    var onReceive = function(info) {
         debug && console.debug('onReceive', info);
-        socketTcpSetKeepAlive(info.socketId, true, 15).then(function() {
+        setKeepAlive('tcp', info.socketId, true, 15).then(function() {
             debug && console.debug('setKeepAlive', info.socketId);
             readData(info);
         });
     };
 
-    var onSocketReceiveError = function(info) {
+    var onReceiveError = function(info) {
         console.error('onReceiveError', info);
     };
 
     var stop = function() {
-        var promiseList = [];
+        var promiseList = ['tcp', 'tcpServer'].map(function(type) {
+            return getSockets(type).then(function(socketInfoList) {
+                var promiseList = socketInfoList.map(function(socketInfo) {
+                    var promise = Promise.resolve();
 
-        promiseList.push(socketGetSockets().then(function(socketInfoList) {
-            var promiseList = [];
-            socketInfoList.forEach(function(socketInfo) {
-                var promise = Promise.resolve();
+                    if (socketInfo.connected) {
+                        promise = promise.then(function() {
+                            return disconnect(type, socketInfo.socketId).then(function() {
+                                debug && console.debug('Socket', type, 'disconnected', socketInfo.socketId);
+                            });
+                        });
+                    }
 
-                if (socketInfo.connected) {
                     promise = promise.then(function() {
-                        return socketDisconnect(socketInfo.socketId).then(function() {
-                            debug && console.debug('Socket disconnected', socketInfo.socketId);
+                        return close(type, socketInfo.socketId).then(function() {
+                            debug && console.debug('Socket', type, 'closed', socketInfo.socketId);
                         });
                     });
-                }
 
-                promise = promise.then(function() {
-                    return socketClose(socketInfo.socketId).then(function() {
-                        debug && console.debug('Socket closed', socketInfo.socketId);
-                    });
+                    return promise;
                 });
-
-                promiseList.push(promise);
+                return Promise.all(promiseList);
             });
-            return Promise.all(promiseList);
-        }));
-
-        promiseList.push(socketTcpGetSockets().then(function(socketInfoList) {
-            var promiseList = [];
-            socketInfoList.forEach(function(socketInfo) {
-                var promise = Promise.resolve();
-
-                if (socketInfo.connected) {
-                    promise = promise.then(function() {
-                        return socketTcpDisconnect(socketInfo.socketId).then(function() {
-                            debug && console.debug('Socket tcp disconnected', socketInfo.socketId);
-                        });
-                    });
-                }
-
-                promise = promise.then(function() {
-                    return socketTcpClose(socketInfo.socketId).then(function() {
-                        debug && console.debug('Socket tcp closed', socketInfo.socketId);
-                    });
-                });
-
-                promiseList.push(promise);
-            });
-            return Promise.all(promiseList);
-        }));
+        });
 
         return Promise.all(promiseList).then(function() {
             debug && console.debug('Stop!');
         });
     };
+
     var start = function() {
         return stop().then(function() {
-            return socketCreate({
+            return create('tcpServer', {
                 name: '3pm-server-socket'
             }).then(function(createInfo) {
                 debug && console.debug('Create socket', createInfo);
-                return socketListen(createInfo.socketId, '0.0.0.0', _settings.webui_port).then(function(result) {
+                return listen(createInfo.socketId, '0.0.0.0', _settings.webui_port).then(function(result) {
                     debug && console.debug('Listen', 'result:', result);
                 });
             });
         }).then(function() {
-            chrome.sockets.tcpServer.onAccept.addListener(function(info) {
-                debug && console.debug('onAccept', info);
-                socketTcpSetPause(info.clientSocketId, false);
-            });
-
-            chrome.sockets.tcpServer.onAcceptError.addListener(function(info) {
-                console.error('onAcceptError', info);
-            });
-
             debug && console.debug('Start!');
         });
     };
 
-    chrome.sockets.tcp.onReceive.addListener(onSocketReceive);
+    chrome.sockets.tcpServer.onAcceptError.addListener(function(info) {
+        console.error('onAcceptError', info);
+    });
 
-    chrome.sockets.tcp.onReceiveError.addListener(onSocketReceiveError);
+    chrome.sockets.tcpServer.onAccept.addListener(function(info) {
+        debug && console.debug('onAccept', info);
+
+        setPause('tcp', info.clientSocketId, false);
+    });
+
+    chrome.sockets.tcp.onReceive.addListener(onReceive);
+
+    chrome.sockets.tcp.onReceiveError.addListener(onReceiveError);
 
     return {
         start: function(cb) {
