@@ -55,18 +55,8 @@ var options = function () {
         var interfaceList = [
             {name: 'Any', address: '0.0.0.0'}
         ];
-        chrome.socket.getNetworkList(function (items) {
-            items.forEach(function (item) {
-                if (item.address.indexOf(':') !== -1) {
-                    item.name += ' (IPv6)';
-                    if (ipv6_disable) {
-                        return 1;
-                    }
-                }
-                interfaceList.push({name: item.name, address: item.address});
-            });
-            writeInterfaceList(interfaceList);
-        });
+
+        writeInterfaceList(interfaceList);
     };
     var set_place_holder = function () {
         var settings = _settings;

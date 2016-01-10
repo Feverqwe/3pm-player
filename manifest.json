@@ -3,7 +3,7 @@
     "name": "__MSG_appName__",
     "description": "__MSG_appDesc__",
     "default_locale": "en",
-    "version": "0.8.39",
+    "version": "0.8.40",
     "minimum_chrome_version": "23",
     "icons": {
         "16": "img/icon_16.png",
@@ -22,8 +22,7 @@
             ],
             "extensions": [
                 "mp3", "m4a", "ogg", "oga"
-            ],
-            "title": "3pm-audio player"
+            ]
         },
         "video": {
             "types": [
@@ -31,8 +30,12 @@
             ],
             "extensions": [
                 "mp4", "mov", "m4v"
-            ],
-            "title": "3pm-video player"
+            ]
+        }
+    },
+    "sockets": {
+        "tcpServer": {
+            "listen": "*"
         }
     },
     "permissions": [
@@ -42,11 +45,6 @@
         "contextMenus", "fullscreen",
         "identity", "notifications",
         "power",
-        {"sockets": {
-            "tcpServer": {
-                "listen": ")"
-            }
-        }},
         {"fileSystem": ["retainEntries", "directory"]},
         "http://*/*", "https://*/*"
     ]
