@@ -42,7 +42,11 @@
         "contextMenus", "fullscreen",
         "identity", "notifications",
         "power",
-        {"socket": ["tcp-listen:*:*"]},
+        {"sockets": {
+            "tcpServer": {
+                "listen": ")"
+            }
+        }},
         {"fileSystem": ["retainEntries", "directory"]},
         "http://*/*", "https://*/*"
     ]
