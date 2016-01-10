@@ -2,8 +2,7 @@ engine.webui = function() {
     var active = false;
     var not_found = [];
     var cache = {};
-    
-    var debug = false;
+    var debug = true;
     
     var stringToArrayBuffer = function(string) {
         var buffer = new ArrayBuffer(string.length);
@@ -13,6 +12,7 @@ engine.webui = function() {
         }
         return buffer;
     };
+
     var arrayBufferToString = function(buffer) {
         var array = new Uint8Array(buffer);
         var str = '';
@@ -21,6 +21,7 @@ engine.webui = function() {
         }
         return str;
     };
+
     var waitPlChange = function(id,cb) {
         //ждем изменения плэйлиста в течении 30 секунд, проверка каждые 500мс
         var counter = 60;
@@ -220,6 +221,66 @@ engine.webui = function() {
         }
     };
 
+    var responseData = function(socketId, headerMap, content, headers) {
+        var head, header, header_ab;
+
+        if (headers[0].substr(0, 3) === "304") {
+            head = "HTTP/1.1 " + headers.join('\n');
+            header = head + '\n\n';
+            header_ab = stringToArrayBuffer(header);
+
+            return socketTcpSend(socketId, header_ab).then(function(sendInfo) {
+                debug && console.debug(sendInfo);
+            });
+        }
+
+        var content_ab = content;
+        if (typeof content === 'string') {
+            content_ab = stringToArrayBuffer(content);
+        }
+
+        headers.push("Content-Length: " + content_ab.byteLength);
+        headers.push("Connection: keep-alive");
+
+        head = "HTTP/1.1 " + headers.join('\n');
+        header = head + '\n\n';
+        header_ab = stringToArrayBuffer(header);
+
+        var packege_ab = new ArrayBuffer(content_ab.byteLength + header_ab.byteLength);
+        var packege = new Uint8Array(packege_ab);
+        packege.set(new Uint8Array(header_ab));
+        packege.set(new Uint8Array(content_ab), header_ab.byteLength);
+
+        return socketTcpSend(socketId, packege_ab).then(function(sendInfo) {
+            debug && console.debug(sendInfo);
+        });
+    };
+
+    var readData = function(info) {
+        var requestData = arrayBufferToString(info.data).replace(/\r\n/g, '\n');
+        var endIndex = requestData.indexOf('\n\n', endIndex);
+        if (endIndex === -1) {
+            return;
+        }
+        var headers = requestData.substring(0, endIndex).split('\n');
+        var headerMap = {};
+        var requestLine = headers[0].split(' ');
+        headerMap['method'] = requestLine[0];
+        headerMap['url'] = requestLine[1];
+        headerMap['Http-Version'] = requestLine[2];
+        for (var i = 1; i < headers.length; i++) {
+            requestLine = headers[i].split(':', 2);
+            if (requestLine.length === 2) {
+                headerMap[requestLine[0]] = requestLine[1].trim();
+            }
+        }
+        if (headerMap.url === undefined) {
+            return responseData(info.socketId, headerMap, "Don't have url!", ['404 Not Found']);
+        } else {
+            readUrl(headerMap, info.socketId);
+        }
+    };
+
     var socketTcpGetSockets = function() {
         return new Promise(function(resolve) {
             chrome.sockets.tcp.getSockets(resolve);
@@ -291,66 +352,6 @@ engine.webui = function() {
         return new Promise(function(resolve) {
             chrome.sockets.tcp.send(socketId, data, resolve);
         });
-    };
-
-    var responseData = function(socketId, headerMap, content, headers) {
-        var head, header, header_ab;
-
-        if (headers[0].substr(0, 3) === "304") {
-            head = "HTTP/1.1 " + headers.join('\n');
-            header = head + '\n\n';
-            header_ab = stringToArrayBuffer(header);
-
-            return socketTcpSend(socketId, header_ab).then(function(sendInfo) {
-                debug && console.debug(sendInfo);
-            });
-        }
-
-        var content_ab = content;
-        if (typeof content === 'string') {
-            content_ab = stringToArrayBuffer(content);
-        }
-
-        headers.push("Content-Length: " + content_ab.byteLength);
-        headers.push("Connection: keep-alive");
-
-        head = "HTTP/1.1 " + headers.join('\n');
-        header = head + '\n\n';
-        header_ab = stringToArrayBuffer(header);
-
-        var packege_ab = new ArrayBuffer(content_ab.byteLength + header_ab.byteLength);
-        var packege = new Uint8Array(packege_ab);
-        packege.set(new Uint8Array(header_ab));
-        packege.set(new Uint8Array(content_ab), header_ab.byteLength);
-
-        return socketTcpSend(socketId, packege_ab).then(function(sendInfo) {
-            debug && console.debug(sendInfo);
-        });
-    };
-
-    var readData = function(info) {
-        var requestData = arrayBufferToString(info.data).replace(/\r\n/g, '\n');
-        var endIndex = requestData.indexOf('\n\n', endIndex);
-        if (endIndex === -1) {
-            return;
-        }
-        var headers = requestData.substring(0, endIndex).split('\n');
-        var headerMap = {};
-        var requestLine = headers[0].split(' ');
-        headerMap['method'] = requestLine[0];
-        headerMap['url'] = requestLine[1];
-        headerMap['Http-Version'] = requestLine[2];
-        for (var i = 1; i < headers.length; i++) {
-            requestLine = headers[i].split(':', 2);
-            if (requestLine.length === 2) {
-                headerMap[requestLine[0]] = requestLine[1].trim();
-            }
-        }
-        if (headerMap.url === undefined) {
-            return responseData(info.socketId, headerMap, "Don't have url!", ['404 Not Found']);
-        } else {
-            readUrl(headerMap, info.socketId);
-        }
     };
 
     var onSocketReceive = function(info) {
