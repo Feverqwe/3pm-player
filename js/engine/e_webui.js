@@ -419,6 +419,9 @@ engine.webui = function() {
             start().then(function() {
                 active = true;
                 engine.context.update("webUI", {checked: active});
+            }).catch(function(e) {
+                console.error('Can\' start server!', e);
+            }).then(function() {
                 cb && cb();
             });
         },
@@ -426,6 +429,9 @@ engine.webui = function() {
             stop().then(function() {
                 active = false;
                 engine.context.update("webUI", {checked: active});
+            }).catch(function(e) {
+                console.error('Can\' stop server!', e);
+            }).then(function() {
                 cb && cb();
             });
         },
