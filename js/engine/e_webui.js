@@ -2,7 +2,7 @@ engine.webui = function() {
     var active = false;
     var not_found = [];
     var cache = {};
-    var debug = true;
+    var debug = false;
     
     var stringToArrayBuffer = function(string) {
         var buffer = new ArrayBuffer(string.length);
@@ -344,18 +344,6 @@ engine.webui = function() {
         });
     };
 
-    var onReceive = function(info) {
-        debug && console.debug('onReceive', info);
-        setKeepAlive('tcp', info.socketId, true, 15).then(function() {
-            debug && console.debug('setKeepAlive', info.socketId);
-            readData(info);
-        });
-    };
-
-    var onReceiveError = function(info) {
-        console.error('onReceiveError', info);
-    };
-
     var stop = function() {
         var promiseList = ['tcp', 'tcpServer'].map(function(type) {
             return getSockets(type).then(function(socketInfoList) {
@@ -393,6 +381,7 @@ engine.webui = function() {
                 name: '3pm-server-socket'
             }).then(function(createInfo) {
                 debug && console.debug('Create socket', createInfo);
+
                 return listen(createInfo.socketId, '0.0.0.0', _settings.webui_port).then(function(result) {
                     debug && console.debug('Listen', 'result:', result);
                 });
@@ -402,19 +391,28 @@ engine.webui = function() {
         });
     };
 
-    chrome.sockets.tcpServer.onAcceptError.addListener(function(info) {
-        console.error('onAcceptError', info);
-    });
-
     chrome.sockets.tcpServer.onAccept.addListener(function(info) {
         debug && console.debug('onAccept', info);
 
         setPause('tcp', info.clientSocketId, false);
     });
 
-    chrome.sockets.tcp.onReceive.addListener(onReceive);
+    debug && chrome.sockets.tcpServer.onAcceptError.addListener(function(info) {
+        debug && console.error('onAcceptError', info);
+    });
 
-    chrome.sockets.tcp.onReceiveError.addListener(onReceiveError);
+    chrome.sockets.tcp.onReceive.addListener(function(info) {
+        debug && console.debug('onReceive', info);
+
+        setKeepAlive('tcp', info.socketId, true, 15).then(function() {
+            debug && console.debug('setKeepAlive', info.socketId);
+            readData(info);
+        });
+    });
+
+    debug && chrome.sockets.tcp.onReceiveError.addListener(function(info) {
+        debug && console.error('onReceiveError', info);
+    });
 
     return {
         start: function(cb) {
